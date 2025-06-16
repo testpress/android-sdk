@@ -12,12 +12,20 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.AnimationUtils
+import android.widget.ImageButton
+import android.widget.LinearLayout
+import android.widget.TextView
+import androidx.core.view.isVisible
 import androidx.lifecycle.Observer
+import com.airbnb.lottie.LottieAnimationView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
+import `in`.testpress.network.Resource
 
 class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
+    private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
 
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
@@ -35,14 +43,47 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         super.onViewCreated(view, savedInstanceState)
         bindViews(view)
         val contentId = requireArguments().getLong(CONTENT_ID)
-        viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer {
-            when (it?.status) {
+
+        contentReloadObserver = Observer<Resource<DomainContent>>{
+            when (it.status) {
                 Status.SUCCESS -> {
-                    createAttemptAndInitializeExoplayer(it.data!!)
+                    it.data?.let { domainContent ->
+                        if (domainContent.video?.isTranscodingStatusComplete() == true) {
+                            createAttemptAndInitializeExoplayer(it.data!!)
+                        } else {
+                            showVideoTranscodingScreen()
+                        }
+                    }
                 }
                 else -> {}
             }
-        })
+        }
+
+        viewModel.getContent(contentId).observe(viewLifecycleOwner, contentReloadObserver!!)
+
+        val retryButton = exoPlayerMainFrame.findViewById<ImageButton>(R.id.retry_button)
+
+        retryButton.setOnClickListener {
+            hideVideoTranscodingScreen()
+
+            contentReloadObserver?.let {
+                viewModel.getContent(contentId).removeObservers(viewLifecycleOwner)
+            }
+            viewModel.getContent(contentId, true).observe(viewLifecycleOwner, contentReloadObserver!!)
+        }
+    }
+
+    private fun showVideoTranscodingScreen() {
+        exoPlayerMainFrame.findViewById<LottieAnimationView>(R.id.exo_player_progress).isVisible = false
+        exoPlayerMainFrame.findViewById<LinearLayout>(R.id.error_message).isVisible = true
+        exoPlayerMainFrame.findViewById<TextView>(R.id.error_message).setText(R.string.transcoding_message_description)
+        exoPlayerMainFrame.findViewById<ImageButton>(R.id.retry_button).isVisible = true
+    }
+
+    private fun hideVideoTranscodingScreen() {
+        exoPlayerMainFrame.findViewById<ImageButton>(R.id.retry_button).isVisible = false
+        exoPlayerMainFrame.findViewById<LottieAnimationView>(R.id.exo_player_progress).isVisible = true
+        exoPlayerMainFrame.findViewById<LinearLayout>(R.id.error_message).isVisible = false
     }
 
     fun bindViews(view: View) {

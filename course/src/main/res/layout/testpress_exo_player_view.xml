@@ -42,8 +42,8 @@
             />
 
         <TextView android:id="@+id/error_message"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintLeft_toLeftOf="parent"
             app:layout_constraintRight_toRightOf="parent"
             app:layout_constraintTop_toTopOf="parent"
@@ -54,6 +54,18 @@
             android:textColor="#ffffff"
             android:background="#40000000"
             />
+
+        <ImageButton
+            android:id="@+id/retry_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#00000000"
+            android:src="@drawable/baseline_refresh_24"
+            app:layout_constraintLeft_toLeftOf="parent"
+            app:layout_constraintRight_toRightOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/error_message"
+            android:visibility="gone"/>
 
         <TextView android:id="@+id/zoom_mode_text"
             android:layout_width="wrap_content"

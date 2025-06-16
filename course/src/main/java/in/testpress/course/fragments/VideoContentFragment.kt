@@ -194,14 +194,6 @@ open class VideoContentFragment : BaseContentDetailFragment() {
     }
 
     override fun display() {
-        if (content.video?.isTranscodingStatusComplete() == false){
-            displayTranscodingMessage()
-            if (::menu.isInitialized) {
-                menu.findItem(R.id.download)?.isVisible = false
-            }
-            return
-        }
-
         if (content.video?.isViewsExhausted == true) {
             emptyViewFragment.showViewsExhaustedMessage()
             setHasOptionsMenu(false)
@@ -219,13 +211,6 @@ open class VideoContentFragment : BaseContentDetailFragment() {
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
-    }
-
-    private fun displayTranscodingMessage(){
-        emptyViewFragment.setEmptyText(
-            R.string.transcoding_message_title,
-            R.string.transcoding_message_description,
-            null)
     }
 
     override fun onResume() {
