@@ -221,8 +221,23 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
             boolean numberType = attemptQuestion.getType().equals("N");
             questionsView.setNumberType(numberType);
             String value = attemptItem.getCurrentShortText() != null ? attemptItem.getCurrentShortText() : "";
-            htmlContent += "<input class='edit_box' type='text' onpaste='return false'" +
-                    "value='" + value + "' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>";
+            htmlContent += "<input class='edit_box' type='text' onpaste='return false' " +
+                    "value='" + value + "' oninput='onValueChange(this); sanitizeInput(this)' " +
+                    "placeholder='YOUR ANSWER'>" +
+                    "<script>" +
+                    "function sanitizeInput(input) {" +
+                    "  let val = input.value;" +
+                    "  val = val.replace(/,/g, '');" +                    // Remove commas
+                    "  let hasNegative = val.startsWith('-');" +
+                    "  val = val.replace(/-/g, '');" +                    // Remove all dashes
+                    "  let parts = val.split('.');" +
+                    "  if (parts.length > 1) {" +
+                    "    val = parts[0] + '.' + parts.slice(1).join('');" + // Keep first dot, remove others
+                    "  }" +
+                    "  if (hasNegative) val = '-' + val;" +               // Add single dash back if needed
+                    "  input.value = val;" +
+                    "}" +
+                    "</script>";
         }
         htmlContent += "</div>";
         // Add review later button
