@@ -90,8 +90,6 @@ data class DomainExamContent(
     fun isQuizModeEnabled() = enableQuizMode != null && enableQuizMode == true
 
     fun isAttemptResumeDisabled() = disableAttemptResume != null && disableAttemptResume
-
-    fun isDetailFetched() = disableAttemptResume != null
 }
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {
