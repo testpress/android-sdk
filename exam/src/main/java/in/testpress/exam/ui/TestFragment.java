@@ -1570,6 +1570,24 @@ public class TestFragment extends BaseFragment implements
                         .show();
     }
 
+    void showExamEndDialog() {
+        if (getActivity() == null) {
+            return;
+        }
+        resumeExamDialog =
+                new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
+                        .setCancelable(false)
+                        .setMessage(R.string.testpress_exam_end_due_disable_resume)
+                        .setPositiveButton(R.string.testpress_ok,
+                                new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialogInterface, int i) {
+                                        endExam();
+                                    }
+                                })
+                        .show();
+    }
+
     void resumeExam() {
         showProgress(R.string.testpress_please_wait);
         resumeExamApiRequest = apiClient.startAttempt(attempt.getStartUrlFrag())
@@ -1609,7 +1627,11 @@ public class TestFragment extends BaseFragment implements
                 heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog,
                 sectionInfoAlertDialog
         });
-        showResumeExamDialog();
+        if (exam != null && exam.isAttemptResumeDisabled()){
+            showExamEndDialog();
+        } else {
+            showResumeExamDialog();
+        }
     }
 
     @Override
