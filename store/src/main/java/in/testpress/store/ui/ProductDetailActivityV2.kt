@@ -18,7 +18,7 @@ class ProductDetailsActivityV2 : BaseToolBarActivity() {
 
         productId = intent?.getIntExtra(PRODUCT_ID, DEFAULT_PRODUCT_ID) ?: DEFAULT_PRODUCT_ID
 
-        ProductDetailFragment.show(this, binding.fragmentContainer.id, productId)
+        ProductDetailFragmentV2.show(this, binding.fragmentContainer.id, productId)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

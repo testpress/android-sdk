@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Apply Coupon"
+        android:textColor="@color/testpress_black"
+        android:textSize="20sp"
+        android:textStyle="bold" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <EditText
+            android:id="@+id/couponEditText"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/edittext_background"
+            android:hint="Enter Coupon Code"
+            android:imeOptions="actionDone"
+            android:paddingHorizontal="16dp"
+            android:paddingVertical="12dp"
+            android:textColor="@color/testpress_black"
+            android:textSize="16sp" />
+
+        <Button
+            android:id="@+id/applyCouponButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:background="@drawable/button_apply_coupon"
+            android:enabled="false"
+            android:minWidth="72dp"
+            android:minHeight="48dp"
+            android:text="Apply"
+            android:textAllCaps="true"
+            android:textColor="@color/testpress_white"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="16dp" />
+
+    <TextView
+        android:id="@+id/coupon_applied_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="16dp"
+        android:drawableStart="@drawable/baseline_check_24"
+        android:drawablePadding="4dp"
+        android:text="TEST 123 Applied! You have saved ₹600 on this course."
+        android:textColor="@color/testpress_text_gray"
+        android:textSize="16sp"
+        android:visibility="gone" />
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancel_button"
+        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:backgroundTint="@android:color/transparent"
+        android:strokeWidth="1"
+        android:strokeColor="@color/testpress_orange"
+        android:text="Cancel"
+        android:textAllCaps="false"
+        android:textColor="@color/testpress_orange" />
+
+</LinearLayout>
