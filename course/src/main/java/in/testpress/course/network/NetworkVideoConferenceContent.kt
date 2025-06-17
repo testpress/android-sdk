@@ -13,11 +13,12 @@ data class NetworkVideoConferenceContent(
     val password: String? = null,
     val accessToken: String? = null,
     val showRecordedVideo: Boolean? = false,
+    val state: String? = null
 )
 
 fun NetworkVideoConferenceContent.asGreenDaoModel(): VideoConference {
     return VideoConference(
         this.title, this.joinUrl, this.id, this.start, this.duration, this.provider, this.conferenceId,
-        this.accessToken, this.password, this.showRecordedVideo
+        this.accessToken, this.password, this.showRecordedVideo, this.state
     )
 }

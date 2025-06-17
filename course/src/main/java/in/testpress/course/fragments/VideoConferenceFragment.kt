@@ -17,6 +17,7 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
+import androidx.core.view.isVisible
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import io.sentry.Sentry
@@ -27,6 +28,8 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var startButton: Button
     private lateinit var duration: TextView
     private lateinit var startTime: TextView
+    private lateinit var endMessageTitle:TextView
+    private lateinit var endMessageDescription: TextView
     private var videoConferenceHandler: VideoConferenceHandler? = null
     private var profileDetails: ProfileDetails? = null
 
@@ -54,15 +57,16 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         startButton = view.findViewById(R.id.start_button)
         duration = view.findViewById(R.id.duration)
         startTime = view.findViewById(R.id.start_time)
+        endMessageTitle = view.findViewById(R.id.video_conference_title)
+        endMessageDescription = view.findViewById(R.id.video_conference_description)
         ViewUtils.setTypeface(
-            arrayOf(titleView, startTime, duration),
-            TestpressSdk.getRubikMediumFont(activity!!)
+            arrayOf(titleView, startTime, duration, endMessageTitle, endMessageDescription),
+            TestpressSdk.getRubikMediumFont(requireActivity())
         )
     }
 
     override fun display() {
         val videoConference = content.videoConference
-        initializeVideoConferenceHandler(videoConference)
 
         titleView.text = content.title
         titleLayout.visibility = View.VISIBLE
@@ -70,6 +74,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             duration.text = it.duration.toString()
             startTime.text = it.formattedStartDate()
         }
+
+        if (videoConference?.isEnded() == true) {
+            view?.findViewById<LinearLayout>(R.id.video_conference_ended_layout)?.isVisible = true
+            return
+        }
+
+        initializeVideoConferenceHandler(videoConference)
+
         startButton.visibility = View.VISIBLE
         startButton.setOnClickListener {
             showLoadingAndDisableStartButton("JOINING")

@@ -18,6 +18,7 @@ data class DomainVideoConferenceContent(
     val accessToken: String? = null,
     val password: String? = null,
     val showRecordedVideo: Boolean?,
+    val state: String? = null
 ) {
     private fun formattedDate(inputString: String): String {
         var date: Date? = null
@@ -36,6 +37,8 @@ data class DomainVideoConferenceContent(
     }
 
     fun formattedStartDate() = formattedDate(start ?: "")
+
+    fun isEnded() = state?.equals("ended", ignoreCase = true) == true
 }
 
 fun createDomainVideoConferenceContent(video: VideoConference): DomainVideoConferenceContent {
@@ -50,6 +53,7 @@ fun createDomainVideoConferenceContent(video: VideoConference): DomainVideoConfe
         password = video.password,
         accessToken = video.accessToken,
         showRecordedVideo = video.showRecordedVideo,
+        state = video.state
     )
 }
 

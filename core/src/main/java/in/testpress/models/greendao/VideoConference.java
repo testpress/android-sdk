@@ -24,6 +24,7 @@ public class VideoConference {
     private String accessToken;
     private String password;
     private Boolean showRecordedVideo;
+    private String state;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -37,7 +38,7 @@ public class VideoConference {
     }
 
     @Generated
-    public VideoConference(String title, String joinUrl, Long id, String start, Integer duration, String provider, String conferenceId, String accessToken, String password, Boolean showRecordedVideo) {
+    public VideoConference(String title, String joinUrl, Long id, String start, Integer duration, String provider, String conferenceId, String accessToken, String password, Boolean showRecordedVideo, String state) {
         this.title = title;
         this.joinUrl = joinUrl;
         this.id = id;
@@ -48,6 +49,7 @@ public class VideoConference {
         this.accessToken = accessToken;
         this.password = password;
         this.showRecordedVideo = showRecordedVideo;
+        this.state = state;
     }
 
     public String getTitle() {
@@ -128,6 +130,14 @@ public class VideoConference {
 
     public void setShowRecordedVideo(Boolean showRecordedVideo) {
         this.showRecordedVideo = showRecordedVideo;
+    }
+
+    public String getState() {
+        return state;
+    }
+
+    public void setState(String state) {
+        this.state = state;
     }
 
     // KEEP METHODS - put your custom methods here
