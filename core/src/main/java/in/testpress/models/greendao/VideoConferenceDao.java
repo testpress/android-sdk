@@ -32,6 +32,7 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         public final static Property AccessToken = new Property(7, String.class, "accessToken", false, "ACCESS_TOKEN");
         public final static Property Password = new Property(8, String.class, "password", false, "PASSWORD");
         public final static Property ShowRecordedVideo = new Property(9, Boolean.class, "showRecordedVideo", false, "SHOW_RECORDED_VIDEO");
+        public final static Property State = new Property(10, String.class, "state", false, "STATE");
     }
 
 
@@ -56,7 +57,8 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
                 "\"CONFERENCE_ID\" TEXT," + // 6: conferenceId
                 "\"ACCESS_TOKEN\" TEXT," + // 7: accessToken
                 "\"PASSWORD\" TEXT," + // 8: password
-                "\"SHOW_RECORDED_VIDEO\" INTEGER);"); // 9: showRecordedVideo
+                "\"SHOW_RECORDED_VIDEO\" INTEGER," + // 9: showRecordedVideo
+                "\"STATE\" TEXT);"); // 10: state
     }
 
     /** Drops the underlying database table. */
@@ -118,6 +120,11 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         if (showRecordedVideo != null) {
             stmt.bindLong(10, showRecordedVideo ? 1L: 0L);
         }
+ 
+        String state = entity.getState();
+        if (state != null) {
+            stmt.bindString(11, state);
+        }
     }
 
     @Override
@@ -173,6 +180,11 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         if (showRecordedVideo != null) {
             stmt.bindLong(10, showRecordedVideo ? 1L: 0L);
         }
+ 
+        String state = entity.getState();
+        if (state != null) {
+            stmt.bindString(11, state);
+        }
     }
 
     @Override
@@ -192,7 +204,8 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // conferenceId
             cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // accessToken
             cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8), // password
-            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0 // showRecordedVideo
+            cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0, // showRecordedVideo
+            cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10) // state
         );
         return entity;
     }
@@ -209,6 +222,7 @@ public class VideoConferenceDao extends AbstractDao<VideoConference, Long> {
         entity.setAccessToken(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
         entity.setPassword(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
         entity.setShowRecordedVideo(cursor.isNull(offset + 9) ? null : cursor.getShort(offset + 9) != 0);
+        entity.setState(cursor.isNull(offset + 10) ? null : cursor.getString(offset + 10));
      }
     
     @Override

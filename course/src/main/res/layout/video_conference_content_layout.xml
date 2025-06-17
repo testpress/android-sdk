@@ -160,6 +160,44 @@
                     android:textAppearance="@style/TextAppearance.MaterialComponents.Button"
                     android:visibility="gone"
                     app:cornerRadius="5dp" />
+
+                    <LinearLayout
+                        android:id="@+id/video_conference_ended_layout"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="32dp"
+                        android:visibility="gone"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:padding="24dp">
+
+                        <ImageView
+                            android:layout_width="48dp"
+                            android:layout_height="48dp"
+                            android:layout_marginBottom="16dp"
+                            android:background="@drawable/circle_green_background"
+                            android:src="@drawable/round_warning_amber_24"
+                            android:scaleType="center" />
+
+                        <TextView
+                            android:id="@+id/video_conference_title"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="This Video Conference has ended"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Subtitle1"
+                            android:textColor="@color/black"
+                            android:layout_marginBottom="8dp"
+                            android:textAlignment="center" />
+
+                        <TextView
+                            android:id="@+id/video_conference_description"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="This live session has ended. See you in the next one!"
+                            android:textAppearance="@style/TextAppearance.MaterialComponents.Body2"
+                            android:textColor="?android:attr/textColorSecondary"
+                            android:textAlignment="center" />
+                    </LinearLayout>
                 </LinearLayout>
 
 
