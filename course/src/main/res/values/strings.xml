@@ -76,6 +76,8 @@
     <string name="live_stream_concluded_no_recording_desc">The live stream has ended. See you at the next one!</string>
 
     <string name="transcoding_message_description">The video is being processed and will be available shortly.</string>
+    <string name="video_conference_ended_title">This Video Conference has ended</string>
+    <string name="video_conference_ended_description">This live session has ended. See you in the next one!</string>
 
     //
     <string name="testpress_running_contents">Running</string>

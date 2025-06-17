@@ -38,9 +38,7 @@ data class DomainVideoConferenceContent(
 
     fun formattedStartDate() = formattedDate(start ?: "")
 
-    fun isEnded(): Boolean {
-        return state != null && state.lowercase() == "ended"
-    }
+    fun isEnded() = state?.equals("ended", ignoreCase = true) == true
 }
 
 fun createDomainVideoConferenceContent(video: VideoConference): DomainVideoConferenceContent {
