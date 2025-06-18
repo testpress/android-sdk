@@ -83,7 +83,7 @@ public class ExamSampleActivity extends BaseToolBarActivity {
                     .setBookmarksEnabled(true)
                     .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
-                    .setAndroidSentryDns("https://186f9948d5294b4c9c03aa9d2a11c982@sentry.testpress.in/3")
+                    .setAndroidSentryDns("https://35dcf0dbd28045628831e62dd959ae4b@sentry.testpress.in/5")
                     .setCoursesGamificationEnabled(false);
             TestpressSdk.setTestpressSession(this, session);
             switch (clickedButtonId) {

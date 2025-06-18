@@ -1001,31 +1001,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         String username = (profileDetails != null) ? profileDetails.getUsernameOrEmail() : "null";
         String packageName = (activity != null) ? activity.getPackageName() : "Package name not available";
         long contentId = (content != null) ? content.getId() : -1;
-        String cause = "Cause not found";
-        try {
-            cause = exception.getCause().toString();
-        } catch (Exception ignored){}
-        String finalCause = cause;
-        Sentry.captureMessage(
-                errorMessage, new ScopeCallback() {
-                    @Override
-                    public void run(@org.jetbrains.annotations.NotNull Scope scope) {
-                        scope.setTag("playback_id", playbackId);
-                        scope.setTag("package_name", packageName);
-                        scope.setTag("user_name", username);
-                        scope.setContexts(
-                                "Player Error",
-                                new HashMap<String, Object>() {{
-                                    put("Content Id", contentId);
-                                    put("Playback Id", playbackId);
-                                    put("Error Code", exception.errorCode);
-                                    put("Error Message", exception.getMessage());
-                                    put("Error Cause", finalCause);
-                                }}
-                        );
-
-                    }
-                }
+        SentryLoggerKt.logPlaybackException(
+                username,
+                packageName,
+                contentId,
+                errorMessage,
+                playbackId,
+                exception
         );
     }
 }
