@@ -11,8 +11,6 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
-import android.media.MediaCodecInfo;
-import android.media.MediaCodecList;
 import android.os.Build;
 import android.os.Handler;
 import android.text.Html;
@@ -442,7 +440,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     public MediaItem getMediaItem(boolean isDownloaded) {
         MediaItem mediaItem = new MediaItem.Builder()
-                .setUri(url+"d")
+                .setUri(url)
                 .setDrmUuid(C.WIDEVINE_UUID)
                 .setDrmMultiSession(true).build();
 
