@@ -4,7 +4,7 @@ import android.media.MediaCodecList
 import com.google.android.exoplayer2.PlaybackException
 import io.sentry.Scope
 import io.sentry.Sentry
-import java.util.*
+import io.sentry.SentryLevel
 
 fun logPlaybackException(
     username: String,
@@ -18,7 +18,8 @@ fun logPlaybackException(
         "Content Id" to contentId,
         "Playback Id" to playbackId,
         "Error Code" to exception.errorCode,
-        "Error Message" to exception.message,
+        "Player Error Message" to errorMessage,
+        "Exception Error Message" to exception.message,
         "Error Cause" to (exception.cause?.toString() ?: "Cause not found")
     )
 
@@ -27,7 +28,8 @@ fun logPlaybackException(
             .getOrElse { ex -> "Failed to get codec info: ${ex.message}" }
     }
 
-    Sentry.captureMessage(errorMessage) { scope: Scope ->
+    Sentry.captureException(exception) { scope: Scope ->
+        scope.level = SentryLevel.ERROR
         scope.setTag("playback_id", playbackId)
         scope.setTag("package_name", packageName)
         scope.setTag("user_name", username)
