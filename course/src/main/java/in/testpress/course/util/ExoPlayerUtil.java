@@ -11,6 +11,8 @@ import android.content.pm.ActivityInfo;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.media.MediaCodec;
+import android.media.MediaCodecInfo;
+import android.media.MediaCodecList;
 import android.os.Build;
 import android.os.Handler;
 import android.text.Html;
@@ -440,7 +442,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     public MediaItem getMediaItem(boolean isDownloaded) {
         MediaItem mediaItem = new MediaItem.Builder()
-                .setUri(url)
+                .setUri(url+"d")
                 .setDrmUuid(C.WIDEVINE_UUID)
                 .setDrmMultiSession(true).build();
 
@@ -1001,31 +1003,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         String username = (profileDetails != null) ? profileDetails.getUsernameOrEmail() : "null";
         String packageName = (activity != null) ? activity.getPackageName() : "Package name not available";
         long contentId = (content != null) ? content.getId() : -1;
-        String cause = "Cause not found";
-        try {
-            cause = exception.getCause().toString();
-        } catch (Exception ignored){}
-        String finalCause = cause;
-        Sentry.captureMessage(
-                errorMessage, new ScopeCallback() {
-                    @Override
-                    public void run(@org.jetbrains.annotations.NotNull Scope scope) {
-                        scope.setTag("playback_id", playbackId);
-                        scope.setTag("package_name", packageName);
-                        scope.setTag("user_name", username);
-                        scope.setContexts(
-                                "Player Error",
-                                new HashMap<String, Object>() {{
-                                    put("Content Id", contentId);
-                                    put("Playback Id", playbackId);
-                                    put("Error Code", exception.errorCode);
-                                    put("Error Message", exception.getMessage());
-                                    put("Error Cause", finalCause);
-                                }}
-                        );
-
-                    }
-                }
+        SentryLoggerKt.logPlaybackException(
+                username,
+                packageName,
+                contentId,
+                errorMessage,
+                playbackId,
+                exception
         );
     }
 }
