@@ -42,12 +42,21 @@ private fun getAVCCodecSupportInfo(): Map<String, Map<String, Any>> {
     return codecList.codecInfos
         .filter { !it.isEncoder && "avc" in it.name.lowercase() }
         .associate { codec ->
-            val capabilities = codec.getCapabilitiesForType("video/avc").videoCapabilities
+            val capabilities = codec.getCapabilitiesForType("video/avc")
+            val videoCapabilities = capabilities.videoCapabilities
+            val profileLevels = capabilities.profileLevels.map {
+                mapOf(
+                    "Profile" to it.profile,
+                    "Level" to it.level
+                )
+            }
+
             codec.name to mapOf(
-                "Width Alignment" to capabilities.widthAlignment,
-                "Height Alignment" to capabilities.heightAlignment,
-                "Supported Widths" to capabilities.supportedWidths.toString(),
-                "Supported Heights" to capabilities.supportedHeights.toString()
+                "Width Alignment" to videoCapabilities.widthAlignment,
+                "Height Alignment" to videoCapabilities.heightAlignment,
+                "Supported Widths" to videoCapabilities.supportedWidths.toString(),
+                "Supported Heights" to videoCapabilities.supportedHeights.toString(),
+                "Supported Profiles & Levels" to profileLevels
             )
         }
 }
