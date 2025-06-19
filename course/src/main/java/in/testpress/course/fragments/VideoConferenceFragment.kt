@@ -84,9 +84,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         }
 
         videoConference?.accessToken?.let { token ->
-            if (JWT(token).isExpired(10) && reloadContent < maxReloadContent) {
-                reloadContent++
-                forceReloadContent()
+            try {
+                if (JWT(token).isExpired(10) && reloadContent < maxReloadContent) {
+                    reloadContent++
+                    forceReloadContent()
+                    return
+                }
+            } catch (e: Exception) {
+                Sentry.captureException(e)
                 return
             }
         }
