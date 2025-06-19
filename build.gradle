@@ -92,6 +92,7 @@ ext {
     kotlinxCoroutinesCore = "org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.3"
     kotlinxCoroutinesAndroid = "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.3.3"
     flexboxLayout = "com.google.android.flexbox:flexbox:3.0.0"
+    jwtdecode = "com.auth0.android:jwtdecode:2.0.2"
 
     // Payment Dependencies
     payUCheckoutPro = "in.payu:payu-checkout-pro:1.8.0"

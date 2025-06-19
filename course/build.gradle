@@ -66,6 +66,7 @@ dependencies {
     api rootProject.doubleTapPlayerView
     api rootProject.pagingRuntime
     api rootProject.pagingCommon
+    api rootProject.jwtdecode
     debugImplementation rootProject.fragmentTestingExtensions
 
     testImplementation rootProject.junit

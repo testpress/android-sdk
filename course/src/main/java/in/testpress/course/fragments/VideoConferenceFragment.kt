@@ -18,6 +18,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
+import com.auth0.android.jwt.JWT
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import io.sentry.Sentry
@@ -32,6 +33,8 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var endMessageDescription: TextView
     private var videoConferenceHandler: VideoConferenceHandler? = null
     private var profileDetails: ProfileDetails? = null
+    private var reloadContent = 0
+    private val maxReloadContent = 3
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -78,6 +81,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         if (videoConference?.isEnded() == true) {
             view?.findViewById<LinearLayout>(R.id.video_conference_ended_layout)?.isVisible = true
             return
+        }
+
+        videoConference?.accessToken?.let { token ->
+            if (JWT(token).isExpired(10) && reloadContent < maxReloadContent) {
+                reloadContent++
+                forceReloadContent()
+                return
+            }
         }
 
         initializeVideoConferenceHandler(videoConference)
