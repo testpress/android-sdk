@@ -33,6 +33,7 @@ fun logPlaybackException(
         scope.setTag("playback_id", playbackId)
         scope.setTag("package_name", packageName)
         scope.setTag("user_name", username)
+        scope.setTag("exoplayer_error_code", exception.errorCode.toString())
         scope.setContexts("Player Error", extraInfo)
     }
 }
