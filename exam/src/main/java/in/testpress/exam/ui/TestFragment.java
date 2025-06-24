@@ -4,8 +4,10 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.Dialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -22,6 +24,7 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -115,7 +118,7 @@ public class TestFragment extends BaseFragment implements
     Attempt attempt;
     private Exam exam;
     private Content courseContent;
-    private CourseAttempt courseAttempt;
+    CourseAttempt courseAttempt;
     private int currentQuestionIndex;
     List<AttemptSection> sections = new ArrayList<>();
     List<AttemptItem> attemptItemList = new ArrayList<>();
@@ -148,9 +151,12 @@ public class TestFragment extends BaseFragment implements
     private EventsTrackerFacade eventsTrackerFacade;
     private AttemptViewModel attemptViewModel;
 
+    private String TAG = "TAG";
+
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Log.d(TAG, "onCreate: ");
         attemptViewModel = AttemptViewModel.Companion.initializeViewModel(requireActivity());
         initializeAttemptAndExamVariables(savedInstanceState);
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
@@ -188,6 +194,7 @@ public class TestFragment extends BaseFragment implements
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
+        Log.d(TAG, "onCreateView: ");
 
         return inflater.inflate(R.layout.testpress_fragment_test_engine, container, false);
     }
@@ -195,6 +202,7 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
+        Log.d(TAG, "onViewCreated: ");
         bindViews();
         initializeProgressDialog();
         initializeListeners();
@@ -692,6 +700,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void observeAttemptItemResources(){
+        Log.d(TAG, "observeAttemptItemResources: ");
         attemptViewModel.getAttemptItemsResource().observe(requireActivity(), new Observer<Resource<List<AttemptItem>>>() {
             @Override
             public void onChanged(Resource<List<AttemptItem>> listResource) {
@@ -763,7 +772,9 @@ public class TestFragment extends BaseFragment implements
                         break;
                     }
                     case LOADING:{
-                        progressDialog.show();
+                        if (isAdded()) {
+                            progressDialog.show();
+                        }
                         break;
                     }
                     case ERROR:{
@@ -1637,12 +1648,14 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         attempt.setSections(sections);
+        Log.d(TAG, "onSaveInstanceState: ");
         outState.putParcelable(PARAM_ATTEMPT, attempt);
         super.onSaveInstanceState(outState);
     }
 
     @Override
     public void onResume() {
+        Log.d(TAG, "onResume: ");
         super.onResume();
         removeAppBackgroundHandler();
     }
@@ -1657,6 +1670,7 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onStop() {
         super.onStop();
+        Log.d(TAG, "onStop: ");
         saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
         appBackgroundStateHandler = new Handler();
         appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
@@ -1672,6 +1686,7 @@ public class TestFragment extends BaseFragment implements
 
     @Override
     public Dialog[] getDialogs() {
+        Log.d(TAG, "getDialogs: ");
         return new Dialog[] {
                 progressDialog, resumeExamDialog, heartBeatAlertDialog, saveAnswerAlertDialog,
                 networkErrorAlertDialog
@@ -1680,6 +1695,7 @@ public class TestFragment extends BaseFragment implements
 
     @Override
     public void onDestroy() {
+        Log.d(TAG, "onDestroy: ");
         stopTimer();
         removeAppBackgroundHandler();
         super.onDestroy();
@@ -1698,5 +1714,53 @@ public class TestFragment extends BaseFragment implements
 
     private boolean isOfflineExam() {
         return exam != null && Boolean.TRUE.equals(exam.getIsOfflineExam());
+    }
+
+    @Override
+    public void onLowMemory() {
+        super.onLowMemory();
+        Log.d(TAG, "onLowMemory: ");
+    }
+
+    @Override
+    public void onDestroyView() {
+        super.onDestroyView();
+        Log.d(TAG, "onDestroyView: ");
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        super.onAttach(context);
+        Log.d(TAG, "onAttach: ");
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        Log.d(TAG, "onDetach: ");
+    }
+
+    @Override
+    public void onConfigurationChanged(@NonNull Configuration newConfig) {
+        super.onConfigurationChanged(newConfig);
+        Log.d(TAG, "onConfigurationChanged: ");
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.d(TAG, "onPause: ");
+    }
+
+    @Override
+    public void onStart() {
+        super.onStart();
+        Log.d(TAG, "onStart: ");
+    }
+
+    @Override
+    public void onPrimaryNavigationFragmentChanged(boolean isPrimaryNavigationFragment) {
+        super.onPrimaryNavigationFragmentChanged(isPrimaryNavigationFragment);
+        Log.d(TAG, "onPrimaryNavigationFragmentChanged: ");
     }
 }

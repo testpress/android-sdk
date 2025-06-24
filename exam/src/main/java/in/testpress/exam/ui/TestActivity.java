@@ -136,10 +136,21 @@ public class TestActivity extends BaseToolBarActivity  {
             TestFragment testFragment = getCurrentFragment();
             if (testFragment != null) {
                 attempt = testFragment.attempt;
+                courseAttempt = testFragment.courseAttempt;
+
+                if (attempt == null){
+                    attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
+                }
+
+                if (courseAttempt == null){
+                    courseAttempt = savedInstanceState.getParcelable(PARAM_COURSE_ATTEMPT);
+                }
+
                 getSupportFragmentManager().beginTransaction().remove(testFragment)
                         .commitAllowingStateLoss();
             } else {
                 attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
+                courseAttempt = savedInstanceState.getParcelable(PARAM_COURSE_ATTEMPT);
             }
             permission = savedInstanceState.getParcelable(PARAM_PERMISSION);
             languages = savedInstanceState.getParcelableArrayList(PARAM_LANGUAGES);
@@ -149,7 +160,9 @@ public class TestActivity extends BaseToolBarActivity  {
             attempt = data.getParcelable(PARAM_ATTEMPT);
         }
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
-        courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
+        if (courseAttempt == null){
+            courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
+        }
         onDataInitialized();
         observePermissionResources();
         observeLanguageResources();
@@ -542,7 +555,11 @@ public class TestActivity extends BaseToolBarActivity  {
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            startExam(true);
+                            if (exam.isAttemptResumeDisabled()) {
+                                endExam();
+                            } else {
+                                startExam(true);
+                            }
                         }});
             durationLabel.setText(getString(R.string.testpress_time_remaining));
             examDuration.setText(attempt.getRemainingTime());
@@ -749,6 +766,7 @@ public class TestActivity extends BaseToolBarActivity  {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(PARAM_EXAM, exam);
         outState.putParcelable(PARAM_ATTEMPT, attempt);
+        outState.putParcelable(PARAM_COURSE_ATTEMPT, courseAttempt);
         outState.putParcelable(PARAM_PERMISSION, permission);
         if (languages != null) {
             outState.putParcelableArrayList(PARAM_LANGUAGES, new ArrayList<>(languages));
