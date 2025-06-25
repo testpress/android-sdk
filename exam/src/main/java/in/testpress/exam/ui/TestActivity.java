@@ -5,7 +5,6 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -153,9 +152,7 @@ public class TestActivity extends BaseToolBarActivity  {
             attempt = data.getParcelable(PARAM_ATTEMPT);
         }
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
-        if (courseAttempt == null){
-            courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
-        }
+        courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
         retrieveDataFromSavedInstanceState(savedInstanceState);
         onDataInitialized();
         observePermissionResources();
