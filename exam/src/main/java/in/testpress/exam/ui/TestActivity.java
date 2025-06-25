@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
@@ -136,10 +137,12 @@ public class TestActivity extends BaseToolBarActivity  {
             TestFragment testFragment = getCurrentFragment();
             if (testFragment != null) {
                 attempt = testFragment.attempt;
+                courseAttempt = testFragment.courseAttempt;
                 getSupportFragmentManager().beginTransaction().remove(testFragment)
                         .commitAllowingStateLoss();
             } else {
                 attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
+                courseAttempt = savedInstanceState.getParcelable(PARAM_COURSE_ATTEMPT);
             }
             permission = savedInstanceState.getParcelable(PARAM_PERMISSION);
             languages = savedInstanceState.getParcelableArrayList(PARAM_LANGUAGES);
@@ -150,11 +153,24 @@ public class TestActivity extends BaseToolBarActivity  {
         }
         courseContent = data.getParcelable(PARAM_COURSE_CONTENT);
         courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
+        retrieveDataFromSavedInstanceState(savedInstanceState);
         onDataInitialized();
         observePermissionResources();
         observeLanguageResources();
         observeContentAttemptResources();
         observeAttemptResources();
+    }
+
+    private void retrieveDataFromSavedInstanceState(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) return;
+
+        if (attempt == null) {
+            attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
+        }
+
+        if (courseAttempt == null) {
+            courseAttempt = savedInstanceState.getParcelable(PARAM_COURSE_ATTEMPT);
+        }
     }
 
     void observePermissionResources(){
@@ -542,7 +558,11 @@ public class TestActivity extends BaseToolBarActivity  {
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            startExam(true);
+                            if (exam.isAttemptResumeDisabled()) {
+                                endExam();
+                            } else {
+                                startExam(true);
+                            }
                         }});
             durationLabel.setText(getString(R.string.testpress_time_remaining));
             examDuration.setText(attempt.getRemainingTime());
@@ -749,6 +769,7 @@ public class TestActivity extends BaseToolBarActivity  {
     protected void onSaveInstanceState(Bundle outState) {
         outState.putParcelable(PARAM_EXAM, exam);
         outState.putParcelable(PARAM_ATTEMPT, attempt);
+        outState.putParcelable(PARAM_COURSE_ATTEMPT, courseAttempt);
         outState.putParcelable(PARAM_PERMISSION, permission);
         if (languages != null) {
             outState.putParcelableArrayList(PARAM_LANGUAGES, new ArrayList<>(languages));

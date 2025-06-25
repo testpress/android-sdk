@@ -115,7 +115,7 @@ public class TestFragment extends BaseFragment implements
     Attempt attempt;
     private Exam exam;
     private Content courseContent;
-    private CourseAttempt courseAttempt;
+    CourseAttempt courseAttempt;
     private int currentQuestionIndex;
     List<AttemptSection> sections = new ArrayList<>();
     List<AttemptItem> attemptItemList = new ArrayList<>();
@@ -692,7 +692,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void observeAttemptItemResources(){
-        attemptViewModel.getAttemptItemsResource().observe(requireActivity(), new Observer<Resource<List<AttemptItem>>>() {
+        attemptViewModel.getAttemptItemsResource().observe(getViewLifecycleOwner(), new Observer<Resource<List<AttemptItem>>>() {
             @Override
             public void onChanged(Resource<List<AttemptItem>> listResource) {
                 switch (listResource.getStatus()){
@@ -927,7 +927,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void observeSaveAnswerResource() {
-        attemptViewModel.getSaveResultResource().observe(requireActivity(), new Observer<Resource<Triple<Integer, AttemptItem, Action>>>() {
+        attemptViewModel.getSaveResultResource().observe(getViewLifecycleOwner(), new Observer<Resource<Triple<Integer, AttemptItem, Action>>>() {
             @Override
             public void onChanged(Resource<Triple<Integer, AttemptItem, Action>> hashMapResource) {
                 if (hashMapResource == null || getActivity() == null) {
@@ -1051,7 +1051,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     void observeUpdateSectionResource() {
-        attemptViewModel.getUpdateSectionResource().observe(requireActivity(), new Observer<Resource<Pair<NetworkAttemptSection, Action>>>() {
+        attemptViewModel.getUpdateSectionResource().observe(getViewLifecycleOwner(), new Observer<Resource<Pair<NetworkAttemptSection, Action>>>() {
             @Override
             public void onChanged(Resource<Pair<NetworkAttemptSection, Action>> pairResource) {
                 if (pairResource == null || getActivity() == null) {
@@ -1154,7 +1154,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void observeEndContentAttemptResources(){
-        attemptViewModel.getEndContentAttemptResource().observe(requireActivity(), new Observer<Resource<CourseAttempt>>() {
+        attemptViewModel.getEndContentAttemptResource().observe(getViewLifecycleOwner(), new Observer<Resource<CourseAttempt>>() {
             @Override
             public void onChanged(Resource<CourseAttempt> courseAttemptResource) {
                 switch (courseAttemptResource.getStatus()){
@@ -1198,7 +1198,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void observeEndAttemptResources() {
-        attemptViewModel.getEndAttemptResource().observe(requireActivity(), new Observer<Resource<Attempt>>() {
+        attemptViewModel.getEndAttemptResource().observe(getViewLifecycleOwner(), new Observer<Resource<Attempt>>() {
             @Override
             public void onChanged(Resource<Attempt> attemptResource) {
                 switch (attemptResource.getStatus()){
