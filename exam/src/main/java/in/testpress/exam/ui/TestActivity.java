@@ -5,6 +5,8 @@ import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+
+import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
@@ -137,15 +139,6 @@ public class TestActivity extends BaseToolBarActivity  {
             if (testFragment != null) {
                 attempt = testFragment.attempt;
                 courseAttempt = testFragment.courseAttempt;
-
-                if (attempt == null){
-                    attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
-                }
-
-                if (courseAttempt == null){
-                    courseAttempt = savedInstanceState.getParcelable(PARAM_COURSE_ATTEMPT);
-                }
-
                 getSupportFragmentManager().beginTransaction().remove(testFragment)
                         .commitAllowingStateLoss();
             } else {
@@ -163,11 +156,24 @@ public class TestActivity extends BaseToolBarActivity  {
         if (courseAttempt == null){
             courseAttempt = data.getParcelable(PARAM_COURSE_ATTEMPT);
         }
+        retrieveDataFromSavedInstanceState(savedInstanceState);
         onDataInitialized();
         observePermissionResources();
         observeLanguageResources();
         observeContentAttemptResources();
         observeAttemptResources();
+    }
+
+    private void retrieveDataFromSavedInstanceState(@Nullable Bundle savedInstanceState) {
+        if (savedInstanceState == null) return;
+
+        if (attempt == null) {
+            attempt = savedInstanceState.getParcelable(PARAM_ATTEMPT);
+        }
+
+        if (courseAttempt == null) {
+            courseAttempt = savedInstanceState.getParcelable(PARAM_COURSE_ATTEMPT);
+        }
     }
 
     void observePermissionResources(){

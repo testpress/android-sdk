@@ -148,8 +148,6 @@ public class TestFragment extends BaseFragment implements
     private EventsTrackerFacade eventsTrackerFacade;
     private AttemptViewModel attemptViewModel;
 
-    private String TAG = "TAG";
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
