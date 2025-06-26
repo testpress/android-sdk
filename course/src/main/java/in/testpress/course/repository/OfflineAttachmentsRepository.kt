@@ -22,7 +22,7 @@ class OfflineAttachmentsRepository(
         DownloadQueueManager.setCallback(this)
     }
 
-    fun getAll(): List<OfflineAttachment> = dao.getAll()
+    suspend fun getAll(): List<OfflineAttachment> = dao.getAll()
 
     fun getAllFiles(): Flow<List<OfflineAttachment>> = dao.getAllFiles()
 

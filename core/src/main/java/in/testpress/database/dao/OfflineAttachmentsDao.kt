@@ -11,7 +11,7 @@ interface OfflineAttachmentsDao {
     fun getAllFiles(): Flow<List<OfflineAttachment>>
 
     @Query("SELECT * FROM OfflineAttachment ORDER BY id DESC")
-    fun getAll(): List<OfflineAttachment>
+    suspend fun getAll(): List<OfflineAttachment>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(file: OfflineAttachment)
