@@ -233,6 +233,7 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                     @Override
                     public void onSuccess(final Order confirmedOrder) {
                         if (confirmedOrder.getStatus().equals("Completed")) {
+                            logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
                             showPaymentSuccessScreen();
                         } else {
                             progressBar.setVisibility(View.GONE);
