@@ -92,7 +92,7 @@ fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
             OfflineAttachmentList(
                 attachments = attachments!!,
                 onOpenFile = { file ->
-                    if (file.status == OfflineAttachmentDownloadStatus.DOWNLOADED) {
+                    if (file.status == OfflineAttachmentDownloadStatus.COMPLETED) {
                         viewModel.openFile(context, file)
                     }
                 },
@@ -335,7 +335,7 @@ fun getAttachmentStatusText(
     attachmentProgress: Int
 ): String {
     return when (attachmentStatus) {
-        OfflineAttachmentDownloadStatus.DOWNLOADED -> "Tap to open"
+        OfflineAttachmentDownloadStatus.COMPLETED -> "Tap to open"
         OfflineAttachmentDownloadStatus.FAILED -> "Download Failed"
         OfflineAttachmentDownloadStatus.QUEUED -> "Waiting to download..."
         OfflineAttachmentDownloadStatus.DOWNLOADING -> "Downloading...${attachmentProgress}%"
@@ -372,7 +372,7 @@ private fun AttachmentBottomSheet(
                 }
             }
 
-            OfflineAttachmentDownloadStatus.DOWNLOADED,
+            OfflineAttachmentDownloadStatus.COMPLETED,
             OfflineAttachmentDownloadStatus.DELETE,
             OfflineAttachmentDownloadStatus.FAILED -> {
                 TextButton(
@@ -413,7 +413,7 @@ fun OfflineAttachmentListPreview() {
             title = "Chapter 1 Notes",
             url = "",
             path = "/path/to/file1.pdf",
-            status = OfflineAttachmentDownloadStatus.DOWNLOADED,
+            status = OfflineAttachmentDownloadStatus.COMPLETED,
             progress = 100
         ),
         OfflineAttachment(

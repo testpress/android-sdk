@@ -54,7 +54,7 @@ class OfflineAttachmentsRepository(
 
     override fun onDownloadCompleted(item: DownloadItem) {
         scope.launch {
-            updateStatus(item.id, OfflineAttachmentDownloadStatus.DOWNLOADED)
+            updateStatus(item.id, OfflineAttachmentDownloadStatus.COMPLETED)
         }
     }
 
