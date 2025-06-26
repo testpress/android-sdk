@@ -161,4 +161,27 @@ object DownloadQueueManager {
             }
         }
     }
+
+    fun syncDownloadedFileWithDatabase(context: Context) {
+        downloadScope.launch {
+            val dao = TestpressDatabase.invoke(context.applicationContext).offlineAttachmentDao()
+            val repo = OfflineAttachmentsRepository(dao, downloadScope)
+            val offlineAttachments = repo.getAll()
+
+            offlineAttachments.forEach { offlineAttachment ->
+                try {
+                    val path = offlineAttachment.path
+                    if (path.isNotBlank()) {
+                        val file = File(path)
+                        if (!file.exists()) {
+                            repo.updateStatus(offlineAttachment.id, OfflineAttachmentDownloadStatus.DELETE)
+                        }
+                    }
+                } catch (e: Exception) {
+                    Log.e("DownloadQueueManager", "Error checking file for attachment ID: ${offlineAttachment.id}", e)
+                }
+            }
+        }
+    }
+
 }
