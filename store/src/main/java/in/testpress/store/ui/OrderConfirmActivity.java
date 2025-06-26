@@ -232,11 +232,15 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                 .enqueue(new TestpressCallback<Order>() {
                     @Override
                     public void onSuccess(final Order confirmedOrder) {
-                        progressBar.setVisibility(View.GONE);
-                        order.setOrderId(confirmedOrder.getOrderId()); // orderId for Razorpay order gets assigned by Razorpay on confirming
-                        PaymentGateway paymentGateway = new PaymentGatewayFactory().create(confirmedOrder, OrderConfirmActivity.this);
-                        paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
-                        paymentGateway.showPaymentPage();
+                        if (confirmedOrder.getStatus().equals("Completed")) {
+                            showPaymentSuccessScreen();
+                        } else {
+                            progressBar.setVisibility(View.GONE);
+                            order.setOrderId(confirmedOrder.getOrderId()); // orderId for Razorpay order gets assigned by Razorpay on confirming
+                            PaymentGateway paymentGateway = new PaymentGatewayFactory().create(confirmedOrder, OrderConfirmActivity.this);
+                            paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
+                            paymentGateway.showPaymentPage();
+                        }
                     }
 
                     @Override
