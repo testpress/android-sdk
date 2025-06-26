@@ -22,13 +22,15 @@ class OfflineAttachmentsRepository(
         DownloadQueueManager.setCallback(this)
     }
 
+    suspend fun getAll(): List<OfflineAttachment> = dao.getAll()
+
     fun getAllFiles(): Flow<List<OfflineAttachment>> = dao.getAllFiles()
 
     suspend fun insert(file: OfflineAttachment) = dao.insert(file)
 
     suspend fun delete(id: Long) = dao.deleteById(id)
 
-    private suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus) =
+    suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus) =
         dao.updateStatus(id, status)
 
     private suspend fun updateProgress(id: Long, progress: Int) = dao.updateProgress(id, progress)
