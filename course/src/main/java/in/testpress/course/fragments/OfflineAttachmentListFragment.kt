@@ -339,7 +339,7 @@ fun getAttachmentStatusText(
         OfflineAttachmentDownloadStatus.FAILED -> "Download Failed"
         OfflineAttachmentDownloadStatus.QUEUED -> "Waiting to download..."
         OfflineAttachmentDownloadStatus.DOWNLOADING -> "Downloading...${attachmentProgress}%"
-        OfflineAttachmentDownloadStatus.DELETE -> "This content have been removed"
+        OfflineAttachmentDownloadStatus.DELETE -> "This content has been removed"
     }
 }
 
