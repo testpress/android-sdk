@@ -53,22 +53,40 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
     }
 
     private fun initializeExitText() {
-        binding.btnDownload.setOnClickListener {
-            val attachment = DomainAttachmentContent(
-                id = 1,
-                title = "Attach 1",
-                attachmentUrl = "https://d36vpug2b5drql.cloudfront.net/institute/lmsdemo/private/courses/492/attachments/bc037ba7f7654d9a958bb405c6e8f49d.png?response-content-disposition=attachment%3B%20filename%3Dimage.png&Expires=1748513422&Signature=QZgtgNGzaXAZEbUvtjDVA1ur4mm47NiUtBnAy6IkDoj6jaWCqz5yyJSxgVpMv-rVEb-JNgDnXqBLcCyqO9jQu-vb5FNw2nlw4PQ7mFn2fBHx3HhFUWFZXqcN4kMPyHo4AYLPPwcx00Ri-HpujyZDOudMaH0~rdgMB9roBBpVCa2Ta5WXJ~h4tWcrsMd~U9COwrN2o0CHO62sJ~z2lsw7PTahFj8ly2TWRgAO0n8UIN-3-JknUaZPqd0nocZEzurxaf6tia9qHfx5B4q8JQZfnjcCAMzWZ3xViZFjD7EECFR-NNvqsVyKfA~iygCHfYmAUDXhBs~HAFjAa4Mgy8jjCg__&Key-Pair-Id=K2XWKDWM065EGO",
-                description = "",
-                isRenderable = false
-            )
-            viewModel.requestDownload(
-                attachment,
-                destinationPath = File(
-                    "${this.filesDir}/offline_attachments/",
-                    attachment.title!!
-                ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
-            )
+        binding.btnDownload1.setOnClickListener {
+            val attachment = getDummyAttachment(1)
+            startDownload(attachment)
         }
+
+        binding.btnDownload2.setOnClickListener {
+            val attachment = getDummyAttachment(2)
+            startDownload(attachment)
+        }
+
+        binding.btnDownload3.setOnClickListener {
+            val attachment = getDummyAttachment(3)
+            startDownload(attachment)
+        }
+    }
+
+    private fun getDummyAttachment(index: Long): DomainAttachmentContent {
+        return DomainAttachmentContent(
+            id = index,
+            title = "File $index",
+            attachmentUrl = "https://d36vpug2b5drql.cloudfront.net/institute/lmsdemo/private/courses/492/attachments/1bcdb2781fe5429bb30171296586aa5d.pdf?response-content-disposition=attachment%3B%20filename%3D100%20MB%20File.pdf&Expires=1751019079&Signature=KucUUmOHRWbG4X-YUfvRemwoVcEwxYoP6l3isK-x0VaimoGCrup4W63i4COnCDxFBlBaH~LYkv83YjVhTxhjCv4S8o75ttVYwHZqfWX0Z6RqPzEObX6TzpS9dZrTl~ACa8yiX1MhNqA5B1z17UiXvn6fYqusNw5OZviFqeoja~ngjOX4FdypnTA2GXQlv7JOmGAM3cDOC~YA1G879viq~BiqDDVx1T9zycPzVPN7kas7A6Uj-Ew1PpYIDGJte2Y2d5lvv3KyqNQ8FXZZxWEWP20B1EDW2DgDJ~1klEIKB~AsX1Eq~MIvnkV~67Hoyr246IQKMqYUE5eZNx12jsaFZw__&Key-Pair-Id=K2XWKDWM065EGO",
+            description = "",
+            isRenderable = false
+        )
+    }
+
+    private fun startDownload(attachment: DomainAttachmentContent) {
+        viewModel.requestDownload(
+            attachment,
+            destinationPath = File(
+                "${this.filesDir}/offline_attachments/",
+                attachment.title!!
+            ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
+        )
     }
 
 }
