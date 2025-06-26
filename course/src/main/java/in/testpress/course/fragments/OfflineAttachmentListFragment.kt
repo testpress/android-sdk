@@ -96,7 +96,7 @@ fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
                         viewModel.openFile(context, file)
                     }
                 },
-                onDeleteDownload = { fileId -> viewModel.delete(fileId) },
+                onDeleteDownload = { fileId -> viewModel.delete(context, fileId) },
                 onCancelDownload = { fileId -> viewModel.cancel(fileId) }
             )
         }

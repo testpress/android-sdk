@@ -1,11 +1,7 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.core.TestpressSdk
-import `in`.testpress.course.R
-import `in`.testpress.course.domain.DomainAttachmentContent
-import `in`.testpress.util.PermissionsUtils
-import `in`.testpress.util.ViewUtils
 import android.os.Bundle
+import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,9 +9,14 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.lifecycle.lifecycleScope
-import `in`.testpress.course.util.FileUtils.getFileExtensionFromUrl
+import `in`.testpress.core.TestpressSdk
+import `in`.testpress.course.R
+import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import `in`.testpress.util.PermissionsUtils
+import `in`.testpress.util.ViewUtils
+import `in`.testpress.util.getFileExtensionFromUrl
 import kotlinx.coroutines.launch
 import java.io.File
 
@@ -68,12 +69,14 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
                 .collect { offlineAttachment ->
                     when (offlineAttachment?.status) {
                         OfflineAttachmentDownloadStatus.FAILED -> {
+                            actionButton.text = "Download Attachment"
+                            offlineAttachmentViewModel.delete(requireContext(), offlineAttachment.id)
                             actionButton.setOnClickListener {
                                 onDownloadClick(attachment)
                             }
                         }
 
-                        OfflineAttachmentDownloadStatus.DOWNLOADED -> {
+                        OfflineAttachmentDownloadStatus.COMPLETED -> {
                             actionButton.text = "Open Attachment"
                             actionButton.setOnClickListener {
                                 offlineAttachmentViewModel.openFile(
@@ -93,6 +96,14 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
                             actionButton.isClickable = false
                         }
 
+                        OfflineAttachmentDownloadStatus.DELETE -> {
+                            actionButton.text = "Download Attachment"
+                            offlineAttachmentViewModel.delete(requireContext(), offlineAttachment.id)
+                            actionButton.setOnClickListener {
+                                onDownloadClick(attachment)
+                            }
+                        }
+
                         null -> {
                             actionButton.setOnClickListener {
                                 onDownloadClick(attachment)
@@ -109,9 +120,10 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
 
     private fun onDownloadClick(attachment: DomainAttachmentContent) {
         offlineAttachmentViewModel.requestDownload(
+            context = requireContext(),
             attachment = attachment,
             destinationPath = File(
-                "${requireActivity().filesDir}/offline_attachments/",
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS),
                 attachment.title!!
             ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
         )

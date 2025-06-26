@@ -4,6 +4,8 @@ import android.content.ActivityNotFoundException
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
+import android.os.Build
+import android.os.Build.VERSION_CODES.Q
 import android.os.Environment
 import java.io.File
 import java.io.FileOutputStream
@@ -11,6 +13,7 @@ import java.io.InputStream
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
+import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import java.net.URLDecoder
@@ -137,7 +140,15 @@ fun openFile(context: Context, path: String) {
     }
 }
 
-fun deleteFile(path: String) {
+fun deleteFile(context: Context, path: String) {
+if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P){
+        deleteFileScoped(context, path)
+    } else {
+        deleteFileLegacy(path)
+    }
+}
+
+fun deleteFileLegacy(path: String) {
     val file = File(path)
     if (file.exists()) {
         try {
@@ -145,6 +156,21 @@ fun deleteFile(path: String) {
         } catch (e: Exception) {
             Log.e("AttachmentDelete", "Failed to delete file: ${file.absolutePath}", e)
         }
+    }
+}
+
+@RequiresApi(Q)
+private fun deleteFileScoped(context: Context, contentUriString: String) {
+    try {
+        val uri = Uri.parse(contentUriString)
+        val deleted = context.contentResolver.delete(uri, null, null)
+        if (deleted > 0) {
+            Log.i("AttachmentDelete", "Deleted content URI: $uri")
+        } else {
+            Log.w("AttachmentDelete", "Failed to delete content URI: $uri")
+        }
+    } catch (e: Exception) {
+        Log.e("AttachmentDelete", "Error deleting content URI: $contentUriString", e)
     }
 }
 

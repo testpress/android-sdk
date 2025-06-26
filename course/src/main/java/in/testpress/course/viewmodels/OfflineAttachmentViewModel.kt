@@ -32,7 +32,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 
     fun getOfflineAttachment(id: Long) = repo.getAttachment(id)
 
-    fun requestDownload(attachment: DomainAttachmentContent, destinationPath: String) {
+    fun requestDownload(context: Context, attachment: DomainAttachmentContent, destinationPath: String) {
         if (attachment.attachmentUrl.isNullOrEmpty()) return
         val file = OfflineAttachment(
             id = attachment.id,
@@ -44,7 +44,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         )
         viewModelScope.launch {
             repo.insert(file)
-            DownloadQueueManager.enqueue(DownloadItem(file.id, file.url, file.path))
+            DownloadQueueManager.enqueue(context, DownloadItem(file.id, file.url, file.path))
         }
     }
 
@@ -52,12 +52,12 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         DownloadQueueManager.cancelDownloadById(id)
     }
 
-    fun delete(id: Long) {
+    fun delete(context: Context, id: Long) {
         viewModelScope.launch {
             val attachment = repo.getAttachmentById(id)
             repo.delete(id)
             attachment?.let {
-                deleteFile(it.path)
+                deleteFile(context.applicationContext, it.path)
             }
         }
     }
