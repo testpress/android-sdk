@@ -100,6 +100,7 @@ class DownloadsAdapter(
 
             when (item.status) {
                 OfflineAttachmentDownloadStatus.DOWNLOADED,
+                OfflineAttachmentDownloadStatus.DELETE,
                 OfflineAttachmentDownloadStatus.FAILED -> {
                     binding.progressBar.visibility = android.view.View.GONE
                     binding.btnCancel.visibility = android.view.View.GONE
@@ -129,6 +130,7 @@ class DownloadsAdapter(
             OfflineAttachmentDownloadStatus.FAILED -> "Download Failed"
             OfflineAttachmentDownloadStatus.QUEUED -> "Waiting to download..."
             OfflineAttachmentDownloadStatus.DOWNLOADING -> "Downloading...${attachmentProgress}%"
+            OfflineAttachmentDownloadStatus.DELETE -> "This content have been removed"
         }
     }
 
