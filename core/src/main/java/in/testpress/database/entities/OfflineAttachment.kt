@@ -14,5 +14,5 @@ data class OfflineAttachment(
 )
 
 enum class OfflineAttachmentDownloadStatus {
-    QUEUED, DOWNLOADING, FAILED, DOWNLOADED, DELETE
+    QUEUED, DOWNLOADING, FAILED, COMPLETED, DELETE
 }

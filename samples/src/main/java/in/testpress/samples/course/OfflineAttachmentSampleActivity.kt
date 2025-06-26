@@ -99,7 +99,7 @@ class DownloadsAdapter(
             binding.textSubtitle.text = getAttachmentStatusText(item.status, item.progress)
 
             when (item.status) {
-                OfflineAttachmentDownloadStatus.DOWNLOADED,
+                OfflineAttachmentDownloadStatus.COMPLETED,
                 OfflineAttachmentDownloadStatus.DELETE,
                 OfflineAttachmentDownloadStatus.FAILED -> {
                     binding.progressBar.visibility = android.view.View.GONE
@@ -126,7 +126,7 @@ class DownloadsAdapter(
         attachmentProgress: Int
     ): String {
         return when (attachmentStatus) {
-            OfflineAttachmentDownloadStatus.DOWNLOADED -> "Tap to open"
+            OfflineAttachmentDownloadStatus.COMPLETED -> "Tap to open"
             OfflineAttachmentDownloadStatus.FAILED -> "Download Failed"
             OfflineAttachmentDownloadStatus.QUEUED -> "Waiting to download..."
             OfflineAttachmentDownloadStatus.DOWNLOADING -> "Downloading...${attachmentProgress}%"
