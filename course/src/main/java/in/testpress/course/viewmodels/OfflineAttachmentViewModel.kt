@@ -18,6 +18,7 @@ import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.course.services.DownloadItem
 import `in`.testpress.course.services.DownloadQueueManager
+import `in`.testpress.course.services.OfflineAttachmentDownloadManager
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
@@ -26,7 +27,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import java.io.File
 
-class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application) {
+class OfflineAttachmentViewModel(private val application: Application) : AndroidViewModel(application) {
     private val dao = TestpressDatabase.invoke(application).offlineAttachmentDao()
     private val repo = OfflineAttachmentsRepository(dao)
 
@@ -43,21 +44,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         attachment: DomainAttachmentContent,
         destinationPath: String
     ) {
-        if (attachment.attachmentUrl.isNullOrEmpty()) return
-        val file = OfflineAttachment(
-            id = attachment.id,
-            title = attachment.title ?: "attachment_${attachment.id}",
-            // If thr url is null, it will be empty string and download will be failed
-            url = attachment.attachmentUrl,
-            path = destinationPath,
-            contentUri = null,
-            downloadId = -1,
-            status = OfflineAttachmentDownloadStatus.QUEUED
-        )
-        viewModelScope.launch {
-            repo.insert(file)
-            DownloadQueueManager.enqueue(context, DownloadItem(file.id, file.url, file.path))
-        }
+        OfflineAttachmentDownloadManager(context = context,repo).enqueueDownload(attachment)
     }
 
     fun cancel(offlineAttachment: OfflineAttachment) {

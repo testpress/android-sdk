@@ -27,18 +27,22 @@ class OfflineAttachmentsRepository(
 
     suspend fun insert(file: OfflineAttachment) = dao.insert(file)
 
+    suspend fun update(file: OfflineAttachment) = dao.update(file)
+
     suspend fun delete(id: Long) = dao.deleteById(id)
 
     suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus) =
         dao.updateStatus(id, status)
 
-    private suspend fun updateProgress(id: Long, progress: Int) = dao.updateProgress(id, progress)
+    suspend fun updateProgressWithDownloadId(downloadId: Long, progress: Int) = dao.updateProgressWithDownloadId(downloadId, progress)
 
-    private suspend fun updateFileName(id: Long, fileName: String) = dao.updateFileName(id, fileName)
+    suspend fun updateStatusWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus) = dao.updateProgressWithDownloadId(downloadId, status)
 
-    private suspend fun updateContentUri(id: Long, contentUri: String) = dao.updateContentUri(id, contentUri)
+    suspend fun getByDownloadId(downloadId: Long) = dao.getByDownloadId(downloadId)
 
-    private suspend fun updateFilePath(id: Long, path: String) = dao.updateFilePath(id, path)
+    suspend fun updateContentUri(id: Long, contentUri: String) = dao.updateContentUri(id, contentUri)
+
+    suspend fun updateFilePath(id: Long, path: String) = dao.updateFilePath(id, path)
 
     suspend fun getAttachmentById(id: Long) = dao.getAttachmentById(id)
 
@@ -55,7 +59,7 @@ class OfflineAttachmentsRepository(
 
     override fun onProgress(item: DownloadItem, progress: Int) {
         scope.launch {
-            updateProgress(item.id, progress)
+            //updateProgress(item.id, progress)
         }
     }
 
@@ -87,7 +91,6 @@ class OfflineAttachmentsRepository(
         contentUri: String
     ) {
         scope.launch {
-            updateFileName(item.id, displayName)
             updateContentUri(item.id, contentUri)
             updateFilePath(item.id, localPath)
         }
