@@ -71,7 +71,7 @@ object DownloadQueueManager {
         currentDownloadJob = downloadScope.launch {
             try {
                 callback?.onDownloadStarted(item)
-                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     downloadFile(context, item)
                 } else {
                     downloadFile(item)
@@ -241,7 +241,7 @@ object DownloadQueueManager {
 
     fun syncDownloadedFileWithDatabase(context: Context) {
         downloadScope.launch {
-            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 syncUsingContentUri(context)
             } else {
                 syncUsingFilePath(context)
