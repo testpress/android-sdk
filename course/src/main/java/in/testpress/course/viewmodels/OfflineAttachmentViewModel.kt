@@ -2,6 +2,9 @@ package `in`.testpress.course.viewmodels
 
 import android.app.Application
 import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.util.Log
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -14,11 +17,11 @@ import `in`.testpress.course.services.DownloadQueueManager
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
-import `in`.testpress.util.deleteFile
 import `in`.testpress.util.openFile
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import java.io.File
 
 class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = TestpressDatabase.invoke(application).offlineAttachmentDao()
@@ -33,6 +36,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     fun getOfflineAttachment(id: Long) = repo.getAttachment(id)
 
     fun requestDownload(
+        context: Context,
         attachment: DomainAttachmentContent,
         destinationPath: String
     ) {
@@ -49,7 +53,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         )
         viewModelScope.launch {
             repo.insert(file)
-            DownloadQueueManager.enqueue(DownloadItem(file.id, file.url, file.path))
+            DownloadQueueManager.enqueue(context, DownloadItem(file.id, file.url, file.path))
         }
     }
 
@@ -57,13 +61,11 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         DownloadQueueManager.cancelDownloadById(offlineAttachment.id)
     }
 
-    fun delete(offlineAttachment: OfflineAttachment) {
+    fun delete(context: Context, offlineAttachment: OfflineAttachment) {
         viewModelScope.launch {
-            val attachment = repo.getAttachmentById(offlineAttachment.downloadId)
+            val attachment = repo.getAttachmentById(offlineAttachment.id)
             repo.delete(offlineAttachment.id)
-            attachment?.let {
-                deleteFile(it.path)
-            }
+            attachment?.deleteFile(context)
         }
     }
 
@@ -76,6 +78,24 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
                     return OfflineAttachmentViewModel(context.application) as T
                 }
             }).get(OfflineAttachmentViewModel::class.java)
+        }
+    }
+}
+
+fun OfflineAttachment.deleteFile(context: Context) {
+    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+        val resolver = context.contentResolver
+        contentUri?.let {
+            resolver.delete(Uri.parse(it), null, null)
+        }
+    } else {
+        val file = File(path)
+        if (file.exists()) {
+            try {
+                file.delete()
+            } catch (e: Exception) {
+                Log.e("AttachmentDelete", "Failed to delete file: ${file.absolutePath}", e)
+            }
         }
     }
 }

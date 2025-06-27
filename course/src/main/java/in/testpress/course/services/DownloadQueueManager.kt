@@ -1,17 +1,29 @@
 package `in`.testpress.course.services
 
+import android.content.ContentValues
 import android.content.Context
+import android.net.Uri
+import android.os.Build
+import android.os.Environment
+import android.provider.MediaStore
 import android.util.Log
+import android.webkit.MimeTypeMap
+import androidx.annotation.RequiresApi
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import `in`.testpress.util.getMimeTypeFromUrl
 import kotlinx.coroutines.*
 import kotlinx.coroutines.ensureActive
 import okhttp3.OkHttpClient
 import okhttp3.Request
+import okhttp3.Response
+import okhttp3.ResponseBody
 import okio.IOException
 import java.io.File
 import java.io.FileOutputStream
+import java.io.InputStream
+import java.io.OutputStream
 import java.util.concurrent.CopyOnWriteArrayList
 
 data class DownloadItem(val id: Long, val url: String, val file: String)
@@ -24,6 +36,7 @@ object DownloadQueueManager {
         fun onDownloadCompleted(item: DownloadItem)
         fun onDownloadFailed(item: DownloadItem, error: Throwable)
         fun onDownloadCancelled(item: DownloadItem)
+        fun onDownloadFileInfoUpdated(item: DownloadItem, localPath: String, displayName: String, contentUri: String)
     }
 
     private var callback: Callback? = null
@@ -39,16 +52,16 @@ object DownloadQueueManager {
         this.callback = callback
     }
 
-    fun enqueue(item: DownloadItem) {
+    fun enqueue(context: Context, item: DownloadItem) {
         downloadQueue.add(item)
-        processQueue()
+        processQueue(context)
     }
 
     fun clearQueue() {
         downloadQueue.clear()
     }
 
-    private fun processQueue() {
+    private fun processQueue(context: Context) {
         if (isDownloading || downloadQueue.isEmpty()) return
 
         isDownloading = true
@@ -58,7 +71,11 @@ object DownloadQueueManager {
         currentDownloadJob = downloadScope.launch {
             try {
                 callback?.onDownloadStarted(item)
-                downloadFile(item)
+                if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                    downloadFile(context, item)
+                } else {
+                    downloadFile(item)
+                }
                 callback?.onDownloadCompleted(item)
             } catch (e: CancellationException) {
                 Log.w("DownloadQueueManager", "Download cancelled: ${item.url}")
@@ -70,56 +87,116 @@ object DownloadQueueManager {
                 isDownloading = false
                 currentItem = null
                 currentDownloadJob = null
-                processQueue()
+                processQueue(context)
             }
         }
     }
 
     private suspend fun downloadFile(item: DownloadItem) =
         withContext(downloadScope.coroutineContext) {
-            val request = Request.Builder()
-                .url(item.url)
-                .build()
-
+            val request = Request.Builder().url(item.url).build()
             val response = okHttpClient.newCall(request).execute()
 
-            if (!response.isSuccessful) {
-                throw IOException("Failed to download file: ${response.code}")
-            }
-
+            if (!response.isSuccessful) throw IOException("Failed: ${response.code}")
             val body = response.body ?: throw IOException("Empty response body")
-            val contentLength = body.contentLength()
-            if (contentLength <= 0) {
-                Log.w("DownloadQueueManager", "Invalid contentLength: $contentLength")
+
+            val target = File(item.file)
+            target.parentFile?.mkdirs()
+
+            try {
+                downloadAndWriteStream(item, body) {
+                    FileOutputStream(target)
+                }
+            } catch (e: CancellationException) {
+                target.delete()
+                throw e
+            } finally {
+                response.close()
+            }
+        }
+
+    @RequiresApi(Build.VERSION_CODES.Q)
+    private suspend fun downloadFile(context: Context, item: DownloadItem) =
+        withContext(Dispatchers.IO) {
+            val resolver = context.contentResolver
+            val fileName = File(item.file).name
+            val collection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
+
+            val contentValues = ContentValues().apply {
+                put(MediaStore.Downloads.DISPLAY_NAME, fileName)
+                put(MediaStore.Downloads.MIME_TYPE, getMimeTypeFromUrl(item.url))
+                put(MediaStore.Downloads.RELATIVE_PATH, Environment.DIRECTORY_DOWNLOADS)
+                put(MediaStore.Downloads.IS_PENDING, 1)
             }
 
-            body.byteStream().use { input ->
+            val fileUri = resolver.insert(collection, contentValues)
+                ?: throw IOException("Failed to create MediaStore entry")
 
-                val target = File(item.file)
-                target.parentFile?.mkdirs()
+            val request = Request.Builder().url(item.url).build()
+            val response = okHttpClient.newCall(request).execute()
 
-                FileOutputStream(target).use { output ->
-                    val buffer = ByteArray(8 * 1024)
-                    var bytesRead: Int
-                    var totalRead = 0L
-                    var lastProgress = -1
+            if (!response.isSuccessful) throw IOException("HTTP error: ${response.code}")
+            val body = response.body ?: throw IOException("Empty response body")
 
-                    while (input.read(buffer).also { bytesRead = it } != -1) {
-                        currentDownloadJob?.ensureActive()
-                        output.write(buffer, 0, bytesRead)
-                        totalRead += bytesRead
+            try {
+                downloadAndWriteStream(item, body) {
+                    resolver.openOutputStream(fileUri)
+                        ?: throw IOException("Failed to open output stream")
+                }
 
-                        if (contentLength > 0) {
-                            val progress = (totalRead * 100 / contentLength).toInt()
-                            if (progress != lastProgress) {
-                                lastProgress = progress
-                                callback?.onProgress(item, progress)
-                            }
-                        }
+                contentValues.clear()
+                contentValues.put(MediaStore.Downloads.IS_PENDING, 0)
+                resolver.update(fileUri, contentValues, null, null)
+
+                resolver.query(fileUri, arrayOf(
+                    MediaStore.Downloads.DISPLAY_NAME,
+                    MediaStore.Downloads.DATA
+                ), null, null, null)?.use { cursor ->
+                    if (cursor.moveToFirst()) {
+                        val name = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Downloads.DISPLAY_NAME))
+                        val path = cursor.getString(cursor.getColumnIndexOrThrow(MediaStore.Downloads.DATA))
+                        callback?.onDownloadFileInfoUpdated(item, path, name, fileUri.toString())
+                    }
+                }
+            } catch (e: CancellationException) {
+                resolver.delete(fileUri, null, null)
+                throw e
+            } finally {
+                response.close()
+            }
+        }
+
+    private suspend fun downloadAndWriteStream(
+        item: DownloadItem,
+        responseBody: ResponseBody,
+        outputStreamProvider: suspend () -> OutputStream
+    ) {
+        val contentLength = responseBody.contentLength()
+        val input = responseBody.byteStream()
+
+        outputStreamProvider().use { output ->
+            val buffer = ByteArray(8 * 1024)
+            var bytesRead: Int
+            var totalRead = 0L
+            var lastProgress = -1
+
+            while (input.read(buffer).also { bytesRead = it } != -1) {
+                currentDownloadJob?.ensureActive()
+                output.write(buffer, 0, bytesRead)
+                totalRead += bytesRead
+
+                if (contentLength > 0) {
+                    val progress = (totalRead * 100 / contentLength).toInt()
+                    if (progress != lastProgress) {
+                        lastProgress = progress
+                        callback?.onProgress(item, progress)
                     }
                 }
             }
         }
+
+        input.close()
+    }
 
     private fun cancelCurrent() {
         currentDownloadJob?.cancel()
@@ -154,32 +231,70 @@ object DownloadQueueManager {
                 repo.getAllWithStatus(OfflineAttachmentDownloadStatus.DOWNLOADING)
             val queuedAttachments = repo.getAllWithStatus(OfflineAttachmentDownloadStatus.QUEUED)
             downloadingAttachments.forEach { attachment ->
-                enqueue(DownloadItem(attachment.id, attachment.url, attachment.path))
+                enqueue(context, DownloadItem(attachment.id, attachment.url, attachment.path))
             }
             queuedAttachments.forEach { attachment ->
-                enqueue(DownloadItem(attachment.id, attachment.url, attachment.path))
+                enqueue(context, DownloadItem(attachment.id, attachment.url, attachment.path))
             }
         }
     }
 
     fun syncDownloadedFileWithDatabase(context: Context) {
         downloadScope.launch {
-            val dao = TestpressDatabase.invoke(context.applicationContext).offlineAttachmentDao()
-            val repo = OfflineAttachmentsRepository(dao, downloadScope)
-            val offlineAttachments = repo.getAll()
+            if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+                syncUsingContentUri(context)
+            } else {
+                syncUsingFilePath(context)
+            }
+        }
+    }
 
-            offlineAttachments.forEach { offlineAttachment ->
-                try {
-                    val path = offlineAttachment.path
-                    if (path.isNotBlank()) {
-                        val file = File(path)
-                        if (!file.exists()) {
-                            repo.updateStatus(offlineAttachment.id, OfflineAttachmentDownloadStatus.DELETE)
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e("DownloadQueueManager", "Error checking file for attachment ID: ${offlineAttachment.id}", e)
+    private suspend fun syncUsingContentUri(context: Context) {
+        val dao = TestpressDatabase.invoke(context.applicationContext).offlineAttachmentDao()
+        val repo = OfflineAttachmentsRepository(dao, downloadScope)
+        val offlineAttachments = repo.getAll()
+        val contentResolver = context.contentResolver
+
+        offlineAttachments.forEach { attachment ->
+            try {
+                val uriString = attachment.contentUri
+                val isContentUriAvailable = if (!uriString.isNullOrBlank()) {
+                    runCatching {
+                        val uri = Uri.parse(uriString)
+                        contentResolver.openAssetFileDescriptor(uri, "r")?.use {
+                            true
+                        } ?: false
+                    }.getOrDefault(false)
+                } else {
+                    false
                 }
+
+                if (!isContentUriAvailable) {
+                    repo.updateStatus(attachment.id, OfflineAttachmentDownloadStatus.DELETE)
+                }
+
+            } catch (e: Exception) {
+                Log.e("DownloadQueueManager", "Error checking contentUri for ID: ${attachment.id}", e)
+            }
+        }
+    }
+
+    private suspend fun syncUsingFilePath(context: Context) {
+        val dao = TestpressDatabase.invoke(context.applicationContext).offlineAttachmentDao()
+        val repo = OfflineAttachmentsRepository(dao, downloadScope)
+        val offlineAttachments = repo.getAll()
+
+        offlineAttachments.forEach { offlineAttachment ->
+            try {
+                val path = offlineAttachment.path
+                if (path.isNotBlank()) {
+                    val file = File(path)
+                    if (!file.exists()) {
+                        repo.updateStatus(offlineAttachment.id, OfflineAttachmentDownloadStatus.DELETE)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e("DownloadQueueManager", "Error checking file for attachment ID: ${offlineAttachment.id}", e)
             }
         }
     }

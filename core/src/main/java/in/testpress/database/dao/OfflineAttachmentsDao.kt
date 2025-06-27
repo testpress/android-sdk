@@ -28,6 +28,15 @@ interface OfflineAttachmentsDao {
     @Query("UPDATE OfflineAttachment SET progress = :progress WHERE id = :id")
     suspend fun updateProgress(id: Long, progress: Int)
 
+    @Query("UPDATE OfflineAttachment SET fileName = :fileName WHERE id = :id")
+    suspend fun updateFileName(id: Long, fileName: String)
+
+    @Query("UPDATE OfflineAttachment SET contentUri = :contentUri WHERE id = :id")
+    suspend fun updateContentUri(id: Long, contentUri: String)
+
+    @Query("UPDATE OfflineAttachment SET path = :path WHERE id = :id")
+    suspend fun updateFilePath(id: Long, path: String)
+
     @Query("SELECT * FROM OfflineAttachment WHERE id = :id")
     suspend fun getAttachmentById(id: Long): OfflineAttachment?
 
