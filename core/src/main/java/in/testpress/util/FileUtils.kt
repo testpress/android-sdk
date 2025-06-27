@@ -10,6 +10,7 @@ import java.io.FileOutputStream
 import java.io.InputStream
 import android.provider.OpenableColumns
 import android.util.Log
+import android.webkit.MimeTypeMap
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
@@ -137,17 +138,6 @@ fun openFile(context: Context, path: String) {
     }
 }
 
-fun deleteFile(path: String) {
-    val file = File(path)
-    if (file.exists()) {
-        try {
-            file.delete()
-        } catch (e: Exception) {
-            Log.e("AttachmentDelete", "Failed to delete file: ${file.absolutePath}", e)
-        }
-    }
-}
-
 fun getFileExtensionFromUrl(url: String?): String {
     if (url.isNullOrEmpty()) return ".pdf"
 
@@ -179,4 +169,9 @@ fun getFileExtensionFromUrl(url: String?): String {
     }
 
     return ".pdf"
+}
+
+fun getMimeTypeFromUrl(url: String): String {
+    val extension = MimeTypeMap.getFileExtensionFromUrl(url)
+    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase()) ?: ""
 }
