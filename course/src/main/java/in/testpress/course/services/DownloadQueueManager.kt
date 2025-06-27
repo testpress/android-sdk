@@ -11,6 +11,7 @@ import android.webkit.MimeTypeMap
 import androidx.annotation.RequiresApi
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.util.getMimeTypeFromUrl
 import kotlinx.coroutines.*
@@ -298,5 +299,4 @@ object DownloadQueueManager {
             }
         }
     }
-
 }

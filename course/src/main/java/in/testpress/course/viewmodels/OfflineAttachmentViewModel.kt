@@ -65,6 +65,12 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         DownloadQueueManager.cancelDownloadById(id)
     }
 
+    fun delete(id: Long) {
+        viewModelScope.launch {
+            repo.delete(id)
+        }
+    }
+
     fun delete(context: Context, id: Long) {
         viewModelScope.launch {
             val attachment = repo.getAttachmentById(id)
@@ -74,6 +80,10 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun openFile(context: Context, file: OfflineAttachment) = file.openFile(context)
+
+    suspend fun syncDownloadedFileWithDatabase(context: Context, id: Long) {
+
+    }
 
     companion object {
         fun get(context: FragmentActivity): OfflineAttachmentViewModel {
