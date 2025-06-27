@@ -12,14 +12,16 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.course.domain.DomainAttachmentContent
+import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
 import `in`.testpress.course.services.DownloadQueueManager.restartPendingDownloads
-import `in`.testpress.course.services.DownloadQueueManager.syncDownloadedFileWithDatabase
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.samples.databinding.ActivityOfflineAttachmentSampleBinding
 import `in`.testpress.samples.databinding.ListItemDownloadBinding
 import `in`.testpress.util.getFileExtensionFromUrl
+import kotlinx.coroutines.launch
 import java.io.File
 
 class OfflineAttachmentSampleActivity : AppCompatActivity() {
@@ -37,7 +39,17 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         observeViewModel()
         initializeExitText()
         restartPendingDownloads(this)
-        syncDownloadedFileWithDatabase(this)
+        syncDownloads()
+    }
+
+    private fun syncDownloads() {
+        lifecycleScope.launch {
+            val dao = TestpressDatabase.invoke(this@OfflineAttachmentSampleActivity)
+                .offlineAttachmentDao()
+            val syncManager =
+                OfflineAttachmentSyncManager(this@OfflineAttachmentSampleActivity, dao)
+            syncManager.syncDownloads()
+        }
     }
 
     private fun setupRecyclerView() {
@@ -79,7 +91,7 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         return DomainAttachmentContent(
             id = index,
             title = "File $index",
-            attachmentUrl = "https://d36vpug2b5drql.cloudfront.net/institute/lmsdemo/private/courses/492/attachments/1bcdb2781fe5429bb30171296586aa5d.pdf?response-content-disposition=attachment%3B%20filename%3D100%20MB%20File.pdf&Expires=1751019079&Signature=KucUUmOHRWbG4X-YUfvRemwoVcEwxYoP6l3isK-x0VaimoGCrup4W63i4COnCDxFBlBaH~LYkv83YjVhTxhjCv4S8o75ttVYwHZqfWX0Z6RqPzEObX6TzpS9dZrTl~ACa8yiX1MhNqA5B1z17UiXvn6fYqusNw5OZviFqeoja~ngjOX4FdypnTA2GXQlv7JOmGAM3cDOC~YA1G879viq~BiqDDVx1T9zycPzVPN7kas7A6Uj-Ew1PpYIDGJte2Y2d5lvv3KyqNQ8FXZZxWEWP20B1EDW2DgDJ~1klEIKB~AsX1Eq~MIvnkV~67Hoyr246IQKMqYUE5eZNx12jsaFZw__&Key-Pair-Id=K2XWKDWM065EGO",
+            attachmentUrl = "https://d36vpug2b5drql.cloudfront.net/institute/lmsdemo/private/courses/492/attachments/1bcdb2781fe5429bb30171296586aa5d.pdf?Expires=1751110950&Signature=FWDtOP7DCPGWvwAHzi4aXVWzRGeUELNzAGQ5GfVHMyNwPU~HLaDDXzNRW9-og9SBJswUJKT3JrBnqOJWs2bK2SRzl9l~rBh6B8oBrRggNpqj0DdFSADGiR8WoxWbIMRNQfudYmzABWN~ulGgLlNkJE4NxZGPhjoEUjAZmjPXfR9CkKBszHcF27391cCn46X6AjcLg0s9h8eX0IGoTXVPT~~KqrsdJJohMQTC9PGfNH2wOQDrqyjPApvaTbg9q-MF2T3xX~6t5amXzAUyuJP98InU03~nKXF-J7fdhW596IDWFHb4oGl2e59Uj8i98HkSl8YuehP6tTW9gQCKtBL9aQ__&Key-Pair-Id=K2XWKDWM065EGO",
             description = "",
             isRenderable = false
         )
