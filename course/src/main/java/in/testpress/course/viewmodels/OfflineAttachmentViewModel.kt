@@ -1,10 +1,14 @@
 package `in`.testpress.course.viewmodels
 
 import android.app.Application
+import android.content.ActivityNotFoundException
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import android.widget.Toast
+import androidx.core.content.FileProvider
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
@@ -17,7 +21,6 @@ import `in`.testpress.course.services.DownloadQueueManager
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
-import `in`.testpress.util.openFile
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -70,7 +73,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    fun openFile(context: Context, file: OfflineAttachment) = openFile(context, file.path)
+    fun openFile(context: Context, file: OfflineAttachment) = file.openFile(context)
 
     companion object {
         fun get(context: FragmentActivity): OfflineAttachmentViewModel {
@@ -87,7 +90,11 @@ fun OfflineAttachment.deleteFile(context: Context) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val resolver = context.contentResolver
         contentUri?.let {
-            resolver.delete(Uri.parse(it), null, null)
+            try {
+                resolver.delete(Uri.parse(it), null, null)
+            } catch (e: Exception) {
+                Log.e("AttachmentDelete", "Failed to delete file: $it", e)
+            }
         }
     } else {
         val file = File(path)
@@ -100,4 +107,37 @@ fun OfflineAttachment.deleteFile(context: Context) {
         }
     }
 }
+
+fun OfflineAttachment.openFile(context: Context) {
+    val uri = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        if (contentUri.isNullOrBlank()) {
+            Toast.makeText(context, "File not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        Uri.parse(contentUri)
+    } else {
+        val file = File(path)
+        if (!file.exists()) {
+            Toast.makeText(context, "File not found.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.testpressFileProvider",
+            file
+        )
+    }
+
+    val intent = Intent(Intent.ACTION_VIEW).apply {
+        setDataAndType(uri, context.contentResolver.getType(uri))
+        flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+    }
+
+    try {
+        context.startActivity(Intent.createChooser(intent, "Open with"))
+    } catch (e: ActivityNotFoundException) {
+        Toast.makeText(context, "No app found to open this file type.", Toast.LENGTH_SHORT).show()
+    }
+}
+
 
