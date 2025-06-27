@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 36,
-    "identityHash": "eac828d2e9688936bd34965393fb2429",
+    "identityHash": "375a7fc8c05ac6d75047521cc3c14bd6",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -1848,7 +1848,7 @@
       },
       {
         "tableName": "OfflineAttachment",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `path` TEXT NOT NULL, `fileName` TEXT NOT NULL, `contentUri` TEXT, `status` TEXT NOT NULL, `progress` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `path` TEXT NOT NULL, `contentUri` TEXT, `downloadId` INTEGER NOT NULL, `status` TEXT NOT NULL, `progress` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -1875,16 +1875,16 @@
             "notNull": true
           },
           {
-            "fieldPath": "fileName",
-            "columnName": "fileName",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
             "fieldPath": "contentUri",
             "columnName": "contentUri",
             "affinity": "TEXT",
             "notNull": false
+          },
+          {
+            "fieldPath": "downloadId",
+            "columnName": "downloadId",
+            "affinity": "INTEGER",
+            "notNull": true
           },
           {
             "fieldPath": "status",
@@ -1912,7 +1912,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eac828d2e9688936bd34965393fb2429')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '375a7fc8c05ac6d75047521cc3c14bd6')"
     ]
   }
 }
