@@ -146,7 +146,9 @@ fun getFileExtensionFromUrl(url: String?): String {
     return ".pdf"
 }
 
-fun getMimeTypeFromUrl(url: String): String {
+fun getMimeTypeFromUrl(url: String?): String {
+    if (url.isNullOrEmpty()) return "application/pdf" // Default MIME type
     val extension = MimeTypeMap.getFileExtensionFromUrl(url)
-    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase()) ?: ""
+    return MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase())
+        ?: "application/pdf"
 }

@@ -135,6 +135,7 @@ fun OfflineAttachment.openFile(context: Context) {
     try {
         context.startActivity(Intent.createChooser(intent, "Open with"))
     } catch (e: ActivityNotFoundException) {
+        Log.w("AttachmentOpen", "No app found to open file type: ${context.contentResolver.getType(uri)}", e)
         Toast.makeText(context, "No app found to open this file type.", Toast.LENGTH_SHORT).show()
     }
 }
