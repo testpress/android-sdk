@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 36,
-    "identityHash": "b59a3e447c5a27f4a0756c2dcc807deb",
+    "identityHash": "eac828d2e9688936bd34965393fb2429",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -1848,7 +1848,7 @@
       },
       {
         "tableName": "OfflineAttachment",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `path` TEXT NOT NULL, `status` TEXT NOT NULL, `progress` INTEGER NOT NULL, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `title` TEXT NOT NULL, `url` TEXT NOT NULL, `path` TEXT NOT NULL, `fileName` TEXT NOT NULL, `contentUri` TEXT, `status` TEXT NOT NULL, `progress` INTEGER NOT NULL, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -1873,6 +1873,18 @@
             "columnName": "path",
             "affinity": "TEXT",
             "notNull": true
+          },
+          {
+            "fieldPath": "fileName",
+            "columnName": "fileName",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "contentUri",
+            "columnName": "contentUri",
+            "affinity": "TEXT",
+            "notNull": false
           },
           {
             "fieldPath": "status",
@@ -1900,7 +1912,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'b59a3e447c5a27f4a0756c2dcc807deb')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'eac828d2e9688936bd34965393fb2429')"
     ]
   }
 }

@@ -41,6 +41,7 @@ import `in`.testpress.database.roommigration.RoomMigration32To33.MIGRATION_32_33
 import `in`.testpress.database.roommigration.RoomMigration33To34.MIGRATION_33_34
 import `in`.testpress.database.roommigration.RoomMigration34To35.MIGRATION_34_35
 import `in`.testpress.database.roommigration.RoomMigration35To36.MIGRATION_35_36
+import `in`.testpress.database.roommigration.RoomMigration36To37.MIGRATION_36_37
 
 @Database(version = 36,
         entities = [
@@ -99,7 +100,7 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
             MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
             MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34,
-            MIGRATION_34_35, MIGRATION_35_36
+            MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
