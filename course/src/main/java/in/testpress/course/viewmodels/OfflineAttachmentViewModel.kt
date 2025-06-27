@@ -84,7 +84,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 }
 
 fun OfflineAttachment.deleteFile(context: Context) {
-    if (Build.VERSION.SDK_INT > Build.VERSION_CODES.P) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         val resolver = context.contentResolver
         contentUri?.let {
             resolver.delete(Uri.parse(it), null, null)
