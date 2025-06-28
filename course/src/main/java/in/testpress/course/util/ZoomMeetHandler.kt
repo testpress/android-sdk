@@ -147,6 +147,7 @@ class ZoomMeetHandler(
                 "Failed to initialize Zoom Meeting. Error: $errorCode, internalErrorCode=$internalErrorCode",
                 Toast.LENGTH_LONG
             ).show()
+            logZoomInitializationFailure(errorCode, internalErrorCode)
             onInitializeCallback?.onFailure()
         } else {
             registerMeetingServiceListener()
@@ -208,4 +209,23 @@ class ZoomMeetHandler(
             inMeetingEventHandler.setRegisterWebinarInfo(name, profileDetails.email, false)
         }
     }
+
+    private fun logZoomInitializationFailure(errorCode: Int, internalErrorCode: Int) {
+        val packageName = context.packageName ?: "Package name not available"
+
+        val errorInfoMap = mutableMapOf<String, Any?>(
+            "User ID" to profileDetails.id,
+            "User Name" to profileDetails.username,
+            "User Email" to profileDetails.email,
+            "Package Name" to packageName,
+            "Video Conference Content ID" to videoConference.id,
+            "Video Conference ID" to videoConference.conferenceId,
+            "Zoom Error Code" to errorCode,
+            "Zoom Internal Error Code" to internalErrorCode,
+            "Video Conference AT" to videoConference.accessToken
+        )
+
+        logZoomSdkInitializationError(errorInfoMap)
+    }
+
 }

@@ -61,3 +61,13 @@ private fun getAVCCodecSupportInfo(): Map<String, Map<String, Any>> {
             )
         }
 }
+
+fun logZoomSdkInitializationError(extraInfo: Map<String, Any?>) {
+    Sentry.captureMessage("Zoom SDK Initialization Failed") { scope: Scope ->
+        scope.level = SentryLevel.ERROR
+        scope.setTag("package_name", extraInfo["Package Name"].toString())
+        scope.setTag("user_name", extraInfo["User Name"].toString())
+        scope.setTag("user_email", extraInfo["User Email"].toString())
+        scope.setContexts("Zoom SDK Error", extraInfo)
+    }
+}
