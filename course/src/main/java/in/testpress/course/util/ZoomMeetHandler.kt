@@ -1,5 +1,9 @@
 package `in`.testpress.course.util
 
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.course.domain.DomainVideoConferenceContent
@@ -9,10 +13,6 @@ import `in`.testpress.course.ui.ZoomMeetActivity
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.widget.Toast
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_PASSWORD
@@ -47,7 +47,7 @@ class ZoomMeetHandler(
 
     fun getInitializationParams(): ZoomSDKInitParams {
         val initParams = ZoomSDKInitParams()
-        initParams.jwtToken = videoConference.accessToken
+        initParams.jwtToken = "fdsdfsfsdvdv"
         initParams.enableLog = true
         initParams.logSize = 50
         initParams.domain = "zoom.us"
@@ -147,6 +147,7 @@ class ZoomMeetHandler(
                 "Failed to initialize Zoom Meeting. Error: $errorCode, internalErrorCode=$internalErrorCode",
                 Toast.LENGTH_LONG
             ).show()
+            logZoomInitializationFailure(errorCode, internalErrorCode)
             onInitializeCallback?.onFailure()
         } else {
             registerMeetingServiceListener()
@@ -208,4 +209,23 @@ class ZoomMeetHandler(
             inMeetingEventHandler.setRegisterWebinarInfo(name, profileDetails.email, false)
         }
     }
+
+    private fun logZoomInitializationFailure(errorCode: Int, internalErrorCode: Int) {
+        val packageName = context.packageName ?: "Package name not available"
+
+        val errorInfoMap = mutableMapOf<String, Any?>(
+            "User ID" to profileDetails.id,
+            "User Name" to profileDetails.username,
+            "User Email" to profileDetails.email,
+            "Package Name" to packageName,
+            "Video Conference Content ID" to videoConference.id,
+            "Video Conference ID" to videoConference.conferenceId,
+            "Zoom Error Code" to errorCode,
+            "Zoom Internal Error Code" to internalErrorCode,
+            "Video Conference AT" to videoConference.accessToken
+        )
+
+        logZoomSdkInitializationError(errorInfoMap)
+    }
+
 }
