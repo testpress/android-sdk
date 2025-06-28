@@ -1,9 +1,5 @@
 package `in`.testpress.course.util
 
-import android.app.Activity
-import android.content.Context
-import android.content.Intent
-import android.widget.Toast
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.course.domain.DomainVideoConferenceContent
@@ -13,6 +9,10 @@ import `in`.testpress.course.ui.ZoomMeetActivity
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.isEmailValid
+import android.app.Activity
+import android.content.Context
+import android.content.Intent
+import android.widget.Toast
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_PASSWORD
@@ -47,7 +47,7 @@ class ZoomMeetHandler(
 
     fun getInitializationParams(): ZoomSDKInitParams {
         val initParams = ZoomSDKInitParams()
-        initParams.jwtToken = "fdsdfsfsdvdv"
+        initParams.jwtToken = videoConference.accessToken
         initParams.enableLog = true
         initParams.logSize = 50
         initParams.domain = "zoom.us"
