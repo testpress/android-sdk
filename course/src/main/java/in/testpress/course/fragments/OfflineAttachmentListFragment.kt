@@ -96,8 +96,8 @@ fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
                         viewModel.openFile(context, file)
                     }
                 },
-                onDeleteDownload = { fileId -> viewModel.delete(fileId) },
-                onCancelDownload = { fileId -> viewModel.cancel(fileId) }
+                onDeleteDownload = { file -> viewModel.delete(file) },
+                onCancelDownload = { file -> viewModel.cancel(file) }
             )
         }
     }
@@ -224,8 +224,8 @@ fun EmptyState() {
 fun OfflineAttachmentList(
     attachments: List<OfflineAttachment>,
     onOpenFile: (OfflineAttachment) -> Unit,
-    onDeleteDownload: (Long) -> Unit,
-    onCancelDownload: (Long) -> Unit
+    onDeleteDownload: (OfflineAttachment) -> Unit,
+    onCancelDownload: (OfflineAttachment) -> Unit
 ) {
 
     val scope = rememberCoroutineScope()
@@ -346,8 +346,8 @@ fun getAttachmentStatusText(
 @Composable
 private fun AttachmentBottomSheet(
     attachment: OfflineAttachment,
-    onDeleteDownload: (Long) -> Unit,
-    onCancelDownload: (Long) -> Unit,
+    onDeleteDownload: (OfflineAttachment) -> Unit,
+    onCancelDownload: (OfflineAttachment) -> Unit,
     onDismiss: () -> Unit
 ) {
     Row(
@@ -360,7 +360,7 @@ private fun AttachmentBottomSheet(
             OfflineAttachmentDownloadStatus.DOWNLOADING -> {
                 TextButton(
                     onClick = {
-                        onCancelDownload(attachment.id)
+                        onCancelDownload(attachment)
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth()
@@ -377,7 +377,7 @@ private fun AttachmentBottomSheet(
             OfflineAttachmentDownloadStatus.FAILED -> {
                 TextButton(
                     onClick = {
-                        onDeleteDownload(attachment.id)
+                        onDeleteDownload(attachment)
                         onDismiss()
                     },
                     modifier = Modifier.fillMaxWidth()

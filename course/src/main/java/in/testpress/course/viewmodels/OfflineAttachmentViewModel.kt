@@ -53,14 +53,14 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         }
     }
 
-    fun cancel(id: Long) {
-        DownloadQueueManager.cancelDownloadById(id)
+    fun cancel(offlineAttachment: OfflineAttachment) {
+        DownloadQueueManager.cancelDownloadById(offlineAttachment.id)
     }
 
-    fun delete(id: Long) {
+    fun delete(offlineAttachment: OfflineAttachment) {
         viewModelScope.launch {
-            val attachment = repo.getAttachmentById(id)
-            repo.delete(id)
+            val attachment = repo.getAttachmentById(offlineAttachment.downloadId)
+            repo.delete(offlineAttachment.id)
             attachment?.let {
                 deleteFile(it.path)
             }
