@@ -233,10 +233,15 @@ public class OrderConfirmActivity extends BaseToolBarActivity implements Payment
                     @Override
                     public void onSuccess(final Order confirmedOrder) {
                         progressBar.setVisibility(View.GONE);
-                        order.setOrderId(confirmedOrder.getOrderId()); // orderId for Razorpay order gets assigned by Razorpay on confirming
-                        PaymentGateway paymentGateway = new PaymentGatewayFactory().create(confirmedOrder, OrderConfirmActivity.this);
-                        paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
-                        paymentGateway.showPaymentPage();
+                        if (confirmedOrder.getStatus().equals("Completed")) {
+                            logEvent(EventsTrackerFacade.PAYMENT_SUCCESS);
+                            showPaymentSuccessScreen();
+                        } else {
+                            order.setOrderId(confirmedOrder.getOrderId()); // orderId for Razorpay order gets assigned by Razorpay on confirming
+                            PaymentGateway paymentGateway = new PaymentGatewayFactory().create(confirmedOrder, OrderConfirmActivity.this);
+                            paymentGateway.setPaymentGatewayListener(OrderConfirmActivity.this);
+                            paymentGateway.showPaymentPage();
+                        }
                     }
 
                     @Override
