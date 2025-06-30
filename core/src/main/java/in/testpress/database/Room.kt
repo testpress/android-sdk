@@ -43,7 +43,7 @@ import `in`.testpress.database.roommigration.RoomMigration34To35.MIGRATION_34_35
 import `in`.testpress.database.roommigration.RoomMigration35To36.MIGRATION_35_36
 import `in`.testpress.database.roommigration.RoomMigration36To37.MIGRATION_36_37
 
-@Database(version = 36,
+@Database(version = 37,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,

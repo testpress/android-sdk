@@ -9,8 +9,8 @@ data class OfflineAttachment(
     val title: String,
     val url: String,
     val path: String,
-    val fileName: String,
     val contentUri: String?,
+    val downloadId: Long,
     val status: OfflineAttachmentDownloadStatus,
     val progress: Int = 0
 )
