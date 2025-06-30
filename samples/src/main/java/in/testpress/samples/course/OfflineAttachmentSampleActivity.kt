@@ -89,12 +89,9 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         val destinationPath = File(
             Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS), attachment.title!!
         ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
-
-        val fileName = File(destinationPath).name
         viewModel.requestDownload(
             attachment,
-            destinationPath = destinationPath,
-            fileName = fileName
+            destinationPath = destinationPath
         )
     }
 
