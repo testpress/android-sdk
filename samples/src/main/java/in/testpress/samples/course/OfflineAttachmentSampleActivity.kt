@@ -1,8 +1,6 @@
 package `in`.testpress.samples.course
 
 import android.os.Bundle
-import android.os.Environment
-import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -13,16 +11,13 @@ import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
-import `in`.testpress.course.services.DownloadQueueManager.restartPendingDownloads
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.samples.databinding.ActivityOfflineAttachmentSampleBinding
 import `in`.testpress.samples.databinding.ListItemDownloadBinding
-import `in`.testpress.util.getFileExtensionFromUrl
 import kotlinx.coroutines.launch
-import java.io.File
 
 class OfflineAttachmentSampleActivity : AppCompatActivity() {
 
@@ -38,7 +33,6 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         setupRecyclerView()
         observeViewModel()
         initializeExitText()
-        restartPendingDownloads(this)
         syncDownloads()
     }
 
@@ -54,7 +48,7 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = DownloadsAdapter(
-            onCancel = { viewModel.cancel(it) },
+            onCancel = { viewModel.cancel(this, it) },
             onDelete = { viewModel.delete(this, it) },
             onOpen = { viewModel.openFile(this, it) }
         )
@@ -98,13 +92,9 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
     }
 
     private fun startDownload(attachment: DomainAttachmentContent) {
-        val destinationPath = File(
-            Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS), attachment.title!!
-        ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
         viewModel.requestDownload(
             this,
             attachment,
-            destinationPath = destinationPath
         )
     }
 

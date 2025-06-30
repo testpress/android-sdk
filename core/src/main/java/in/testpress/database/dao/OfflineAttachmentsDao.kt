@@ -25,18 +25,6 @@ interface OfflineAttachmentsDao {
     @Query("UPDATE OfflineAttachment SET status = :status WHERE id = :id")
     suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus)
 
-    @Query("UPDATE OfflineAttachment SET progress = :progress WHERE id = :id")
-    suspend fun updateProgress(id: Long, progress: Int)
-
-    @Query("UPDATE OfflineAttachment SET contentUri = :contentUri WHERE id = :id")
-    suspend fun updateContentUri(id: Long, contentUri: String)
-
-    @Query("UPDATE OfflineAttachment SET path = :path WHERE id = :id")
-    suspend fun updateFilePath(id: Long, path: String)
-
-    @Query("SELECT * FROM OfflineAttachment WHERE id = :id")
-    suspend fun getAttachmentById(id: Long): OfflineAttachment?
-
     @Query("SELECT * FROM OfflineAttachment WHERE id = :id")
     fun getAttachment(id: Long): Flow<OfflineAttachment?>
 
@@ -51,4 +39,10 @@ interface OfflineAttachmentsDao {
 
     @Query("UPDATE OfflineAttachment SET status = :status WHERE downloadId = :downloadId")
     suspend fun updateProgressWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus)
+
+    @Query("UPDATE OfflineAttachment SET path = :path WHERE downloadId = :downloadId")
+    suspend fun updateFilePathWithDownloadId(downloadId: Long, path: String)
+
+    @Query("UPDATE OfflineAttachment SET contentUri = :contentUri WHERE downloadId = :downloadId")
+    suspend fun updateContentUriWithDownloadId(downloadId: Long, contentUri: String)
 }

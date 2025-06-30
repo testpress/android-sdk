@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import android.os.Build
 import android.util.Log
+import androidx.core.net.toUri
 import `in`.testpress.database.dao.OfflineAttachmentsDao
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import kotlinx.coroutines.Dispatchers
@@ -27,8 +28,8 @@ class OfflineAttachmentSyncManager(
                         resolver.openAssetFileDescriptor(uri, "r")?.use { true } ?: false
                     }.getOrDefault(false)
                 } else {
-                    val file = File(attachment.path)
-                    file.exists()
+                    val file = attachment.path.toUri().path?.let { File(it) }
+                    file?.exists() ?: false
                 }
 
                 if (!fileExists && attachment.status == OfflineAttachmentDownloadStatus.COMPLETED) {
