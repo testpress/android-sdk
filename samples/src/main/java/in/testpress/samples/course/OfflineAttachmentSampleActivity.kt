@@ -42,8 +42,8 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
 
     private fun setupRecyclerView() {
         adapter = DownloadsAdapter(
-            onCancel = { viewModel.cancel(it.id) },
-            onDelete = { viewModel.delete(it.id) },
+            onCancel = { viewModel.cancel(it) },
+            onDelete = { viewModel.delete(it) },
             onOpen = { viewModel.openFile(this, it) }
         )
         binding.listViewDownloads.layoutManager = LinearLayoutManager(this)
