@@ -43,7 +43,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
     }
 
     fun openFile(context: Context, offlineAttachment: OfflineAttachment) {
-        OfflineAttachmentDownloadManager.getInstance().openFiles(context, offlineAttachment)
+        OfflineAttachmentDownloadManager.getInstance().openFile(context, offlineAttachment)
     }
 
     companion object {

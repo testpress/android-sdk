@@ -198,7 +198,7 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
         }
     }
 
-    fun openFiles(context: Context, offlineAttachment: OfflineAttachment) {
+    fun openFile(context: Context, offlineAttachment: OfflineAttachment) {
         val filePathUri = offlineAttachment.path
         val contentUri = offlineAttachment.contentUri
         val mimeType = getMimeTypeFromUri(context, filePathUri, contentUri)
