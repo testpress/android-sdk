@@ -110,8 +110,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
             public void onClick(View view) {
                 if (!usernameEditText.getText().toString().trim().isEmpty() &&
                         !passwordEditText.getText().toString().trim().isEmpty()) {
-                    authenticate("111",
-                            "111", TestpressSdk.Provider.TESTPRESS);
+                    authenticate(usernameEditText.getText().toString().trim(),
+                            passwordEditText.getText().toString().trim(), TestpressSdk.Provider.TESTPRESS);
                 }
             }
         });
@@ -119,8 +119,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
     }
 
     private void authenticate(String userId, String accessToken, TestpressSdk.Provider provider) {
-        InstituteSettings instituteSettings = new InstituteSettings("https://lmsdemo.testpress.in");
-        instituteSettings.setWhiteLabeledHostUrl("https://lmsdemo.testpress.in");
+        InstituteSettings instituteSettings = new InstituteSettings("https://sandbox.testpress.in");
+        instituteSettings.setWhiteLabeledHostUrl("https://sandbox.testpress.in");
         instituteSettings.setAndroidSentryDns("https://35dcf0dbd28045628831e62dd959ae4b@sentry.testpress.in/5");
         instituteSettings.setEnableOfflineExam(true);
         instituteSettings.setUseNewDiscountFeat(false);
