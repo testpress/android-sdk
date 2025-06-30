@@ -79,7 +79,7 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         return DomainAttachmentContent(
             id = index,
             title = "File $index",
-            attachmentUrl = "https://d36vpug2b5drql.cloudfront.net/institute/lmsdemo/private/courses/492/attachments/1bcdb2781fe5429bb30171296586aa5d.pdf?response-content-disposition=attachment%3B%20filename%3D100%20MB%20File.pdf&Expires=1751019079&Signature=KucUUmOHRWbG4X-YUfvRemwoVcEwxYoP6l3isK-x0VaimoGCrup4W63i4COnCDxFBlBaH~LYkv83YjVhTxhjCv4S8o75ttVYwHZqfWX0Z6RqPzEObX6TzpS9dZrTl~ACa8yiX1MhNqA5B1z17UiXvn6fYqusNw5OZviFqeoja~ngjOX4FdypnTA2GXQlv7JOmGAM3cDOC~YA1G879viq~BiqDDVx1T9zycPzVPN7kas7A6Uj-Ew1PpYIDGJte2Y2d5lvv3KyqNQ8FXZZxWEWP20B1EDW2DgDJ~1klEIKB~AsX1Eq~MIvnkV~67Hoyr246IQKMqYUE5eZNx12jsaFZw__&Key-Pair-Id=K2XWKDWM065EGO",
+            attachmentUrl = "https://d36vpug2b5drql.cloudfront.net/institute/lmsdemo/private/courses/492/attachments/1bcdb2781fe5429bb30171296586aa5d.pdf?response-content-disposition=attachment%3B%20filename%3D100%20MB%20File.pdf&Expires=1751346205&Signature=kWbUUOCzcW2-LvkqAPQMqpwMfaabbig0hXVniihR39ivVz27PGKIyfRKr8oGrGONB2pKsgfWHgdFmBuAMAYGfpJMja3x8klB2a0yk95AVoitv8vbePQVH0OBmlZFyesFJUjYYkxnf4CTjN7uavRza0QIApIk2nZCyP5bQ1Hd9CnM4rPxOLYDxFNjco2KyAjFWDHUUem6aZRMx6WCyFeax~pPa3YLzCmOhANegFQfIE3J1qbj~r~jHKziDydwAjop73zwPWGVziXwlcEzud5Rl1LAN6I3Jkk3Jf7ZWYzspeW3KOI5QDskHiGeFjBa0hrmnWBJKml6b14HCE92NTytMA__&Key-Pair-Id=K2XWKDWM065EGO",
             description = "",
             isRenderable = false
         )
