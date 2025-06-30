@@ -36,7 +36,7 @@ class OfflineAttachmentBroadcastReceiver : BroadcastReceiver() {
     private suspend fun handleDownloadCompletion(context: Context, downloadId: Long) {
         val dao = TestpressDatabase.invoke(context).offlineAttachmentDao()
         val repository = OfflineAttachmentsRepository(dao)
-        val downloadManager = context.getSystemService(DownloadManager::class.java)
+        val downloadManager = context.getSystemService(DownloadManager::class.java) ?: return
 
         val attachment = repository.getByDownloadId(downloadId) ?: return
         val downloadInfo = queryDownloadInfo(downloadManager, downloadId)
@@ -79,7 +79,12 @@ class OfflineAttachmentBroadcastReceiver : BroadcastReceiver() {
                 status = it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     path = it.getString(it.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI))
-                    contentUri = it.getString(it.getColumnIndexOrThrow(DownloadManager.COLUMN_MEDIAPROVIDER_URI))
+                    contentUri =
+                        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+                            it.getString(it.getColumnIndexOrThrow(DownloadManager.COLUMN_MEDIAPROVIDER_URI))
+                        } else {
+                            null
+                        }
                 }
             }
         }
