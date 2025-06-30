@@ -5,7 +5,6 @@ import `in`.testpress.course.services.DownloadQueueManager
 import `in`.testpress.database.dao.OfflineAttachmentsDao
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
-import `in`.testpress.util.deleteFile
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -34,6 +33,12 @@ class OfflineAttachmentsRepository(
         dao.updateStatus(id, status)
 
     private suspend fun updateProgress(id: Long, progress: Int) = dao.updateProgress(id, progress)
+
+    private suspend fun updateFileName(id: Long, fileName: String) = dao.updateFileName(id, fileName)
+
+    private suspend fun updateContentUri(id: Long, contentUri: String) = dao.updateContentUri(id, contentUri)
+
+    private suspend fun updateFilePath(id: Long, path: String) = dao.updateFilePath(id, path)
 
     suspend fun getAttachmentById(id: Long) = dao.getAttachmentById(id)
 
@@ -71,8 +76,20 @@ class OfflineAttachmentsRepository(
             val attachment = getAttachmentById(item.id)
             attachment?.let {
                 delete(item.id)
-                deleteFile(it.path)
             }
+        }
+    }
+
+    override fun onDownloadFileInfoUpdated(
+        item: DownloadItem,
+        localPath: String,
+        displayName: String,
+        contentUri: String
+    ) {
+        scope.launch {
+            updateFileName(item.id, displayName)
+            updateContentUri(item.id, contentUri)
+            updateFilePath(item.id, localPath)
         }
     }
 }

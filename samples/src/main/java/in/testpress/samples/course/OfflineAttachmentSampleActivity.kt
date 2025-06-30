@@ -43,7 +43,7 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
     private fun setupRecyclerView() {
         adapter = DownloadsAdapter(
             onCancel = { viewModel.cancel(it.id) },
-            onDelete = { viewModel.delete(it.id) },
+            onDelete = { viewModel.delete(this, it.id) },
             onOpen = { viewModel.openFile(this, it) }
         )
         binding.listViewDownloads.layoutManager = LinearLayoutManager(this)
@@ -91,7 +91,9 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
 
         val fileName = File(destinationPath).name
+
         viewModel.requestDownload(
+            this,
             attachment,
             destinationPath = destinationPath,
             fileName = fileName
