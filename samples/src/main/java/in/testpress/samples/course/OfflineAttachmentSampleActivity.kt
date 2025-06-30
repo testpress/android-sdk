@@ -10,14 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.course.domain.DomainAttachmentContent
-import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
-import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.samples.databinding.ActivityOfflineAttachmentSampleBinding
 import `in`.testpress.samples.databinding.ListItemDownloadBinding
-import kotlinx.coroutines.launch
 
 class OfflineAttachmentSampleActivity : AppCompatActivity() {
 
@@ -33,17 +30,6 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         setupRecyclerView()
         observeViewModel()
         initializeExitText()
-        syncDownloads()
-    }
-
-    private fun syncDownloads() {
-        lifecycleScope.launch {
-            val dao = TestpressDatabase.invoke(this@OfflineAttachmentSampleActivity)
-                .offlineAttachmentDao()
-            val syncManager =
-                OfflineAttachmentSyncManager(this@OfflineAttachmentSampleActivity, dao)
-            syncManager.syncDownloads()
-        }
     }
 
     private fun setupRecyclerView() {
