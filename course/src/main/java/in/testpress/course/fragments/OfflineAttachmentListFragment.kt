@@ -413,8 +413,8 @@ fun OfflineAttachmentListPreview() {
             title = "Chapter 1 Notes",
             url = "",
             path = "/path/to/file1.pdf",
-            fileName = "Chapter 1 Notes.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.COMPLETED,
             progress = 100
         ),
@@ -423,8 +423,8 @@ fun OfflineAttachmentListPreview() {
             title = "Lecture Slides - Week 2",
             url = "",
             path = "",
-            fileName = "Lecture Slides - Week 2.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.DOWNLOADING,
             progress = 50
         ),
@@ -433,8 +433,8 @@ fun OfflineAttachmentListPreview() {
             title = "Lecture Slides - Week 3",
             url = "",
             path = "",
-            fileName = "Lecture Slides - Week 3.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.DOWNLOADING,
             progress = 0
         ),
@@ -443,8 +443,8 @@ fun OfflineAttachmentListPreview() {
             title = "Corrupted",
             url = "",
             path = "",
-            fileName = "Corrupted.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.FAILED
         ),
         OfflineAttachment(
@@ -452,8 +452,8 @@ fun OfflineAttachmentListPreview() {
             title = "QUEUED",
             url = "",
             path = "",
-            fileName = "QUEUED.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.QUEUED
         )
     )
@@ -475,8 +475,8 @@ fun AttachmentBottomSheetForDeletePreview() {
             title = "Lecture Slides - Week 2.pdf",
             url = "",
             path = "",
-            fileName = "Lecture Slides - Week 2.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.FAILED,
             progress = 0
         ),
@@ -495,8 +495,8 @@ fun AttachmentBottomSheetForCancelPreview() {
             title = "Lecture Slides - Week 2.pdf",
             url = "",
             path = "",
-            fileName = "Lecture Slides - Week 2.pdf",
             contentUri = "content://media/downloaded/110111",
+            downloadId = 100,
             status = OfflineAttachmentDownloadStatus.QUEUED,
             progress = 20
         ),

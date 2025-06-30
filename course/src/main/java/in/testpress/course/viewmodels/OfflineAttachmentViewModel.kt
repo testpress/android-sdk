@@ -34,8 +34,7 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 
     fun requestDownload(
         attachment: DomainAttachmentContent,
-        destinationPath: String,
-        fileName: String
+        destinationPath: String
     ) {
         if (attachment.attachmentUrl.isNullOrEmpty()) return
         val file = OfflineAttachment(
@@ -44,8 +43,8 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
             // If thr url is null, it will be empty string and download will be failed
             url = attachment.attachmentUrl,
             path = destinationPath,
-            fileName = fileName,
             contentUri = null,
+            downloadId = -1,
             status = OfflineAttachmentDownloadStatus.QUEUED
         )
         viewModelScope.launch {
