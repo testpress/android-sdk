@@ -38,7 +38,7 @@ interface OfflineAttachmentsDao {
     suspend fun updateProgressWithDownloadId(downloadId: Long, progress: Int)
 
     @Query("UPDATE OfflineAttachment SET status = :status WHERE downloadId = :downloadId")
-    suspend fun updateProgressWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus)
+    suspend fun updateStatusWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus)
 
     @Query("UPDATE OfflineAttachment SET path = :path WHERE downloadId = :downloadId")
     suspend fun updateFilePathWithDownloadId(downloadId: Long, path: String)

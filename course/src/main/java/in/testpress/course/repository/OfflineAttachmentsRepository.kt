@@ -19,7 +19,7 @@ class OfflineAttachmentsRepository(private val dao: OfflineAttachmentsDao) {
 
     suspend fun updateProgressWithDownloadId(downloadId: Long, progress: Int) = dao.updateProgressWithDownloadId(downloadId, progress)
 
-    suspend fun updateStatusWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus) = dao.updateProgressWithDownloadId(downloadId, status)
+    suspend fun updateStatusWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus) = dao.updateStatusWithDownloadId(downloadId, status)
 
     suspend fun updateFilePathWithDownloadId(downloadId: Long, path: String) = dao.updateFilePathWithDownloadId(downloadId, path)
 
