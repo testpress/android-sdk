@@ -1,12 +1,12 @@
 package `in`.testpress.course.fragments
 
-import android.net.Uri
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.util.PermissionsUtils
 import `in`.testpress.util.ViewUtils
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,16 +14,29 @@ import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
-import `in`.testpress.util.FileDownloader
-import java.io.File
+import androidx.lifecycle.lifecycleScope
+import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
+import `in`.testpress.database.entities.OfflineAttachment
+import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.launch
 
 class AttachmentContentFragment : BaseContentDetailFragment() {
     private lateinit var attachmentContentLayout: LinearLayout
     private lateinit var titleView: TextView
     private lateinit var description: TextView
     private lateinit var titleLayout: LinearLayout
-    private lateinit var downloadButton: Button
+    private lateinit var actionButton: Button
     private lateinit var permissionsUtils: PermissionsUtils
+    private lateinit var offlineAttachmentViewModel: OfflineAttachmentViewModel
+    private var downloadStatusJob: Job? = null
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        offlineAttachmentViewModel = OfflineAttachmentViewModel.get(requireActivity())
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -40,9 +53,9 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         titleLayout = view.findViewById(R.id.title_layout)
         description = view.findViewById(R.id.description)
         description.typeface = TestpressSdk.getRubikRegularFont(requireContext())
-        downloadButton = view.findViewById(R.id.download_attachment)
+        actionButton = view.findViewById(R.id.download_attachment)
         ViewUtils.setTypeface(arrayOf(titleView), TestpressSdk.getRubikMediumFont(requireActivity()))
-        ViewUtils.setLeftDrawable(context, downloadButton, R.drawable.ic_file_download_18dp)
+        ViewUtils.setLeftDrawable(context, actionButton, R.drawable.ic_file_download_18dp)
         permissionsUtils = PermissionsUtils(requireActivity(), view)
     }
 
@@ -50,6 +63,7 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         showTitle()
         showDescription()
         setupDownloadButton()
+        observeDownloadStatus()
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)
     }
@@ -66,40 +80,95 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     }
 
     private fun setupDownloadButton() {
-        val attachment = content.attachment ?: return
-        downloadButton.setOnClickListener {
-            onDownloadClick(attachment)
+        updateActionButton("Download Attachment", true) {
+            onDownloadClick(content.attachment!!)
         }
     }
 
-    private fun onDownloadClick(attachment: DomainAttachmentContent){
-        if (permissionsUtils.isStoragePermissionGranted){
+    private fun observeDownloadStatus() {
+        val attachment = content.attachment ?: return
+        if (downloadStatusJob?.isActive == true) return
+
+        downloadStatusJob = viewLifecycleOwner.lifecycleScope.launch {
+            offlineAttachmentViewModel.getOfflineAttachment(attachment.id)
+                .filterNotNull()
+                .distinctUntilChanged()
+                .collect { offlineAttachment ->
+                when (offlineAttachment.status) {
+                    OfflineAttachmentDownloadStatus.FAILED -> {
+                        handleDownloadFailed(offlineAttachment)
+                    }
+
+                    OfflineAttachmentDownloadStatus.DELETE -> {
+                        handleDownloadDeleted(offlineAttachment)
+                    }
+
+                    OfflineAttachmentDownloadStatus.COMPLETED -> {
+                        handleDownloadCompleted(offlineAttachment)
+                    }
+
+                    OfflineAttachmentDownloadStatus.QUEUED -> {
+                        updateActionButton("Waiting to download", isClickable = false)
+                    }
+
+                    OfflineAttachmentDownloadStatus.DOWNLOADING -> {
+                        val progressText = "Downloading...%${offlineAttachment.progress}"
+                        updateActionButton(progressText, isClickable = false)
+                    }
+                }
+            }
+        }
+    }
+
+    private fun handleDownloadFailed(attachment: OfflineAttachment) {
+        offlineAttachmentViewModel.deleteById(attachment.id)
+        updateActionButton("Download Attachment", isClickable = true) {
+            onDownloadClick(content.attachment!!)
+        }
+        showToast("Download Failed. Try Again")
+    }
+
+    private fun handleDownloadDeleted(attachment: OfflineAttachment) {
+        offlineAttachmentViewModel.deleteById(attachment.id)
+        updateActionButton("Download Attachment", isClickable = true) {
+            onDownloadClick(content.attachment!!)
+        }
+        showToast("Download has been removed")
+    }
+
+    private fun handleDownloadCompleted(attachment: OfflineAttachment) {
+        updateActionButton("Open Attachment", isClickable = true) {
+            offlineAttachmentViewModel.openFile(requireContext(), attachment)
+        }
+    }
+
+    private fun updateActionButton(text: String, isClickable: Boolean, onClick: (() -> Unit)? = null) {
+        actionButton.text = text
+        actionButton.isClickable = isClickable
+        actionButton.setOnClickListener(null)
+        onClick?.let { actionButton.setOnClickListener { it() } }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun onDownloadClick(attachment: DomainAttachmentContent) {
+        if (permissionsUtils.isStoragePermissionGranted) {
             forceReloadContent {
-                downloadFile(attachment)
+                offlineAttachmentViewModel.requestDownload(
+                    requireContext(),
+                    attachment = attachment
+                )
             }
         } else {
             permissionsUtils.requestStoragePermissionWithSnackbar()
         }
     }
 
-    private fun downloadFile(attachment: DomainAttachmentContent){
-        if (isDownloadUrlAvailable(attachment.attachmentUrl)){
-            val fileDownloader = FileDownloader(requireContext())
-            fileDownloader.downloadFile(
-                attachment.attachmentUrl!!,
-                "${attachment.title!!}${getFileType(attachment.attachmentUrl)}"
-            )
-        } else {
-            Toast.makeText(requireContext(),"File not available, Please try-again later",Toast.LENGTH_SHORT).show()
-        }
-    }
-
-    private fun isDownloadUrlAvailable(url:String?) = !url.isNullOrEmpty()
-
-    private fun getFileType(url: String): String {
-        val uri = Uri.parse(url)
-        val filename = uri.lastPathSegment ?: ""
-        val extension = File(filename).extension
-        return if (extension.isNotBlank()) ".${extension}" else ""
+    override fun onDestroyView() {
+        super.onDestroyView()
+        downloadStatusJob?.cancel()
+        downloadStatusJob = null
     }
 }

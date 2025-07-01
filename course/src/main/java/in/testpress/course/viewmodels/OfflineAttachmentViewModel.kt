@@ -14,6 +14,7 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 
 class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(application) {
     private val dao = TestpressDatabase.invoke(application).offlineAttachmentDao()
@@ -44,6 +45,12 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 
     fun openFile(context: Context, offlineAttachment: OfflineAttachment) {
         OfflineAttachmentDownloadManager.getInstance().openFile(context, offlineAttachment)
+    }
+
+    fun deleteById(id: Long) {
+        viewModelScope.launch {
+            repo.delete(id)
+        }
     }
 
     companion object {
