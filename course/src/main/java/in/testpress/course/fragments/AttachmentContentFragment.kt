@@ -47,19 +47,29 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     }
 
     override fun display() {
+        showTitle()
+        showDescription()
+        setupDownloadButton()
+        attachmentContentLayout.visibility = View.VISIBLE
+        viewModel.createContentAttempt(contentId)
+    }
+
+    private fun showTitle() {
         titleView.text = content.title
         titleLayout.visibility = View.VISIBLE
+    }
 
-        val attachment = content.attachment!!
-        if (!attachment.description.isNullOrEmpty()) {
-            description.text = attachment.description
-        }
+    private fun showDescription() {
+        content.attachment?.description
+            ?.takeIf { it.isNotEmpty() }
+            ?.let { description.text = it }
+    }
 
+    private fun setupDownloadButton() {
+        val attachment = content.attachment ?: return
         downloadButton.setOnClickListener {
             onDownloadClick(attachment)
         }
-        attachmentContentLayout.visibility = View.VISIBLE
-        viewModel.createContentAttempt(contentId)
     }
 
     private fun onDownloadClick(attachment: DomainAttachmentContent){
