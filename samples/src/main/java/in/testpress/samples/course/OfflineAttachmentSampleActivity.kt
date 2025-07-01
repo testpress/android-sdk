@@ -1,8 +1,6 @@
 package `in`.testpress.samples.course
 
 import android.os.Bundle
-import android.os.Environment
-import android.os.Environment.DIRECTORY_DOWNLOADS
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.appcompat.app.AppCompatActivity
@@ -12,15 +10,11 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import `in`.testpress.course.domain.DomainAttachmentContent
-import `in`.testpress.course.services.DownloadQueueManager.restartPendingDownloads
-import `in`.testpress.course.services.DownloadQueueManager.syncDownloadedFileWithDatabase
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.samples.databinding.ActivityOfflineAttachmentSampleBinding
 import `in`.testpress.samples.databinding.ListItemDownloadBinding
-import `in`.testpress.util.getFileExtensionFromUrl
-import java.io.File
 
 class OfflineAttachmentSampleActivity : AppCompatActivity() {
 
@@ -36,14 +30,12 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
         setupRecyclerView()
         observeViewModel()
         initializeExitText()
-        restartPendingDownloads(this)
-        syncDownloadedFileWithDatabase(this)
     }
 
     private fun setupRecyclerView() {
         adapter = DownloadsAdapter(
-            onCancel = { viewModel.cancel(it) },
-            onDelete = { viewModel.delete(it) },
+            onCancel = { viewModel.cancel(this, it) },
+            onDelete = { viewModel.delete(this, it) },
             onOpen = { viewModel.openFile(this, it) }
         )
         binding.listViewDownloads.layoutManager = LinearLayoutManager(this)
@@ -86,12 +78,9 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
     }
 
     private fun startDownload(attachment: DomainAttachmentContent) {
-        val destinationPath = File(
-            Environment.getExternalStoragePublicDirectory(DIRECTORY_DOWNLOADS), attachment.title!!
-        ).path + getFileExtensionFromUrl(attachment.attachmentUrl)
         viewModel.requestDownload(
+            this,
             attachment,
-            destinationPath = destinationPath
         )
     }
 

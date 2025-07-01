@@ -1,26 +1,11 @@
 package `in`.testpress.course.repository
 
-import `in`.testpress.course.services.DownloadItem
-import `in`.testpress.course.services.DownloadQueueManager
 import `in`.testpress.database.dao.OfflineAttachmentsDao
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
-import `in`.testpress.util.deleteFile
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.launch
 
-class OfflineAttachmentsRepository(
-    private val dao: OfflineAttachmentsDao,
-    private val scope: CoroutineScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-) :
-    DownloadQueueManager.Callback {
-
-    init {
-        DownloadQueueManager.setCallback(this)
-    }
+class OfflineAttachmentsRepository(private val dao: OfflineAttachmentsDao) {
 
     suspend fun getAll(): List<OfflineAttachment> = dao.getAll()
 
@@ -28,51 +13,19 @@ class OfflineAttachmentsRepository(
 
     suspend fun insert(file: OfflineAttachment) = dao.insert(file)
 
+    suspend fun update(file: OfflineAttachment) = dao.update(file)
+
     suspend fun delete(id: Long) = dao.deleteById(id)
 
-    suspend fun updateStatus(id: Long, status: OfflineAttachmentDownloadStatus) =
-        dao.updateStatus(id, status)
+    suspend fun updateProgressWithDownloadId(downloadId: Long, progress: Int) = dao.updateProgressWithDownloadId(downloadId, progress)
 
-    private suspend fun updateProgress(id: Long, progress: Int) = dao.updateProgress(id, progress)
+    suspend fun updateStatusWithDownloadId(downloadId: Long, status: OfflineAttachmentDownloadStatus) = dao.updateStatusWithDownloadId(downloadId, status)
 
-    suspend fun getAttachmentById(id: Long) = dao.getAttachmentById(id)
+    suspend fun updateFilePathWithDownloadId(downloadId: Long, path: String) = dao.updateFilePathWithDownloadId(downloadId, path)
 
+    suspend fun getByDownloadId(downloadId: Long) = dao.getByDownloadId(downloadId)
     fun getAttachment(id: Long) = dao.getAttachment(id)
 
     suspend fun getAllWithStatus(status: OfflineAttachmentDownloadStatus) =
         dao.getAllWithStatus(status)
-
-    override fun onDownloadStarted(item: DownloadItem) {
-        scope.launch {
-            updateStatus(item.id, OfflineAttachmentDownloadStatus.DOWNLOADING)
-        }
-    }
-
-    override fun onProgress(item: DownloadItem, progress: Int) {
-        scope.launch {
-            updateProgress(item.id, progress)
-        }
-    }
-
-    override fun onDownloadCompleted(item: DownloadItem) {
-        scope.launch {
-            updateStatus(item.id, OfflineAttachmentDownloadStatus.COMPLETED)
-        }
-    }
-
-    override fun onDownloadFailed(item: DownloadItem, error: Throwable) {
-        scope.launch {
-            updateStatus(item.id, OfflineAttachmentDownloadStatus.FAILED)
-        }
-    }
-
-    override fun onDownloadCancelled(item: DownloadItem) {
-        scope.launch {
-            val attachment = getAttachmentById(item.id)
-            attachment?.let {
-                delete(item.id)
-                deleteFile(it.path)
-            }
-        }
-    }
 }

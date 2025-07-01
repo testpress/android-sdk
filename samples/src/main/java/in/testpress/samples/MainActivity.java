@@ -6,6 +6,10 @@ import androidx.annotation.Nullable;
 import android.view.View;
 
 import in.testpress.core.TestpressSdk;
+import in.testpress.course.repository.OfflineAttachmentsRepository;
+import in.testpress.course.services.OfflineAttachmentDownloadManager;
+import in.testpress.database.TestpressDatabase;
+import in.testpress.database.dao.OfflineAttachmentsDao;
 import in.testpress.exam.TestpressExam;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.samples.core.TestpressCoreSampleActivity;
@@ -24,6 +28,7 @@ public class MainActivity extends BaseToolBarActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ActivityKt.requestStoragePermission(this);
+        initOfflineAttachmentDownloadManager();
         findViewById(R.id.core).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -58,6 +63,13 @@ public class MainActivity extends BaseToolBarActivity {
                 startActivity(intent);
             }
         });
+    }
+
+    private void initOfflineAttachmentDownloadManager() {
+        OfflineAttachmentsDao offlineAttachmentDao = TestpressDatabase.Companion.invoke(this).offlineAttachmentDao();
+        OfflineAttachmentsRepository offlineAttachmentsRepository =new OfflineAttachmentsRepository(offlineAttachmentDao);
+        OfflineAttachmentDownloadManager.Companion.init(offlineAttachmentsRepository);
+        OfflineAttachmentDownloadManager.Companion.getInstance().restartDownloadProgressTracking(this);
     }
 
     private void showAnalytics() {
