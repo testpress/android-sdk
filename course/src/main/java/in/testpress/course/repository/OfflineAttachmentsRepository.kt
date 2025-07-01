@@ -23,8 +23,6 @@ class OfflineAttachmentsRepository(private val dao: OfflineAttachmentsDao) {
 
     suspend fun updateFilePathWithDownloadId(downloadId: Long, path: String) = dao.updateFilePathWithDownloadId(downloadId, path)
 
-    suspend fun updateFilePathWithDownloadId(downloadId: Long, path: String) = dao.updateFilePathWithDownloadId(downloadId, path)
-
     suspend fun getByDownloadId(downloadId: Long) = dao.getByDownloadId(downloadId)
     fun getAttachment(id: Long) = dao.getAttachment(id)
 
