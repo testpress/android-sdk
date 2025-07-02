@@ -62,7 +62,6 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     override fun display() {
         showTitle()
         showDescription()
-        setupDownloadButton()
         observeDownloadStatus()
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)
@@ -79,22 +78,15 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
             ?.let { description.text = it }
     }
 
-    private fun setupDownloadButton() {
-        updateActionButton("Download Attachment", true) {
-            onDownloadClick(content.attachment!!)
-        }
-    }
-
     private fun observeDownloadStatus() {
         val attachment = content.attachment ?: return
         if (downloadStatusJob?.isActive == true) return
 
         downloadStatusJob = viewLifecycleOwner.lifecycleScope.launch {
             offlineAttachmentViewModel.getOfflineAttachment(attachment.id)
-                .filterNotNull()
                 .distinctUntilChanged()
                 .collect { offlineAttachment ->
-                when (offlineAttachment.status) {
+                when (offlineAttachment?.status) {
                     OfflineAttachmentDownloadStatus.FAILED -> {
                         handleDownloadFailed(offlineAttachment)
                     }
@@ -114,6 +106,11 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
                     OfflineAttachmentDownloadStatus.DOWNLOADING -> {
                         val progressText = "Downloading...%${offlineAttachment.progress}"
                         updateActionButton(progressText, isClickable = false)
+                    }
+                    null-> {
+                        updateActionButton("Download Attachment", true) {
+                            onDownloadClick(content.attachment!!)
+                        }
                     }
                 }
             }
