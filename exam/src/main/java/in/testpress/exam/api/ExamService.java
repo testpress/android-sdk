@@ -110,7 +110,7 @@ public interface ExamService {
     @PATCH("{end_exam_url}")
     RetrofitCall<CourseAttempt> endContentAttempt(
             @Path(value = "end_exam_url", encoded = true) String endExamUrlFrag,
-            @Body Map<String, Object> body);
+            @Body Map<String, Object> requestBody);
 
     @GET("{attempts_url}")
     RetrofitCall<TestpressApiResponse<Attempt>> getAttempts(

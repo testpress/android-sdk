@@ -1680,7 +1680,7 @@ public class TestFragment extends BaseFragment implements
 
         if (exceededViolationCount){
             builder.setMessage(R.string.exam_final_violation_message);
-            builder.setPositiveButton("OK", (dialog, which)  -> endExam(true));
+            builder.setPositiveButton(R.string.testpress_ok, (dialog, which)  -> endExam(true));
         } else {
             String message = getString(
                     R.string.window_violation_warning,

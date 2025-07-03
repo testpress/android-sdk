@@ -33,6 +33,7 @@ import in.testpress.v2_4.models.BookmarksListResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
+import okhttp3.ResponseBody;
 
 public class TestpressExamApiClient extends TestpressApiClient {
 
@@ -152,14 +153,19 @@ public class TestpressExamApiClient extends TestpressApiClient {
 
     public RetrofitCall<CourseAttempt> endContentAttempt(String endAttemptUrlFrag, boolean isExamWindowViolated) {
         if (isExamWindowViolated){
-            Map<String, Object> body = new HashMap<>();
-            Map<String, Object> assessment = new HashMap<>();
-            assessment.put("is_exam_window_violated", true);
-            body.put("assessment", assessment);
-            return getExamService().endContentAttempt(endAttemptUrlFrag, body);
+            Map<String, Object> requestBody = createExamViolationBody();
+            return getExamService().endContentAttempt(endAttemptUrlFrag, requestBody);
         } else {
             return getExamService().endContentAttempt(endAttemptUrlFrag);
         }
+    }
+
+    private Map<String, Object> createExamViolationBody() {
+        Map<String, Object> requestBody = new HashMap<>();
+        Map<String, Object> assessment = new HashMap<>();
+        assessment.put("is_exam_window_violated", true);
+        requestBody.put("assessment", assessment);
+        return requestBody;
     }
 
     public RetrofitCall<TestpressApiResponse<AttemptItem>> getQuestions(
