@@ -67,6 +67,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property ExamDataModifiedOn = new Property(39, String.class, "examDataModifiedOn", false, "EXAM_DATA_MODIFIED_ON");
         public final static Property IsOfflineExam = new Property(40, Boolean.class, "isOfflineExam", false, "IS_OFFLINE_EXAM");
         public final static Property GraceDurationForOfflineSubmission = new Property(41, Long.class, "graceDurationForOfflineSubmission", false, "GRACE_DURATION_FOR_OFFLINE_SUBMISSION");
+        public final static Property EnableExamWindowMonitoring = new Property(42, Boolean.class, "enableExamWindowMonitoring", false, "ENABLE_EXAM_WINDOW_MONITORING");
     }
 
     private DaoSession daoSession;
@@ -127,7 +128,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"ALLOW_PREEMPTIVE_SECTION_ENDING\" INTEGER," + // 38: allowPreemptiveSectionEnding
                 "\"EXAM_DATA_MODIFIED_ON\" TEXT," + // 39: examDataModifiedOn
                 "\"IS_OFFLINE_EXAM\" INTEGER," + // 40: isOfflineExam
-                "\"GRACE_DURATION_FOR_OFFLINE_SUBMISSION\" INTEGER);"); // 41: graceDurationForOfflineSubmission
+                "\"GRACE_DURATION_FOR_OFFLINE_SUBMISSION\" INTEGER," + // 41: graceDurationForOfflineSubmission
+                "\"ENABLE_EXAM_WINDOW_MONITORING\" INTEGER);"); // 42: enableExamWindowMonitoring
     }
 
     /** Drops the underlying database table. */
@@ -349,6 +351,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (graceDurationForOfflineSubmission != null) {
             stmt.bindLong(42, graceDurationForOfflineSubmission);
         }
+ 
+        Boolean enableExamWindowMonitoring = entity.getEnableExamWindowMonitoring();
+        if (enableExamWindowMonitoring != null) {
+            stmt.bindLong(43, enableExamWindowMonitoring ? 1L: 0L);
+        }
     }
 
     @Override
@@ -564,6 +571,11 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (graceDurationForOfflineSubmission != null) {
             stmt.bindLong(42, graceDurationForOfflineSubmission);
         }
+ 
+        Boolean enableExamWindowMonitoring = entity.getEnableExamWindowMonitoring();
+        if (enableExamWindowMonitoring != null) {
+            stmt.bindLong(43, enableExamWindowMonitoring ? 1L: 0L);
+        }
     }
 
     @Override
@@ -621,7 +633,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 38) ? null : cursor.getShort(offset + 38) != 0, // allowPreemptiveSectionEnding
             cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39), // examDataModifiedOn
             cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0, // isOfflineExam
-            cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41) // graceDurationForOfflineSubmission
+            cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41), // graceDurationForOfflineSubmission
+            cursor.isNull(offset + 42) ? null : cursor.getShort(offset + 42) != 0 // enableExamWindowMonitoring
         );
         return entity;
     }
@@ -670,6 +683,7 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setExamDataModifiedOn(cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39));
         entity.setIsOfflineExam(cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0);
         entity.setGraceDurationForOfflineSubmission(cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41));
+        entity.setEnableExamWindowMonitoring(cursor.isNull(offset + 42) ? null : cursor.getShort(offset + 42) != 0);
      }
     
     @Override
