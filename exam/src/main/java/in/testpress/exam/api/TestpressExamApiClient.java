@@ -33,7 +33,6 @@ import in.testpress.v2_4.models.BookmarksListResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 import in.testpress.network.RetrofitCall;
 import in.testpress.network.TestpressApiClient;
-import okhttp3.ResponseBody;
 
 public class TestpressExamApiClient extends TestpressApiClient {
 
