@@ -1653,17 +1653,36 @@ public class TestFragment extends BaseFragment implements
         }
 
         if (currentViolationCount > MAX_VIOLATION_COUNT) {
-            endExam();
+            showFinalViolationDialog();
         } else if (currentViolationCount > 0) {
             showViolationDialog();
         }
+    }
+
+    private void showFinalViolationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle(R.string.window_switch_detected_title);
+        builder.setMessage(R.string.exam_final_violation_message);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                dialog.dismiss();
+                endExam();
+            }
+        });
+
+        builder.setCancelable(false);
+        builder.show();
     }
 
     private void showViolationDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
                 R.style.TestpressAppCompatAlertDialogStyle);
 
-        builder.setTitle(getString(R.string.window_switch_detected_title));
+        builder.setTitle(R.string.window_switch_detected_title);
 
         String message = getString(
                 R.string.window_violation_warning,
