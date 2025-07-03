@@ -207,7 +207,7 @@ class ExamRepository(val context: Context) {
         }
     }
 
-    fun endContentAttempt(attemptId: Long, attemptEndFrag: String) {
+    fun endContentAttempt(attemptId: Long, attemptEndFrag: String, isExamWindowViolated: Boolean) {
         _contentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam){
             CoroutineScope(Dispatchers.IO).launch {
@@ -228,7 +228,7 @@ class ExamRepository(val context: Context) {
                 )
             }
         } else {
-            apiClient.endContentAttempt(attemptEndFrag)
+            apiClient.endContentAttempt(attemptEndFrag, isExamWindowViolated)
                 .enqueue(object : TestpressCallback<CourseAttempt>() {
                     override fun onSuccess(result: CourseAttempt) {
                         _contentAttemptResource.postValue(Resource.success(result))

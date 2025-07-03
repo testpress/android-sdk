@@ -1244,6 +1244,10 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endExam() {
+        endExam(false);
+    }
+
+    void endExam(boolean isExamWindowViolated) {
         stopTimer();
         // Save attemptItem, if option or review is changed
         if (!attemptItemList.isEmpty() && attemptItemList.get(viewPager.getCurrentItem()).hasChanged()) {
@@ -1252,7 +1256,7 @@ public class TestFragment extends BaseFragment implements
         }
         showProgress(R.string.testpress_ending_exam);
         if (courseContent != null) {
-            attemptViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl());
+            attemptViewModel.endContentAttempt(courseAttempt.getEndAttemptUrl(), isExamWindowViolated);
         } else {
             attemptViewModel.endAttempt(attempt.getEndUrlFrag());
         }
@@ -1676,7 +1680,7 @@ public class TestFragment extends BaseFragment implements
 
         if (exceededViolationCount){
             builder.setMessage(R.string.exam_final_violation_message);
-            builder.setPositiveButton("OK", (dialog, which)  -> endExam());
+            builder.setPositiveButton("OK", (dialog, which)  -> endExam(true));
         } else {
             String message = getString(
                     R.string.window_violation_warning,

@@ -291,7 +291,7 @@ class AttemptRepository(val context: Context) {
 
     }
 
-    fun endContentAttempt(attemptEndFrag: String) {
+    fun endContentAttempt(attemptEndFrag: String, isExamWindowViolated: Boolean) {
         _endContentAttemptResource.postValue(Resource.loading(null))
         if (isOfflineExam) {
             CoroutineScope(Dispatchers.IO).launch {
@@ -304,7 +304,7 @@ class AttemptRepository(val context: Context) {
                 _endContentAttemptResource.postValue(Resource.success(offlineCourseAttempt!!.createGreenDoaModel(attempt)))
             }
         } else {
-            apiClient.endContentAttempt(attemptEndFrag)
+            apiClient.endContentAttempt(attemptEndFrag, isExamWindowViolated)
                 .enqueue(object : TestpressCallback<CourseAttempt>() {
                     override fun onSuccess(result: CourseAttempt) {
                         _endContentAttemptResource.postValue(Resource.success(result))
