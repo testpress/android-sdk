@@ -88,8 +88,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     }
 
     private void showOrHideCourseValidity(Course course) {
-        setText(8, CourseKt.getFormattedExpiryDate(course));
-        setGone(8, CourseKt.getFormattedExpiryDate(course).isEmpty());
+        final String formattedDate = CourseKt.getFormattedExpiryDate(course);
+        setText(8, formattedDate);
+        setGone(8, formattedDate.isEmpty());
     }
 
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
