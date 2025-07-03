@@ -904,7 +904,7 @@ public class Exam implements android.os.Parcelable {
     }
 
     public boolean isWindowMonitoringEnabled() {
-        return disableAttemptResume != null && disableAttemptResume;
+        return enableExamWindowMonitoring != null && enableExamWindowMonitoring;
     }
 
     public boolean isPreemptiveSectionEndingEnabled() {
