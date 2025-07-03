@@ -46,6 +46,7 @@ fun OfflineExam.asGreenDaoModel(): Exam {
         this.allowPreemptiveSectionEnding,
         this.examDataModifiedOn,
         true,
-        this.graceDurationForOfflineSubmission
+        this.graceDurationForOfflineSubmission,
+        false
     )
 }
