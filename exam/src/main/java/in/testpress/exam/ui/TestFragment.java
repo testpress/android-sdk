@@ -1660,42 +1660,29 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void showFinalViolationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
-                R.style.TestpressAppCompatAlertDialogStyle);
-
-        builder.setTitle(R.string.window_switch_detected_title);
-        builder.setMessage(R.string.exam_final_violation_message);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
-                endExam();
-            }
-        });
-
-        builder.setCancelable(false);
-        builder.show();
+        showViolationAlertDialog(getString(R.string.exam_final_violation_message), this::endExam);
     }
 
     private void showViolationDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
-                R.style.TestpressAppCompatAlertDialogStyle);
-
-        builder.setTitle(R.string.window_switch_detected_title);
-
         String message = getString(
                 R.string.window_violation_warning,
                 currentViolationCount,
                 MAX_VIOLATION_COUNT
         );
+        showViolationAlertDialog(message, null);
+    }
 
+    private void showViolationAlertDialog(CharSequence message, Runnable onPositiveClick) {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle(R.string.window_switch_detected_title);
         builder.setMessage(message);
 
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                dialog.dismiss();
+        builder.setPositiveButton("OK", (dialog, which) -> {
+            dialog.dismiss();
+            if (onPositiveClick != null) {
+                onPositiveClick.run();
             }
         });
 
