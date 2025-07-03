@@ -1663,10 +1663,15 @@ public class TestFragment extends BaseFragment implements
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
                 R.style.TestpressAppCompatAlertDialogStyle);
 
-        builder.setTitle("Window Switch Detected");
-        builder.setMessage("You switched windows " + currentViolationCount +
-                " time(s). Switching windows more than " + MAX_VIOLATION_COUNT +
-                " times will end the exam.");
+        builder.setTitle(getString(R.string.window_switch_detected_title));
+
+        String message = getString(
+                R.string.window_violation_warning,
+                currentViolationCount,
+                MAX_VIOLATION_COUNT
+        );
+
+        builder.setMessage(message);
 
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
