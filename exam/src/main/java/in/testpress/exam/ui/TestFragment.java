@@ -147,6 +147,8 @@ public class TestFragment extends BaseFragment implements
     private InstituteSettings instituteSettings;
     private EventsTrackerFacade eventsTrackerFacade;
     private AttemptViewModel attemptViewModel;
+    private static final long MAX_VIOLATION_COUNT = 2;
+    private long currentViolationCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -1644,7 +1646,37 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        removeAppBackgroundHandler();
+
+        if (!exam.isWindowMonitoringEnabled()) {
+            removeAppBackgroundHandler();
+            return;
+        }
+
+        if (currentViolationCount > MAX_VIOLATION_COUNT) {
+            endExam();
+        } else if (currentViolationCount > 0) {
+            showViolationDialog();
+        }
+    }
+
+    private void showViolationDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle("Window Switch Detected");
+        builder.setMessage("You switched windows " + currentViolationCount +
+                " time(s). Switching windows more than " + MAX_VIOLATION_COUNT +
+                " times will end the exam.");
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                removeAppBackgroundHandler();
+            }
+        });
+
+        builder.setCancelable(false);
+        builder.show();
     }
 
     void removeAppBackgroundHandler() {
@@ -1660,6 +1692,9 @@ public class TestFragment extends BaseFragment implements
         saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
         appBackgroundStateHandler = new Handler();
         appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
+        if (exam.isWindowMonitoringEnabled()) {
+            currentViolationCount++;
+        }
     }
 
     @Override
