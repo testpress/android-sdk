@@ -12,6 +12,7 @@ import in.testpress.ui.WebViewActivity;
 import in.testpress.models.greendao.Course;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.util.extension.CourseKt;
 
 class CourseListAdapter extends SingleTypeAdapter<Course> {
 
@@ -87,8 +88,9 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     }
 
     private void showOrHideCourseValidity(Course course) {
-        setText(8, course.getFormattedExpiryDate());
-        setGone(8, course.getFormattedExpiryDate().isEmpty());
+        final String formattedDate = CourseKt.getFormattedExpiryDate(course);
+        setText(8, formattedDate);
+        setGone(8, formattedDate.isEmpty());
     }
 
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
