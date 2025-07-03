@@ -615,7 +615,6 @@ public class TestActivity extends BaseToolBarActivity  {
                 }
             });
             builder.setNegativeButton("Cancel", null);
-            builder.setCancelable(false);
             builder.show();
         } else {
             startExam(false);
