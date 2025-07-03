@@ -1655,26 +1655,13 @@ public class TestFragment extends BaseFragment implements
         }
 
         if (currentViolationCount > MAX_VIOLATION_COUNT) {
-            showFinalViolationDialog();
+            showViolationAlertDialog(true);
         } else if (currentViolationCount > 0) {
-            showViolationDialog();
+            showViolationAlertDialog(false);
         }
     }
 
-    private void showFinalViolationDialog() {
-        showViolationAlertDialog(getString(R.string.exam_final_violation_message), this::endExam);
-    }
-
-    private void showViolationDialog() {
-        String message = getString(
-                R.string.window_violation_warning,
-                currentViolationCount,
-                MAX_VIOLATION_COUNT
-        );
-        showViolationAlertDialog(message, null);
-    }
-
-    private void showViolationAlertDialog(CharSequence message, Runnable onPositiveClick) {
+    private void showViolationAlertDialog(boolean exceededViolationCount) {
         if (!isAdded()) return;
 
         if (windowViolationDialog != null && windowViolationDialog.isShowing()) {
@@ -1686,14 +1673,19 @@ public class TestFragment extends BaseFragment implements
                 R.style.TestpressAppCompatAlertDialogStyle);
 
         builder.setTitle(R.string.window_switch_detected_title);
-        builder.setMessage(message);
 
-        builder.setPositiveButton("OK", (dialog, which) -> {
-            if (onPositiveClick != null) {
-                onPositiveClick.run();
-            }
-        });
-
+        if (exceededViolationCount){
+            builder.setMessage(R.string.exam_final_violation_message);
+            builder.setPositiveButton("OK", (dialog, which)  -> endExam());
+        } else {
+            String message = getString(
+                    R.string.window_violation_warning,
+                    currentViolationCount,
+                    MAX_VIOLATION_COUNT
+            );
+            builder.setMessage(message);
+            builder.setPositiveButton("OK",null);
+        }
         builder.setCancelable(false);
         windowViolationDialog = builder.create();
         windowViolationDialog.show();
@@ -1730,7 +1722,7 @@ public class TestFragment extends BaseFragment implements
     public Dialog[] getDialogs() {
         return new Dialog[] {
                 progressDialog, resumeExamDialog, heartBeatAlertDialog, saveAnswerAlertDialog,
-                networkErrorAlertDialog
+                networkErrorAlertDialog, windowViolationDialog
         };
     }
 
