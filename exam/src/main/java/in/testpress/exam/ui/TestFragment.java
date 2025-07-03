@@ -622,7 +622,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void endExamAlert() {
-        if (exam == null || exam.isAttemptResumeDisabled()){
+        if (exam == null || exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()){
             showEndExamAlert();
         } else {
             AlertDialog.Builder dialogBuilder =
@@ -655,7 +655,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     void showPauseExamAlert() {
-        if (exam.isAttemptResumeDisabled()) {
+        if (exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()) {
             showEndExamAlert();
             return;
         }
@@ -1671,7 +1671,7 @@ public class TestFragment extends BaseFragment implements
         builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                removeAppBackgroundHandler();
+                dialog.dismiss();
             }
         });
 
@@ -1690,11 +1690,12 @@ public class TestFragment extends BaseFragment implements
     public void onStop() {
         super.onStop();
         saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
-        appBackgroundStateHandler = new Handler();
-        appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
         if (exam.isWindowMonitoringEnabled()) {
             currentViolationCount++;
+            return;
         }
+        appBackgroundStateHandler = new Handler();
+        appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
     }
 
     @Override

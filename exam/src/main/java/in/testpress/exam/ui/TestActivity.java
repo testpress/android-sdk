@@ -558,7 +558,7 @@ public class TestActivity extends BaseToolBarActivity  {
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            if (exam.isAttemptResumeDisabled()) {
+                            if (exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()) {
                                 endExam();
                             } else {
                                 startExam(true);
