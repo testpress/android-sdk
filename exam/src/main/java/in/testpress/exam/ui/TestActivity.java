@@ -498,7 +498,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 assert getSupportActionBar() != null;
                 if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
                     getSupportActionBar().setTitle(getString(R.string.testpress_end_exam));
-                    endExam();
+                    endExam(exam.isWindowMonitoringEnabled());
                     return;
                 } else {
                     getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
