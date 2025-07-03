@@ -110,6 +110,8 @@ public class TestFragment extends BaseFragment implements
     private AlertDialog saveAnswerAlertDialog;
     private AlertDialog networkErrorAlertDialog;
     private AlertDialog sectionInfoAlertDialog;
+    private AlertDialog windowViolationDialog;
+
     private View questionsListProgressBar;
 
     Attempt attempt;
@@ -147,6 +149,8 @@ public class TestFragment extends BaseFragment implements
     private InstituteSettings instituteSettings;
     private EventsTrackerFacade eventsTrackerFacade;
     private AttemptViewModel attemptViewModel;
+    private static final long MAX_VIOLATION_COUNT = 2;
+    private long currentViolationCount = 0;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -620,7 +624,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void endExamAlert() {
-        if (exam == null || exam.isAttemptResumeDisabled()){
+        if (exam == null || exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()){
             showEndExamAlert();
         } else {
             AlertDialog.Builder dialogBuilder =
@@ -653,7 +657,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     void showPauseExamAlert() {
-        if (exam.isAttemptResumeDisabled()) {
+        if (exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()) {
             showEndExamAlert();
             return;
         }
@@ -1625,7 +1629,7 @@ public class TestFragment extends BaseFragment implements
         }
         CommonUtils.dismissDialogs(new Dialog[] {
                 heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog,
-                sectionInfoAlertDialog
+                sectionInfoAlertDialog, windowViolationDialog
         });
         if (exam != null && exam.isAttemptResumeDisabled()){
             showExamEndDialog();
@@ -1644,7 +1648,47 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onResume() {
         super.onResume();
-        removeAppBackgroundHandler();
+
+        if (!exam.isWindowMonitoringEnabled()) {
+            removeAppBackgroundHandler();
+            return;
+        }
+
+        if (currentViolationCount > MAX_VIOLATION_COUNT) {
+            showViolationAlertDialog(true);
+        } else if (currentViolationCount > 0) {
+            showViolationAlertDialog(false);
+        }
+    }
+
+    private void showViolationAlertDialog(boolean exceededViolationCount) {
+        if (!isAdded()) return;
+
+        if (windowViolationDialog != null && windowViolationDialog.isShowing()) {
+            windowViolationDialog.dismiss();
+            windowViolationDialog = null;
+        }
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
+                R.style.TestpressAppCompatAlertDialogStyle);
+
+        builder.setTitle(R.string.window_switch_detected_title);
+
+        if (exceededViolationCount){
+            builder.setMessage(R.string.exam_final_violation_message);
+            builder.setPositiveButton("OK", (dialog, which)  -> endExam());
+        } else {
+            String message = getString(
+                    R.string.window_violation_warning,
+                    currentViolationCount,
+                    MAX_VIOLATION_COUNT
+            );
+            builder.setMessage(message);
+            builder.setPositiveButton("OK",null);
+        }
+        builder.setCancelable(false);
+        windowViolationDialog = builder.create();
+        windowViolationDialog.show();
     }
 
     void removeAppBackgroundHandler() {
@@ -1658,6 +1702,10 @@ public class TestFragment extends BaseFragment implements
     public void onStop() {
         super.onStop();
         saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
+        if (exam.isWindowMonitoringEnabled()) {
+            currentViolationCount++;
+            return;
+        }
         appBackgroundStateHandler = new Handler();
         appBackgroundStateHandler.postDelayed(stopTimerTask, APP_BACKGROUND_DELAY);
     }
@@ -1674,7 +1722,7 @@ public class TestFragment extends BaseFragment implements
     public Dialog[] getDialogs() {
         return new Dialog[] {
                 progressDialog, resumeExamDialog, heartBeatAlertDialog, saveAnswerAlertDialog,
-                networkErrorAlertDialog
+                networkErrorAlertDialog, windowViolationDialog
         };
     }
 

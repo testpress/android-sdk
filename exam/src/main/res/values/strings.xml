@@ -249,6 +249,12 @@
 
     <string name="exam_resume_disable_warning_title">"IMPORTANT NOTICE!"</string>
 
+    <string name="window_monitoring_warning_description">Before you proceed, please be aware:\n\n<b>WINDOW MONITORING IS ENABLED:</b> This exam monitors if you leave the app.\n\n<b>DO NOT SWITCH APPS:</b> If you minimize this app or switch to another app more than 2 times, your exam will be automatically ended.\n\nStay focused in the exam screen to avoid violations and complete your attempt without interruption. </string>
+
+    <string name="exam_combined_warning_description">Before you proceed, please be aware:\n\n<b>RESUME IS DISABLED:</b> The admin has disabled the resume feature for this exam. Once you begin, if you close or navigate away from this app, you will NOT be able to resume your attempt. Your attempt will be permanently ended.\n\n<b>WINDOW MONITORING IS ENABLED:</b> This exam monitors if you leave the app. Minimizing this app or switching to another app more than 2 times will automatically end your exam.\n\nEnsure you are ready to take the exam without any interruptions. Double-check your internet connection, silence notifications, and make sure your device has sufficient power. </string>
+    <string name="window_switch_detected_title">Window Switch Detected</string>
+    <string name="window_violation_warning">You switched apps %1$d time(s). Switching apps more than %2$d times will end the exam.</string>
+    <string name="exam_final_violation_message"><b>Violation Detected:</b> You have exceeded the maximum allowed interruptions during the assessment.\n\nThe system has recorded multiple interruptions, which may be caused by one or more of the following:\n1) Minimizing the app or switching to another app.\n2) Pressing restricted keys or attempting to access system features.\n3) Trying to leave the assessment screen.\n\n<b>Your exam will now be ended permanently.</b>\n\nYou will not be able to resume this attempt. Please contact your administrator if you believe this was a mistake.</string>
     <string name="testpress_retake_with">Retake with?</string>
     <string-array name="testpress_retake_options">
         <item>All Questions</item>

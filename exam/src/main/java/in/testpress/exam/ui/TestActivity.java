@@ -550,7 +550,7 @@ public class TestActivity extends BaseToolBarActivity  {
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            showResumeDisabledWarningAlertOrStartExam();
+                            showWarningAlertOrStartExam();
                         }});
             examDuration.setText(exam.getDuration());
         } else {
@@ -558,7 +558,7 @@ public class TestActivity extends BaseToolBarActivity  {
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            if (exam.isAttemptResumeDisabled()) {
+                            if (exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()) {
                                 endExam();
                             } else {
                                 startExam(true);
@@ -594,11 +594,20 @@ public class TestActivity extends BaseToolBarActivity  {
         }
     }
 
-    private void showResumeDisabledWarningAlertOrStartExam() {
-        if (exam.isAttemptResumeDisabled()) {
+    private void showWarningAlertOrStartExam() {
+        boolean isResumeDisabled = exam.isAttemptResumeDisabled();
+        boolean isWindowMonitoringEnabled = exam.isWindowMonitoringEnabled();
+
+        if (isResumeDisabled || isWindowMonitoringEnabled) {
             AlertDialog.Builder builder = new AlertDialog.Builder(this, R.style.TestpressAppCompatAlertDialogStyle);
             builder.setTitle(R.string.exam_resume_disable_warning_title);
-            builder.setMessage(R.string.exam_resume_disable_warning_description);
+            if (isResumeDisabled && isWindowMonitoringEnabled){
+                builder.setMessage(R.string.exam_combined_warning_description);
+            } else if (isResumeDisabled){
+                builder.setMessage(R.string.exam_resume_disable_warning_description);
+            } else {
+                builder.setMessage(R.string.window_monitoring_warning_description);
+            }
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
@@ -606,8 +615,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 }
             });
             builder.setNegativeButton("Cancel", null);
-            AlertDialog dialog = builder.create();
-            dialog.show();
+            builder.show();
         } else {
             startExam(false);
         }
