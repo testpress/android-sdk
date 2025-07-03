@@ -110,6 +110,8 @@ public class TestFragment extends BaseFragment implements
     private AlertDialog saveAnswerAlertDialog;
     private AlertDialog networkErrorAlertDialog;
     private AlertDialog sectionInfoAlertDialog;
+    private AlertDialog windowViolationDialog;
+
     private View questionsListProgressBar;
 
     Attempt attempt;
@@ -1627,7 +1629,7 @@ public class TestFragment extends BaseFragment implements
         }
         CommonUtils.dismissDialogs(new Dialog[] {
                 heartBeatAlertDialog, saveAnswerAlertDialog, networkErrorAlertDialog,
-                sectionInfoAlertDialog
+                sectionInfoAlertDialog, windowViolationDialog
         });
         if (exam != null && exam.isAttemptResumeDisabled()){
             showExamEndDialog();
@@ -1673,6 +1675,13 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void showViolationAlertDialog(CharSequence message, Runnable onPositiveClick) {
+        if (!isAdded()) return;
+
+        if (windowViolationDialog != null && windowViolationDialog.isShowing()) {
+            windowViolationDialog.dismiss();
+            windowViolationDialog = null;
+        }
+
         AlertDialog.Builder builder = new AlertDialog.Builder(requireActivity(),
                 R.style.TestpressAppCompatAlertDialogStyle);
 
@@ -1680,14 +1689,14 @@ public class TestFragment extends BaseFragment implements
         builder.setMessage(message);
 
         builder.setPositiveButton("OK", (dialog, which) -> {
-            dialog.dismiss();
             if (onPositiveClick != null) {
                 onPositiveClick.run();
             }
         });
 
         builder.setCancelable(false);
-        builder.show();
+        windowViolationDialog = builder.create();
+        windowViolationDialog.show();
     }
 
     void removeAppBackgroundHandler() {
