@@ -498,7 +498,7 @@ public class TestActivity extends BaseToolBarActivity  {
                 assert getSupportActionBar() != null;
                 if (action != null && action.equals(PARAM_VALUE_ACTION_END)) {
                     getSupportActionBar().setTitle(getString(R.string.testpress_end_exam));
-                    endExam();
+                    endExam(exam.isWindowMonitoringEnabled());
                     return;
                 } else {
                     getSupportActionBar().setTitle(getString(R.string.testpress_resume_exam));
@@ -559,7 +559,7 @@ public class TestActivity extends BaseToolBarActivity  {
                         @Override
                         public void onLanguageSelected() {
                             if (exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled()) {
-                                endExam();
+                                endExam(exam.isWindowMonitoringEnabled());
                             } else {
                                 startExam(true);
                             }
@@ -622,9 +622,13 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void endExam() {
+        endExam(false);
+    }
+
+    private void endExam(boolean isExamWindowViolated) {
         progressBar.setVisibility(View.VISIBLE);
         if (courseContent != null){
-            examViewModel.endContentAttempt(attempt.getId(), courseAttempt.getEndAttemptUrl());
+            examViewModel.endContentAttempt(attempt.getId(), courseAttempt.getEndAttemptUrl(), isExamWindowViolated);
         } else {
             examViewModel.endAttempt(attempt.getId(), attempt.getEndUrlFrag());
         }

@@ -39,8 +39,8 @@ class ExamViewModel(val repository: ExamRepository) : ViewModel() {
         repository.startAttempt(attemptStartFrag)
     }
 
-    fun endContentAttempt(attemptId: Long, attemptEndFrag: String) {
-        repository.endContentAttempt(attemptId, attemptEndFrag)
+    fun endContentAttempt(attemptId: Long, attemptEndFrag: String, isExamWindowViolated: Boolean) {
+        repository.endContentAttempt(attemptId, attemptEndFrag, isExamWindowViolated)
     }
 
     fun endAttempt(attemptId: Long, attemptEndFrag: String) {

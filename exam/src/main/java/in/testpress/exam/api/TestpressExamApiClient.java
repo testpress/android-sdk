@@ -150,8 +150,21 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().endExam(endAttemptUrlFrag);
     }
 
-    public RetrofitCall<CourseAttempt> endContentAttempt(String endAttemptUrlFrag) {
-        return getExamService().endContentAttempt(endAttemptUrlFrag);
+    public RetrofitCall<CourseAttempt> endContentAttempt(String endAttemptUrlFrag, boolean isExamWindowViolated) {
+        if (isExamWindowViolated){
+            Map<String, Object> requestBody = createExamViolationBody();
+            return getExamService().endContentAttempt(endAttemptUrlFrag, requestBody);
+        } else {
+            return getExamService().endContentAttempt(endAttemptUrlFrag);
+        }
+    }
+
+    private Map<String, Object> createExamViolationBody() {
+        Map<String, Object> requestBody = new HashMap<>();
+        Map<String, Object> assessment = new HashMap<>();
+        assessment.put("is_exam_window_violated", true);
+        requestBody.put("assessment", assessment);
+        return requestBody;
     }
 
     public RetrofitCall<TestpressApiResponse<AttemptItem>> getQuestions(
