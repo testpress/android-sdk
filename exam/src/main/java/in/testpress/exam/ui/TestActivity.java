@@ -550,7 +550,7 @@ public class TestActivity extends BaseToolBarActivity  {
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
-                            showResumeDisabledWarningAlertOrStartExam();
+                            showWarningAlertOrStartExam();
                         }});
             examDuration.setText(exam.getDuration());
         } else {
@@ -594,7 +594,7 @@ public class TestActivity extends BaseToolBarActivity  {
         }
     }
 
-    private void showResumeDisabledWarningAlertOrStartExam() {
+    private void showWarningAlertOrStartExam() {
         boolean isResumeDisabled = exam.isAttemptResumeDisabled();
         boolean isWindowMonitoringEnabled = exam.isWindowMonitoringEnabled();
 
