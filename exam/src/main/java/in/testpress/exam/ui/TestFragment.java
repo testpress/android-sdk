@@ -1703,6 +1703,19 @@ public class TestFragment extends BaseFragment implements
         }
     }
 
+    @Override
+    public void onPause() {
+        super.onPause();
+        enableScreenTimeout();
+    }
+
+    private void enableScreenTimeout() {
+        if (isAdded() && exam != null && exam.isWindowMonitoringEnabled()) {
+            requireActivity().getWindow()
+                    .clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
+    }
+
     void removeAppBackgroundHandler() {
         if (appBackgroundStateHandler != null) {
             appBackgroundStateHandler.removeCallbacks(stopTimerTask);
