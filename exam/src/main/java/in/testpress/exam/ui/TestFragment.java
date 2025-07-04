@@ -767,7 +767,7 @@ public class TestFragment extends BaseFragment implements
                         break;
                     }
                     case LOADING:{
-                        progressDialog.show();
+                        showProgress(R.string.testpress_loading_questions);
                         break;
                     }
                     case ERROR:{
@@ -783,7 +783,7 @@ public class TestFragment extends BaseFragment implements
                         builder.setPositiveButton(R.string.testpress_retry_again, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialogInterface, int i) {
-                                progressDialog.show();
+                                showProgress(R.string.testpress_loading_questions);
                                 fetchAttemptItems();
                             }
                         });
@@ -823,10 +823,8 @@ public class TestFragment extends BaseFragment implements
         }
 
         if (attempt.hasSectionalLock()) {
-            progressDialog.setMessage(getString(R.string.testpress_loading_section_questions,
+            showProgress(getString(R.string.testpress_loading_section_questions,
                     sections.get(attempt.getCurrentSectionPosition()).getName()));
-
-            progressDialog.show();
         } else {
             showProgress(R.string.testpress_loading_questions);
         }
@@ -1492,7 +1490,11 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void showProgress(@StringRes int stringResId) {
-        progressDialog.setMessage(getString(stringResId));
+        showProgress(getString(stringResId));
+    }
+
+    private void showProgress(CharSequence message) {
+        progressDialog.setMessage(message);
         if (!progressDialog.isShowing()) {
             progressDialog.show();
         }
