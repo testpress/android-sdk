@@ -157,10 +157,6 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
                     }
                     repository.updateStatusWithDownloadId(downloadId, OfflineAttachmentDownloadStatus.DOWNLOADING)
                 }
-
-                DownloadManager.STATUS_FAILED -> {
-                    repository.updateStatusWithDownloadId(downloadId, OfflineAttachmentDownloadStatus.FAILED)
-                }
             }
         }
     }
