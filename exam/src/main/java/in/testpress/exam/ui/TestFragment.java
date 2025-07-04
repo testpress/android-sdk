@@ -25,6 +25,7 @@ import android.text.Html;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ImageButton;
@@ -1663,6 +1664,7 @@ public class TestFragment extends BaseFragment implements
         } else if (currentViolationCount > 0) {
             showViolationAlertDialog(false);
         }
+        disableScreenTimeOut();
     }
 
     private void showViolationAlertDialog(boolean exceededViolationCount) {
@@ -1693,6 +1695,12 @@ public class TestFragment extends BaseFragment implements
         builder.setCancelable(false);
         windowViolationDialog = builder.create();
         windowViolationDialog.show();
+    }
+
+    private void disableScreenTimeOut() {
+        if (isAdded() && exam != null && exam.isWindowMonitoringEnabled()) {
+            requireActivity().getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        }
     }
 
     void removeAppBackgroundHandler() {
