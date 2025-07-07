@@ -91,6 +91,8 @@ data class DomainExamContent(
     fun isQuizModeEnabled() = enableQuizMode != null && enableQuizMode == true
 
     fun isAttemptResumeDisabled() = disableAttemptResume != null && disableAttemptResume
+
+    fun isWindowMonitoringEnabled() = enableExamWindowMonitoring != null && enableExamWindowMonitoring
 }
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {
