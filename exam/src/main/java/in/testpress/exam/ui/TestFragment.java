@@ -705,9 +705,7 @@ public class TestFragment extends BaseFragment implements
                         if (getActivity() == null) {
                             return;
                         }
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+                        hideProgressBar();
 
                         if (listResource.getData() == null || listResource.getData().isEmpty()) { // Display alert if no questions exist
                             new AlertDialog.Builder(getActivity(), R.style.TestpressAppCompatAlertDialogStyle)
@@ -775,9 +773,7 @@ public class TestFragment extends BaseFragment implements
                         if (getActivity() == null) {
                             return;
                         }
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+                        hideProgressBar();
 
                         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity(),
                                 R.style.TestpressAppCompatAlertDialogStyle);
@@ -1167,9 +1163,7 @@ public class TestFragment extends BaseFragment implements
                             return;
                         }
                         logEvent(EventsTrackerFacade.ENDED_EXAM);
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+                        hideProgressBar();
                         if (isOfflineExam()){
                             returnToHistory();
                             return;
@@ -1184,9 +1178,7 @@ public class TestFragment extends BaseFragment implements
                         break;
                     }
                     case ERROR:{
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+                        hideProgressBar();
                         showException(
                                 courseAttemptResource.getException(),
                                 R.string.testpress_exam_paused_check_internet_to_end,
@@ -1211,9 +1203,7 @@ public class TestFragment extends BaseFragment implements
                             return;
                         }
                         logEvent(EventsTrackerFacade.ENDED_EXAM);
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+                        hideProgressBar();
                         if (isOfflineExam()){
                             returnToHistory();
                             return;
@@ -1226,9 +1216,7 @@ public class TestFragment extends BaseFragment implements
                         break;
                     }
                     case ERROR:{
-                        if (progressDialog.isShowing()) {
-                            progressDialog.dismiss();
-                        }
+                        hideProgressBar();
                         showException(
                                 attemptResource.getException(),
                                 R.string.testpress_exam_paused_check_internet_to_end,
@@ -1498,6 +1486,12 @@ public class TestFragment extends BaseFragment implements
         progressDialog.setMessage(message);
         if (!progressDialog.isShowing()) {
             progressDialog.show();
+        }
+    }
+
+    private void hideProgressBar() {
+        if (progressDialog != null && progressDialog.isShowing()) {
+            progressDialog.dismiss();
         }
     }
 
