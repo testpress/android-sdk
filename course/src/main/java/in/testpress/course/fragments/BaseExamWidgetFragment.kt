@@ -413,9 +413,9 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun shouldShowExamDetails(exam: DomainExamContent): Boolean {
         // If 'isAttemptResumeDisabled or isWindowMonitoringEnabled' is true, we return false to
-        // display the Exam Detail page. Otherwise, we return false to start the exam without
+        // display the Exam Detail page. Otherwise, we return true to start the exam without
         // displaying the Exam Detail page.
-        return !exam.isAttemptResumeDisabled() || !exam.isWindowMonitoringEnabled()
+        return !(exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled())
     }
 
     private fun showExamModesOrStartExam(

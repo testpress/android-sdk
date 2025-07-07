@@ -131,7 +131,8 @@ fun createDomainExamContent(exam: Exam): DomainExamContent {
         rankPublishingDate = exam.rankPublishingDate,
         enableQuizMode = exam.enableQuizMode,
         disableAttemptResume = exam.disableAttemptResume,
-        allowPreemptiveSectionEnding = exam.allowPreemptiveSectionEnding
+        allowPreemptiveSectionEnding = exam.allowPreemptiveSectionEnding,
+        enableExamWindowMonitoring = exam.enableExamWindowMonitoring
     )
 }
 
