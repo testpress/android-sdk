@@ -1490,7 +1490,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void hideProgressBar() {
-        if (progressDialog.isShowing()) {
+        if (progressDialog != null && progressDialog.isShowing()) {
             progressDialog.dismiss();
         }
     }
