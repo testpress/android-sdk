@@ -922,6 +922,8 @@ public class TestFragment extends BaseFragment implements
             }
             progressDialog.dismiss();
             returnToHistory();
+        } else {
+            hideProgressBar();
         }
     }
 
