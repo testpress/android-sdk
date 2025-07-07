@@ -1283,9 +1283,6 @@ public class TestFragment extends BaseFragment implements
     }
 
     private void onExpandPanel() {
-        if (!attemptItemList.isEmpty() && attemptItemList.get(viewPager.getCurrentItem()).hasChanged()) {
-            saveResult(viewPager.getCurrentItem(), Action.UPDATE_ANSWER);
-        }
         viewPager.setSwipeEnabled(false);
         previous.setVisibility(View.INVISIBLE);
         next.setVisibility(View.INVISIBLE);
