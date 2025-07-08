@@ -277,7 +277,7 @@ class AttemptRepository(val context: Context) {
                 val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptIdAndId(attempt.id, attempt.currentSectionPosition.toLong())
                 offlineAttemptSection?.state = Attempt.COMPLETED
                 offlineAttemptSectionDao.update(offlineAttemptSection!!)
-                attemptItem.clear()
+                clearAttemptItem()
                 _updateSectionResource.postValue(Resource.success(Pair(offlineAttemptSection.asNetworkModel(), action)))
             }
             Action.START_SECTION -> {
