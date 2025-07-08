@@ -57,7 +57,7 @@ class AttemptViewModel(val repository: AttemptRepository) : ViewModel() {
         repository.endAttempt(attemptEndFrag)
     }
 
-    fun clearAttemptItem() = repository.clearAttemptItem()
+    fun clearAttemptItems() = repository.clearAttemptItems()
 
     fun resetPageCount() = repository.resetPageCount()
 
