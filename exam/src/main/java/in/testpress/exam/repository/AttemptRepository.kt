@@ -31,7 +31,7 @@ class AttemptRepository(val context: Context) {
     lateinit var attempt : Attempt
     private val isOfflineExam: Boolean get() = exam?.isOfflineExam ?: false
     var page = 1
-    val attemptItem = mutableListOf<AttemptItem>()
+    val attemptItems = mutableListOf<AttemptItem>()
     private var _totalQuestions = 0
     val totalQuestions get() = _totalQuestions
 
@@ -75,8 +75,8 @@ class AttemptRepository(val context: Context) {
                     override fun onSuccess(result: TestpressApiResponse<AttemptItem>) {
                         if (fetchSinglePageOnly) {
                             _totalQuestions = result.count
-                            attemptItem.addAll(result.results)
-                            _attemptItemsResource.postValue(Resource.success(attemptItem))
+                            attemptItems.addAll(result.results)
+                            _attemptItemsResource.postValue(Resource.success(attemptItems))
                             if (result.hasMore()) {
                                 page++
                             }
@@ -84,12 +84,12 @@ class AttemptRepository(val context: Context) {
                         }
                         if (result.hasMore()) {
                             _totalQuestions = result.count
-                            attemptItem.addAll(result.results)
+                            attemptItems.addAll(result.results)
                             page++
                             fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
                         } else {
-                            attemptItem.addAll(result.results)
-                            _attemptItemsResource.postValue(Resource.success(attemptItem))
+                            attemptItems.addAll(result.results)
+                            _attemptItemsResource.postValue(Resource.success(attemptItems))
                         }
                     }
 
@@ -277,7 +277,7 @@ class AttemptRepository(val context: Context) {
                 val offlineAttemptSection = offlineAttemptSectionDao.getByAttemptIdAndId(attempt.id, attempt.currentSectionPosition.toLong())
                 offlineAttemptSection?.state = Attempt.COMPLETED
                 offlineAttemptSectionDao.update(offlineAttemptSection!!)
-                clearAttemptItem()
+                clearAttemptItems()
                 _updateSectionResource.postValue(Resource.success(Pair(offlineAttemptSection.asNetworkModel(), action)))
             }
             Action.START_SECTION -> {
@@ -368,8 +368,8 @@ class AttemptRepository(val context: Context) {
         }
     }
 
-    fun clearAttemptItem() {
-        attemptItem.clear()
+    fun clearAttemptItems() {
+        attemptItems.clear()
     }
 
     fun resetPageCount() {

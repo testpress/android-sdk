@@ -1086,7 +1086,7 @@ public class TestFragment extends BaseFragment implements
             onSectionEnded();
         } else {
             String questionUrl = (isOfflineExam()) ? "" : greenDaoAttemptSection.getQuestionsUrlFrag().replace("2.3", "2.2");
-            attemptViewModel.clearAttemptItem();
+            attemptViewModel.clearAttemptItems();
             attemptViewModel.fetchAttemptItems(questionUrl, true);
         }
     }
