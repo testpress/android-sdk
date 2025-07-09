@@ -6,7 +6,6 @@ import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.util.PermissionsUtils
 import `in`.testpress.util.ViewUtils
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,12 +14,13 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
+import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
 
 class AttachmentContentFragment : BaseContentDetailFragment() {
@@ -60,11 +60,21 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     }
 
     override fun display() {
+        syncDownloadedAttachment()
         showTitle()
         showDescription()
         observeDownloadStatus()
         attachmentContentLayout.visibility = View.VISIBLE
         viewModel.createContentAttempt(contentId)
+    }
+
+    private fun syncDownloadedAttachment() {
+        lifecycleScope.launch {
+            val dao = TestpressDatabase.invoke(requireContext()).offlineAttachmentDao()
+            content.attachment?.id?.let {
+                OfflineAttachmentSyncManager(requireContext(), dao).syncDownload(it)
+            }
+        }
     }
 
     private fun showTitle() {
@@ -104,7 +114,7 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
                     }
 
                     OfflineAttachmentDownloadStatus.DOWNLOADING -> {
-                        val progressText = "Downloading...%${offlineAttachment.progress}"
+                        val progressText = "Downloading...${offlineAttachment.progress}%"
                         updateActionButton(progressText, isClickable = false)
                     }
                     null-> {
@@ -151,15 +161,21 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
     }
 
     private fun onDownloadClick(attachment: DomainAttachmentContent) {
-        if (permissionsUtils.isStoragePermissionGranted) {
-            forceReloadContent {
-                offlineAttachmentViewModel.requestDownload(
-                    requireContext(),
-                    attachment = attachment
-                )
-            }
-        } else {
+        if (!permissionsUtils.isStoragePermissionGranted) {
             permissionsUtils.requestStoragePermissionWithSnackbar()
+            return
+        }
+        if (attachment.isAttachmentUrlExpired()) {
+            forceReloadContent()
+        } else {
+            offlineAttachmentViewModel.requestDownload(requireContext(), attachment = attachment)
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (isContentInitialized()){
+            syncDownloadedAttachment()
         }
     }
 

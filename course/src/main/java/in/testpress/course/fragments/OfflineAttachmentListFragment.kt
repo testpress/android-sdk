@@ -44,9 +44,12 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import `in`.testpress.course.R
+import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
 import `in`.testpress.course.util.extension.debouncedClickable
 import `in`.testpress.course.viewmodels.OfflineAttachmentViewModel
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import kotlinx.coroutines.launch
@@ -70,6 +73,14 @@ class OfflineAttachmentListFragment : Fragment() {
             setContent {
                 OfflineAttachmentScreen(viewModel = viewModel)
             }
+        }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        lifecycleScope.launch {
+            val dao = TestpressDatabase.invoke(requireContext()).offlineAttachmentDao()
+            OfflineAttachmentSyncManager(requireContext(), dao).syncDownloads()
         }
     }
 }
