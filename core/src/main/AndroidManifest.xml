@@ -32,13 +32,6 @@
             android:name=".ui.WebViewWithSSOActivity"
             android:configChanges="orientation|keyboardHidden|screenSize" />
 
-        <receiver android:name=".util.FileDownloaderBroadcastReceiver"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
-            </intent-filter>
-        </receiver>
-
         <provider
             android:name=".util.TestpressFileProvider"
             android:authorities="${applicationId}.testpressFileProvider"

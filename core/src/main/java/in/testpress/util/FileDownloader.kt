@@ -18,7 +18,7 @@ class FileDownloader(private val context: Context) {
     private fun getDownloadManagerRequest(fileUrl: String, fileName: String): DownloadManager.Request{
         return DownloadManager.Request(Uri.parse(fileUrl)).apply {
             setTitle(fileName)
-            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE)
+            setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED)
             setAllowedOverRoaming(true)
             setDestinationInExternalPublicDir(DIRECTORY_DOWNLOADS, fileName)
         }
