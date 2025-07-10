@@ -28,6 +28,9 @@ interface OfflineAttachmentsDao {
     @Query("SELECT * FROM OfflineAttachment WHERE id = :id")
     fun getAttachment(id: Long): Flow<OfflineAttachment?>
 
+    @Query("SELECT * FROM OfflineAttachment WHERE id = :id")
+    fun getById(id: Long): OfflineAttachment?
+
     @Query("SELECT * FROM OfflineAttachment WHERE downloadId = :downloadId")
     suspend fun getByDownloadId(downloadId: Long): OfflineAttachment?
 

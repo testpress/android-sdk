@@ -1,5 +1,6 @@
 package `in`.testpress.course.domain
 
+import androidx.core.net.toUri
 import `in`.testpress.models.greendao.Attachment
 
 data class DomainAttachmentContent(
@@ -8,7 +9,16 @@ data class DomainAttachmentContent(
     val attachmentUrl: String? = null,
     val description: String? = null,
     val isRenderable: Boolean? = null
-)
+) {
+
+    fun isAttachmentUrlExpired(): Boolean {
+        attachmentUrl ?: return true
+        val uri = attachmentUrl.toUri()
+        val expires = uri.getQueryParameter("Expires")?.toLongOrNull() ?: return true
+        val currentTime = System.currentTimeMillis() / 1000
+        return currentTime > expires
+    }
+}
 
 
 fun createDomainAttachmentContent(attachment: Attachment): DomainAttachmentContent {
