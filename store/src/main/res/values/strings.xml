@@ -69,4 +69,16 @@
     <string name="buy_now_button_text">Buy Now</string>
     <string name="product_thumbnail_description">Product thumbnail image</string>
 
+    <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
+    <string name="testpress_tap_to_retry">Tap to retry</string>
+
+    <string name="testpress_network_error">Network Error</string>
+    <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+    <string name="testpress_are_you_sure">Are you sure?</string>
+    <string name="testpress_yes">Yes</string>
+    <string name="testpress_no">No</string>
+    <string name="testpress_authentication_failed">Authentication failed</string>
+    <string name="testpress_please_login">Please login to see this exams</string>
+
+
 </resources>

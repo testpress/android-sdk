@@ -128,5 +128,354 @@
     <string name="exoplayer_decoding_error">A decoding error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_audio_track_error">An AudioTrack error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_drm_error">A DRM error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
+    <string name="testpress_your_answer">Your Answer:</string>
+    <string name="testpress_correct_answer">Correct Answer:</string>
+    <string name="testpress_explanation">Explanation:</string>
+    <string name="testpress_network_error">Network Error</string>
+    <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
+    <string name="testpress_error_loading_questions">Loading questions failed</string>
+    <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+    <string name="testpress_error_loading_bookmarks">Loading bookmarks failed</string>
+    <string name="testpress_marks_awarded">Marks Awarded:</string>
+    <string name="testpress_app_name">Testpress Exam Sdk</string>
+    <string name="testpress_subject">Subject:</string>
+    <string name="testpress_bookmark_moved">Bookmark moved successfully</string>
+    <string name="testpress_bookmark_deleted">Bookmark deleted successfully</string>
+    <string name="testpress_undo">Undo</string>
+    <string name="testpress_folder_name_not_allowed">Folder name not allowed</string>
+
+
+
+    <string name="testpress_please_wait">Please Wait…</string>
+
+    <string name="testpress_loading">Loading…</string>
+
+    <string name="testpress_no_internet_connection">No internet connection</string>
+    <string name="testpress_tap_to_retry">Tap to retry</string>
+
+    <string name="testpress_loading_failed">Loading Failed</string>
+    <string name="testpress_authentication_failed">Authentication failed</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="content_scheduled">This content is scheduled!</string>
+    <string name="testpress_please_login">Please login to see this exams</string>
+    <string name="testpress_no_permission">You do not have permission to view this.</string>
+
+    <string name="video_id_locked"> This Video is locked!</string>
+    <string name="testpress_views_exhausted">You\'ve exhausted your views limit for this content. Contact your administrator for further information.</string>
+
+    <string name="testpress_ok">OK</string>
+    <string name="testpress_cancel">Cancel</string>
+
+    <string name="testpress_filter">Filter</string>
+    <string name="testpress_vote_casted">Vote casted successfully!</string>
+    <string name="testpress_self_vote_error">You can\'t vote for yourself!</string>
+
+    <string name="testpress_label_fill_required_details">*Please fill required details</string>
+
+    <string name="testpress_yes">Yes</string>
+    <string name="testpress_no">No</string>
+
+    <string name="testpress_are_you_sure">Are you sure?</string>
+
+    <string name="testpress_deny">Deny</string>
+    <string name="testpress_permission_denied">Permission Denied</string>
+    <string name="testpress_permission_denied_message">Without this permission app is unable to do your intended action, Goto app settings -> Permissions -> Enable permission to continue.</string>
+    <string name="testpress_go_to_settings">Goto Settings</string>
+    <string name="testpress_action_cant_done_without_permission">Action can\'t be done without permission</string>
+    <string name="last_used">Last Used</string>
+    <string name="ip_address">IP Address</string>
+    <string name="logout_devices">Logout Devices</string>
+    <string name="max_login_limit_exceeded_error">Your account has been locked as it has exceeded maximum devices it can be used.</string>
+    <string name="account_unlock_info">Your account will automatically get unlocked within </string>
+    <string name="no_devices_found">No devices found</string>
+    <string name="session_cleared_message">Your session has been cleared. Please log out and login again.</string>
+    <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
+
+    <string name="failed_loading_pdf"> Failed to load the PDF </string>
+    <string name="hint"><font size="14">Type message</font></string>
+
+
+
+    <string-array name="discussions_author_filter">
+        <item>All</item>
+        <item>My threads</item>
+    </string-array>
+
+    <string-array name="discussions_upvotes_filter">
+        <item>All</item>
+        <item>Upvoted By me</item>
+    </string-array>
+
+    <string-array name="discussions_comments_filter">
+        <item>All</item>
+        <item>Commented By me</item>
+    </string-array>
+
+    <plurals name="time_duration">
+        <item quantity="one">in %d %s</item>
+        <item quantity="other">in %d %ss</item>
+    </plurals>
+
+
+
+    <string name="testpress_exams">Exams</string>
+
+    <string name="testpress_course">Course</string>
+    <string name="testpress_questions">Questions</string>
+    <string name="testpress_attempt">attempt</string>
+    <string name="testpress_attempts">attempts</string>
+    <string name="testpress_to">to</string>
+
+    <string name="testpress_retry_again">Retry Again</string>
+
+    <string name="testpress_exam_paused_check_internet">Exam is paused, Please check your internet connection &amp; resume again.</string>
+    <string name="testpress_exam_paused_check_internet_to_end">Exam is paused, Please check your internet connection &amp; try again.</string>
+    <string name="testpress_try_again">Try again</string>
+
+    <string name="testpress_exam_no_permission">You do not have permission to attempt this exam.</string>
+    <string name="testpress_loading_questions">Loading questions</string>
+    <string name="testpress_no_exams">No Exams</string>
+    <string name="testpress_no_exams_description">You can buy exams from the store.</string>
+    <string name="testpress_no_attempts">No Attempts</string>
+    <string name="testpress_no_attempts_description">To review, start and complete your exams.</string>
+    <string name="testpress_error_loading_exams">Loading exams failed</string>
+    <string name="testpress_error_loading_exam">Loading exam failed</string>
+    <string name="testpress_error_loading_permission">Loading permission failed</string>
+    <string name="testpress_error_loading_languages">Loading languages failed</string>
+    <string name="testpress_error_loading_attempts">Loading attempts failed</string>
+
+    <string name="testpress_cannot_attempt_exam">Can\'t attempt this exam</string>
+    <string name="testpress_no_questions">No Questions</string>
+    <string name="testpress_no_questions_to_review">There are no questions to review.</string>
+    <string name="testpress_no_categories">No Categories</string>
+    <string name="testpress_no_categories_description">We\'ll be adding new categories here soon.\nCheck back later. Thanks!</string>
+    <string name="testpress_error_loading_categories">Loading categories failed</string>
+    <string name="testpress_exam_not_available">Exam not available</string>
+    <string name="testpress_exam_not_available_description">This is no longer available or not published yet.</string>
+    <string name="testpress_exam_paused">Exam is paused, click resume to continue</string>
+    <string name="testpress_exam_end_due_disable_resume">You navigated away from the app, so the attempt has ended because resume is disabled for this exam.</string>
+
+
+    <string name="testpress_analytics">Analytics</string>
+    <string name="testpress_error_loading_analytics">Loading analytics failed</string>
+    <string name="testpress_no_analytics">No Analytics Data</string>
+    <string name="testpress_no_subjects_description">This exam doesn\'t contain any subjects.</string>
+    <string name="testpress_no_analytics_description">To review the Analytics, start and complete your exams.</string>
+
+    <string name="testpress_page_available_exams">Available</string>
+    <string name="testpress_page_upcoming_exams">Upcoming</string>
+    <string name="testpress_page_history_exams">History</string>
+
+    <string name="testpress_page_stats">Stats</string>
+    <string name="testpress_page_all">All</string>
+    <string name="testpress_page_correct">Correct</string>
+    <string name="testpress_page_incorrect">Incorrect</string>
+    <string name="testpress_page_unanswered">Unanswered</string>
+    <string name="testpress_page_review">Marked for Review</string>
+
+    <string name="testpress_pause">PAUSE</string>
+    <string name="testpress_resume_exam_online">RESUME EXAM ONLINE</string>
+    <string name="testpress_resume">RESUME</string>
+    <string name="testpress_retake_exam_online">RETAKE EXAM ONLINE</string>
+    <string name="testpress_retake">RETAKE</string>
+    <string name="testpress_review">REVIEW</string>
+    <string name="testpress_retake_exam">Retake Exam</string>
+    <string name="testpress_start_exam">Start Exam</string>
+    <string name="testpress_resume_exam">Resume Exam</string>
+    <string name="testpress_end_exam">End Exam</string>
+    <string name="testpress_not_now">Not Now</string>
+    <string name="testpress_next">NEXT</string>
+    <string name="testpress_previous">PREV</string>
+    <string name="testpress_paused">PAUSED</string>
+    <string name="testpress_end">END</string>
+    <string name="testpress_yes_pause">Yes, Pause!</string>
+    <string name="testpress_pause_message">Are you sure? Want to Pause the exam &amp; resume later before the end date.</string>
+    <string name="testpress_end_title">Exit Exam?</string>
+    <string name="testpress_end_message">You can pause the exam &amp; resume later before the end date.</string>
+
+    <string name="testpress_email_mcqs">Email MCQs</string>
+
+    <string name="testpress_mail_pdf_confirm_title">Mail PDF</string>
+    <string name="testpress_mail_pdf_confirm">PDF will be mailed to your email address. Click OK to confirm.</string>
+    <string name="testpress_mail_pdf">Initiating PDF mail</string>
+    <string name="testpress_mail_pdf_complete">PDF Request Complete</string>
+    <string name="testpress_mail_pdf_complete_description">Your PDF request has been initiated. Please wait while your PDF is generated and mailed to you.</string>
+    <string name="testpress_mail_pdf_error">PDF Request Error</string>
+    <string name="testpress_mail_pdf_error_description">There was an error in generating your PDF.</string>
+
+    <string name="testpress_all_the_best">All the best!</string>
+    <string name="testpress_exam_has_ended">This exam has ended</string>
+    <string name="testpress_no_of_questions">Number of Questions</string>
+    <string name="testpress_duration">Duration</string>
+    <string name="testpress_mark_per_question">Mark per question</string>
+    <string name="testpress_negative_mark">Negative marks</string>
+    <string name="testpress_start_date">Start &amp; End date</string>
+    <string name="testpress_select_language">Select Language</string>
+    <string name="testpress_select_subject">Select Subject</string>
+    <string name="testpress_description">Description</string>
+    <string name="testpress_questions_list">QUESTIONS LIST</string>
+
+    <string name="testpress_your_score">Your score</string>
+    <string name="testpress_correct">correct</string>
+    <string name="testpress_percentile">Percentile</string>
+    <string name="testpress_incorrect">incorrect</string>
+    <string name="testpress_time_remaining">Time Remaining</string>
+
+    <string name="testpress_question">Question</string>
+    <string name="testpress_review_later">Review Later</string>
+    <string name="testpress_uncategorized">Uncategorized</string>
+    <string name="testpress_attempted_on">Attempted on</string>
+    <string name="testpress_started_on">Started on</string>
+
+    <string name="testpress_show_passage">Show Passage</string>
+    <string name="testpress_hide_passage">Hide Passage</string>
+
+    <string name="testpress_test_report">Test Report</string>
+    <string name="testpress_rank">Rank</string>
+    <string name="testpress_score">Score</string>
+    <string name="testpress_total_correct">Total correct</string>
+    <string name="testpress_total_incorrect">Total Incorrect</string>
+    <string name="testpress_total_unanswered">Total Unanswered</string>
+    <string name="testpress_time_taken">Time Taken</string>
+    <string name="testpress_speed">Speed</string>
+    <string name="testpress_accuracy">Accuracy</string>
+
+    <string name="testpress_review_label">Review</string>
+    <string name="testpress_resume_label">Resume</string>
+    <string name="testpress_your_percentile_is">Your percentile is</string>
+    <string name="testpress_scored_less_than">\u0020of users scored less than your score of\u0020</string>
+
+    <string name="testpress_search">Search</string>
+    <string name="testpress_search_hint">Search…</string>
+    <string name="testpress_no_results_found">Sorry, No results found</string>
+    <string name="testpress_try_with_other_keyword">Please try with some other keywords</string>
+    <string name="testpress_speech_recognition_not_supported">Opps! Your device doesn\'t support Speech to Text</string>
+
+    <string name="testpress_show_as_grid">Grid</string>
+    <string name="testpress_show_as_list">List</string>
+
+    <string name="testpress_date">Date</string>
+    <string name="testpress_action">Action</string>
+    <string name="testpress_trophies">Trophies</string>
+
+    <string name="testpress_solutions">Solutions</string>
+    <string name="testpress_time_analytics">Time Analytics</string>
+
+    <string name="testpress_web_only_exam">Web Only Exam</string>
+    <string name="testpress_web_only_exam_description">This exam can only be attempted on the website.</string>
+    <string name="testpress_can_start_exam_only_after">You can attempt this exam only after \n%1$s</string>
+    <string name="testpress_score_good_in_previous_exam">You need to get good scores in the previous tests to attempt this test.</string>
+
+    <string name="testpress_strength">Strength</string>
+    <string name="testpress_weakness">Weakness</string>
+
+    <string name="testpress_strength_label">Strength / Correct</string>
+    <string name="testpress_weakness_label">Weakness / Incorrect</string>
+
+    <string name="testpress_individual_reports">Individual Reports</string>
+    <string name="testpress_overall_reports">Overall Reports</string>
+    <string name="testpress_subject_name">Subject</string>
+
+    <string name="testpress_no_questions_message">No questions added to this exam till now, Please check back later or contact administrator</string>
+
+    <string name="comments_title">Comments</string>
+    <string name="write_a_comment">Write a comment&#8230;</string>
+    <string name="load_previous_comments">Load previous comments</string>
+    <string name="load_new_comments">Load new comments</string>
+    <string name="load_comments">Load comments</string>
+    <string name="comment_posted">Comment posted successfully</string>
+    <string name="no_comments">Be the first to post a comment</string>
+    <plurals name="new_comments_available">
+        <item quantity="one">Tap to view a new comment</item>
+        <item quantity="other">Tap to view %d new comments</item>
+    </plurals>
+
+    <string name="testpress_test_completed_you_earned">Test completed!\nYou’ve earned</string>
+    <string name="testpress_okay">Okay</string>
+
+    <string name="testpress_continue">Continue</string>
+    <string name="testpress_time_analytics_label">Time Analytics</string>
+    <string name="testpress_incorrect_filter_text">Incorrect</string>
+    <string name="testpress_correct_filter_text">Correct</string>
+    <string name="testpress_unanswered_filter_text">Unanswered</string>
+    <string name="testpress_answer_type">Answer Type</string>
+    <string name="testpress_subject_filter">Filter by Subject</string>
+    <string name="testpress_time_sort">Sort by Time</string>
+    <string name="testpress_users_answered_right">users answered right</string>
+    <string name="testpress_total_questions">QUESTIONS</string>
+    <string name="testpress_total_marks">TOTAL MARKS</string>
+    <string name="testpress_total_time">TOTAL TIME</string>
+    <string name="testpress_cutoff">CUTOFF</string>
+
+    <string name="testpress_exam_ended">This exam has ended</string>
+
+    <string name="testpress_access_code">Access Code</string>
+    <string name="testpress_enter_access_code">Enter Access Code</string>
+    <string name="testpress_get_exams">Get Exams</string>
+    <string name="testpress_invalid_access_code">Invalid Access Code</string>
+
+    <string name="testpress_bookmark">Bookmark</string>
+    <string name="testpress_bookmarks">Bookmarks</string>
+    <string name="testpress_bookmark_this">Bookmark this</string>
+    <string name="testpress_remove_bookmark">Remove Bookmark</string>
+    <string name="testpress_move_bookmark">Move Bookmark</string>
+    <string name="testpress_remove">Remove</string>
+    <string name="testpress_add_folder">Add Folder</string>
+    <string name="testpress_enter_folder_name">Enter Folder Name</string>
+    <string name="testpress_bookmarks_list">Bookmarks List</string>
+    <string name="testpress_no_bookmarks">No bookmarks added yet</string>
+    <string name="testpress_no_bookmarks_description">You can bookmark stuff like Questions, Articles, Videos and Files you see in the courses you’ve opted for.</string>
+
+    <string name="testpress_rename_folder">Rename Folder</string>
+    <string name="testpress_update">Update</string>
+    <string name="testpress_delete">Delete</string>
+    <string name="testpress_folder_updated">Folder updated successfully</string>
+    <string name="testpress_folder_deleted">Folder deleted successfully</string>
+
+    <string name="testpress_want_to_delete_folder">Do you want to delete this folder?</string>
+
+
+
+    <string name="testpress_saving_last_change">Saving your last change</string>
+    <string name="testpress_ending_section">Ending current section</string>
+    <string name="testpress_starting_section">Starting next section</string>
+    <string name="testpress_loading_section_questions">Loading \"%s\" questions</string>
+    <string name="testpress_ending_exam">Ending exam</string>
+    <string name="testpress_cannot_switch">Can\'t Switch Section!</string>
+    <string name="testpress_cannot_switch_section">Section is locked. Switching section is not allowed.</string>
+    <string name="testpress_already_submitted">You have already submitted this section.</string>
+    <string name="testpress_switch_section">Switch Section?</string>
+    <string name="testpress_switch_section_message">Are you sure want to move to the next section? You won\'t be able to switch back to this section.</string>
+    <string name="testpress_attempt_sections_in_order">You need to attempt sections in order.</string>
+    <string name="testpress_end_section">End current section</string>
+
+    <string name="exam_resume_disable_warning_description">Before you proceed, please be aware:\n\n<b>DO NOT CLOSE THIS APP:</b> Once you begin your exam, if you close or navigate away from this app, you will NOT be able to resume your attempt.\n\n<b>RESUME IS DISABLED:</b> The admin has disabled the resume feature for this exam. Once closed, your attempt will be permanently ended.\n\nEnsure you are ready to take the exam without interruptions. Double-check your internet connection and make sure your device has sufficient power.</string>
+
+    <string name="exam_resume_disable_warning_title">"IMPORTANT NOTICE!"</string>
+
+    <string name="window_monitoring_warning_description">Before you proceed, please be aware:\n\n<b>WINDOW MONITORING IS ENABLED:</b> This exam monitors if you leave the app.\n\n<b>DO NOT SWITCH APPS:</b> If you minimize this app or switch to another app more than 2 times, your exam will be automatically ended.\n\nStay focused in the exam screen to avoid violations and complete your attempt without interruption. </string>
+
+    <string name="exam_combined_warning_description">Before you proceed, please be aware:\n\n<b>RESUME IS DISABLED:</b> The admin has disabled the resume feature for this exam. Once you begin, if you close or navigate away from this app, you will NOT be able to resume your attempt. Your attempt will be permanently ended.\n\n<b>WINDOW MONITORING IS ENABLED:</b> This exam monitors if you leave the app. Minimizing this app or switching to another app more than 2 times will automatically end your exam.\n\nEnsure you are ready to take the exam without any interruptions. Double-check your internet connection, silence notifications, and make sure your device has sufficient power. </string>
+    <string name="window_switch_detected_title">Window Switch Detected</string>
+    <string name="window_violation_warning">You switched apps %1$d time(s). Switching apps more than %2$d times will end the exam.</string>
+    <string name="exam_final_violation_message"><b>Violation Detected:</b> You have exceeded the maximum allowed interruptions during the assessment.\n\nThe system has recorded multiple interruptions, which may be caused by one or more of the following:\n1) Minimizing the app or switching to another app.\n2) Pressing restricted keys or attempting to access system features.\n3) Trying to leave the assessment screen.\n\n<b>Your exam will now be ended permanently.</b>\n\nYou will not be able to resume this attempt. Please contact your administrator if you believe this was a mistake.</string>
+    <string name="testpress_retake_with">Retake with?</string>
+    <string-array name="testpress_retake_options">
+        <item>All Questions</item>
+        <item>Wrong Questions</item>
+    </string-array>
+    <string name="testpress_can_retake_in_few_min">You can retake this exam %s. Meanwhile review your previous attempt.</string>
+
+    <string name="testpress_share">Share</string>
+    <string name="testpress_share_screenshot">Share Screenshot</string>
+    <string name="testpress_no_app_available">No App Available</string>
+    <string name="testpress_share_screenshot_text">Do check out this question from %1$s. Get it at %2$s</string>
+    <string name="share_app_message">Share this app to your friends twice to unlock explanations</string>
+
+    <string name="testpress_advanced_analytics">Advanced Analytics</string>
+
+    <string name="rank_will_be_published">Rank will be published %s</string>
+    <string name="storage_permission_to_upload_file">The photos and videos permission is required to upload files.</string>
+    <string name="testpress_pdf_preview">PDF Preview</string>
 
 </resources>

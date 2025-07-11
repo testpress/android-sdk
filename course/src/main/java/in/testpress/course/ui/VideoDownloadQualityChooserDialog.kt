@@ -61,7 +61,7 @@ class VideoDownloadQualityChooserDialog(val content: DomainContent) : DialogFrag
     }
     
     private fun initializeTrackSelectionView(view: View) {
-        trackSelectionView = view.findViewById(R.id.exo_track_selection_view)
+        trackSelectionView = view.findViewById(com.google.android.exoplayer2.ui.R.id.exo_track_selection_view)
         trackSelectionView.setShowDisableOption(false)
         trackSelectionView.setAllowAdaptiveSelections(false)
         trackSelectionView.setAllowMultipleOverrides(false)

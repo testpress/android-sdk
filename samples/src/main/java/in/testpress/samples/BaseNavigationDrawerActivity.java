@@ -55,15 +55,15 @@ public abstract class BaseNavigationDrawerActivity extends AppCompatActivity {
     }
 
     protected void onDrawerItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.home:
-                displayHome();
-                selectedItem = 0;
-                break;
-            case R.id.logout:
-                logout();
-                break;
+        int itemId = menuItem.getItemId();
+
+        if (itemId == R.id.home) {
+            displayHome();
+            selectedItem = 0;
+        } else if (itemId == R.id.logout) {
+            logout();
         }
+
         drawerLayout.closeDrawers();
     }
 

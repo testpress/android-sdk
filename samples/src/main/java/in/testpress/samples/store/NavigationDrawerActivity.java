@@ -28,14 +28,14 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
     @Override
     protected void onDrawerItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.store:
-                showSDK(R.id.store);
-                break;
-            case R.id.products:
-                showSDK(R.id.products);
-                break;
+        int itemId = menuItem.getItemId();
+
+        if (itemId == R.id.store) {
+            showSDK(R.id.store);
+        } else if (itemId == R.id.products) {
+            showSDK(R.id.products);
         }
+
         super.onDrawerItemSelected(menuItem);
     }
 

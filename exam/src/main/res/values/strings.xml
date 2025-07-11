@@ -273,4 +273,74 @@
     <string name="rank_will_be_published">Rank will be published %s</string>
     <string name="storage_permission_to_upload_file">The photos and videos permission is required to upload files.</string>
     <string name="testpress_pdf_preview">PDF Preview</string>
+    <string name="testpress_ok">OK</string>
+    <string name="testpress_cancel">Cancel</string>
+    <string name="testpress_no_internet_try_again">Please check your internet connection &amp; try again.</string>
+    <string name="testpress_tap_to_retry">Tap to retry</string>
+    <string name="testpress_authentication_failed">Authentication failed</string>
+    <string name="testpress_network_error">Network Error</string>
+    <string name="testpress_loading_failed">Loading Failed</string>
+    <string name="permission_denied">Permission Denied</string>
+    <string name="content_scheduled">This content is scheduled!</string>
+    <string name="testpress_no_permission">You do not have permission to view this.</string>
+    <string name="testpress_some_thing_went_wrong_try_again">Some thing went wrong, please try again later.</string>
+    <string name="testpress_error_loading_contents">Loading contents failed</string>
+    <string name="testpress_content_not_available">Content not available</string>
+    <string name="testpress_content_not_available_description">Content is no longer available or not published yet.</string>
+    <string name="video_id_locked"> This Video is locked!</string>
+    <string name="testpress_views_exhausted">You\'ve exhausted your views limit for this content. Contact your administrator for further information.</string>
+    <string name="testpress_vote_casted">Vote casted successfully!</string>
+    <string name="testpress_self_vote_error">You can\'t vote for yourself!</string>
+
+    <string name="testpress_please_wait">Please Wait…</string>
+
+    <string name="testpress_loading">Loading…</string>
+
+    <string name="testpress_label_fill_required_details">*Please fill required details</string>
+
+    <string name="testpress_yes">Yes</string>
+    <string name="testpress_no">No</string>
+
+    <string name="testpress_are_you_sure">Are you sure?</string>
+
+    <string name="testpress_deny">Deny</string>
+    <string name="testpress_permission_denied">Permission Denied</string>
+    <string name="testpress_permission_denied_message">Without this permission app is unable to do your intended action, Goto app settings -> Permissions -> Enable permission to continue.</string>
+    <string name="testpress_go_to_settings">Goto Settings</string>
+    <string name="testpress_action_cant_done_without_permission">Action can\'t be done without permission</string>
+    <string name="last_used">Last Used</string>
+    <string name="ip_address">IP Address</string>
+    <string name="logout_devices">Logout Devices</string>
+    <string name="max_login_limit_exceeded_error">Your account has been locked as it has exceeded maximum devices it can be used.</string>
+    <string name="account_unlock_info">Your account will automatically get unlocked within </string>
+    <string name="no_devices_found">No devices found</string>
+    <string name="session_cleared_message">Your session has been cleared. Please log out and login again.</string>
+    <string name="lockout_limit_info">Note : Admin has restricted login attempts to %d</string>
+
+    <string name="failed_loading_pdf"> Failed to load the PDF </string>
+    <string name="hint"><font size="14">Type message</font></string>
+
+
+
+    <string-array name="discussions_author_filter">
+        <item>All</item>
+        <item>My threads</item>
+    </string-array>
+
+    <string-array name="discussions_upvotes_filter">
+        <item>All</item>
+        <item>Upvoted By me</item>
+    </string-array>
+
+    <string-array name="discussions_comments_filter">
+        <item>All</item>
+        <item>Commented By me</item>
+    </string-array>
+
+    <plurals name="time_duration">
+        <item quantity="one">in %d %s</item>
+        <item quantity="other">in %d %ss</item>
+    </plurals>
+
+
 </resources>

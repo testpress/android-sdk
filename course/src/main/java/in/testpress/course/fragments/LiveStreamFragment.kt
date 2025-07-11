@@ -88,7 +88,7 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
         exoPlayerView = view!!.findViewById(R.id.exo_player_main_frame)
         exoPlayerView.visibility = View.VISIBLE
         exoPlayerView.setAspectRatio(16f / 9f)
-        exoPlayerView.findViewById<TextView>(R.id.exo_duration).visibility = View.GONE
+        //exoPlayerView.findViewById<TextView>(R.id.exo_duration).visibility = View.GONE
         exoPlayerView.findViewById<RelativeLayout>(R.id.live_label).visibility = View.VISIBLE
     }
 
