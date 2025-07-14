@@ -20,6 +20,7 @@ android {
     }
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
+    namespace 'in.testpress.samples'
     defaultConfig {
         multiDexEnabled true
         applicationId "in.testpress.samples"
