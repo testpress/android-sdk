@@ -258,6 +258,10 @@ public class WebViewUtils {
         return false;
     }
 
+    public boolean isWindowMonitoringEnabled() {
+        return false;
+    }
+
     public String getQuestionsHeader() {
         return getBaseHeader() +
                 "<link rel='stylesheet' type='text/css' href='testpress_questions_typebase.css' />" +
@@ -370,7 +374,7 @@ public class WebViewUtils {
 
     protected void onClickImage(String url, Activity activity) {
         TestpressSession session = TestpressSdk.getTestpressSession(activity);
-        if (Boolean.TRUE.equals(session.getInstituteSettings().getDisableImageFullscreenZoomInExam())) {
+        if (Boolean.TRUE.equals(session.getInstituteSettings().getDisableImageFullscreenZoomInExam()) || isWindowMonitoringEnabled()) {
            return;
         }
         activity.startActivity(ZoomableImageActivity.createIntent(url, activity));
