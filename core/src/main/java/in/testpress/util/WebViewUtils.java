@@ -374,9 +374,13 @@ public class WebViewUtils {
 
     protected void onClickImage(String url, Activity activity) {
         TestpressSession session = TestpressSdk.getTestpressSession(activity);
-        if (Boolean.TRUE.equals(session.getInstituteSettings().getDisableImageFullscreenZoomInExam()) || isWindowMonitoringEnabled()) {
-           return;
+        boolean isFullscreenDisabled = session != null &&
+                Boolean.TRUE.equals(session.getInstituteSettings().getDisableImageFullscreenZoomInExam());
+
+        if (isFullscreenDisabled || isWindowMonitoringEnabled()) {
+            return;
         }
+
         activity.startActivity(ZoomableImageActivity.createIntent(url, activity));
     }
 
