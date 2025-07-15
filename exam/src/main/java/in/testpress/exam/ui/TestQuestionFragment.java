@@ -129,6 +129,11 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                 }
 
                 @Override
+                public boolean isWindowMonitoringEnabled() {
+                    return exam.isWindowMonitoringEnabled();
+                }
+
+                @Override
                 public String getJavascript(Context context) {
                     String javascript = super.getJavascript(context);
                     List<Integer> selectedAnswers = attemptItem.getSavedAnswers();
