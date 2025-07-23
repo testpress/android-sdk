@@ -10,7 +10,6 @@ import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import `in`.testpress.ui.BaseToolBarActivity
-import androidx.core.view.isVisible
 
 class PdfViewerActivity : BaseToolBarActivity(), PdfDownloadListener, DisplayPDFListener {
     private lateinit var binding: LayoutPdfViewerBinding
@@ -28,7 +27,6 @@ class PdfViewerActivity : BaseToolBarActivity(), PdfDownloadListener, DisplayPDF
         super.onCreate(savedInstanceState)
         binding = LayoutPdfViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
-        hideToolBar()
         hideStatusBar()
         getDataFromBundle()
         pdfDownloadManager = PDFDownloadManager(this,this,fileName)
@@ -45,10 +43,6 @@ class PdfViewerActivity : BaseToolBarActivity(), PdfDownloadListener, DisplayPDF
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
-    }
-
-    private fun hideToolBar() {
-        binding.toolBar.root.isVisible = false
     }
 
     private fun getDataFromBundle() {

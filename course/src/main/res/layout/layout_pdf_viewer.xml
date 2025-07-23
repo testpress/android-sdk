@@ -6,8 +6,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
-    <include android:id="@+id/tool_bar"
-        layout="@layout/testpress_toolbar" />
+    <!-- We are displaying the PDF content in fullscreen, so the toolbar is hidden.
+         However, the toolbar view is still required because this Activity extends BaseToolBarActivity. -->
+    <include layout="@layout/testpress_toolbar"
+        android:visibility="gone" />
 
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfView"
