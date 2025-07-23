@@ -8,8 +8,8 @@ import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
-import android.view.WindowManager
 import `in`.testpress.ui.BaseToolBarActivity
+import android.view.WindowManager
 
 class PdfViewerActivity : BaseToolBarActivity(), PdfDownloadListener, DisplayPDFListener {
     private lateinit var binding: LayoutPdfViewerBinding
