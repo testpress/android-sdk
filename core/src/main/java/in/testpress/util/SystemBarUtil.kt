@@ -3,6 +3,7 @@ package `in`.testpress.util
 import android.content.Context
 import android.graphics.*
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.LayerDrawable
 import android.os.Build
 import android.view.View
 import androidx.core.content.ContextCompat
@@ -11,9 +12,10 @@ import androidx.core.view.WindowInsetsCompat
 import `in`.testpress.R
 
 /**
- * Drawable that draws custom colors for the system bars (status bar and navigation bar).
+ * Drawable that overlays custom colors for the system bars (status bar and navigation bar)
+ * without affecting the existing background of the root view.
  */
-private class SystemBarBackgroundDrawable(
+private class SystemBarOverlayDrawable(
     private val statusBarColor: Int,
     private val navBarColor: Int
 ) : Drawable() {
@@ -23,7 +25,8 @@ private class SystemBarBackgroundDrawable(
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG)
 
     /**
-     * Updates the inset heights and redraws.
+     * Updates the status bar and navigation bar inset heights and triggers a redraw
+     * if they have changed.
      */
     fun updateInsets(statusBarHeight: Int, navBarHeight: Int) {
         if (this.statusBarHeight != statusBarHeight || this.navBarHeight != navBarHeight) {
@@ -37,29 +40,23 @@ private class SystemBarBackgroundDrawable(
         val width = bounds.width()
         val height = bounds.height()
 
-        // Draw status bar area
-        paint.color = statusBarColor
-        canvas.drawRect(0f, 0f, width.toFloat(), statusBarHeight.toFloat(), paint)
+        // Draw status bar area overlay
+        if (statusBarHeight > 0) {
+            paint.color = statusBarColor
+            canvas.drawRect(0f, 0f, width.toFloat(), statusBarHeight.toFloat(), paint)
+        }
 
-        // Draw content area (between status and nav bar) in white
-        paint.color = Color.WHITE
-        canvas.drawRect(
-            0f,
-            statusBarHeight.toFloat(),
-            width.toFloat(),
-            (height - navBarHeight).toFloat(),
-            paint
-        )
-
-        // Draw navigation bar area
-        paint.color = navBarColor
-        canvas.drawRect(
-            0f,
-            (height - navBarHeight).toFloat(),
-            width.toFloat(),
-            height.toFloat(),
-            paint
-        )
+        // Draw navigation bar area overlay
+        if (navBarHeight > 0) {
+            paint.color = navBarColor
+            canvas.drawRect(
+                0f,
+                (height - navBarHeight).toFloat(),
+                width.toFloat(),
+                height.toFloat(),
+                paint
+            )
+        }
     }
 
     override fun setAlpha(alpha: Int) {}
@@ -68,18 +65,28 @@ private class SystemBarBackgroundDrawable(
 }
 
 /**
- * Applies custom colors to the system status bar and navigation bar
- * by adding a background drawable that accounts for insets.
+ * Applies overlay colors to the system status bar and navigation bar
+ * without replacing the existing background of the root view.
+ *
+ * This draws the overlay in the system bar inset areas only.
  */
 fun applySystemBarColors(rootView: View, statusBarColor: Int, navBarColor: Int) {
-    val systemBarDrawable = SystemBarBackgroundDrawable(statusBarColor, navBarColor)
-    rootView.background = systemBarDrawable
+    val overlayDrawable = SystemBarOverlayDrawable(statusBarColor, navBarColor)
+
+    val existingBackground = rootView.background
+    val layeredDrawable = if (existingBackground != null) {
+        LayerDrawable(arrayOf(existingBackground, overlayDrawable))
+    } else {
+        overlayDrawable
+    }
+
+    rootView.background = layeredDrawable
 
     ViewCompat.setOnApplyWindowInsetsListener(rootView) { view, insets ->
         val statusInsets = insets.getInsets(WindowInsetsCompat.Type.statusBars())
         val navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars())
 
-        systemBarDrawable.updateInsets(statusInsets.top, navInsets.bottom)
+        overlayDrawable.updateInsets(statusInsets.top, navInsets.bottom)
         view.setPadding(0, statusInsets.top, 0, navInsets.bottom)
 
         insets
@@ -87,10 +94,12 @@ fun applySystemBarColors(rootView: View, statusBarColor: Int, navBarColor: Int) 
 }
 
 /**
- * Applies primary color to the status bar and white color to the navigation bar,
- * using system bar insets for padding and background drawing.
+ * Applies app theme's primary color to the status bar and white color to the navigation bar
+ * on Android 15 (API 35) and above, using system bar insets for layout and background drawing.
  *
- * Example usage in Activity (Kotlin):
+ * This function should be called from your Activity or Fragment to ensure proper appearance.
+ *
+ * Example usage in Activity:
  *
  *     class MainActivity : AppCompatActivity() {
  *         override fun onCreate(savedInstanceState: Bundle?) {
@@ -100,7 +109,7 @@ fun applySystemBarColors(rootView: View, statusBarColor: Int, navBarColor: Int) 
  *         }
  *     }
  *
- * Example usage in Fragment (Kotlin):
+ * Example usage in Fragment:
  *
  *     class HomeFragment : Fragment(R.layout.fragment_home) {
  *         override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
