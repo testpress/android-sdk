@@ -6,6 +6,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:orientation="vertical">
 
+    <include android:id="@+id/tool_bar"
+        layout="@layout/testpress_toolbar" />
+
     <com.github.barteksc.pdfviewer.PDFView
         android:id="@+id/pdfView"
         android:layout_width="0dp"

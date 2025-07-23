@@ -9,9 +9,10 @@ import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
+import `in`.testpress.ui.BaseToolBarActivity
+import androidx.core.view.isVisible
 
-class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
+class PdfViewerActivity : BaseToolBarActivity(), PdfDownloadListener, DisplayPDFListener {
     private lateinit var binding: LayoutPdfViewerBinding
     private lateinit var pdfDownloadManager: PDFDownloadManager
 
@@ -25,9 +26,9 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        disableScreenShot()
         binding = LayoutPdfViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        hideToolBar()
         hideStatusBar()
         getDataFromBundle()
         pdfDownloadManager = PDFDownloadManager(this,this,fileName)
@@ -38,19 +39,16 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         }
     }
 
-    private fun disableScreenShot() {
-        window.setFlags(
-                WindowManager.LayoutParams.FLAG_SECURE,
-                WindowManager.LayoutParams.FLAG_SECURE
-        )
-    }
-
     private fun hideStatusBar() {
         window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
         this.window.setFlags(
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS,
                 WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS
         )
+    }
+
+    private fun hideToolBar() {
+        binding.toolBar.root.isVisible = false
     }
 
     private fun getDataFromBundle() {
