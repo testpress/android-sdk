@@ -10,8 +10,8 @@ import us.zoom.sdk.NewMeetingActivity
 class ZoomMeetActivity: NewMeetingActivity() {
     val session = TestpressSdk.getTestpressSession(this)
 
-    override fun onCreate(p0: Bundle?) {
-        super.onCreate(p0)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         applySystemBarColors(window.decorView.rootView)
     }
 

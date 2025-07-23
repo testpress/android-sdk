@@ -64,7 +64,7 @@ private class SystemBarBackgroundDrawable(
 
     override fun setAlpha(alpha: Int) {}
     override fun setColorFilter(colorFilter: ColorFilter?) {}
-    override fun getOpacity(): Int = PixelFormat.OPAQUE
+    override fun getOpacity(): Int = PixelFormat.TRANSLUCENT
 }
 
 /**
@@ -100,19 +100,6 @@ fun applySystemBarColors(rootView: View, statusBarColor: Int, navBarColor: Int) 
  *         }
  *     }
  *
- * Example usage in Activity (Java):
- *
- *     public class MainActivity extends AppCompatActivity {
- *         @Override
- *         protected void onCreate(Bundle savedInstanceState) {
- *             super.onCreate(savedInstanceState);
- *             setContentView(R.layout.activity_main);
- *
- *             View rootView = getWindow().getDecorView().getRootView();
- *             SystemBarUtil.INSTANCE.applySystemBarColors(this, rootView);
- *         }
- *     }
- *
  * Example usage in Fragment (Kotlin):
  *
  *     class HomeFragment : Fragment(R.layout.fragment_home) {
@@ -121,18 +108,6 @@ fun applySystemBarColors(rootView: View, statusBarColor: Int, navBarColor: Int) 
  *             requireContext().applySystemBarColors(view)
  *         }
  *     }
- *
- * Example usage in Fragment (Java):
- *
- *     public class HomeFragment extends Fragment {
- *
- *         @Override
- *         public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
- *              super.onViewCreated(view, savedInstanceState);
- *              SystemBarUtil.INSTANCE.applySystemBarColors(requireContext(), view);
- *         }
- *     }
- *
  */
 fun Context.applySystemBarColors(rootView: View) {
     val isRuntimeApiAbove34 = Build.VERSION.SDK_INT > Build.VERSION_CODES.UPSIDE_DOWN_CAKE
