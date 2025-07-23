@@ -2,7 +2,6 @@ package `in`.testpress.store.ui
 
 import `in`.testpress.store.R
 import `in`.testpress.store.TestpressStore
-
 import `in`.testpress.ui.BaseToolBarActivity
 import android.content.Intent
 import android.os.Bundle
