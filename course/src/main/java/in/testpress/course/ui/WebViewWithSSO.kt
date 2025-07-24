@@ -16,10 +16,10 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
+import `in`.testpress.ui.BaseToolBarActivity
 import java.io.IOException
 
-class WebViewWithSSO: AppCompatActivity(), EmptyViewListener {
+class WebViewWithSSO: BaseToolBarActivity(), EmptyViewListener {
     private lateinit var binding: TestpressContainerLayoutBinding
     lateinit var emptyViewFragment: EmptyViewFragment
     val instituteSettings: InstituteSettings? = TestpressSdk.getTestpressSession(this)?.instituteSettings;

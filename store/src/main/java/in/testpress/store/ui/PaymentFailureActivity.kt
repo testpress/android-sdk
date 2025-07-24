@@ -2,14 +2,14 @@ package `in`.testpress.store.ui
 
 import `in`.testpress.store.R
 import `in`.testpress.store.TestpressStore
-import android.app.Activity
+import `in`.testpress.ui.BaseToolBarActivity
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
 
-class PaymentFailureActivity: Activity() {
+class PaymentFailureActivity: BaseToolBarActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.payment_failure_activity_layout)
