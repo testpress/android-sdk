@@ -15,6 +15,7 @@ import android.widget.ImageView
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import `in`.testpress.util.applySystemBarColors
 
 /**
  * Base activity used to support the toolbar & handle backpress.
@@ -31,6 +32,11 @@ open class BaseToolBarActivity: AppCompatActivity() {
     private var session: TestpressSession? = null
     protected lateinit var logo: ImageView
     protected lateinit var toolbar: Toolbar
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        applySystemBarColors(window.decorView.rootView)
+    }
 
     override fun setContentView(layoutResId: Int) {
         super.setContentView(layoutResId)
