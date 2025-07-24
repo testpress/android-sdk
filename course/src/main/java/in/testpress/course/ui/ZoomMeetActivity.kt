@@ -1,19 +1,12 @@
 package `in`.testpress.course.ui
 
-import android.os.Bundle
 import `in`.testpress.core.TestpressSdk
 import android.view.View
 import android.view.WindowManager
-import `in`.testpress.util.applySystemBarColors
 import us.zoom.sdk.NewMeetingActivity
 
 class ZoomMeetActivity: NewMeetingActivity() {
     val session = TestpressSdk.getTestpressSession(this)
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        applySystemBarColors(window.decorView.rootView)
-    }
 
     override fun setContentView(layoutResID: Int) {
         disableScreenRecording()
