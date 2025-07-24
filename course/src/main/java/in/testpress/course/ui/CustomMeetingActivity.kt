@@ -17,7 +17,6 @@ import android.widget.Button
 import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import `in`.testpress.util.applySystemBarColors
 import us.zoom.sdk.*
 
 
@@ -34,7 +33,6 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        applySystemBarColors(window.decorView.rootView)
         setUpWindow()
 
         customMeetingBinding = ActivityCustomMeetingBinding.inflate(layoutInflater)
