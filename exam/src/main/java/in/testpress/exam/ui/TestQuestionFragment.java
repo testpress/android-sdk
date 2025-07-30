@@ -130,7 +130,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
 
                 @Override
                 public boolean isWindowMonitoringEnabled() {
-                    return exam.isWindowMonitoringEnabled();
+                    return exam != null && exam.isWindowMonitoringEnabled();
                 }
 
                 @Override
