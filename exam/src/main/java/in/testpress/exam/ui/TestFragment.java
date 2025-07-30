@@ -1649,7 +1649,7 @@ public class TestFragment extends BaseFragment implements
     public void onResume() {
         super.onResume();
 
-        if (!exam.isWindowMonitoringEnabled()) {
+        if (exam != null && !exam.isWindowMonitoringEnabled()) {
             removeAppBackgroundHandler();
             return;
         }
@@ -1722,7 +1722,7 @@ public class TestFragment extends BaseFragment implements
     public void onStop() {
         super.onStop();
         saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
-        if (exam.isWindowMonitoringEnabled()) {
+        if (exam != null && exam.isWindowMonitoringEnabled()) {
             currentViolationCount++;
             return;
         }
