@@ -76,7 +76,6 @@ dependencies {
     api rootProject.firebaseAnalytics
     api rootProject.pagingRuntime
     api rootProject.fragmentKotlinExtensions
-    api rootProject.powerSpinner
     api rootProject.lifecycleViewModelKotlinExtensions
     api rootProject.jsoup
     api rootProject.sentrySDK

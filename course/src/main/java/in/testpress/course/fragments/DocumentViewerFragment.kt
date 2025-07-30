@@ -10,7 +10,6 @@ import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import `in`.testpress.course.util.SHA256Generator.generateSha256
-import `in`.testpress.databinding.DiscussionListBinding
 import android.content.Intent
 import android.os.Bundle
 import android.view.*

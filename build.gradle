@@ -85,7 +85,6 @@ ext {
     branchAndroidSDK = "io.branch.sdk.android:library:5.0.1"
     facebookAndroidSdk = "com.facebook.android:facebook-android-sdk:5.15.3"
     firebaseAnalytics = "com.google.firebase:firebase-analytics:17.4.0"
-    powerSpinner = "com.github.skydoves:powerspinner:1.1.9"
     jsoup = "org.jsoup:jsoup:1.13.1"
     sentrySDK = "io.sentry:sentry-android:6.4.2"
     kotlinStdlibJdk7 = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.8.0"
