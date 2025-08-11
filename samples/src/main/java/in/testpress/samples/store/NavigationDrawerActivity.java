@@ -57,7 +57,7 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
                     @Override
                     public void onClick(@NonNull ProductLiteEntity product) {
                         NavigationDrawerActivity.this.startActivity(
-                                CoursePreviewActivity.createIntent(
+                                CoursePreviewActivity.Companion.createIntent(
                                         new ArrayList<>(product.getCourseIds()),
                                         NavigationDrawerActivity.this,
                                         product.getSlug()
