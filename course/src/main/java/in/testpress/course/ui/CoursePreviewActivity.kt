@@ -19,6 +19,8 @@ class CoursePreviewActivity: BaseToolBarActivity() {
     }
 
     companion object {
+
+        @JvmStatic
         fun createIntent(
             courseIds: ArrayList<Int>,
             context: Context,
