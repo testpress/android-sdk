@@ -23,40 +23,42 @@ object ImageUtils {
         requireNotNull(context) { "Context must not be null." }
 
         val imageLoader = ImageLoader.getInstance()
-        return if (imageLoader.isInited) {
-            imageLoader
-        } else {
-            val defaultOptions = DisplayImageOptions.Builder()
-                .cacheOnDisk(true).cacheInMemory(true)
-                .imageScaleType(ImageScaleType.EXACTLY)
-                .displayer(FadeInBitmapDisplayer(300)).build()
-
-            val config = ImageLoaderConfiguration.Builder(context.applicationContext)
-                .defaultDisplayImageOptions(defaultOptions)
-                .memoryCache(WeakMemoryCache())
-                .diskCacheSize(500 * 1024 * 1024).build()
-
-            imageLoader.init(config)
-            imageLoader
+        if (imageLoader.isInited) {
+            return imageLoader
         }
+
+        val defaultOptions = DisplayImageOptions.Builder()
+            .cacheOnDisk(true).cacheInMemory(true)
+            .imageScaleType(ImageScaleType.EXACTLY)
+            .displayer(FadeInBitmapDisplayer(300)).build()
+
+        val config = ImageLoaderConfiguration.Builder(context.applicationContext)
+            .defaultDisplayImageOptions(defaultOptions)
+            .memoryCache(WeakMemoryCache())
+            .diskCacheSize(500 * 1024 * 1024).build()
+
+        return imageLoader.also { it.init(config) }
+    }
+
+    private fun buildPlaceholderOptions(placeholderResId: Int): DisplayImageOptions.Builder {
+        return DisplayImageOptions.Builder()
+            .cacheInMemory(true)
+            .cacheOnDisk(true)
+            .resetViewBeforeLoading(true)
+            .showImageForEmptyUri(placeholderResId)
+            .showImageOnFail(placeholderResId)
+            .showImageOnLoading(placeholderResId)
     }
 
     @JvmStatic
     fun getPlaceholdersOption(): DisplayImageOptions {
-        return DisplayImageOptions.Builder().cacheInMemory(true)
-            .cacheOnDisk(true).resetViewBeforeLoading(true)
+        return buildPlaceholderOptions(R.drawable.testpress_placeholder_icon)
             .imageScaleType(ImageScaleType.EXACTLY)
-            .showImageForEmptyUri(R.drawable.testpress_placeholder_icon)
-            .showImageOnFail(R.drawable.testpress_placeholder_icon)
-            .showImageOnLoading(R.drawable.testpress_placeholder_icon).build()
+            .build()
     }
 
     @JvmStatic
     fun getAvatarPlaceholdersOption(): DisplayImageOptions {
-        return DisplayImageOptions.Builder().cacheInMemory(true)
-            .cacheOnDisk(true).resetViewBeforeLoading(true)
-            .showImageForEmptyUri(R.drawable.profile_image_place_holder)
-            .showImageOnFail(R.drawable.profile_image_place_holder)
-            .showImageOnLoading(R.drawable.profile_image_place_holder).build()
+        return buildPlaceholderOptions(R.drawable.profile_image_place_holder).build()
     }
 }
