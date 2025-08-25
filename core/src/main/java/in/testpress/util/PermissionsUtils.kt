@@ -3,7 +3,6 @@ package `in`.testpress.util
 import android.Manifest
 import android.app.Activity
 import android.content.Context
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.pm.PackageManager
 import android.net.Uri
@@ -87,7 +86,7 @@ class PermissionsUtils {
     fun requestPermissions(resultHandler: PermissionRequestResultHandler?) {
         this.resultHandler = resultHandler
         if (fragment != null) {
-            fragment!!.requestPermissions(permissions, PERMISSIONS_REQUEST_CODE)
+            fragment?.requestPermissions(permissions, PERMISSIONS_REQUEST_CODE)
         } else {
             ActivityCompat.requestPermissions(activity, permissions, PERMISSIONS_REQUEST_CODE
             )
@@ -97,24 +96,28 @@ class PermissionsUtils {
     fun onRequestPermissionsResult(requestCode: Int, grantResults: IntArray) {
         if (requestCode == PERMISSIONS_REQUEST_CODE) {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                resultHandler!!.onPermissionGranted()
+                resultHandler?.onPermissionGranted()
             } else {
-                val show = ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[0])
+                val show =
+                    if (permissions.isNotEmpty()) ActivityCompat.shouldShowRequestPermissionRationale(
+                        activity,
+                        permissions[0]
+                    ) else false
 
                 if (!show) {
-                    val builder = AlertDialog.Builder(activity, R.style.TestpressAppCompatAlertDialogStyle)
+                    val builder =
+                        AlertDialog.Builder(activity, R.style.TestpressAppCompatAlertDialogStyle)
 
                     builder.setTitle(R.string.testpress_permission_denied)
                     builder.setMessage(R.string.testpress_permission_denied_message)
-                    builder.setPositiveButton(R.string.testpress_go_to_settings,
-                        DialogInterface.OnClickListener { dialog, whichButton ->
-                            checkPermission = true
-                            val intent = Intent()
-                            intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            val uri = Uri.fromParts("package", activity.packageName, null)
-                            intent.setData(uri)
-                            activity.startActivity(intent)
-                        })
+                    builder.setPositiveButton(R.string.testpress_go_to_settings) { _, _ ->
+                        checkPermission = true
+                        val intent = Intent()
+                        intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
+                        val uri = Uri.fromParts("package", activity.packageName, null)
+                        intent.setData(uri)
+                        activity.startActivity(intent)
+                    }
                     builder.setNegativeButton(R.string.testpress_deny, null)
                     builder.show()
                 } else {
