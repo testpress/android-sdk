@@ -15,13 +15,11 @@ import androidx.core.app.ActivityCompat
 import androidx.fragment.app.Fragment
 import com.google.android.material.snackbar.Snackbar
 import `in`.testpress.R
-import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSdk.PERMISSIONS_REQUEST_CODE
-
 
 class PermissionsUtils {
     private var rootLayout: View
-    private lateinit var activity: Activity
+    private var activity: Activity
     private var fragment: Fragment? = null
     private var permissions: Array<String> = arrayOf()
     private var resultHandler: PermissionRequestResultHandler? = null
@@ -101,17 +99,10 @@ class PermissionsUtils {
             if ((grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 resultHandler!!.onPermissionGranted()
             } else {
-                val show =
-                    ActivityCompat.shouldShowRequestPermissionRationale(
-                        activity,
-                        permissions[0]
-                    )
+                val show = ActivityCompat.shouldShowRequestPermissionRationale(activity, permissions[0])
 
                 if (!show) {
-                    val builder = AlertDialog.Builder(
-                        activity,
-                        R.style.TestpressAppCompatAlertDialogStyle
-                    )
+                    val builder = AlertDialog.Builder(activity, R.style.TestpressAppCompatAlertDialogStyle)
 
                     builder.setTitle(R.string.testpress_permission_denied)
                     builder.setMessage(R.string.testpress_permission_denied_message)
@@ -120,9 +111,9 @@ class PermissionsUtils {
                             checkPermission = true
                             val intent = Intent()
                             intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS)
-                            val uri = Uri.fromParts("package", activity!!.packageName, null)
+                            val uri = Uri.fromParts("package", activity.packageName, null)
                             intent.setData(uri)
-                            activity!!.startActivity(intent)
+                            activity.startActivity(intent)
                         })
                     builder.setNegativeButton(R.string.testpress_deny, null)
                     builder.show()
@@ -156,7 +147,7 @@ class PermissionsUtils {
      */
     fun isUriRequiresPermissions(uri: Uri): Boolean {
         try {
-            val resolver = activity!!.contentResolver
+            val resolver = activity.contentResolver
             val stream = resolver.openInputStream(uri)
             stream?.close()
             return false
