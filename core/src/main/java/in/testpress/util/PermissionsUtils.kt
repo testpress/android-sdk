@@ -17,8 +17,8 @@ import `in`.testpress.R
 import `in`.testpress.core.TestpressSdk.PERMISSIONS_REQUEST_CODE
 
 class PermissionsUtils {
-    private var rootLayout: View
-    private var activity: Activity
+    private val rootLayout: View
+    private val activity: Activity
     private var fragment: Fragment? = null
     private var permissions: Array<String> = arrayOf()
     private var resultHandler: PermissionRequestResultHandler? = null
@@ -67,11 +67,11 @@ class PermissionsUtils {
         }.show()
     }
 
-    fun checkPermissionRequired(): Boolean {
+    private fun checkPermissionRequired(): Boolean {
         return checkPermissionRequired(activity, permissions)
     }
 
-    fun checkPermissionRequired(uri: Uri): Boolean {
+    private fun checkPermissionRequired(uri: Uri): Boolean {
         return checkPermissionRequired() && isUriRequiresPermissions(uri)
     }
 
@@ -83,7 +83,7 @@ class PermissionsUtils {
         }
     }
 
-    fun requestPermissions(resultHandler: PermissionRequestResultHandler?) {
+    private fun requestPermissions(resultHandler: PermissionRequestResultHandler?) {
         this.resultHandler = resultHandler
         if (fragment != null) {
             fragment?.requestPermissions(permissions, PERMISSIONS_REQUEST_CODE)
@@ -141,21 +141,12 @@ class PermissionsUtils {
         this.permissions = permissions
     }
 
-    /**
-     * Test if we can open the given Android URI to test if permission required error is thrown.<br></br>
-     * Only relevant for API version 23 and above.
-     * https://github.com/ArthurHub/Android-Image-Cropper/blob/2.8.0/cropper/src/main/java/com/theartofdev/edmodo/cropper/CropImage.java#L396
-     *
-     * @param uri the result URI of image pick.
-     */
-    fun isUriRequiresPermissions(uri: Uri): Boolean {
-        try {
-            val resolver = activity.contentResolver
-            val stream = resolver.openInputStream(uri)
-            stream?.close()
-            return false
+    private fun isUriRequiresPermissions(uri: Uri): Boolean {
+        return try {
+            activity.contentResolver.openInputStream(uri)?.use {}
+            false
         } catch (e: Exception) {
-            return true
+            true
         }
     }
 
@@ -169,17 +160,9 @@ class PermissionsUtils {
             context: Context,
             permissions: Array<String> = arrayOf()
         ): Boolean {
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                for (permission in permissions) {
-                    val required =
-                        context.checkSelfPermission(permission) != PackageManager.PERMISSION_GRANTED
-
-                    if (required) {
-                        return true
-                    }
-                }
+            return Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && permissions.any {
+                context.checkSelfPermission(it) != PackageManager.PERMISSION_GRANTED
             }
-            return false
         }
     }
 }
