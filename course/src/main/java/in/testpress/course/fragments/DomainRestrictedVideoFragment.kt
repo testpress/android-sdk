@@ -1,6 +1,5 @@
 package `in`.testpress.course.fragments
 
-import android.webkit.WebSettings
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.api.TestpressCourseApiClient
 import `in`.testpress.course.domain.DomainContent
@@ -19,10 +18,6 @@ class DomainRestrictedVideoFragment: WebViewVideoFragment() {
     }
 
     private fun disableWebViewCache() {
-        webView.settings.apply {
-            cacheMode = WebSettings.LOAD_NO_CACHE
-            domStorageEnabled = false
-        }
         webView.clearCache(true)
         webView.clearHistory()
     }
