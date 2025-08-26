@@ -49,11 +49,11 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
         try {
             fetchPdf(url, authKey).use { response ->
                 if (!response.isSuccessful) {
-                    onDownloadFailed("Download failed with HTTP status code: ${response.code()}", progressDialog)
+                    onDownloadFailed("Download failed with HTTP status code: ${response.code}", progressDialog)
                     return@withContext
                 }
 
-                val file = savePdfToFile(response.body()?.bytes(), pdfName)
+                val file = savePdfToFile(response.body?.bytes(), pdfName)
                 if (file == null) {
                     onDownloadFailed("Download failed: PDF content was empty.", progressDialog)
                     return@withContext
