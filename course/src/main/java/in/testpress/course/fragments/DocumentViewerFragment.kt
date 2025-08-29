@@ -119,8 +119,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private fun displayPDF() {
         binding.encryptionProgress.visibility = View.VISIBLE
         PDFViewer(requireContext(), displayPDFListener = this).display(
-            file = pdfDownloadManager.get(),
-            pdfView = binding.pdfView
+                file = pdfDownloadManager.get(),
+                pdfView = binding.pdfView
         )
     }
 
@@ -158,16 +158,16 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun showDownloadProgress(progress: Int) {
-            binding.downloadProgress.visibility = View.VISIBLE
-            binding.progressPercentage.visibility = View.VISIBLE
-            binding.downloadProgress.progress = progress
-            binding.progressPercentage.text = "$progress%"
+        binding.downloadProgress.visibility = View.VISIBLE
+        binding.progressPercentage.visibility = View.VISIBLE
+        binding.downloadProgress.progress = progress
+        binding.progressPercentage.text = "$progress%"
     }
 
     private fun hideDownloadProgress() {
         binding.downloadProgress.visibility = View.GONE
         binding.progressPercentage.visibility = View.GONE
-}
+    }
 
     private fun showErrorView() {
         binding.pdfView.visibility = View.GONE
