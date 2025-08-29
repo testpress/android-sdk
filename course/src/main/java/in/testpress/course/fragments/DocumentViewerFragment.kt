@@ -117,11 +117,13 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun displayPDF() {
-        binding.encryptionProgress.visibility = View.VISIBLE
-        PDFViewer(requireContext(),displayPDFListener = this).display(
+        _binding?.apply {
+            encryptionProgress.visibility = View.VISIBLE
+            PDFViewer(requireContext(), displayPDFListener = this@DocumentViewerFragment).display(
                 file = pdfDownloadManager.get(),
                 pdfView = binding.pdfView
-        )
+            )
+        }
     }
 
     override fun onDownloadFailed() {
@@ -130,11 +132,13 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun downloadProgress(progress: Int) {
-        showDownloadProgress(progress)
-        binding.encryptionProgress.visibility = View.GONE
-        if (progress == completeProgress) {
-            hideDownloadProgress()
-            binding.encryptionProgress.visibility = View.VISIBLE
+        _binding?.apply {
+            showDownloadProgress(progress)
+            encryptionProgress.visibility = View.GONE
+            if (progress == completeProgress) {
+                hideDownloadProgress()
+                encryptionProgress.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -147,7 +151,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     override fun onPDFLoaded() {
-        binding.encryptionProgress.visibility = View.GONE
+        _binding?.apply {
+            encryptionProgress.visibility = View.GONE
+        }
         if (::fullScreenMenu.isInitialized) {
             fullScreenMenu.isVisible = true
         }
@@ -158,20 +164,26 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun showDownloadProgress(progress: Int) {
-        binding.downloadProgress.visibility = View.VISIBLE
-        binding.progressPercentage.visibility = View.VISIBLE
-        binding.downloadProgress.progress = progress
-        binding.progressPercentage.text = "$progress%"
+        _binding?.apply {
+            downloadProgress.visibility = View.VISIBLE
+            progressPercentage.visibility = View.VISIBLE
+            downloadProgress.progress = progress
+            progressPercentage.text = "$progress%"
+        }
     }
 
     private fun hideDownloadProgress() {
-        binding.downloadProgress.visibility = View.GONE
-        binding.progressPercentage.visibility = View.GONE
+        _binding?.apply {
+            downloadProgress.visibility = View.GONE
+            progressPercentage.visibility = View.GONE
+        }
     }
 
     private fun showErrorView() {
-        binding.pdfView.visibility = View.GONE
-        binding.emptyContainer.visibility = View.VISIBLE
+        _binding?.apply {
+            pdfView.visibility = View.GONE
+            emptyContainer.visibility = View.VISIBLE
+        }
     }
 
     override fun onDetach() {
