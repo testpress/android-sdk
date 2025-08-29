@@ -121,7 +121,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             encryptionProgress.visibility = View.VISIBLE
             PDFViewer(requireContext(), displayPDFListener = this@DocumentViewerFragment).display(
                 file = pdfDownloadManager.get(),
-                pdfView = binding.pdfView
+                pdfView = this.pdfView
             )
         }
     }
