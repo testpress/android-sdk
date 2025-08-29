@@ -6,6 +6,7 @@ import com.downloader.Error
 import com.downloader.OnDownloadListener
 import com.downloader.PRDownloader
 import com.downloader.request.DownloadRequest
+import com.downloader.Status;
 import `in`.testpress.util.getRootDirPath
 import java.io.File
 
@@ -46,8 +47,10 @@ open class PDFDownloadManager(
         })
 
         prDownloader.setOnProgressListener {
-            val progress = ((it.currentBytes*100)/it.totalBytes)
-            pdfDownloadListener.downloadProgress(progress.toInt())
+            if (prDownloader.status == Status.RUNNING) {
+                val progress = ((it.currentBytes * 100) / it.totalBytes)
+                pdfDownloadListener.downloadProgress(progress.toInt())
+            }
         }
     }
 
