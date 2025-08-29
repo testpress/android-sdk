@@ -54,6 +54,10 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onDestroyView() {
         super.onDestroyView()
+        if (::pdfDownloadManager.isInitialized) {
+            pdfDownloadManager.cancel()
+            pdfDownloadManager.cleanup()
+        }
         _binding = null
     }
 
@@ -172,13 +176,5 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private fun showErrorView() {
         binding.pdfView.visibility = View.GONE
         binding.emptyContainer.visibility = View.VISIBLE
-    }
-
-    override fun onDetach() {
-        super.onDetach()
-        if (::pdfDownloadManager.isInitialized) {
-            pdfDownloadManager.cancel()
-            pdfDownloadManager.cleanup()
-        }
     }
 }
