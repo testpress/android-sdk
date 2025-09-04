@@ -58,7 +58,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property NextContentId = new Property(28, Long.class, "nextContentId", false, "NEXT_CONTENT_ID");
         public final static Property HasEnded = new Property(29, Boolean.class, "hasEnded", false, "HAS_ENDED");
         public final static Property ExamStartUrl = new Property(30, String.class, "examStartUrl", false, "EXAM_START_URL");
-        public final static Property IsAIEnabled = new Property(31, Boolean.class, "isAIEnabled", false, "IS_AIENABLED");
+        public final static Property IsAIEnabled = new Property(31, Boolean.class, "isAIEnabled", false, "IS_AI_ENABLED");
         public final static Property CourseId = new Property(32, Long.class, "courseId", false, "COURSE_ID");
         public final static Property ChapterId = new Property(33, Long.class, "chapterId", false, "CHAPTER_ID");
         public final static Property VideoConferenceId = new Property(34, Long.class, "videoConferenceId", false, "VIDEO_CONFERENCE_ID");
@@ -118,7 +118,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"NEXT_CONTENT_ID\" INTEGER," + // 28: nextContentId
                 "\"HAS_ENDED\" INTEGER," + // 29: hasEnded
                 "\"EXAM_START_URL\" TEXT," + // 30: examStartUrl
-                "\"IS_AIENABLED\" INTEGER," + // 31: isAIEnabled
+                "\"IS_AI_ENABLED\" INTEGER," + // 31: isAIEnabled
                 "\"COURSE_ID\" INTEGER," + // 32: courseId
                 "\"CHAPTER_ID\" INTEGER," + // 33: chapterId
                 "\"VIDEO_CONFERENCE_ID\" INTEGER," + // 34: videoConferenceId

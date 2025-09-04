@@ -60,7 +60,9 @@ public class Content implements android.os.Parcelable {
     private Long nextContentId;
     private Boolean hasEnded;
     private String examStartUrl;
+
     @SerializedName("is_ai_enabled")
+    @Property(nameInDb = "IS_AI_ENABLED")
     private Boolean isAIEnabled;
     private Long courseId;
     private Long chapterId;
