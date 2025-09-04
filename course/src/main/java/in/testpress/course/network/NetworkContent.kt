@@ -53,7 +53,8 @@ data class NetworkContent(
     val isCourseAvailable: Boolean? = null,
     val nextContentId: Long? = null,
     val hasEnded: Boolean? = null,
-    val examStartUrl: String? = null
+    val examStartUrl: String? = null,
+    val isAiEnabled: Boolean? = null
 )
 
 fun NetworkContent.asDatabaseModel(): ContentEntity {
@@ -83,7 +84,8 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         coverImageSmall = this.coverImageSmall,
         nextContentId = this.nextContentId,
         hasEnded = this.hasEnded,
-        examStartUrl = this.examStartUrl
+        examStartUrl = this.examStartUrl,
+        isAiEnabled = this.isAiEnabled
     )
     contentEntity.title = this.title
     contentEntity.order = this.order
@@ -132,6 +134,7 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.nextContentId,
         this.hasEnded,
         this.examStartUrl,
+        this.isAiEnabled,
         this.courseId,
         this.chapterId,
         this.videoConferenceId,

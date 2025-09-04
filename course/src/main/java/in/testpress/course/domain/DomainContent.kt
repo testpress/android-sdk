@@ -66,6 +66,7 @@ data class DomainContent(
     var nextContentId: Long? = null,
     val hasEnded: Boolean?,
     val examStartUrl: String? = null,
+    val isAiEnabled: Boolean? = false,
     val treePath: String? = null,
     val icon: String? = null,
     val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
@@ -155,7 +156,8 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         coverImageMedium = contentEntity.coverImageMedium,
         nextContentId = contentEntity.nextContentId,
         hasEnded = contentEntity.hasEnded,
-        examStartUrl = contentEntity.examStartUrl
+        examStartUrl = contentEntity.examStartUrl,
+        isAiEnabled = contentEntity.isAiEnabled
     )
 }
 
@@ -206,7 +208,8 @@ fun createDomainContent(content: Content): DomainContent {
         coverImageSmall = content.coverImageSmall,
         nextContentId = content.nextContentId,
         hasEnded = content.hasEnded,
-        examStartUrl = content.examStartUrl
+        examStartUrl = content.examStartUrl,
+        isAiEnabled = content.isAiEnabled
     )
 }
 

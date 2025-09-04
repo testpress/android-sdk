@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 37,
-    "identityHash": "375a7fc8c05ac6d75047521cc3c14bd6",
+    "identityHash": "6ab3dea8f296225d6b1f9393cecd4b3c",
     "entities": [
       {
         "tableName": "ContentEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `description` TEXT, `image` TEXT, `url` TEXT NOT NULL, `chapterSlug` TEXT NOT NULL, `chapterUrl` TEXT, `modified` TEXT, `examUrl` TEXT, `videoUrl` TEXT, `attachmentUrl` TEXT, `htmlUrl` TEXT, `isLocked` INTEGER NOT NULL, `isScheduled` INTEGER NOT NULL, `attemptsCount` INTEGER NOT NULL, `bookmarkId` INTEGER, `videoWatchedPercentage` INTEGER, `active` INTEGER NOT NULL, `htmlId` INTEGER, `hasStarted` INTEGER NOT NULL, `isCourseAvailable` INTEGER, `coverImageSmall` TEXT, `coverImageMedium` TEXT, `coverImage` TEXT, `nextContentId` INTEGER, `hasEnded` INTEGER, `examStartUrl` TEXT, `order` INTEGER, `chapterId` INTEGER, `freePreview` INTEGER, `title` TEXT, `courseId` INTEGER, `examId` INTEGER, `contentId` INTEGER, `videoId` INTEGER, `attachmentId` INTEGER, `liveStreamId` INTEGER, `contentType` TEXT, `icon` TEXT, `start` TEXT, `end` TEXT, `treePath` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `description` TEXT, `image` TEXT, `url` TEXT NOT NULL, `chapterSlug` TEXT NOT NULL, `chapterUrl` TEXT, `modified` TEXT, `examUrl` TEXT, `videoUrl` TEXT, `attachmentUrl` TEXT, `htmlUrl` TEXT, `isLocked` INTEGER NOT NULL, `isScheduled` INTEGER NOT NULL, `attemptsCount` INTEGER NOT NULL, `bookmarkId` INTEGER, `videoWatchedPercentage` INTEGER, `active` INTEGER NOT NULL, `htmlId` INTEGER, `hasStarted` INTEGER NOT NULL, `isCourseAvailable` INTEGER, `coverImageSmall` TEXT, `coverImageMedium` TEXT, `coverImage` TEXT, `nextContentId` INTEGER, `hasEnded` INTEGER, `examStartUrl` TEXT, `isAiEnabled` INTEGER, `order` INTEGER, `chapterId` INTEGER, `freePreview` INTEGER, `title` TEXT, `courseId` INTEGER, `examId` INTEGER, `contentId` INTEGER, `videoId` INTEGER, `attachmentId` INTEGER, `liveStreamId` INTEGER, `contentType` TEXT, `icon` TEXT, `start` TEXT, `end` TEXT, `treePath` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -162,6 +162,12 @@
             "fieldPath": "examStartUrl",
             "columnName": "examStartUrl",
             "affinity": "TEXT",
+            "notNull": false
+          },
+          {
+            "fieldPath": "isAiEnabled",
+            "columnName": "isAiEnabled",
+            "affinity": "INTEGER",
             "notNull": false
           },
           {
@@ -1912,7 +1918,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '375a7fc8c05ac6d75047521cc3c14bd6')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '6ab3dea8f296225d6b1f9393cecd4b3c')"
     ]
   }
 }
