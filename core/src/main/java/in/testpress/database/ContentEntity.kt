@@ -32,5 +32,5 @@ data class ContentEntity(
     var nextContentId: Long? = null,
     var hasEnded: Boolean? = null,
     var examStartUrl: String? = null,
-    var isAiEnabled: Boolean? = false
+    var isAiEnabled: Boolean? = null
 ): BaseContentEntity()

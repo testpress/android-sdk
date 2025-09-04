@@ -66,7 +66,7 @@ data class DomainContent(
     var nextContentId: Long? = null,
     val hasEnded: Boolean?,
     val examStartUrl: String? = null,
-    val isAiEnabled: Boolean? = false,
+    val isAiEnabled: Boolean? = null,
     val treePath: String? = null,
     val icon: String? = null,
     val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
