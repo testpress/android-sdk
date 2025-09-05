@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="testpress_difficulty_level_1">#e65c6c</color>
+    <color name="testpress_difficulty_level_2">#ff7519</color>
+    <color name="testpress_difficulty_level_3">#ffb319</color>
+    <color name="testpress_difficulty_level_4">#aacc00</color>
+    <color name="testpress_difficulty_level_5">#44cc00</color>
+    <color name="testpress_difficulty_percentage_gray">#666666</color>
+    <color name="testpress_red">#d9534f</color>
+    <color name="testpress_green">#18be99</color>
+    <color name="testpress_black">#333333</color>
+    <color name="testpress_text_gray">#777</color>
+    <color name="testpress_color_primary">#2196F3</color>
+    <color name="testpress_color_primary_blue">#2196F3</color>
+    <color name="testpress_green_light">#00ccaa</color>
+    <color name="testpress_red_incorrect">#E65C6C</color>
+    <color name="testpress_blue_light_background_transparent">#80b6dcfb</color>
+
+    <color name="testpress_gray_light">#e6e6e6</color>
+</resources>

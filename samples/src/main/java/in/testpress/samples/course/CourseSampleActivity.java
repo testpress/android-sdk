@@ -195,29 +195,29 @@ public class CourseSampleActivity extends BaseToolBarActivity {
     @SuppressWarnings("ConstantConditions")
     private void showSDK(int clickedButtonId) {
         selectedItem = clickedButtonId;
+
         if (TestpressSdk.hasActiveSession(this)) {
             session = TestpressSdk.getTestpressSession(this);
-            switch (clickedButtonId) {
-                case R.id.simple_course:
-                    session.getInstituteSettings()
-                            .setBookmarksEnabled(true)
-                            .setCommentsVotingEnabled(false)
-                            .setCoursesFrontend(true)
-                            .setCoursesGamificationEnabled(false);
-                    break;
-                case R.id.gamified_course:
-                case R.id.leaderboard:
-                case R.id.course_contents:
-                case R.id.chapter_contents:
-                case R.id.bookmarks:
-                case R.id.content_detail:
-                    session.getInstituteSettings()
-                            .setBookmarksEnabled(true)
-                            .setCommentsVotingEnabled(false)
-                            .setCoursesFrontend(true)
-                            .setCoursesGamificationEnabled(true);
-                    break;
+
+            if (clickedButtonId == R.id.simple_course) {
+                session.getInstituteSettings()
+                        .setBookmarksEnabled(true)
+                        .setCommentsVotingEnabled(false)
+                        .setCoursesFrontend(true)
+                        .setCoursesGamificationEnabled(false);
+            } else if (clickedButtonId == R.id.gamified_course ||
+                    clickedButtonId == R.id.leaderboard ||
+                    clickedButtonId == R.id.course_contents ||
+                    clickedButtonId == R.id.chapter_contents ||
+                    clickedButtonId == R.id.bookmarks ||
+                    clickedButtonId == R.id.content_detail) {
+                session.getInstituteSettings()
+                        .setBookmarksEnabled(true)
+                        .setCommentsVotingEnabled(false)
+                        .setCoursesFrontend(true)
+                        .setCoursesGamificationEnabled(true);
             }
+
             session.getInstituteSettings().setDisplayUserEmailOnVideo(true);
             session.getInstituteSettings().setVideoDownloadEnabled(true);
             session.getInstituteSettings().setScreenshotDisabled(false);
@@ -232,34 +232,26 @@ public class CourseSampleActivity extends BaseToolBarActivity {
             session.getInstituteSettings().setAndroidSentryDns("https://35dcf0dbd28045628831e62dd959ae4b@sentry.testpress.in/5");
 
             TestpressSdk.setTestpressSession(this, session);
-            switch (clickedButtonId) {
-                case R.id.simple_course:
-                case R.id.gamified_course:
-                    TestpressCourse.show(this, session);
-                    break;
-                case R.id.leaderboard:
-                    TestpressCourse.showLeaderboard(this, session);
-                    break;
-                case R.id.course_contents:
-                    TestpressCourse.showChapters(this, "Course Detail",
-                            Integer.parseInt(text), session);
-                    break;
-                case R.id.chapter_contents:
-                    String url = session.getInstituteSettings().getBaseUrl() +
-                            "/api/v2.2.1/chapters/" + text + "/";
 
-                    TestpressCourse.showChapterContents(this, url, session);
-                    break;
-                case R.id.bookmarks:
-                    TestpressCourse.showBookmarks(this, session);
-                    break;
-                case R.id.content_detail:
-                    TestpressCourse.showContentDetail(this, text, session);
-                    break;
-                case R.id.downloads:
-                    TestpressCourse.showDownloads(this, session);
-                    break;
+            if (clickedButtonId == R.id.simple_course || clickedButtonId == R.id.gamified_course) {
+                TestpressCourse.show(this, session);
+            } else if (clickedButtonId == R.id.leaderboard) {
+                TestpressCourse.showLeaderboard(this, session);
+            } else if (clickedButtonId == R.id.course_contents) {
+                TestpressCourse.showChapters(this, "Course Detail",
+                        Integer.parseInt(text), session);
+            } else if (clickedButtonId == R.id.chapter_contents) {
+                String url = session.getInstituteSettings().getBaseUrl() +
+                        "/api/v2.2.1/chapters/" + text + "/";
+                TestpressCourse.showChapterContents(this, url, session);
+            } else if (clickedButtonId == R.id.bookmarks) {
+                TestpressCourse.showBookmarks(this, session);
+            } else if (clickedButtonId == R.id.content_detail) {
+                TestpressCourse.showContentDetail(this, text, session);
+            } else if (clickedButtonId == R.id.downloads) {
+                TestpressCourse.showDownloads(this, session);
             }
+
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);

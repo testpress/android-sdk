@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:paddingTop="15dp"
+    android:paddingBottom="15dp"
+    android:paddingLeft="20dp"
+    android:paddingRight="30dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <TextView
+        style="@style/TestpressListItemHeader"
+        android:text="@string/testpress_date"
+        android:layout_weight="@integer/testpress_date_weight"
+        android:gravity="start"
+        android:id="@+id/date_label" />
+
+    <TextView
+        style="@style/TestpressListItemHeader"
+        android:text="@string/testpress_score"
+        android:layout_weight="@integer/testpress_score_weight"
+        android:id="@+id/score_label" />
+
+    <TextView
+        style="@style/TestpressListItemHeader"
+        android:text="@string/testpress_page_correct"
+        android:layout_weight="@integer/testpress_correct_answers_weight"
+        android:id="@+id/correct_label" />
+
+    <TextView
+        style="@style/TestpressListItemHeader"
+        android:text="@string/testpress_trophies"
+        android:layout_weight="@integer/testpress_action_label_weight"
+        android:id="@+id/trophies_label" />
+
+    <TextView
+        style="@style/TestpressListItemHeader"
+        android:text="@string/testpress_action"
+        android:layout_weight="@integer/testpress_action_label_weight"
+        android:id="@+id/action_label" />
+
+</LinearLayout>

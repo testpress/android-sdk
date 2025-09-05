@@ -1,0 +1,58 @@
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:orientation="horizontal"
+    android:gravity="center"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content" >
+
+    <ImageView
+        android:id="@+id/current_state_image"
+        android:layout_width="14dp"
+        android:layout_height="14dp"
+        android:layout_marginRight="12dp"
+        android:layout_marginLeft="17dp"
+        android:tint="#00bb9c"
+        />
+
+    <TextView
+        android:id="@+id/text"
+        android:layout_height="40dp"
+        android:layout_width="0dp"
+        android:layout_weight="1"
+        android:paddingRight="20dp"
+        android:drawablePadding="8dp"
+        android:gravity="center_vertical"
+        android:textSize="16sp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:textColor="@color/testpress_black" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:orientation="horizontal"
+        android:gravity="center"
+        tools:ignore="UseCompoundDrawables">
+
+        <TextView
+            android:id="@+id/count"
+            android:visibility="gone"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            />
+
+        <ImageView
+            android:id="@+id/edit"
+            android:visibility="gone"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:padding="11dp"
+            android:tint="#777"
+            android:background="?android:attr/selectableItemBackground"
+            android:src="@drawable/ic_mode_edit_18dp"
+            />
+
+    </LinearLayout>
+
+</LinearLayout>
