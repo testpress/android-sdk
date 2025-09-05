@@ -31,11 +31,11 @@ class AIChatPdfFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
-        val contentId = arguments?.getLong(ARG_CONTENT_ID, -1L) ?: -1L
-        val courseId = arguments?.getLong(ARG_COURSE_ID, -1L) ?: -1L
+        val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
+        val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
         
         if (contentId == -1L || courseId == -1L) {
-            return
+            throw IllegalArgumentException("Required arguments (contentId, courseId) are missing or invalid.")
         }
         
         val webViewFragment = WebViewFragment()
@@ -53,8 +53,10 @@ class AIChatPdfFragment : Fragment() {
     }
 
     private fun getPdfUrl(courseId: Long, contentId: Long): String {
-        val session = TestpressSdk.getTestpressSession(requireContext())
-        val baseUrl = session?.instituteSettings?.baseUrl ?: ""
+        val session = TestpressSdk.getTestpressSession(requireContext()) 
+            ?: throw IllegalStateException("User session not found.")
+        val baseUrl = session.instituteSettings?.baseUrl.takeIf { !it.isNullOrEmpty() } 
+            ?: throw IllegalStateException("Base URL not configured.")
         return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
     }
 }
