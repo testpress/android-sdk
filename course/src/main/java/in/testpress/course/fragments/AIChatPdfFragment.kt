@@ -15,10 +15,6 @@ import `in`.testpress.core.TestpressSession
 
 class AIChatPdfFragment : Fragment() {
     
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
-    
     companion object {
         private const val ARG_CONTENT_ID = "contentId"
         private const val ARG_COURSE_ID = "courseId"
@@ -44,10 +40,7 @@ class AIChatPdfFragment : Fragment() {
         
         val webViewFragment = WebViewFragment()
         
-        val session: TestpressSession? = TestpressSdk.getTestpressSession(requireContext())
-        val baseUrl = session?.instituteSettings?.baseUrl ?: ""
-        
-        val pdfUrl = "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
+        val pdfUrl = getPdfUrl(courseId, contentId)
     
         webViewFragment.arguments = Bundle().apply {
             putString(URL_TO_OPEN, pdfUrl)
@@ -57,5 +50,11 @@ class AIChatPdfFragment : Fragment() {
         childFragmentManager.beginTransaction()
             .replace(R.id.aiPdf_view_fragment, webViewFragment)
             .commit()
+    }
+
+    private fun getPdfUrl(courseId: Long, contentId: Long): String {
+        val session = TestpressSdk.getTestpressSession(requireContext())
+        val baseUrl = session?.instituteSettings?.baseUrl ?: ""
+        return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
     }
 }
