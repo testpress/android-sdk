@@ -27,6 +27,7 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     public static final String FORCE_REFRESH = "forceRefreshContentList";
     public static final String GO_TO_MENU = "gotoMenu";
     public static final String CONTENT_ID = "contentId";
+    public static final String COURSE_ID = "courseId";
     public static final String CHAPTER_ID = "chapterId";
     public static final String POSITION = "position";
     public static final String HIDE_BOTTOM_NAVIGATION = "hideBottomNavigation";
@@ -103,6 +104,8 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         bundle.putString(CONTENT_TYPE, content.getContentType());
         bundle.putString(PRODUCT_SLUG, getIntent().getStringExtra(PRODUCT_SLUG));
         bundle.putBoolean(HIDE_BOTTOM_NAVIGATION, getIntent().getBooleanExtra(HIDE_BOTTOM_NAVIGATION, false));
+        bundle.putLong(COURSE_ID, content.getCourseId());
+
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.fragment_container, fragment).commitAllowingStateLoss();
