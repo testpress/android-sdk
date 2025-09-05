@@ -158,10 +158,11 @@ open class ContentFragmentFactory {
                 "Quiz" -> QuizContentFragment()
                 "Video" -> VideoContentFragment()
                 "Attachment" -> {
-                    if (content.attachment?.isRenderable == true) {
-                        return DocumentViewerFragment()
+                    when {
+                        content?.isAIEnabled == true -> AIChatPdfFragment()
+                        content?.attachment?.isRenderable == true -> DocumentViewerFragment()
+                        else -> AttachmentContentFragment()
                     }
-                    return AttachmentContentFragment()
                 }
                 "Html" -> HtmlContentFragment()
                 "Notes" -> HtmlContentFragment()
