@@ -55,7 +55,7 @@ class AIChatPdfFragment : Fragment() {
     private fun getPdfUrl(courseId: Long, contentId: Long): String {
         val session = TestpressSdk.getTestpressSession(requireContext()) 
             ?: throw IllegalStateException("User session not found.")
-        val baseUrl = session.instituteSettings?.whiteLabeledHostUrl.takeIf { !it.isNullOrEmpty() }
+        val baseUrl = session.instituteSettings?.domainUrl.takeIf { !it.isNullOrEmpty() }
             ?: throw IllegalStateException("Base URL not configured.")
         return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
     }
