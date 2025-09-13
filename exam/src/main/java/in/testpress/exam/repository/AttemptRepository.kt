@@ -31,7 +31,8 @@ class AttemptRepository(val context: Context) {
     lateinit var attempt : Attempt
     private val isOfflineExam: Boolean get() = exam?.isOfflineExam ?: false
     var page = 1
-    val attemptItems = mutableListOf<AttemptItem>()
+    private val attemptItemMap = linkedMapOf<Int, AttemptItem>()
+    val attemptItems: List<AttemptItem> get() = attemptItemMap.values.toList()
     private var _totalQuestions = 0
     val totalQuestions get() = _totalQuestions
 
@@ -75,7 +76,7 @@ class AttemptRepository(val context: Context) {
                     override fun onSuccess(result: TestpressApiResponse<AttemptItem>) {
                         if (fetchSinglePageOnly) {
                             _totalQuestions = result.count
-                            attemptItems.addAll(result.results)
+                            addToAttemptItems(result.results)
                             _attemptItemsResource.postValue(Resource.success(attemptItems))
                             if (result.hasMore()) {
                                 page++
@@ -84,11 +85,11 @@ class AttemptRepository(val context: Context) {
                         }
                         if (result.hasMore()) {
                             _totalQuestions = result.count
-                            attemptItems.addAll(result.results)
+                            addToAttemptItems(result.results)
                             page++
                             fetchAttemptItems(questionsUrlFrag, fetchSinglePageOnly)
                         } else {
-                            attemptItems.addAll(result.results)
+                            addToAttemptItems(result.results)
                             _attemptItemsResource.postValue(Resource.success(attemptItems))
                         }
                     }
@@ -99,6 +100,13 @@ class AttemptRepository(val context: Context) {
 
                 })
         }
+    }
+
+    // Temporary fix: In rare cases, fetchAttemptItems() was repeatedly invoked due to unknown causes,
+    // leading to duplicate entries in the list. To mitigate this, we're using a LinkedHashMap to ensure
+    // uniqueness by item ID while preserving insertion order.
+    private fun addToAttemptItems(items: List<AttemptItem>) {
+        items.forEach { item -> attemptItemMap[item.id] = item }
     }
 
     private fun createOfflineAttemptItemItem() {
@@ -369,7 +377,7 @@ class AttemptRepository(val context: Context) {
     }
 
     fun clearAttemptItems() {
-        attemptItems.clear()
+        attemptItemMap.clear()
     }
 
     fun resetPageCount() {
