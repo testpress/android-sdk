@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="20dp"
+    android:background="@android:color/white"
+    android:id="@+id/chapter_item_layout"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <RelativeLayout
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_width="72dp"
+        android:layout_height="64dp"
+        android:paddingBottom="5dp">
+
+        <ImageView
+            android:id="@+id/thumbnail_image"
+            android:layout_width="48dp"
+            android:layout_height="48dp"
+            android:scaleType="fitXY"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentBottom="true"
+            android:src="@android:drawable/sym_def_app_icon" />
+
+        <View
+            android:visibility="gone"
+            android:id="@+id/white_foreground"
+            android:background="#aaffffff"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <LinearLayout
+            android:id="@+id/lock"
+            android:background="@drawable/testpress_round_gray_background"
+            android:gravity="center"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
+            android:layout_marginRight="15dp"
+            android:layout_marginEnd="15dp">
+
+            <ImageView
+                android:layout_width="10dp"
+                android:layout_height="16dp"
+                android:scaleType="fitXY"
+                android:layout_marginLeft="13dp"
+                android:layout_marginRight="13dp"
+                android:layout_marginBottom="10dp"
+                android:layout_marginTop="10dp"
+                android:src="@drawable/testpress_lock_outline_white" />
+
+        </LinearLayout>
+
+    </RelativeLayout>
+
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:text="Title goes here"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
+            android:textColor="@color/testpress_black"
+            android:maxLines="2"
+            android:ellipsize="end"
+            android:id="@+id/chapter_title" />
+
+    </LinearLayout>
+
+</LinearLayout>

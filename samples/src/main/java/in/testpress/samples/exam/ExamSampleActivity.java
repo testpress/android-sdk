@@ -78,35 +78,30 @@ public class ExamSampleActivity extends BaseToolBarActivity {
         selectedItem = clickedButtonId;
         if (TestpressSdk.hasActiveSession(this)) {
             TestpressSession session = TestpressSdk.getTestpressSession(this);
-            //noinspection ConstantConditions
             session.getInstituteSettings()
                     .setBookmarksEnabled(true)
                     .setCommentsVotingEnabled(false)
                     .setCoursesFrontend(false)
                     .setAndroidSentryDns("https://35dcf0dbd28045628831e62dd959ae4b@sentry.testpress.in/5")
                     .setCoursesGamificationEnabled(false);
+
             TestpressSdk.setTestpressSession(this, session);
-            switch (clickedButtonId) {
-                case R.id.start_exam:
-                    TestpressExam.startExam(this, examSlug, session);
-                    break;
-                case R.id.attempt_state:
-                    TestpressExam.showExamAttemptedState(this, examSlug, session);
-                    break;
-                case R.id.access_code:
-                    TestpressExam.showExamsForAccessCode(this, session);
-                    break;
-                case R.id.exam_list:
-                    TestpressExam.show(this, session);
-                    break;
-                case R.id.login_activity_button:
-                    Intent intent = new Intent(this, UserDevicesActivity.class);
-                    this.startActivity(intent);
-                    break;
-                default:
-                    TestpressExam.showCategories(this, false, session);
-                    break;
+
+            if (clickedButtonId == R.id.start_exam) {
+                TestpressExam.startExam(this, examSlug, session);
+            } else if (clickedButtonId == R.id.attempt_state) {
+                TestpressExam.showExamAttemptedState(this, examSlug, session);
+            } else if (clickedButtonId == R.id.access_code) {
+                TestpressExam.showExamsForAccessCode(this, session);
+            } else if (clickedButtonId == R.id.exam_list) {
+                TestpressExam.show(this, session);
+            } else if (clickedButtonId == R.id.login_activity_button) {
+                Intent intent = new Intent(this, UserDevicesActivity.class);
+                this.startActivity(intent);
+            } else {
+                TestpressExam.showCategories(this, false, session);
             }
+
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);
             startActivityForResult(intent, AUTHENTICATE_REQUEST_CODE);

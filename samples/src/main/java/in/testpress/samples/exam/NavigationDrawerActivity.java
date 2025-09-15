@@ -24,17 +24,16 @@ public class NavigationDrawerActivity extends BaseNavigationDrawerActivity {
 
     @Override
     protected void onDrawerItemSelected(MenuItem menuItem) {
-        switch (menuItem.getItemId()) {
-            case R.id.exams:
-                showSDK(1);
-                break;
-            case R.id.exams_categories:
-                showSDK(2);
-                break;
-            case R.id.report_question:
-                showSDK(3);
-                break;
+        int itemId = menuItem.getItemId();
+
+        if (itemId == R.id.exams) {
+            showSDK(1);
+        } else if (itemId == R.id.exams_categories) {
+            showSDK(2);
+        } else if (itemId == R.id.report_question) {
+            showSDK(3);
         }
+
         super.onDrawerItemSelected(menuItem);
     }
 
