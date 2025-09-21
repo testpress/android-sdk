@@ -96,7 +96,7 @@ ext {
     // Payment Dependencies
     payUCheckoutPro = "in.payu:payu-checkout-pro:1.8.9"
     payUGpay = "in.payu:payu-gpay:1.4.0"
-    razorpayAndroidCheckoutSDK = "com.razorpay:checkout:1.6.41"
+    razorpayAndroidCheckoutSDK = "com.razorpay:checkout:1.6.38"
     stripeAndroidSDK = "com.stripe:stripe-android:20.32.0"
 
     // Testing Dependencies
