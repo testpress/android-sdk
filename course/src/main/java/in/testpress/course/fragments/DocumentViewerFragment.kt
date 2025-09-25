@@ -56,7 +56,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun onBackPressed() {
         if (isAIView) {
             showDocumentView()
-            (activity as ContentActivity).setBackPressedHandled(true)
+            (activity as? ContentActivity)?.setBackPressedHandled(true)
         } else {
             super.onBackPressed()
             pdfDownloadManager.cancel()
@@ -81,14 +81,16 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun updateAskAIFABVisibility() {
-        try {
-            val isAIEnabled = content?.isAIEnabled == true
-            val isPDFAttachment = content?.contentType == "Attachment" && content?.attachment != null
-
-            binding.askAiFab.visibility = if (isAIEnabled && isPDFAttachment && !isAIView) View.VISIBLE else View.GONE
-        } catch (e: UninitializedPropertyAccessException) {
+        if (!isContentInitialized()) {
             binding.askAiFab.visibility = View.GONE
+            return
         }
+
+        val isAIEnabled = content.isAIEnabled == true
+        val isPDFAttachment = content.contentType == "Attachment" && content.attachment != null
+        val courseIdExists = content.courseId != null
+
+        binding.askAiFab.visibility = if (isAIEnabled && isPDFAttachment && !isAIView && courseIdExists) View.VISIBLE else View.GONE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -121,9 +123,9 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         }
 
         binding.pdfView.visibility = View.GONE
-        binding.root.findViewById<View>(R.id.bottom_navigation_fragment).visibility = View.GONE
+        binding.bottomNavigationFragment.visibility = View.GONE
         binding.askAiFab.visibility = View.GONE
-        binding.root.findViewById<View>(R.id.aiPdf_view_fragment).visibility = View.VISIBLE
+        binding.aiPdfViewFragment.visibility = View.VISIBLE
 
         childFragmentManager.beginTransaction()
             .replace(R.id.aiPdf_view_fragment, aiChatFragment!!)
