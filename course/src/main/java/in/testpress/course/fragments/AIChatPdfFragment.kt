@@ -39,6 +39,7 @@ class AIChatPdfFragment : Fragment() {
         }
         
         val webViewFragment = WebViewFragment()
+        webViewFragment.isPdfContent = true
         
         val pdfUrl = getPdfUrl(courseId, contentId)
     
