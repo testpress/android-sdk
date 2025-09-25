@@ -120,9 +120,55 @@
         android:layout_height="match_parent" />
 
     <FrameLayout
+        android:id="@+id/aiPdf_view_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_navigation_fragment"
+        android:visibility="gone" />
+
+    <FrameLayout
         android:id="@+id/bottom_navigation_fragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
+
+    <!-- Custom Floating Action Button for Ask AI -->
+    <LinearLayout
+        android:id="@+id/ask_ai_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="100dp"
+        android:orientation="horizontal"
+        android:background="@drawable/ask_ai_fab_background"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="10dp"
+        android:paddingBottom="10dp"
+        android:elevation="8dp"
+        android:visibility="visible"
+        android:minWidth="100dp">
+
+        <ImageView
+            android:id="@+id/ai_icon_fab"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_ai"
+            android:contentDescription="AI"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/ai_text_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Ask AI"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 
 </RelativeLayout>
