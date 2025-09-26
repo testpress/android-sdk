@@ -170,12 +170,11 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         if (!fragment.isPdfContent) {
             fragment.requireActivity().requestedOrientation =
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-            hideSystemUI()
         } else {
             fragment.requireActivity().requestedOrientation =
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR
         }
-
+        hideSystemUI()
         fragment.webView.visibility = View.GONE
 
         backCallback = object : OnBackPressedCallback(true) {
