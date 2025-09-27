@@ -39,7 +39,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var allowZoomControl: Boolean = false
     private var enableSwipeRefresh: Boolean = false
     var session: TestpressSession? = null
-    var isPdfContent: Boolean = false
+    var disableOrientation: Boolean = true
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
