@@ -54,7 +54,7 @@
     <string name="hint"><font size="14">Type message</font></string>
 
     <string name="AI">AI</string>
-    <string name="Ask_AI">Ask AI</string>
+    <string name="Switch_to_AI">Switch to AI</string>
 
 
     <string-array name="discussions_author_filter">

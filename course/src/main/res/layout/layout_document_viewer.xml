@@ -140,15 +140,15 @@
         android:layout_alignParentEnd="true"
         android:layout_alignParentBottom="true"
         android:layout_marginEnd="16dp"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="80dp"
         android:orientation="horizontal"
         android:background="@drawable/ask_ai_fab_background"
         android:gravity="center_vertical"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
-        android:paddingTop="10dp"
-        android:paddingBottom="10dp"
-        android:elevation="8dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:elevation="6dp"
         android:visibility="visible"
         android:minWidth="100dp">
 
@@ -164,9 +164,8 @@
             android:id="@+id/ai_text_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/Ask_AI"
+            android:text="@string/Switch_to_AI"
             android:textColor="@color/testpress_white"
-            android:textStyle="bold"
             android:textSize="14sp" />
 
     </LinearLayout>
