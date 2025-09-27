@@ -159,7 +159,6 @@ open class ContentFragmentFactory {
                 "Video" -> VideoContentFragment()
                 "Attachment" -> {
                     when {
-                        content?.isAIEnabled == true -> AIChatPdfFragment()
                         content?.attachment?.isRenderable == true -> DocumentViewerFragment()
                         else -> AttachmentContentFragment()
                     }

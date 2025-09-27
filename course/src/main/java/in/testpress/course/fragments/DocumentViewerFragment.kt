@@ -31,6 +31,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var fullScreenMenu: MenuItem
     private val completeProgress = 100
+    private var isAIView = false
+    private var aiChatFragment: AIChatPdfFragment? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,13 +45,23 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             savedInstanceState: Bundle?
     ): View {
         _binding = LayoutDocumentViewerBinding.inflate(inflater, container, false)
+        
+        binding.askAiFab.setOnClickListener {
+            showAIView()
+        }
+        
         return binding.root
     }
 
     override fun onBackPressed() {
-        super.onBackPressed()
-        pdfDownloadManager.cancel()
-        pdfDownloadManager.cleanup()
+        if (isAIView) {
+            showDocumentView()
+            (activity as? ContentActivity)?.setBackPressedHandled(true)
+        } else {
+            super.onBackPressed()
+            pdfDownloadManager.cancel()
+            pdfDownloadManager.cleanup()
+        }
     }
 
     override fun onDestroyView() {
@@ -65,7 +77,20 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         super.onCreateOptionsMenu(menu, inflater)
         inflater.inflate(R.menu.full_screen_menu, menu)
         fullScreenMenu = menu.findItem(R.id.fullScreen)
-        fullScreenMenu.isVisible = false
+        fullScreenMenu.isVisible = !isAIView
+    }
+
+    private fun updateAskAIFABVisibility() {
+        if (!isContentInitialized()) {
+            binding.askAiFab.visibility = View.GONE
+            return
+        }
+
+        val isAIEnabled = content.isAIEnabled == true
+        val isPDFAttachment = content.contentType == "Attachment" && content.attachment != null
+        val courseIdExists = content.courseId != null
+
+        binding.askAiFab.visibility = if (isAIEnabled && isPDFAttachment && !isAIView && courseIdExists) View.VISIBLE else View.GONE
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -87,10 +112,52 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         })
     }
 
+
+    private fun showAIView() {
+        if (aiChatFragment == null) {
+            aiChatFragment = AIChatPdfFragment()
+            val args = Bundle()
+            args.putLong("contentId", contentId)
+            args.putLong("courseId", content.courseId ?: -1L)
+            aiChatFragment?.arguments = args
+        }
+
+        binding.pdfView.visibility = View.GONE
+        binding.bottomNavigationFragment.visibility = View.GONE
+        binding.askAiFab.visibility = View.GONE
+        binding.aiPdfViewFragment.visibility = View.VISIBLE
+
+        childFragmentManager.beginTransaction()
+            .replace(R.id.aiPdf_view_fragment, aiChatFragment!!)
+            .commit()
+
+        isAIView = true
+        activity?.invalidateOptionsMenu()
+    }
+
+    fun showDocumentView() {
+        binding.pdfView.visibility = View.VISIBLE
+        binding.bottomNavigationFragment.visibility = View.VISIBLE
+        binding.askAiFab.visibility = View.VISIBLE
+        binding.aiPdfViewFragment.visibility = View.GONE
+
+        aiChatFragment?.let {
+            childFragmentManager.beginTransaction()
+                .remove(it)
+                .commitNow()
+        }
+
+        isAIView = false
+        activity?.invalidateOptionsMenu()
+    }
+
     override fun display() {
         (activity as ContentActivity).setActionBarTitle(content.attachment?.title?:DEFAULT_ATTACHMENT_TITLE)
         fileName = getFileName()
         pdfDownloadManager = PDFDownloadManager(this,requireContext(),fileName)
+
+        updateAskAIFABVisibility()
+
         if (pdfDownloadManager.isDownloaded()) {
             displayPDF()
             viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {

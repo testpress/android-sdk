@@ -71,10 +71,11 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
+            backPressedHandled = false;
             delegateBackPressToFragments();
             if (getCallingActivity() != null) {
                 return false;
-            } else {
+            } else if (!backPressedHandled) {
                 super.onBackPressed();
             }
             return true;
@@ -82,10 +83,16 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         return super.onOptionsItemSelected(item);
     }
 
+    private boolean backPressedHandled = false;
+    
     @Override
     public void onBackPressed() {
-        super.onBackPressed();
+        backPressedHandled = false;
         delegateBackPressToFragments();
+        
+        if (!backPressedHandled) {
+            super.onBackPressed();
+        }
     }
 
     private void delegateBackPressToFragments() {
@@ -94,6 +101,10 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
                 ((OnBackPressedListener)fragment).onBackPressed();
             }
         }
+    }
+    
+    public void setBackPressedHandled(boolean handled) {
+        this.backPressedHandled = handled;
     }
 
     @Override
