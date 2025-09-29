@@ -39,7 +39,7 @@ class AIChatPdfFragment : Fragment() {
         }
         
         val webViewFragment = WebViewFragment()
-        webViewFragment.disableOrientation = false
+        webViewFragment.lockToLandscape = false
         
         val pdfUrl = getPdfUrl(courseId, contentId)
     
