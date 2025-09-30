@@ -58,6 +58,7 @@ class WebViewWithSSO: BaseToolBarActivity(), EmptyViewListener {
     private fun openWebview(ssoLink: SSOUrl?) {
         val urlToOpen = intent.getStringExtra(URL_TO_OPEN) ?: ""
         val pageTitle = intent.getStringExtra(TITLE) ?: ""
+        val lockToLandscape = intent.getBooleanExtra(LOCK_TO_LANDSCAPE, false)
         val intent = Intent(this, WebViewActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP;
         intent.putExtra(WebViewActivity.ACTIVITY_TITLE, pageTitle)
@@ -65,6 +66,7 @@ class WebViewWithSSO: BaseToolBarActivity(), EmptyViewListener {
             WebViewActivity.URL_TO_OPEN,
             instituteSettings?.baseUrl + ssoLink?.ssoUrl + "&next=$urlToOpen"
         )
+        intent.putExtra(WebViewActivity.LOCK_TO_LANDSCAPE, lockToLandscape)
         startActivity(intent)
         finish()
     }
@@ -97,12 +99,14 @@ class WebViewWithSSO: BaseToolBarActivity(), EmptyViewListener {
     companion object {
         const val URL_TO_OPEN = "URL"
         const val TITLE = "TITLE"
+        const val LOCK_TO_LANDSCAPE = "LOCK_TO_LANDSCAPE"
 
         @JvmStatic
-        fun createIntent(context: Context, url: String, title: String): Intent {
+        fun createIntent(context: Context, url: String, title: String, lockToLandscape: Boolean = false): Intent {
             return Intent(context, WebViewWithSSO::class.java).apply {
                 putExtra(URL_TO_OPEN, url)
                 putExtra(TITLE, title)
+                putExtra(LOCK_TO_LANDSCAPE, lockToLandscape)
             }
         }
     }

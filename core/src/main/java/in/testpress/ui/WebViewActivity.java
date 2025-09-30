@@ -43,12 +43,14 @@ public class WebViewActivity extends BaseToolBarActivity {
     private static final String TAG = WebViewActivity.class.getSimpleName();
     public static final String URL_TO_OPEN = "URL";
     public static final String ACTIVITY_TITLE = "TITLE";
+    public static final String LOCK_TO_LANDSCAPE = "LOCK_TO_LANDSCAPE";
     private final static int FCR = 1;
     WebView webView;
     private String mCM;
     private ValueCallback<Uri> mUM;
     private ValueCallback<Uri[]> mUMA;
     private String url;
+    private boolean lockToLandscape = false;
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent intent) {
@@ -109,6 +111,7 @@ public class WebViewActivity extends BaseToolBarActivity {
             getSupportActionBar().setTitle(intent.getExtras().getString(ACTIVITY_TITLE));
         }
 
+        lockToLandscape = intent.getBooleanExtra(LOCK_TO_LANDSCAPE, false);
 
 
         if (Build.VERSION.SDK_INT >= 23 && (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED || ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED)) {
