@@ -55,6 +55,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             this.putString(WebViewFragment.URL_TO_OPEN, urlPath)
             this.putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
             this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allowNonInstituteUrl)
+            this.putBoolean(WebViewFragment.LOCK_TO_LANDSCAPE, intent.getBooleanExtra(LOCK_TO_LANDSCAPE, false))
         }
     }
 
@@ -65,6 +66,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         const val URL_TO_OPEN = "URL"
         const val IS_AUTHENTICATION_REQUIRED = "IS_AUTHENTICATION_REQUIRED"
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
+        const val LOCK_TO_LANDSCAPE = "LOCK_TO_LANDSCAPE"
 
         fun createIntent(
             currentContext: Context,

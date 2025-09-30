@@ -39,6 +39,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var allowZoomControl: Boolean = false
     private var enableSwipeRefresh: Boolean = false
     var session: TestpressSession? = null
+    var lockToLandscape: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -81,6 +82,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
             arguments?.getBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW) ?: false
         allowZoomControl = arguments?.getBoolean(ALLOW_ZOOM_CONTROLS) ?: false
         enableSwipeRefresh = arguments?.getBoolean(ENABLE_SWIPE_REFRESH) ?: false
+        lockToLandscape = arguments?.getBoolean(LOCK_TO_LANDSCAPE) ?: false
     }
 
     private fun initializedSwipeRefresh(){
@@ -217,6 +219,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
         const val ALLOW_ZOOM_CONTROLS = "ALLOW_ZOOM_CONTROLS"
         const val ENABLE_SWIPE_REFRESH = "ENABLE_SWIPE_REFRESH"
+        const val LOCK_TO_LANDSCAPE = "LOCK_TO_LANDSCAPE"
     }
 
 }
