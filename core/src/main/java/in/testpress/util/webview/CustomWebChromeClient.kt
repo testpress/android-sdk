@@ -164,7 +164,6 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         )
 
         // Remember current state and switch to landscape
-        previousOrientation = fragment.requireActivity().requestedOrientation
         previousSystemUiVisibility = fragment.requireActivity().window.decorView.systemUiVisibility
 
         if (fragment.lockToLandscape) {
@@ -174,6 +173,7 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
             fragment.requireActivity().requestedOrientation =
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR
         }
+        previousOrientation = fragment.requireActivity().requestedOrientation
         hideSystemUI()
 
         fragment.webView.visibility = View.GONE
