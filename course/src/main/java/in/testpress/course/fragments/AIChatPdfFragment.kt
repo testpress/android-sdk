@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.util.CachedPdfPathProvider
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -18,6 +19,7 @@ class AIChatPdfFragment : Fragment() {
     companion object {
         private const val ARG_CONTENT_ID = "contentId"
         private const val ARG_COURSE_ID = "courseId"
+        private const val ARG_PDF_PATH = "pdfPath"
     }
     
     override fun onCreateView(
@@ -47,6 +49,12 @@ class AIChatPdfFragment : Fragment() {
             putBoolean(IS_AUTHENTICATION_REQUIRED, true)
         }
     
+        webViewFragment.setListener(object : WebViewFragment.Listener {
+            override fun onWebViewInitializationSuccess() {
+                setupJavaScriptInterface(webViewFragment)
+            }
+        })
+
         childFragmentManager.beginTransaction()
             .replace(R.id.aiPdf_view_fragment, webViewFragment)
             .commit()
@@ -58,5 +66,18 @@ class AIChatPdfFragment : Fragment() {
         val baseUrl = session.instituteSettings?.domainUrl.takeIf { !it.isNullOrEmpty() }
             ?: throw IllegalStateException("Base URL not configured.")
         return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
+    }
+
+    private fun setupJavaScriptInterface(webViewFragment: WebViewFragment) {
+        val pdfPath = requireArguments().getString(ARG_PDF_PATH, "")
+        webViewFragment.webView.settings.apply {
+            allowFileAccessFromFileURLs = true
+            allowUniversalAccessFromFileURLs = true
+        }
+        
+        webViewFragment.addJavascriptInterface(
+            CachedPdfPathProvider(requireActivity(), pdfPath), 
+            "AndroidPdfCache"
+        )
     }
 }

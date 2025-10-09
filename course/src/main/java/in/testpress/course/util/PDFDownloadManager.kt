@@ -73,6 +73,10 @@ open class PDFDownloadManager(
     fun get(): File {
         return fileEncryptAndDecryptUtil.decrypt()
     }
+
+    fun getCachedPdfPath(): String {
+        return if (isDownloaded()) get().absolutePath else ""
+    }
 }
 
 interface PdfDownloadListener {
