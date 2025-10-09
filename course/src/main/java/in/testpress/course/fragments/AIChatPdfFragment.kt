@@ -19,6 +19,7 @@ class AIChatPdfFragment : Fragment() {
     companion object {
         private const val ARG_CONTENT_ID = "contentId"
         private const val ARG_COURSE_ID = "courseId"
+        private const val ARG_PDF_PATH = "pdfPath"
     }
     
     override fun onCreateView(
@@ -68,8 +69,7 @@ class AIChatPdfFragment : Fragment() {
     }
 
     private fun setupJavaScriptInterface(webViewFragment: WebViewFragment) {
-        val parentFragment = parentFragment as? DocumentViewerFragment
-        val pdfPath = parentFragment?.pdfDownloadManager?.getCachedPdfPath() ?: ""
+        val pdfPath = requireArguments().getString(ARG_PDF_PATH, "")
         webViewFragment.webView.settings.apply {
             allowFileAccessFromFileURLs = true
             allowUniversalAccessFromFileURLs = true
