@@ -39,7 +39,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var allowZoomControl: Boolean = false
     private var enableSwipeRefresh: Boolean = false
     var session: TestpressSession? = null
-    var lockToLandscape: Boolean = true
+    var lockToLandscape: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
