@@ -33,6 +33,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         super.onCreate(savedInstanceState)
         fullScreenChromeClient = FullScreenChromeClient(activity)
         fullScreenChromeClient.disableLongPress = true
+        fullScreenChromeClient.enableVideoLandscapeMode = true
     }
 
     override fun onCreateView(
