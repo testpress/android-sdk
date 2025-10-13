@@ -3,6 +3,7 @@ package in.testpress.util;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.net.Uri;
 import android.view.View;
 import android.webkit.PermissionRequest;
@@ -25,6 +26,7 @@ public class FullScreenChromeClient extends WebChromeClient {
     private Activity activity;
     private ValueCallback<Uri[]> filePathCallback;
     public boolean disableLongPress = false;
+    public boolean enableVideoLandscapeMode = false;
 
     public FullScreenChromeClient(Activity activity) {
         this.activity = activity;
@@ -62,6 +64,11 @@ public class FullScreenChromeClient extends WebChromeClient {
         mFullScreenViewCallback = paramCustomViewCallback;
         ((FrameLayout) activity.getWindow().getDecorView())
                 .addView(mCustomView, new FrameLayout.LayoutParams(-1, -1));
+
+        // Enable landscape orientation for video content
+        if (enableVideoLandscapeMode) {
+            activity.setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE);
+        }
 
         // https://stackoverflow.com/a/38799514/5134215
         activity.getWindow().getDecorView().setSystemUiVisibility(3846);

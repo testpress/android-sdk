@@ -33,6 +33,7 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
         super.onCreate(savedInstanceState)
         fullScreenChromeClient = FullScreenChromeClient(activity)
         fullScreenChromeClient.disableLongPress = true
+        fullScreenChromeClient.enableVideoLandscapeMode = true
     }
 
     override fun onCreateView(
@@ -60,12 +61,14 @@ open class WebViewVideoFragment : BaseVideoWidgetFragment() {
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            // Load the video in fullscreen
-            enableFullscreen();
-        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            // Restore the WebView to its original size
-            disableFullscreen();
+         if (!fullScreenChromeClient.isFullScreen()) {
+            if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+                // Load the video in fullscreen
+                enableFullscreen();
+            } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+                // Restore the WebView to its original size
+                disableFullscreen();
+         }
         }
     }
 
