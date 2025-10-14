@@ -1,7 +1,9 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.util.CachedPdfPathProvider
+import `in`.testpress.course.util.PdfCacheManager
+import `in`.testpress.course.util.PdfWebViewClient
+import `in`.testpress.course.util.EnhancedPdfProvider
 import android.os.Bundle
 import android.util.Log
 import android.view.LayoutInflater
@@ -23,6 +25,9 @@ class AIChatPdfFragment : Fragment() {
         private const val ARG_PDF_PATH = "pdfPath"
     }
     
+    private lateinit var pdfCacheManager: PdfCacheManager
+    private var pdfId: String? = null
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,9 +41,24 @@ class AIChatPdfFragment : Fragment() {
         
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
+        val pdfPath = requireArguments().getString(ARG_PDF_PATH, "")
         
         if (contentId == -1L || courseId == -1L) {
             throw IllegalArgumentException("Required arguments (contentId, courseId) are missing or invalid.")
+        }
+        
+        // Initialize PDF cache manager
+        pdfCacheManager = PdfCacheManager.getInstance(requireContext())
+        
+        // Register PDF for streaming if path is provided
+        if (pdfPath.isNotEmpty()) {
+            try {
+                pdfId = pdfCacheManager.registerPdf(pdfPath)
+                Log.d("AIChatPdfFragment", "Registered PDF for streaming with ID: $pdfId")
+            } catch (e: Exception) {
+                Log.e("AIChatPdfFragment", "Failed to register PDF for streaming", e)
+                // Fall back to original URL-based approach
+            }
         }
         
         val webViewFragment = WebViewFragment()
@@ -52,6 +72,7 @@ class AIChatPdfFragment : Fragment() {
     
         webViewFragment.setListener(object : WebViewFragment.Listener {
             override fun onWebViewInitializationSuccess() {
+                setupWebViewClient(webViewFragment)
                 setupJavaScriptInterface(webViewFragment)
             }
         })
@@ -69,6 +90,12 @@ class AIChatPdfFragment : Fragment() {
         return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
     }
 
+    private fun setupWebViewClient(webViewFragment: WebViewFragment) {
+        // Replace the default WebViewClient with our PDF streaming client
+        webViewFragment.webView.webViewClient = PdfWebViewClient(webViewFragment, requireContext())
+        Log.d("AIChatPdfFragment", "PDF streaming WebViewClient set up successfully")
+    }
+
     private fun setupJavaScriptInterface(webViewFragment: WebViewFragment) {
         val pdfPath = requireArguments().getString(ARG_PDF_PATH, "")
         Log.d("AIChatPdfFragment", "Setting up JavaScript interface with PDF path: $pdfPath")
@@ -78,11 +105,16 @@ class AIChatPdfFragment : Fragment() {
             allowUniversalAccessFromFileURLs = true
         }
         
-        webViewFragment.addJavascriptInterface(
-            CachedPdfPathProvider(requireActivity(), pdfPath), 
-            "AndroidPdfCache"
-        )
+        // Create enhanced JavaScript interface that provides both streaming URL and base64 fallback
+        val jsInterface = EnhancedPdfProvider(requireActivity(), pdfPath, pdfId)
+        webViewFragment.addJavascriptInterface(jsInterface, "AndroidPdfCache")
         
-        Log.d("AIChatPdfFragment", "JavaScript interface 'AndroidPdfCache' added successfully")
+        Log.d("AIChatPdfFragment", "Enhanced JavaScript interface 'AndroidPdfCache' added successfully")
+    }
+    
+    override fun onDestroy() {
+        super.onDestroy()
+        // Clean up registered PDF
+        pdfId?.let { pdfCacheManager.unregisterPdf(it) }
     }
 }
