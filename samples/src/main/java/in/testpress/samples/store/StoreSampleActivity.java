@@ -57,16 +57,12 @@ public class StoreSampleActivity extends BaseToolBarActivity {
             Assert.assertNotNull("TestpressSession must not be null.", session);
             session.getInstituteSettings().setAccessCodeEnabled(false);
             TestpressSdk.setTestpressSession(this, session);
-            switch (clickedButtonId) {
-                case R.id.store:
-                    TestpressStore.show(this, session);
-                    break;
-                case R.id.show_product:
-                    TestpressStore.showProduct(this, productSlug, session);
-                    break;
-                default:
-                    TestpressStore.show(this, session);
-                    break;
+            if (clickedButtonId == R.id.store) {
+                TestpressStore.show(this, session);
+            } else if (clickedButtonId == R.id.show_product) {
+                TestpressStore.showProduct(this, productSlug, session);
+            } else {
+                TestpressStore.show(this, session);
             }
         } else {
             Intent intent = new Intent(this, TestpressCoreSampleActivity.class);

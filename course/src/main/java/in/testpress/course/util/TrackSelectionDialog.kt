@@ -1,6 +1,6 @@
 package `in`.testpress.course.util
 
-import `in`.testpress.course.R
+
 import `in`.testpress.course.databinding.LayoutDocumentViewerBinding
 import `in`.testpress.course.databinding.TrackSelectionDialogBinding
 import android.app.Dialog
@@ -15,6 +15,7 @@ import com.google.android.exoplayer2.C
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector
 import com.google.android.exoplayer2.ui.TrackSelectionView
+import `in`.testpress.course.R
 
 open class TrackSelectionDialog(
     private val parameters: DefaultTrackSelector.Parameters,
@@ -68,7 +69,7 @@ open class TrackSelectionDialog(
     }
 
     private fun initializeTrackSelectionView(view: View) {
-        trackSelectionView = view.findViewById(R.id.exo_track_selection_view)
+        trackSelectionView = view.findViewById(com.google.android.exoplayer2.ui.R.id.exo_track_selection_view)
         trackSelectionView.setShowDisableOption(false)
         trackSelectionView.setAllowAdaptiveSelections(allowAdaptiveSelections)
         trackSelectionView.setAllowMultipleOverrides(false)

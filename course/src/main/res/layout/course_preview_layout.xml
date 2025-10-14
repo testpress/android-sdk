@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    >
+
+
+    <com.facebook.shimmer.ShimmerFrameLayout
+        android:id="@+id/shimmer_view_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:visibility="gone"
+        app:shimmer_duration="1000">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+            <include
+                layout="@layout/testpress_list_placholder">
+            </include>
+
+        </LinearLayout>
+    </com.facebook.shimmer.ShimmerFrameLayout>
+
+
+
+    <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        android:id="@+id/swipe_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ListView
+            android:id="@android:id/list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"/>
+
+        <com.google.android.material.floatingactionbutton.FloatingActionButton
+            android:id="@+id/fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end|bottom"
+            android:src="@drawable/crown"
+            android:contentDescription="hello"
+            android:layout_alignParentBottom="true"
+            android:layout_margin="16dp" />
+    </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/buy_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/testpress_orange"
+        android:layout_marginTop="20dp"
+        android:text="Buy Now"
+        android:gravity="center"
+        android:textAllCaps="true"
+        android:visibility="gone"
+        android:layout_centerHorizontal="true"
+        android:layout_alignParentBottom="true"
+        android:textColor="@color/testpress_white"
+        android:textSize="@dimen/testpress_text_size_xxlarge" />
+    <include
+        layout="@layout/testpress_empty_view">
+    </include>
+
+</RelativeLayout>

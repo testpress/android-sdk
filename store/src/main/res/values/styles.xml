@@ -19,4 +19,10 @@
         <item name="android:textStyle">bold</item>
     </style>
 
+    <style name="TestpressAppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
+        <item name="colorAccent">#08AE9E</item>
+        <item name="android:textColorPrimary">#333333</item>
+        <item name="android:background">#FFFFFF</item>
+    </style>
+
 </resources>
