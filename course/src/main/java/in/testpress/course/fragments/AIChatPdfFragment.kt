@@ -2,7 +2,6 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.util.PdfCacheManager
-import `in`.testpress.course.util.PdfWebViewClient
 import `in`.testpress.course.util.EnhancedPdfProvider
 import android.os.Bundle
 import android.util.Log
@@ -72,7 +71,6 @@ class AIChatPdfFragment : Fragment() {
     
         webViewFragment.setListener(object : WebViewFragment.Listener {
             override fun onWebViewInitializationSuccess() {
-                setupWebViewClient(webViewFragment)
                 setupJavaScriptInterface(webViewFragment)
             }
         })
@@ -90,12 +88,6 @@ class AIChatPdfFragment : Fragment() {
         return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
     }
 
-    private fun setupWebViewClient(webViewFragment: WebViewFragment) {
-        // Replace the default WebViewClient with our PDF streaming client
-        webViewFragment.webView.webViewClient = PdfWebViewClient(webViewFragment, requireContext())
-        Log.d("AIChatPdfFragment", "PDF streaming WebViewClient set up successfully")
-    }
-
     private fun setupJavaScriptInterface(webViewFragment: WebViewFragment) {
         val pdfPath = requireArguments().getString(ARG_PDF_PATH, "")
         Log.d("AIChatPdfFragment", "Setting up JavaScript interface with PDF path: $pdfPath")
@@ -105,7 +97,7 @@ class AIChatPdfFragment : Fragment() {
             allowUniversalAccessFromFileURLs = true
         }
         
-        // Create enhanced JavaScript interface that provides both streaming URL and base64 fallback
+        // Create enhanced JavaScript interface that provides streaming URL
         val jsInterface = EnhancedPdfProvider(requireActivity(), pdfPath, pdfId)
         webViewFragment.addJavascriptInterface(jsInterface, "AndroidPdfCache")
         
