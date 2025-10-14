@@ -51,6 +51,12 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
             return super.shouldInterceptRequest(view, request)
         }
         
+        // Handle OPTIONS requests (CORS preflight)
+        if (request?.method == "OPTIONS") {
+            Log.d(TAG, "Handling CORS preflight request for: $url")
+            return createCorsPreflightResponse()
+        }
+        
         // Extract PDF ID from URL
         val matcher = PDF_ID_PATTERN.matcher(url)
         if (!matcher.matches()) {
@@ -148,24 +154,48 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     private fun createPdfResponse(pdfFile: File): WebResourceResponse {
         return try {
             val inputStream = FileInputStream(pdfFile)
-            val headers = mapOf(
-                "Cache-Control" to "private, max-age=3600",
-                "Content-Length" to pdfFile.length().toString(),
-                "Content-Type" to "application/pdf"
-            )
+            val corsHeaders = mutableMapOf<String, String>().apply {
+                put("Access-Control-Allow-Origin", "*") // Allow all origins for WebView
+                put("Access-Control-Allow-Methods", "GET, OPTIONS")
+                put("Access-Control-Allow-Headers", "Content-Type, Range")
+                put("Access-Control-Expose-Headers", "Content-Length, Accept-Ranges")
+                put("Cache-Control", "private, max-age=3600")
+                put("Content-Length", pdfFile.length().toString())
+                put("Content-Type", "application/pdf")
+            }
             
             WebResourceResponse(
                 "application/pdf",
                 "binary",
                 200,
                 "OK",
-                headers,
+                corsHeaders,
                 inputStream
             )
         } catch (e: IOException) {
             Log.e(TAG, "Error creating PDF response", e)
             createErrorResponse(500, "Internal Error")
         }
+    }
+
+    private fun createCorsPreflightResponse(): WebResourceResponse {
+        val corsHeaders = mutableMapOf<String, String>().apply {
+            put("Access-Control-Allow-Origin", "*")
+            put("Access-Control-Allow-Methods", "GET, OPTIONS")
+            put("Access-Control-Allow-Headers", "Content-Type, Range")
+            put("Access-Control-Max-Age", "86400") // 24 hours
+        }
+        
+        Log.d(TAG, "Creating CORS preflight response")
+        
+        return WebResourceResponse(
+            "text/plain",
+            "utf-8",
+            200,
+            "OK",
+            corsHeaders,
+            "".byteInputStream()
+        )
     }
 
     private fun createErrorResponse(status: Int, message: String): WebResourceResponse {
