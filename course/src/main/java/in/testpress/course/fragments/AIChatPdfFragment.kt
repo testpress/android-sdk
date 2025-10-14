@@ -3,6 +3,7 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.util.CachedPdfPathProvider
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -70,6 +71,8 @@ class AIChatPdfFragment : Fragment() {
 
     private fun setupJavaScriptInterface(webViewFragment: WebViewFragment) {
         val pdfPath = requireArguments().getString(ARG_PDF_PATH, "")
+        Log.d("AIChatPdfFragment", "Setting up JavaScript interface with PDF path: $pdfPath")
+        
         webViewFragment.webView.settings.apply {
             allowFileAccessFromFileURLs = true
             allowUniversalAccessFromFileURLs = true
@@ -79,5 +82,7 @@ class AIChatPdfFragment : Fragment() {
             CachedPdfPathProvider(requireActivity(), pdfPath), 
             "AndroidPdfCache"
         )
+        
+        Log.d("AIChatPdfFragment", "JavaScript interface 'AndroidPdfCache' added successfully")
     }
 }
