@@ -119,6 +119,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             val args = Bundle()
             args.putLong("contentId", contentId)
             args.putLong("courseId", content.courseId ?: -1L)
+            args.putString("pdfPath", pdfDownloadManager.getCachedPdfPath())
             aiChatFragment?.arguments = args
         }
 
