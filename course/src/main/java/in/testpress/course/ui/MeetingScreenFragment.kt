@@ -88,10 +88,13 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, Meeti
         optionBarFragment.changeHandIconColor(isRaisedHand)
     }
 
-    override fun onSharingStatus(status: SharingStatus, userId: Long) {
+    override fun onSharingStatus(sharingSourceInfo: ZoomSDKSharingSourceInfo) {
+        val userId = sharingSourceInfo.getUserID() 
+        val sharingStatus = sharingSourceInfo.getStatus()
+
         if (inMeetingService.isHostUser(userId) &&
-            status == SharingStatus.Sharing_Other_Share_Begin ||
-            status == SharingStatus.Sharing_Other_Share_End
+            (sharingStatus == SharingStatus.Sharing_Other_Share_Begin ||
+            sharingStatus == SharingStatus.Sharing_Other_Share_End)
         ) {
             renderVideo()
         }

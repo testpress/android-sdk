@@ -44,11 +44,15 @@ class ChatFragment : Fragment(), MeetingChatCallback.ChatEvent{
     private fun sendMessage(){
         val inputBox = binding.inputBox
         val recyclerView = binding.recyclerChat
+        val chatController = ZoomSDK.getInstance().inMeetingService.inMeetingChatController
 
-        if(inputBox.text?.isNotBlank() == true){
-            inMeetingChatController.sendChatToGroup(InMeetingChatController.MobileRTCChatGroup.MobileRTCChatGroup_All,
-                inputBox.text.toString()
-            )
+        if (inputBox.text?.isNotBlank() == true && chatController != null) {
+            val chatMessage = ChatMessageBuilder()
+                .setContent(inputBox.text.toString())
+                .setMessageType(ZoomSDKChatMessageType.ZoomSDKChatMessageType_To_All)
+                .build()
+
+            chatController.sendChatMsgTo(chatMessage)
             inputBox.text!!.clear()
             recyclerView.post { recyclerView.smoothScrollToPosition(messageAdapter.itemCount - 1) }
         }
