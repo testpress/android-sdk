@@ -110,22 +110,16 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.domStorageEnabled = true
         // Disable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
-        // Optimize cache mode for better performance
         webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.settings.setSupportZoom(allowZoomControl)
-        
-        // Performance optimizations
-        webView.settings.databaseEnabled = true
-        webView.settings.setAppCacheEnabled(true)
-        webView.settings.setAppCachePath(requireContext().cacheDir.absolutePath)
-        webView.settings.setRenderPriority(WebSettings.RenderPriority.HIGH)
         
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
         webView.settings.userAgentString += CUSTOM_USER_AGENT
-        
-        // Only clear cache if explicitly needed, not on every setup
-        // This improves performance for subsequent loads
+        webView.apply {
+            clearCache(true)
+            clearHistory()
+        }
     }
 
     private fun populateInstituteSettings() {
