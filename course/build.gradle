@@ -8,7 +8,6 @@ android {
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
         targetSdkVersion rootProject.targetSdkVersion
-        versionName VERSION_NAME
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
     }
@@ -26,11 +25,11 @@ android {
         unitTests.includeAndroidResources = true
     }
     compileOptions {
-        sourceCompatibility 1.8
-        targetCompatibility 1.8
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
     }
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_1_8.toString()
+        jvmTarget = JavaVersion.VERSION_17.toString()
     }
     buildFeatures {
         viewBinding true
@@ -39,6 +38,8 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.1'
     }
+    namespace 'in.testpress.course'
+    testNamespace 'in.testpress.course.androidTest'
 }
 
 dependencies {
