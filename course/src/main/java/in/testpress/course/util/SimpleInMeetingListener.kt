@@ -24,11 +24,9 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onMeetingUserUpdated(l: Long) {}
     override fun onInMeetingUserAvatarPathUpdated(p0: Long) {}
     override fun onMeetingHostChanged(l: Long) {}
-    override fun onMeetingCoHostChanged(l: Long) {}
     override fun onMeetingCoHostChange(userId: Long, isCoHost: Boolean) {}
     override fun onActiveVideoUserChanged(var1: Long) {}
     override fun onActiveSpeakerVideoUserChanged(var1: Long) {}
-    override fun onSpotlightVideoChanged(b: Boolean) {}
     override fun onSpotlightVideoChanged(userList: List<Long>) {}
     override fun onUserVideoStatusChanged(
         userId: Long,
@@ -49,7 +47,6 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onChatMessageReceived(inMeetingChatMessage: InMeetingChatMessage) {}
     override fun onChatMsgDeleteNotification(msgID: String, deleteBy: ChatMessageDeleteType) {}
     override fun onShareMeetingChatStatusChanged(p0: Boolean) {}
-    override fun onUserNetworkQualityChanged(userId: Long) {}
     override fun onSinkMeetingVideoQualityChanged(videoQuality: VideoQuality, userId: Long) {}
     override fun onHostAskUnMute(userId: Long) {}
     override fun onHostAskStartVideo(userId: Long) {}
@@ -65,7 +62,6 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onSinkAttendeeChatPriviledgeChanged(privilege: Int) {}
     override fun onSinkAllowAttendeeChatNotification(privilege: Int) {}
     override fun onSinkPanelistChatPrivilegeChanged(privilege: MobileRTCWebinarPanelistChatPrivilege) {}
-    override fun onUserNameChanged(userId: Long, name: String) {}
     override fun onUserNamesChanged(userList: List<Long>) {}
     override fun onFreeMeetingNeedToUpgrade(type: FreeMeetingNeedUpgradeType, gifUrl: String) {}
     override fun onFreeMeetingUpgradeToGiftFreeTrialStart() {}
@@ -96,4 +92,20 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onFocusModeShareTypeChanged(p0: MobileRTCFocusModeShareType?) {}
     override fun onVideoAlphaChannelStatusChanged(p0: Boolean) {}
     override fun onAllowParticipantsRequestCloudRecording(p0: Boolean) {}
+    override fun onJoinMeetingNeedUserInfo(handler: IMeetingInputUserInfoHandler) {}
+    override fun onWebinarNeedInputScreenName(handler: InMeetingEventHandler) {}
+    override fun onSinkJoin3rdPartyTelephonyAudio(telephonySessionId: String) {}
+    override fun onUserConfirmToStartArchive(handler: IMeetingArchiveConfirmHandler) {}
+    override fun onCameraControlRequestReceived(userId: Long, requestType: CameraControlRequestType, handler: ICameraControlRequestHandler) {}
+    override fun onCameraControlRequestResult(userId: Long, result: CameraControlRequestResult) {}
+    override fun onCameraControlRequestResult(userId: Long, isGranted: Boolean) {}
+    override fun onFileSendStart(fileSender: ZoomSDKFileSender) {}
+    override fun onFileReceived(fileReceiver: ZoomSDKFileReceiver) {}
+    override fun onFileTransferProgress(transferInfo: ZoomSDKFileTransferInfo) {}
+    override fun onMuteOnEntryStatusChange(isEnabled: Boolean) {}
+    override fun onMeetingTopicChanged(topic: String) {}
+    override fun onMeetingFullToWatchLiveStream(liveStreamUrl: String) {}
+    override fun onRobotRelationChanged(userId: Long) {}
+    override fun onVirtualNameTagStatusChanged(isEnabled: Boolean, userId: Long) {}
+    override fun onVirtualNameTagRosterInfoUpdated(userId: Long) {}
 }

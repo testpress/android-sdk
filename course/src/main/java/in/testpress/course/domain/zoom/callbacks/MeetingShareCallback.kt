@@ -4,22 +4,23 @@ import us.zoom.sdk.InMeetingShareController.InMeetingShareListener
 import us.zoom.sdk.ShareSettingType
 import us.zoom.sdk.SharingStatus
 import us.zoom.sdk.ZoomSDK
+import us.zoom.sdk.ZoomSDKSharingSourceInfo
 
 
 object MeetingShareCallback : BaseCallback<MeetingShareCallback.ShareEvent?>() {
     interface ShareEvent : BaseEvent {
-        fun onSharingStatus(status: SharingStatus, userId: Long)
+        fun onSharingStatus(sharingSourceInfo: ZoomSDKSharingSourceInfo)
     }
 
     private var shareListener: InMeetingShareListener = object : InMeetingShareListener {
-        override fun onSharingStatus(status: SharingStatus, userId: Long) {
+        override fun onSharingStatus(sharingSourceInfo: ZoomSDKSharingSourceInfo) {
             for (event in callbacks) {
-                event?.onSharingStatus(status, userId)
+                event?.onSharingStatus(sharingSourceInfo)
             }
         }
 
-        override fun onShareActiveUser(p0: Long) {}
-        override fun onShareUserReceivingStatus(p0: Long) {}
+        override fun onShareContentChanged(sharingSourceInfo: ZoomSDKSharingSourceInfo) {}
+        override fun onShareUserReceivingStatus(shareSourceId: Long) {}
         override fun onShareSettingTypeChanged(p0: ShareSettingType?) {}
     }
 
