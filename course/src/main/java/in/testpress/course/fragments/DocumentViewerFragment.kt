@@ -50,11 +50,6 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             showAIView()
         }
         
-        // Pre-initialize AI fragment for better performance
-        if (isContentInitialized() && content.isAIEnabled == true) {
-            preInitializeAIFragment()
-        }
-        
         return binding.root
     }
 
@@ -97,10 +92,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
         binding.askAiFab.visibility = if (isAIEnabled && isPDFAttachment && !isAIView && courseIdExists) View.VISIBLE else View.GONE
         
-        // Pre-initialize AI fragment when conditions are met
-        if (isAIEnabled && isPDFAttachment && courseIdExists && aiChatFragment == null) {
-            preInitializeAIFragment()
-        }
+        // Note: AI pre-initialization is now handled in startAIPreInitialization() 
+        // which runs earlier in the display() method for better performance
     }
     
     private fun preInitializeAIFragment() {
@@ -182,6 +175,10 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     override fun display() {
         (activity as ContentActivity).setActionBarTitle(content.attachment?.title?:DEFAULT_ATTACHMENT_TITLE)
         fileName = getFileName()
+        
+        // Start AI pre-initialization immediately when content is loaded (parallel to PDF loading)
+        startAIPreInitialization()
+        
         pdfDownloadManager = PDFDownloadManager(this,requireContext(),fileName)
 
         updateAskAIFABVisibility()
@@ -194,6 +191,22 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         } else {
             content.attachment?.attachmentUrl?.let {
                 pdfDownloadManager.download(it)
+            }
+        }
+    }
+    
+    /**
+     * Start AI pre-initialization in background while PDF loads
+     * This maximizes the time for AI webview to load before user clicks "Switch to AI"
+     */
+    private fun startAIPreInitialization() {
+        if (isContentInitialized()) {
+            val isAIEnabled = content.isAIEnabled == true
+            val isPDFAttachment = content.contentType == "Attachment" && content.attachment != null
+            val courseIdExists = content.courseId != null
+            
+            if (isAIEnabled && isPDFAttachment && courseIdExists && aiChatFragment == null) {
+                preInitializeAIFragment()
             }
         }
     }
