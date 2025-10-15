@@ -50,6 +50,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             showAIView()
         }
         
+        // Pre-initialize AI fragment for better performance
+        if (isContentInitialized() && content.isAIEnabled == true) {
+            preInitializeAIFragment()
+        }
+        
         return binding.root
     }
 
@@ -91,6 +96,27 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         val courseIdExists = content.courseId != null
 
         binding.askAiFab.visibility = if (isAIEnabled && isPDFAttachment && !isAIView && courseIdExists) View.VISIBLE else View.GONE
+        
+        // Pre-initialize AI fragment when conditions are met
+        if (isAIEnabled && isPDFAttachment && courseIdExists && aiChatFragment == null) {
+            preInitializeAIFragment()
+        }
+    }
+    
+    private fun preInitializeAIFragment() {
+        if (aiChatFragment == null && isContentInitialized()) {
+            aiChatFragment = AIChatPdfFragment()
+            val args = Bundle()
+            args.putLong("contentId", contentId)
+            args.putLong("courseId", content.courseId ?: -1L)
+            aiChatFragment?.arguments = args
+            
+            // Pre-add the fragment but keep it hidden
+            childFragmentManager.beginTransaction()
+                .add(R.id.aiPdf_view_fragment, aiChatFragment!!)
+                .hide(aiChatFragment!!)
+                .commit()
+        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -114,22 +140,23 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
 
     private fun showAIView() {
+        // Ensure AI fragment is initialized
         if (aiChatFragment == null) {
-            aiChatFragment = AIChatPdfFragment()
-            val args = Bundle()
-            args.putLong("contentId", contentId)
-            args.putLong("courseId", content.courseId ?: -1L)
-            aiChatFragment?.arguments = args
+            preInitializeAIFragment()
         }
 
+        // Hide PDF view and show AI view
         binding.pdfView.visibility = View.GONE
         binding.bottomNavigationFragment.visibility = View.GONE
         binding.askAiFab.visibility = View.GONE
         binding.aiPdfViewFragment.visibility = View.VISIBLE
 
-        childFragmentManager.beginTransaction()
-            .replace(R.id.aiPdf_view_fragment, aiChatFragment!!)
-            .commit()
+        // Show the pre-created fragment (should be much faster now)
+        aiChatFragment?.let { fragment ->
+            childFragmentManager.beginTransaction()
+                .show(fragment)
+                .commit()
+        }
 
         isAIView = true
         activity?.invalidateOptionsMenu()
@@ -141,10 +168,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         binding.askAiFab.visibility = View.VISIBLE
         binding.aiPdfViewFragment.visibility = View.GONE
 
+        // Hide AI fragment instead of removing it for better performance
         aiChatFragment?.let {
             childFragmentManager.beginTransaction()
-                .remove(it)
-                .commitNow()
+                .hide(it)
+                .commit()
         }
 
         isAIView = false

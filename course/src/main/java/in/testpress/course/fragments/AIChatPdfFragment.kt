@@ -20,6 +20,8 @@ class AIChatPdfFragment : Fragment() {
         private const val ARG_COURSE_ID = "courseId"
     }
     
+    private var webViewFragment: WebViewFragment? = null
+    
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -31,6 +33,11 @@ class AIChatPdfFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        // Initialize WebView immediately when fragment is created
+        initializeWebView()
+    }
+    
+    private fun initializeWebView() {
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
         
@@ -38,17 +45,17 @@ class AIChatPdfFragment : Fragment() {
             throw IllegalArgumentException("Required arguments (contentId, courseId) are missing or invalid.")
         }
         
-        val webViewFragment = WebViewFragment()
+        webViewFragment = WebViewFragment()
         
         val pdfUrl = getPdfUrl(courseId, contentId)
     
-        webViewFragment.arguments = Bundle().apply {
+        webViewFragment?.arguments = Bundle().apply {
             putString(URL_TO_OPEN, pdfUrl)
             putBoolean(IS_AUTHENTICATION_REQUIRED, true)
         }
     
         childFragmentManager.beginTransaction()
-            .replace(R.id.aiPdf_view_fragment, webViewFragment)
+            .replace(R.id.aiPdf_view_fragment, webViewFragment!!)
             .commit()
     }
 
