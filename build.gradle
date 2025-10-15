@@ -37,7 +37,7 @@ ext {
     compileSdkVersion = 35
     minSdkVersion = 26
     targetSdkVersion = 35
-    minSdkVersionForUITest = 35
+    minSdkVersionForUITest = 26
     buildToolsVersion = '30.0.3'
 
     //AndroidX Dependencies
