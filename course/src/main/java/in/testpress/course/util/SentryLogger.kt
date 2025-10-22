@@ -28,7 +28,7 @@ fun logPlaybackException(
             .getOrElse { ex -> "Failed to get codec info: ${ex.message}" }
     }
 
-    Sentry.captureException(exception) { scope: Scope ->
+    Sentry.captureException(exception) { scope ->
         scope.level = SentryLevel.ERROR
         scope.setTag("playback_id", playbackId)
         scope.setTag("package_name", packageName)
@@ -63,7 +63,7 @@ private fun getAVCCodecSupportInfo(): Map<String, Map<String, Any>> {
 }
 
 fun logZoomSdkInitializationError(extraInfo: Map<String, Any?>) {
-    Sentry.captureMessage("Zoom SDK Initialization Failed") { scope: Scope ->
+    Sentry.captureMessage("Zoom SDK Initialization Failed") { scope ->
         scope.level = SentryLevel.ERROR
         scope.setTag("package_name", extraInfo["Package Name"].toString())
         scope.setTag("user_name", extraInfo["User Name"].toString())
