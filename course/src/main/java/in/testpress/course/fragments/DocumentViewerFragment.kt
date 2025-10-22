@@ -114,12 +114,20 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
 
     private fun showAIView() {
+        val startTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 1: showAIView() STARTED at ${startTime}")
+        
         if (aiChatFragment == null) {
+            android.util.Log.d("AI_TIMING", "🟦 STEP 2: Creating AIChatPdfFragment...")
+            val fragmentCreateStart = System.currentTimeMillis()
+            
             aiChatFragment = AIChatPdfFragment()
             val args = Bundle()
             args.putLong("contentId", contentId)
             args.putLong("courseId", content.courseId ?: -1L)
             aiChatFragment?.arguments = args
+            
+            android.util.Log.d("AI_TIMING", "✅ STEP 2 DONE: Fragment created in ${System.currentTimeMillis() - fragmentCreateStart}ms")
         }
 
         binding.pdfView.visibility = View.GONE
@@ -127,9 +135,15 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         binding.askAiFab.visibility = View.GONE
         binding.aiPdfViewFragment.visibility = View.VISIBLE
 
+        android.util.Log.d("AI_TIMING", "🟦 STEP 3: Committing fragment transaction...")
+        val transactionStart = System.currentTimeMillis()
+        
         childFragmentManager.beginTransaction()
             .replace(R.id.aiPdf_view_fragment, aiChatFragment!!)
             .commit()
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 3 DONE: Transaction committed in ${System.currentTimeMillis() - transactionStart}ms")
+        android.util.Log.d("AI_TIMING", "✅ showAIView() COMPLETED in ${System.currentTimeMillis() - startTime}ms total")
 
         isAIView = true
         activity?.invalidateOptionsMenu()

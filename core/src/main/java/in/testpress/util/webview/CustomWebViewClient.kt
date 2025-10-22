@@ -9,6 +9,7 @@ import android.webkit.*
 class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
 
     private var errorList = linkedMapOf<WebResourceRequest?,WebResourceResponse?>()
+    private var pageLoadStartTime: Long = 0
 
     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
         val url = request?.url.toString()
@@ -36,10 +37,23 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     }
 
     override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+        pageLoadStartTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 14: WebView.onPageStarted() - URL loading started")
+        android.util.Log.d("AI_TIMING", "   Loading URL: $url")
         if (fragment.showLoadingBetweenPages) fragment.showLoading()
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
+        val totalLoadTime = System.currentTimeMillis() - pageLoadStartTime
+        android.util.Log.d("AI_TIMING", "✅ STEP 14 DONE: WebView.onPageFinished() - Page loaded!")
+        android.util.Log.d("AI_TIMING", "   Loaded URL: $url")
+        android.util.Log.d("AI_TIMING", "   ⏱️ TOTAL PAGE LOAD TIME: ${totalLoadTime}ms")
+        android.util.Log.d("AI_TIMING", "")
+        android.util.Log.d("AI_TIMING", "========================================")
+        android.util.Log.d("AI_TIMING", "🎉 AI WEBVIEW FULLY LOADED AND VISIBLE!")
+        android.util.Log.d("AI_TIMING", "⏱️ Total time from button click: ${totalLoadTime}ms")
+        android.util.Log.d("AI_TIMING", "========================================")
+        
         fragment.hideLoading()
         fragment.hideEmptyViewShowWebView()
         checkWebViewHasError()

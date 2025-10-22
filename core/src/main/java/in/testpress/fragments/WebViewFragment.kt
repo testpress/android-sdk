@@ -43,7 +43,12 @@ class WebViewFragment : Fragment(), EmptyViewListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        val startTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 8: WebViewFragment.onCreate() STARTED")
+        
         parseArguments()
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 8 DONE: WebViewFragment.onCreate() completed in ${System.currentTimeMillis() - startTime}ms")
     }
 
     override fun onCreateView(
@@ -51,20 +56,50 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
+        val startTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 9: WebViewFragment.onCreateView() STARTED")
+        
         _layout = WebviewFragmentBinding.inflate(inflater, container, false)
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 9 DONE: WebViewFragment.onCreateView() completed in ${System.currentTimeMillis() - startTime}ms")
         return layout.root
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        val startTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 10: WebViewFragment.onViewCreated() STARTED")
+        
         showLoading()
+        android.util.Log.d("AI_TIMING", "   Showing loading spinner... (${System.currentTimeMillis() - startTime}ms)")
+        
         initializedSwipeRefresh()
+        android.util.Log.d("AI_TIMING", "   Initialized swipe refresh (${System.currentTimeMillis() - startTime}ms)")
+        
         initializeEmptyViewFragment()
+        android.util.Log.d("AI_TIMING", "   Initialized empty view fragment (${System.currentTimeMillis() - startTime}ms)")
+        
         webView = layout.webView
         listener?.onWebViewInitializationSuccess()
+        android.util.Log.d("AI_TIMING", "   WebView reference obtained (${System.currentTimeMillis() - startTime}ms)")
+        
+        android.util.Log.d("AI_TIMING", "🟦 STEP 11: Calling setupWebView()...")
+        val setupStart = System.currentTimeMillis()
         setupWebView()
+        android.util.Log.d("AI_TIMING", "✅ STEP 11 DONE: setupWebView() completed in ${System.currentTimeMillis() - setupStart}ms")
+        
+        android.util.Log.d("AI_TIMING", "🟦 STEP 12: Calling populateInstituteSettings()...")
+        val settingsStart = System.currentTimeMillis()
         populateInstituteSettings()
+        android.util.Log.d("AI_TIMING", "✅ STEP 12 DONE: populateInstituteSettings() completed in ${System.currentTimeMillis() - settingsStart}ms")
+        
+        android.util.Log.d("AI_TIMING", "🟦 STEP 13: Calling loadContent() - NETWORK REQUEST STARTS HERE...")
+        val loadStart = System.currentTimeMillis()
         loadContent()
+        android.util.Log.d("AI_TIMING", "✅ STEP 13 DONE: loadContent() initiated in ${System.currentTimeMillis() - loadStart}ms (network request continues in background)")
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 10 DONE: WebViewFragment.onViewCreated() completed in ${System.currentTimeMillis() - startTime}ms total")
     }
 
     override fun onDestroy() {
