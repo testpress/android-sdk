@@ -40,6 +40,8 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var enableSwipeRefresh: Boolean = false
     var session: TestpressSession? = null
     var lockToLandscape: Boolean = false
+    private var webViewClient: CustomWebViewClient? = null
+    var loadUrlCalledTime: Long = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -147,8 +149,15 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.builtInZoomControls = false
         webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
         webView.settings.setSupportZoom(allowZoomControl)
-        webView.webViewClient = CustomWebViewClient(this)
+        
+        // Set WebView clients
+        val webViewClient = CustomWebViewClient(this)
+        webView.webViewClient = webViewClient
         webView.webChromeClient = CustomWebChromeClient(this)
+        
+        // Store reference to client for timing
+        this.webViewClient = webViewClient
+        
         webView.settings.userAgentString += CUSTOM_USER_AGENT
         webView.apply {
             clearCache(true)
@@ -174,21 +183,79 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     }
 
     private fun loadContent() {
+        android.util.Log.d("AI_TIMING", "")
+        android.util.Log.d("AI_TIMING", "=== DETAILED loadContent() ANALYSIS ===")
+        val loadContentStart = System.currentTimeMillis()
+        
         if (url.isNotEmpty()) {
-            webView.loadUrl(url, generateHeadersMap())
+            android.util.Log.d("AI_TIMING", "📍 URL to load: $url")
+            
+            // Generate headers
+            val headersStart = System.currentTimeMillis()
+            val headers = generateHeadersMap()
+            android.util.Log.d("AI_TIMING", "⏱️  generateHeadersMap() took: ${System.currentTimeMillis() - headersStart}ms")
+            
+            // Log headers
+            android.util.Log.d("AI_TIMING", "📋 Headers being sent:")
+            headers.forEach { (key, value) ->
+                if (key == "Authorization") {
+                    android.util.Log.d("AI_TIMING", "   $key: JWT [token hidden for security]")
+                } else {
+                    android.util.Log.d("AI_TIMING", "   $key: $value")
+                }
+            }
+            
+            // Actually load the URL
+            android.util.Log.d("AI_TIMING", "🌐 Calling webView.loadUrl()...")
+            android.util.Log.d("AI_TIMING", "")
+            
+            val webViewLoadStart = System.currentTimeMillis()
+            loadUrlCalledTime = webViewLoadStart  // Store for timing calculations
+            webViewClient?.setLoadUrlTime(webViewLoadStart)  // Pass to client
+            
+            webView.loadUrl(url, headers)
+            
+            android.util.Log.d("AI_TIMING", "⏱️  webView.loadUrl() call returned in: ${System.currentTimeMillis() - webViewLoadStart}ms")
+            android.util.Log.d("AI_TIMING", "")
+            android.util.Log.d("AI_TIMING", "⚠️  IMPORTANT: loadUrl() returns immediately!")
+            android.util.Log.d("AI_TIMING", "   The actual network request happens in background on a separate thread")
+            android.util.Log.d("AI_TIMING", "")
+            android.util.Log.d("AI_TIMING", "🔄 Network request phases now starting in background:")
+            android.util.Log.d("AI_TIMING", "   Phase 1: DNS Lookup (50-500ms)")
+            android.util.Log.d("AI_TIMING", "   Phase 2: TCP Connection (50-300ms)")
+            android.util.Log.d("AI_TIMING", "   Phase 3: SSL Handshake (100-500ms)")
+            android.util.Log.d("AI_TIMING", "   Phase 4: HTTP Request (10-50ms)")
+            android.util.Log.d("AI_TIMING", "   Phase 5: Server Processing (200-1000ms)")
+            android.util.Log.d("AI_TIMING", "   Phase 6: Response Headers (10-50ms)")
+            android.util.Log.d("AI_TIMING", "")
+            android.util.Log.d("AI_TIMING", "   ⏰ Waiting for onPageStarted() callback...")
+            android.util.Log.d("AI_TIMING", "   (This will fire when ALL above phases complete)")
+            
         } else if (data.isNotEmpty()) {
             webView.loadData(data, "text/html", null)
         } else {
             // If both the URL and data are empty, pass an unexpected error
             showErrorView(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
         }
+        
+        android.util.Log.d("AI_TIMING", "⏱️  Total loadContent() execution: ${System.currentTimeMillis() - loadContentStart}ms")
+        android.util.Log.d("AI_TIMING", "=====================================")
+        android.util.Log.d("AI_TIMING", "")
     }
 
     private fun generateHeadersMap(): Map<String, String> {
         val headersMap = mutableMapOf<String, String>()
         if (isAuthenticationRequired){
-            headersMap["Authorization"] = "JWT ${session?.token}"
-            headersMap["User-Agent"] = UserAgentProvider.get(requireContext())
+            val tokenStart = System.currentTimeMillis()
+            val token = session?.token
+            android.util.Log.d("AI_TIMING", "   Getting auth token took: ${System.currentTimeMillis() - tokenStart}ms")
+            
+            val userAgentStart = System.currentTimeMillis()
+            val userAgent = UserAgentProvider.get(requireContext())
+            android.util.Log.d("AI_TIMING", "   Getting user agent took: ${System.currentTimeMillis() - userAgentStart}ms")
+            
+            headersMap["Authorization"] = "JWT $token"
+            headersMap["User-Agent"] = userAgent
         }
         return headersMap
     }
