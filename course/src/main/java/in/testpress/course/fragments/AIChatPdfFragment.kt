@@ -25,11 +25,20 @@ class AIChatPdfFragment : Fragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.ai_pdf_fragment, container, false)
+        val startTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 4: AIChatPdfFragment.onCreateView() STARTED")
+        
+        val view = inflater.inflate(R.layout.ai_pdf_fragment, container, false)
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 4 DONE: AIChatPdfFragment.onCreateView() completed in ${System.currentTimeMillis() - startTime}ms")
+        return view
     }
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
+        val startTime = System.currentTimeMillis()
+        android.util.Log.d("AI_TIMING", "🟦 STEP 5: AIChatPdfFragment.onViewCreated() STARTED")
         
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
@@ -38,18 +47,30 @@ class AIChatPdfFragment : Fragment() {
             throw IllegalArgumentException("Required arguments (contentId, courseId) are missing or invalid.")
         }
         
+        android.util.Log.d("AI_TIMING", "🟦 STEP 6: Creating WebViewFragment...")
+        val webViewCreateStart = System.currentTimeMillis()
+        
         val webViewFragment = WebViewFragment()
         
         val pdfUrl = getPdfUrl(courseId, contentId)
+        android.util.Log.d("AI_TIMING", "   URL to load: $pdfUrl")
     
         webViewFragment.arguments = Bundle().apply {
             putString(URL_TO_OPEN, pdfUrl)
             putBoolean(IS_AUTHENTICATION_REQUIRED, true)
         }
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 6 DONE: WebViewFragment created in ${System.currentTimeMillis() - webViewCreateStart}ms")
+        
+        android.util.Log.d("AI_TIMING", "🟦 STEP 7: Committing WebViewFragment transaction...")
+        val transactionStart = System.currentTimeMillis()
     
         childFragmentManager.beginTransaction()
             .replace(R.id.aiPdf_view_fragment, webViewFragment)
             .commit()
+        
+        android.util.Log.d("AI_TIMING", "✅ STEP 7 DONE: WebView transaction committed in ${System.currentTimeMillis() - transactionStart}ms")
+        android.util.Log.d("AI_TIMING", "✅ STEP 5 DONE: AIChatPdfFragment.onViewCreated() completed in ${System.currentTimeMillis() - startTime}ms total")
     }
 
     private fun getPdfUrl(courseId: Long, contentId: Long): String {
