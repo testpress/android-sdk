@@ -213,23 +213,87 @@ class WebViewFragment : Fragment(), EmptyViewListener {
             loadUrlCalledTime = webViewLoadStart  // Store for timing calculations
             webViewClient?.setLoadUrlTime(webViewLoadStart)  // Pass to client
             
-            webView.loadUrl(url, headers)
+            // 🧪 TEST MODE: Load simple HTML instead of network URL
+            android.util.Log.d("AI_TIMING", "🧪 TEST MODE: Loading local HTML instead of network URL")
+            android.util.Log.d("AI_TIMING", "   This will tell us if delay is from network or WebView initialization")
+            android.util.Log.d("AI_TIMING", "")
             
-            android.util.Log.d("AI_TIMING", "⏱️  webView.loadUrl() call returned in: ${System.currentTimeMillis() - webViewLoadStart}ms")
+            val testHtml = """
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                    <title>Hello World Test</title>
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 100vh;
+                            margin: 0;
+                            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                            color: white;
+                        }
+                        .container {
+                            text-align: center;
+                            padding: 40px;
+                            background: rgba(255, 255, 255, 0.1);
+                            border-radius: 20px;
+                            backdrop-filter: blur(10px);
+                        }
+                        h1 {
+                            font-size: 48px;
+                            margin: 0 0 20px 0;
+                        }
+                        p {
+                            font-size: 18px;
+                            opacity: 0.9;
+                        }
+                        .info {
+                            margin-top: 30px;
+                            font-size: 14px;
+                            opacity: 0.7;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="container">
+                        <h1>🚀 Hello World!</h1>
+                        <p>WebView loaded successfully</p>
+                        <div class="info">
+                            <p>✅ No network request</p>
+                            <p>✅ Pure local HTML</p>
+                            <p>✅ Instant loading test</p>
+                        </div>
+                    </div>
+                    <script>
+                        console.log('Hello World HTML loaded at:', new Date().toISOString());
+                    </script>
+                </body>
+                </html>
+            """.trimIndent()
+            
+            webView.loadDataWithBaseURL(
+                null,  // baseUrl
+                testHtml,  // data
+                "text/html",  // mimeType
+                "UTF-8",  // encoding
+                null  // historyUrl
+            )
+            
+            // Original network URL loading (commented out for test)
+            // webView.loadUrl(url, headers)
+            
+            android.util.Log.d("AI_TIMING", "⏱️  webView.loadDataWithBaseURL() call returned in: ${System.currentTimeMillis() - webViewLoadStart}ms")
             android.util.Log.d("AI_TIMING", "")
-            android.util.Log.d("AI_TIMING", "⚠️  IMPORTANT: loadUrl() returns immediately!")
-            android.util.Log.d("AI_TIMING", "   The actual network request happens in background on a separate thread")
-            android.util.Log.d("AI_TIMING", "")
-            android.util.Log.d("AI_TIMING", "🔄 Network request phases now starting in background:")
-            android.util.Log.d("AI_TIMING", "   Phase 1: DNS Lookup (50-500ms)")
-            android.util.Log.d("AI_TIMING", "   Phase 2: TCP Connection (50-300ms)")
-            android.util.Log.d("AI_TIMING", "   Phase 3: SSL Handshake (100-500ms)")
-            android.util.Log.d("AI_TIMING", "   Phase 4: HTTP Request (10-50ms)")
-            android.util.Log.d("AI_TIMING", "   Phase 5: Server Processing (200-1000ms)")
-            android.util.Log.d("AI_TIMING", "   Phase 6: Response Headers (10-50ms)")
+            android.util.Log.d("AI_TIMING", "⚠️  IMPORTANT: loadDataWithBaseURL() returns immediately!")
+            android.util.Log.d("AI_TIMING", "   Since this is local HTML, there's NO network delay")
+            android.util.Log.d("AI_TIMING", "   Any delay you see is purely from WebView rendering")
             android.util.Log.d("AI_TIMING", "")
             android.util.Log.d("AI_TIMING", "   ⏰ Waiting for onPageStarted() callback...")
-            android.util.Log.d("AI_TIMING", "   (This will fire when ALL above phases complete)")
+            android.util.Log.d("AI_TIMING", "   (Should fire almost instantly with local HTML)")
             
         } else if (data.isNotEmpty()) {
             webView.loadData(data, "text/html", null)
