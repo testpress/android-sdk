@@ -69,7 +69,7 @@ ext {
     lottie = 'com.airbnb.android:lottie:2.5.4'
     shimmer = 'com.facebook.shimmer:shimmer:0.5.0'
     ringProgressBar = "com.github.HotBitmapGG:RingProgressBar:V1.2.3"
-    androidPDFViewer = "com.github.mhiew:android-pdf-viewer:3.2.0-beta.1"
+    androidPDFViewer = "com.github.marain87:AndroidPdfViewer:3.2.8"
     doubleTapPlayerView = "com.github.vkay94:DoubleTapPlayerView:1.0.0"
     pRDownloader = "com.github.alexto9090:PRDownloader:1.0"
 
