@@ -40,6 +40,7 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     }
 
     override fun onPageFinished(view: WebView?, url: String?) {
+        android.util.Log.d("CustomWebViewClient", "✅ onPageFinished called with URL: $url")
         fragment.hideLoading()
         fragment.hideEmptyViewShowWebView()
         checkWebViewHasError()

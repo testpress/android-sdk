@@ -227,4 +227,25 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         fragment.requireActivity().window.decorView.systemUiVisibility =
             View.SYSTEM_UI_FLAG_LAYOUT_STABLE
     }
+    
+    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+        consoleMessage?.let {
+            val level = it.messageLevel()
+            val message = it.message()
+            val source = it.sourceId()
+            val line = it.lineNumber()
+            
+            // Log all console messages
+            Log.d("WebViewConsole", "[$level] $message")
+            Log.d("WebViewConsole", "   Source: $source (line $line)")
+            
+            // Also check for specific errors
+            if (level == ConsoleMessage.MessageLevel.ERROR) {
+                Log.e("WebViewConsole", "❌ ERROR in WebView: $message")
+            }
+        } ?: run {
+            Log.d("WebViewConsole", "onConsoleMessage called with null")
+        }
+        return true
+    }
 }

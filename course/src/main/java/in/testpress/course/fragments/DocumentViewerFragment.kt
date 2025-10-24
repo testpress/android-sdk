@@ -119,6 +119,21 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             val args = Bundle()
             args.putLong("contentId", contentId)
             args.putLong("courseId", content.courseId ?: -1L)
+            
+            // Get local PDF file path (already downloaded and cached)
+            val localPdfFile = if (::pdfDownloadManager.isInitialized && pdfDownloadManager.isDownloaded()) {
+                pdfDownloadManager.get()
+            } else {
+                null
+            }
+            
+            // Use file:// URL for local PDF or fallback to remote URL
+            val pdfUrl = localPdfFile?.let { "file://${it.absolutePath}" } 
+                ?: content.attachment?.attachmentUrl
+                ?: throw IllegalStateException("PDF URL not available")
+            
+            args.putString("pdfUrl", pdfUrl)
+            args.putString("pdfTitle", content.attachment?.title ?: DEFAULT_ATTACHMENT_TITLE)
             aiChatFragment?.arguments = args
         }
 
