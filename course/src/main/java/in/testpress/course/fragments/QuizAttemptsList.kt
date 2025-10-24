@@ -83,8 +83,8 @@ class QuizAttemptsList : Fragment() {
         val attempts = content.getGreenDaoContentAttempts(requireContext())
         attemptList.apply {
             isNestedScrollingEnabled = false
-            layoutManager = LinearLayoutManager(activity)
-            adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.asReversed())
+            layoutManager = LinearLayoutManager(requireActivity())
+            adapter = ContentAttemptListAdapter(requireActivity(), greenDaoContent, attempts.asReversed())
             visibility = View.VISIBLE
         }
         attemptList.setHasFixedSize(true)

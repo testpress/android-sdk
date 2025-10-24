@@ -41,8 +41,8 @@ open class AttemptsListFragment : BaseExamWidgetFragment() {
         val attempts = content.getGreenDaoContentAttempts(requireContext())
         attemptList.isNestedScrollingEnabled = false
         attemptList.setHasFixedSize(true)
-        attemptList.layoutManager = LinearLayoutManager(activity)
-        attemptList.adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.asReversed())
+        attemptList.layoutManager = LinearLayoutManager(requireActivity())
+        attemptList.adapter = ContentAttemptListAdapter(requireActivity(), greenDaoContent, attempts.asReversed())
         attemptList.visibility = View.VISIBLE
     }
 }
