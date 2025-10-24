@@ -6,6 +6,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.sync.Mutex
+import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -36,6 +38,7 @@ object LearnLensAssetManager {
     private var isDownloaded = false
     
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+    private val downloadMutex = Mutex()  // Thread-safe lock for coroutines
     
     /**
      * Download assets in background (non-blocking).
@@ -64,15 +67,20 @@ object LearnLensAssetManager {
     /**
      * Download and cache LearnLens assets if not already cached.
      * Safe to call multiple times - will skip if already downloaded.
+     * Thread-safe using Mutex.
      */
     suspend fun downloadAssetsIfNeeded(context: Context) {
+        // Quick check without lock (optimization)
         if (isDownloaded || isAssetsCached(context)) {
             Log.d(TAG, "✅ Assets already cached")
             return
         }
         
-        synchronized(this) {
+        // Use Mutex to ensure only one coroutine downloads at a time
+        downloadMutex.withLock {
+            // Double-check after acquiring lock
             if (isDownloaded || isAssetsCached(context)) {
+                Log.d(TAG, "✅ Assets already cached (after lock)")
                 return
             }
             
