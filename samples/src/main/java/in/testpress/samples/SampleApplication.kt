@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
+import `in`.testpress.course.util.LearnLensAssetManager
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.util.applySystemBarColors
 import kotlinx.coroutines.CoroutineScope
@@ -18,6 +19,11 @@ class SampleApplication : Application() {
         super.onCreate()
         syncDownloads()
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
+        downloadLearnLensAssets()
+}
+    
+    private fun downloadLearnLensAssets() {
+        LearnLensAssetManager.downloadAssetsInBackground(this)
     }
 
     private fun syncDownloads() {

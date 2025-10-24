@@ -17,6 +17,7 @@ import android.webkit.*
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import java.io.File
 
 const val CUSTOM_USER_AGENT = " TestpressAndroidApp/WebView"
 
@@ -35,6 +36,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private var data: String = ""
     var showLoadingBetweenPages: Boolean = false
     private var isAuthenticationRequired: Boolean = true
+    private var baseUrl: String? = null
     var allowNonInstituteUrlInWebView: Boolean = false
     private var allowZoomControl: Boolean = false
     private var enableSwipeRefresh: Boolean = false
@@ -76,6 +78,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private fun parseArguments() {
         url = arguments?.getString(URL_TO_OPEN, "") ?: ""
         data = arguments?.getString(DATA_TO_OPEN, "") ?: ""
+        baseUrl = arguments?.getString(BASE_URL)
         showLoadingBetweenPages = arguments?.getBoolean(SHOW_LOADING_BETWEEN_PAGES) ?: false
         isAuthenticationRequired = arguments?.getBoolean(IS_AUTHENTICATION_REQUIRED) ?: true
         allowNonInstituteUrlInWebView =
@@ -142,7 +145,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         if (url.isNotEmpty()) {
             webView.loadUrl(url, generateHeadersMap())
         } else if (data.isNotEmpty()) {
-            webView.loadData(data, "text/html", null)
+            webView.loadDataWithBaseURL(baseUrl, data, "text/html", "UTF-8", null)
         } else {
             // If both the URL and data are empty, pass an unexpected error
             showErrorView(TestpressException.unexpectedError(Exception("URL not found and data not found.")))
@@ -213,6 +216,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     companion object {
         const val URL_TO_OPEN = "URL_TO_OPEN"
         const val DATA_TO_OPEN = "DATA_TO_OPEN"
+        const val BASE_URL = "BASE_URL"  // Optional base URL for loadDataWithBaseURL
         const val IS_AUTHENTICATION_REQUIRED = "IS_AUTHENTICATION_REQUIRED"
         const val SHOW_LOADING_BETWEEN_PAGES = "SHOW_LOADING_BETWEEN_PAGES"
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
