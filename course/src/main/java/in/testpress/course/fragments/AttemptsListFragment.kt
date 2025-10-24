@@ -42,7 +42,7 @@ open class AttemptsListFragment : BaseExamWidgetFragment() {
         attemptList.isNestedScrollingEnabled = false
         attemptList.setHasFixedSize(true)
         attemptList.layoutManager = LinearLayoutManager(activity)
-        attemptList.adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.reversed())
+        attemptList.adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.asReversed())
         attemptList.visibility = View.VISIBLE
     }
 }

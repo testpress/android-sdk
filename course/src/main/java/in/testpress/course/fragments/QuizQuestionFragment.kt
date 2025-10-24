@@ -279,9 +279,9 @@ class QuizQuestionFragment : Fragment() {
     }
 
     private fun populateChartValues(audiencePollResponse: AudiencePollResponse, chart: HorizontalBarChart) {
-        val yValues = extractPollPercent(audiencePollResponse).reversed()
+        val yValues = extractPollPercent(audiencePollResponse).asReversed()
         val xValues = (1..yValues.size).map { it.toFloat() }
-        val optionLabels = List(xValues.size) { index -> ('A'.code + index).toChar().toString() }.reversed()
+        val optionLabels = List(xValues.size) { index -> ('A'.code + index).toChar().toString() }.asReversed()
         val entries = xValues.mapIndexed { index, xValue -> BarEntry(xValue, yValues[index]) }
         val barDataSet = BarDataSet(entries, "BarDataSet")
         val iBarDataSets = ArrayList<IBarDataSet>()

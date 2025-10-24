@@ -84,7 +84,7 @@ class QuizAttemptsList : Fragment() {
         attemptList.apply {
             isNestedScrollingEnabled = false
             layoutManager = LinearLayoutManager(activity)
-            adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.reversed())
+            adapter = ContentAttemptListAdapter(activity, greenDaoContent, attempts.asReversed())
             visibility = View.VISIBLE
         }
         attemptList.setHasFixedSize(true)
