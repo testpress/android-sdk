@@ -4,8 +4,8 @@ import `in`.testpress.course.R
 import `in`.testpress.course.util.PdfWebViewCache
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.util.webview.EmptyViewFragment
-import `in`.testpress.util.webview.EmptyViewListener
+import `in`.testpress.fragments.EmptyViewFragment
+import `in`.testpress.fragments.EmptyViewListener
 import android.graphics.Bitmap
 import android.os.Bundle
 import android.util.Log
