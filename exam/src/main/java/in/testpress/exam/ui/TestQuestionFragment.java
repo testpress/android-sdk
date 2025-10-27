@@ -10,6 +10,7 @@ import android.content.Intent;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.MediaStore;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -383,11 +384,7 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
         @JavascriptInterface
         public void onFileUploadClick() {
             Log.d("TAG", "onFileUploadClick: ");
-            if (ActivityKt.isStoragePermissionGranted(getActivity())) {
-                pickFile();
-            } else {
-                ActivityKt.askStoragePermission(getActivity(),getString(R.string.storage_permission_to_upload_file));
-            }
+            pickFile();
         }
 
         @JavascriptInterface
@@ -430,11 +427,9 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                 Uri uri = data.getData();
                 if (uri != null){
                     try {
-                        requireContext().getContentResolver()
-                                .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
                         selectedUriFromIntent = uri;
                         
-                        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {                
                             FileUtilsKt.copyFileFromUriAndUpload(
                                 requireContext(),
                                 uri,
@@ -448,7 +443,25 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
                                 }
                             );
                         } else {
-                            pickiT.getPath(uri, Build.VERSION.SDK_INT);
+                            requireContext().getContentResolver()
+                                    .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                            
+                            if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                                FileUtilsKt.copyFileFromUriAndUpload(
+                                    requireContext(),
+                                    uri,
+                                    filePath -> {
+                                        uploadFileAndSaveURL(filePath);
+                                        return null;
+                                    },
+                                    errorMessage -> {
+                                        showAlert(requireContext(), "Uploading Error", errorMessage);
+                                        return null;
+                                    }
+                                );
+                            } else {
+                                pickiT.getPath(uri, Build.VERSION.SDK_INT);
+                            }
                         }
                     } catch (SecurityException e) {
                         showAlert(requireContext(), "Permission Error", e.getMessage());

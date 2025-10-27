@@ -3,8 +3,11 @@ package in.testpress.exam.util;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Build;
 import android.os.Handler;
+import android.provider.MediaStore;
 import androidx.annotation.NonNull;
 import com.google.android.material.snackbar.Snackbar;
 import androidx.fragment.app.Fragment;
@@ -444,12 +447,17 @@ public class CommentsUtil implements LoaderManager.LoaderCallbacks<List<Comment>
     }
 
     private void pickImageFromMobile() {
-        if (fragment != null) {
-            fragment.startActivityForResult(CropImage.getPickImageChooserIntent(activity),
-                    PICK_IMAGE_CHOOSER_REQUEST_CODE);
+        Intent intent;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            intent = new Intent(MediaStore.ACTION_PICK_IMAGES);
         } else {
-            activity.startActivityForResult(CropImage.getPickImageChooserIntent(activity),
-                    PICK_IMAGE_CHOOSER_REQUEST_CODE);
+            intent = CropImage.getPickImageChooserIntent(activity);
+        }
+        
+        if (fragment != null) {
+            fragment.startActivityForResult(intent, PICK_IMAGE_CHOOSER_REQUEST_CODE);
+        } else {
+            activity.startActivityForResult(intent, PICK_IMAGE_CHOOSER_REQUEST_CODE);
         }
     }
 
