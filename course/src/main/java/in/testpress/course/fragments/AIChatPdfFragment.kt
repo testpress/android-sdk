@@ -145,7 +145,10 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     private inner class AIChatWebViewClient : WebViewClient() {
         
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-            if (isAdded) showLoading()
+            if (isAdded) {
+                errorList.clear()  // Clear errors from previous page
+                showLoading()
+            }
         }
         
         override fun onPageFinished(view: WebView?, url: String?) {
