@@ -50,7 +50,7 @@ class PdfWebViewCacheInitializerTest {
 
     @Test
     fun queryShouldReturnNull() {
-        assertNull(initializer.query(null, null, null, null, null))
+        assertNull(initializer.query(android.net.Uri.EMPTY, null, null, null, null))
     }
 
     @Test
