@@ -5,6 +5,7 @@ import android.app.Application
 import android.os.Bundle
 import android.util.Log
 import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
+import `in`.testpress.course.util.PdfWebViewCache
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.util.applySystemBarColors
 import kotlinx.coroutines.CoroutineScope
@@ -16,6 +17,10 @@ class SampleApplication : Application() {
 
     override fun onCreate() {
         super.onCreate()
+        
+        // Initialize PDF WebView cache
+        PdfWebViewCache.init(this)
+        
         syncDownloads()
         registerActivityLifecycleCallbacks(activityLifecycleCallbacks)
     }

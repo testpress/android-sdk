@@ -1,18 +1,18 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.util.WebViewFragmentCache
+import `in`.testpress.course.util.PdfWebViewCache
 import `in`.testpress.core.TestpressSdk
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import androidx.fragment.app.Fragment
 
 /**
- * Fragment that displays PDF content using a cached WebViewFragment.
- * 
- * Reuses existing WebViewFragment instances for instant switching between PDFs.
+ * Fragment that displays PDF using a cached WebView.
+ * WebViews survive Activity destruction for instant return.
  */
 class AIChatPdfFragment : Fragment() {
     
@@ -20,6 +20,9 @@ class AIChatPdfFragment : Fragment() {
         private const val ARG_CONTENT_ID = "contentId"
         private const val ARG_COURSE_ID = "courseId"
     }
+    
+    private var webView: android.webkit.WebView? = null
+    private var container: FrameLayout? = null
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,39 +42,26 @@ class AIChatPdfFragment : Fragment() {
             throw IllegalArgumentException("Required arguments (contentId, courseId) are missing or invalid.")
         }
         
+        container = view.findViewById(R.id.aiPdf_view_fragment)
+        
         // Get PDF URL
         val pdfUrl = getPdfUrl(courseId, contentId)
         
-        // Get cached WebViewFragment or create new one
-        val webViewFragment = WebViewFragmentCache.getOrCreate(contentId, pdfUrl)
+        // Get cached WebView (or create new one)
+        webView = PdfWebViewCache.acquire(contentId, pdfUrl)
         
-        // Add once, then just show/hide
-        val transaction = childFragmentManager.beginTransaction()
-        
-        if (!webViewFragment.isAdded) {
-            // First time - add the fragment
-            transaction.add(R.id.aiPdf_view_fragment, webViewFragment)
-        } else if (webViewFragment.isDetached) {
-            // Was detached before - reattach it
-            transaction.attach(webViewFragment)
-        }
-        
-        transaction.commit()
+        // Attach to container
+        container?.let { PdfWebViewCache.attach(it, webView!!) }
     }
     
     override fun onDestroyView() {
         super.onDestroyView()
         
-        // Detach (not remove!) so fragment stays alive in cache
-        val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
-        val pdfUrl = getPdfUrl(requireArguments().getLong(ARG_COURSE_ID, -1L), contentId)
-        val webViewFragment = WebViewFragmentCache.getOrCreate(contentId, pdfUrl)
+        // Detach but don't destroy - stays in cache!
+        PdfWebViewCache.detach(webView)
         
-        if (webViewFragment.isAdded) {
-            childFragmentManager.beginTransaction()
-                .detach(webViewFragment)
-                .commit()
-        }
+        webView = null
+        container = null
     }
 
     private fun getPdfUrl(courseId: Long, contentId: Long): String {
