@@ -429,11 +429,31 @@ public class TestQuestionFragment extends Fragment implements PickiTCallbacks, E
             if (data != null) {
                 Uri uri = data.getData();
                 if (uri != null){
-                    requireContext().getContentResolver()
-                            .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
-                    selectedUriFromIntent = uri;
+                    try {
+                        requireContext().getContentResolver()
+                                .takePersistableUriPermission(uri, Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                        selectedUriFromIntent = uri;
+                        
+                        if (Build.VERSION.SDK_INT == Build.VERSION_CODES.Q) {
+                            FileUtilsKt.copyFileFromUriAndUpload(
+                                requireContext(),
+                                uri,
+                                filePath -> {
+                                    uploadFileAndSaveURL(filePath);
+                                    return null;
+                                },
+                                errorMessage -> {
+                                    showAlert(requireContext(), "Uploading Error", errorMessage);
+                                    return null;
+                                }
+                            );
+                        } else {
+                            pickiT.getPath(uri, Build.VERSION.SDK_INT);
+                        }
+                    } catch (SecurityException e) {
+                        showAlert(requireContext(), "Permission Error", e.getMessage());
+                    }
                 }
-                pickiT.getPath(uri, Build.VERSION.SDK_INT);
             }
         } else {
             super.onActivityResult(requestCode, resultCode, data);
