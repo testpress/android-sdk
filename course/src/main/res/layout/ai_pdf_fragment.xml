@@ -5,11 +5,31 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
+    <!-- Loading progress (same as WebViewFragment) -->
+    <ProgressBar
+        android:id="@+id/pb_loading"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
+        android:layout_centerInParent="true"
+        android:layout_above="@id/bottom_navigation_fragment"
+        android:indeterminate="true"
+        android:indeterminateTint="@color/testpress_color_primary" />
+
+    <!-- WebView container -->
     <FrameLayout
         android:id="@+id/aiPdf_view_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom_navigation_fragment"/>
+        android:layout_above="@id/bottom_navigation_fragment"
+        android:visibility="gone"/>
+
+    <!-- Error view container (same as WebViewFragment) -->
+    <FrameLayout
+        android:id="@+id/empty_view_container"
+        android:visibility="gone"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@id/bottom_navigation_fragment" />
 
     <FrameLayout
         android:id="@+id/bottom_navigation_fragment"
