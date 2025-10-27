@@ -69,18 +69,33 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         // Setup error view (same as WebViewFragment)
         initializeEmptyViewFragment()
         
-        // Show loading
-        showLoading()
-        
         // Get PDF URL
         val pdfUrl = getPdfUrl(courseId, contentId)
         
+        // Check if WebView is already cached
+        val isNewWebView = !PdfWebViewCache.isCached(contentId, pdfUrl)
+        
+        // Only show loading for NEW WebViews (not cached ones)
+        if (isNewWebView) {
+            showLoading()
+        }
+        
         // Get cached WebView (or create new one)
-        webView = PdfWebViewCache.acquire(contentId, pdfUrl).apply {
+        // Configure lambda is ONLY called when creating NEW WebView (not on cache hit!)
+        webView = PdfWebViewCache.acquire(contentId, pdfUrl) { wv ->
             // Set WebViewClient with error handling (like WebViewFragment)
-            webViewClient = AIChatWebViewClient()
+            // This is ONLY called ONCE when WebView is first created!
+            wv.webViewClient = AIChatWebViewClient()
             // Set WebChromeClient with progress (like WebViewFragment)
-            webChromeClient = AIChatWebChromeClient()
+            wv.webChromeClient = AIChatWebChromeClient()
+            
+            Log.d(TAG, "WebView configured ONCE for contentId: $contentId")
+        }
+        
+        // If cached, hide loading immediately (page already loaded)
+        if (!isNewWebView) {
+            hideLoading()
+            Log.d(TAG, "Using cached WebView - no loading needed")
         }
         
         // Attach to container
@@ -157,19 +172,23 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     
     /**
      * WebViewClient that mimics CustomWebViewClient behavior.
-     * Handles errors, page states, exactly like WebViewFragment.
+     * STANDALONE (doesn't reference fragment) for cached WebViews.
      */
     private inner class AIChatWebViewClient : WebViewClient() {
         
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-            // Show loading when page starts (like WebViewFragment)
-            showLoading()
+            // Only show loading if fragment still exists
+            if (isAdded && view != null) {
+                showLoading()
+            }
         }
         
         override fun onPageFinished(view: WebView?, url: String?) {
-            // Hide loading when page finishes (like WebViewFragment)
-            hideLoading()
-            checkWebViewHasError()
+            // Only hide loading if fragment still exists
+            if (isAdded && view != null) {
+                hideLoading()
+                checkWebViewHasError()
+            }
         }
         
         override fun onReceivedError(
@@ -177,7 +196,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
             request: WebResourceRequest?,
             error: WebResourceError?
         ) {
-            // Handle errors same as CustomWebViewClient
+            // Handle errors only if fragment still exists
+            if (!isAdded) return
+            
             val requestUrl = request?.url.toString()
             val currentWebViewUrl = webView?.url.toString()
             if (requestUrl == currentWebViewUrl) {
@@ -193,7 +214,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
             request: WebResourceRequest?,
             errorResponse: WebResourceResponse?
         ) {
-            // Track HTTP errors same as CustomWebViewClient
+            // Track HTTP errors
             errorList[request] = errorResponse
         }
         
@@ -201,6 +222,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
          * Check if WebView has HTTP errors (same logic as CustomWebViewClient).
          */
         private fun checkWebViewHasError() {
+            if (!isAdded) return
+            
             errorList.forEach { error ->
                 val requestUrl = error.key?.url.toString()
                 val currentWebViewUrl = webView?.url.toString()
@@ -216,12 +239,15 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     }
     
     /**
-     * WebChromeClient that handles progress (like CustomWebChromeClient).
+     * WebChromeClient that handles progress.
+     * STANDALONE (checks fragment exists) for cached WebViews.
      */
     private inner class AIChatWebChromeClient : WebChromeClient() {
         
         override fun onProgressChanged(view: WebView?, newProgress: Int) {
             super.onProgressChanged(view, newProgress)
+            
+            if (!isAdded) return
             
             Log.d(TAG, "Loading progress: $newProgress%")
             
@@ -232,7 +258,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         }
         
         override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
-            // Log console messages (like WebViewFragment)
+            // Log console messages
             consoleMessage?.let {
                 Log.d(TAG, "Console: ${it.message()} (${it.sourceId()}:${it.lineNumber()})")
             }

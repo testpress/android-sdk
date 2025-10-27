@@ -43,23 +43,34 @@ object PdfWebViewCache {
     }
     
     /**
+     * Check if WebView is cached for this contentId and URL.
+     */
+    fun isCached(contentId: Long, url: String): Boolean {
+        synchronized(cache) {
+            val cached = cache[contentId]
+            return cached != null && cached.url == url
+        }
+    }
+    
+    /**
      * Get or create a WebView for the given contentId and URL.
      * Uses EXACT same settings as WebViewFragment.
+     * 
+     * @param configure Called ONLY when creating a new WebView (not when reusing cached one)
      */
-    fun acquire(contentId: Long, url: String): WebView {
+    fun acquire(contentId: Long, url: String, configure: (WebView) -> Unit): WebView {
         synchronized(cache) {
             var cached = cache[contentId]
             
-            // Return cached if URL matches
+            // Return cached if URL matches (NO reconfigure, NO reload!)
             if (cached != null && cached.url == url) {
-                Log.d(TAG, "Reusing cached WebView for contentId: $contentId")
+                Log.d(TAG, "Reusing cached WebView for contentId: $contentId (NO reload)")
                 return cached.webView
             }
             
-            // If URL changed, update cache
+            // If URL changed, reload but DON'T reconfigure
             if (cached != null && cached.url != url) {
                 Log.d(TAG, "URL changed for contentId: $contentId, reloading")
-                // Load new URL with auth
                 loadUrlWithAuth(cached.webView, url)
                 cached.url = url
                 return cached.webView
@@ -96,6 +107,9 @@ object PdfWebViewCache {
                 // Enable cookies (important for authentication)
                 CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
             }
+            
+            // Configure WebViewClient/WebChromeClient ONCE (via lambda)
+            configure(webView)
             
             // Load URL with auth headers (same as WebViewFragment.generateHeadersMap())
             loadUrlWithAuth(webView, url)
