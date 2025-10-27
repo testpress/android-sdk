@@ -120,16 +120,17 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             args.putLong("contentId", contentId)
             args.putLong("courseId", content.courseId ?: -1L)
             aiChatFragment?.arguments = args
+            
+            // Add fragment only once, then show/hide container
+            childFragmentManager.beginTransaction()
+                .add(R.id.aiPdf_view_fragment, aiChatFragment!!)
+                .commit()
         }
 
         binding.pdfView.visibility = View.GONE
         binding.bottomNavigationFragment.visibility = View.GONE
         binding.askAiFab.visibility = View.GONE
         binding.aiPdfViewFragment.visibility = View.VISIBLE
-
-        childFragmentManager.beginTransaction()
-            .replace(R.id.aiPdf_view_fragment, aiChatFragment!!)
-            .commit()
 
         isAIView = true
         activity?.invalidateOptionsMenu()
@@ -141,11 +142,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         binding.askAiFab.visibility = View.VISIBLE
         binding.aiPdfViewFragment.visibility = View.GONE
 
-        aiChatFragment?.let {
-            childFragmentManager.beginTransaction()
-                .remove(it)
-                .commitNow()
-        }
+        // Don't remove fragment - just hide the container
+        // This allows the cached WebView to remain attached and ready
 
         isAIView = false
         activity?.invalidateOptionsMenu()
