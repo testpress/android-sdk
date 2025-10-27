@@ -209,6 +209,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         }
         
         override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
+            consoleMessage?.let {
+                Log.d(TAG, "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}")
+            }
             return true
         }
     }
