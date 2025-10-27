@@ -151,7 +151,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Incorrect Solution"
+                android:text="Incorrect Answer"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
@@ -159,7 +159,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="No Solution"
+                android:text="No Explanation"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
@@ -167,7 +167,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:text="Incomplete Solution"
+                android:text="Incomplete Explanation"
                 android:theme="@style/ReportQuestionRadioButton" />
 
             <RadioButton
