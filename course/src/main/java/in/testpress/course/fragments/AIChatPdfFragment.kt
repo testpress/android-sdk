@@ -43,7 +43,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
     
-    private val errorList = linkedMapOf<WebResourceRequest?, WebResourceResponse?>()
+    private val errorList = linkedMapOf<String, WebResourceResponse?>()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -94,6 +94,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     override fun onDestroyView() {
         super.onDestroyView()
         PdfWebViewCache.detach(webView)
+        errorList.clear()
         webView = null
         container = null
         progressBar = null
@@ -175,21 +176,21 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
             request: WebResourceRequest?,
             errorResponse: WebResourceResponse?
         ) {
-            errorList[request] = errorResponse
+            request?.url?.toString()?.let { url ->
+                errorList[url] = errorResponse
+            }
         }
         
         private fun checkWebViewHasError() {
             if (!isAdded) return
             
-            errorList.forEach { (request, response) ->
-                val requestUrl = request?.url.toString()
-                val currentWebViewUrl = webView?.url.toString()
-                if (requestUrl == currentWebViewUrl) {
-                    val statusCode = response?.statusCode ?: -1
-                    val reasonPhrase = response?.reasonPhrase ?: "Unknown Error"
-                    showErrorView(TestpressException.httpError(statusCode, reasonPhrase))
-                    errorList.clear()
-                }
+            val currentWebViewUrl = webView?.url?.toString() ?: return
+            
+            errorList[currentWebViewUrl]?.let { response ->
+                val statusCode = response.statusCode
+                val reasonPhrase = response.reasonPhrase ?: "Unknown Error"
+                showErrorView(TestpressException.httpError(statusCode, reasonPhrase))
+                errorList.clear()
             }
         }
     }
