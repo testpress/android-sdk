@@ -1,6 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
+import `in`.testpress.course.util.LearnLensAssetManager
 import `in`.testpress.course.util.PdfWebViewCache
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
@@ -22,6 +23,7 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
+import java.io.File
 
 /**
  * Displays PDF content in AI chat view using cached WebView instances.
@@ -35,6 +37,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         private const val TAG = "AIChatPdfFragment"
         private const val ARG_CONTENT_ID = "contentId"
         private const val ARG_COURSE_ID = "courseId"
+        private const val ARG_PDF_URL = "pdfUrl"
+        private const val ARG_PDF_TITLE = "pdfTitle"
     }
     
     private var webView: WebView? = null
@@ -58,9 +62,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
+        val pdfUrl = requireArguments().getString(ARG_PDF_URL)
+        val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
         
-        if (contentId == -1L || courseId == -1L) {
-            throw IllegalArgumentException("Required arguments (contentId, courseId) are missing or invalid.")
+        require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
+            "Required arguments are missing or invalid"
         }
         
         container = view.findViewById(R.id.aiPdf_view_fragment)
@@ -68,18 +74,17 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         emptyViewContainer = view.findViewById(R.id.empty_view_container)
         
         initializeEmptyViewFragment()
+        LearnLensAssetManager.downloadAssetsInBackground(requireContext())
         
-        val pdfUrl = getPdfUrl(courseId, contentId)
-        
-        val isNewWebView = !PdfWebViewCache.isCached(contentId, pdfUrl)
+        val cacheKey = "learnlens_$contentId"
+        val isNewWebView = !PdfWebViewCache.isCached(contentId, cacheKey)
         
         if (isNewWebView) {
             showLoading()
         }
         
-        webView = PdfWebViewCache.acquire(contentId, pdfUrl) { wv ->
-            wv.webViewClient = AIChatWebViewClient()
-            wv.webChromeClient = AIChatWebChromeClient()
+        webView = PdfWebViewCache.acquire(contentId, cacheKey, loadUrl = false) { wv ->
+            configureWebView(wv, pdfUrl, pdfTitle, contentId.toString())
         }
         
         if (!isNewWebView) {
@@ -89,6 +94,29 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         container?.let { cont -> 
             webView?.let { wv -> PdfWebViewCache.attach(cont, wv) }
         }
+    }
+    
+    private fun configureWebView(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+        enableFileAccess(wv)
+        wv.webViewClient = AIChatWebViewClient()
+        wv.webChromeClient = AIChatWebChromeClient()
+        loadLearnLensHtml(wv, pdfUrl, pdfTitle, pdfId)
+    }
+    
+    private fun enableFileAccess(wv: WebView) {
+        wv.settings.allowFileAccess = true
+        wv.settings.allowFileAccessFromFileURLs = true
+        wv.settings.allowUniversalAccessFromFileURLs = true
+        WebView.setWebContentsDebuggingEnabled(true)
+    }
+    
+    private fun loadLearnLensHtml(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+        val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
+        val html = LearnLensAssetManager.generateLearnLensHtml(
+            requireContext(), pdfUrl, pdfTitle, pdfId, authToken
+        )
+        val cacheDir = File(requireContext().filesDir, "learnlens_cache")
+        wv.loadDataWithBaseURL("file://${cacheDir.absolutePath}/", html, "text/html", "UTF-8", null)
     }
     
     override fun onDestroyView() {
@@ -134,19 +162,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         webView?.reload()
     }
 
-    private fun getPdfUrl(courseId: Long, contentId: Long): String {
-        val session = TestpressSdk.getTestpressSession(requireContext()) 
-            ?: throw IllegalStateException("User session not found.")
-        val baseUrl = session.instituteSettings?.domainUrl.takeIf { !it.isNullOrEmpty() }
-            ?: throw IllegalStateException("Base URL not configured.")
-        return "$baseUrl/courses/$courseId/contents/$contentId/?content_detail_v2=true"
-    }
-
     private inner class AIChatWebViewClient : WebViewClient() {
         
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
             if (isAdded) {
-                errorList.clear()  // Clear errors from previous page
+                errorList.clear()
                 showLoading()
             }
         }

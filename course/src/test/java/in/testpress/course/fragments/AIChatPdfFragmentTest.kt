@@ -34,6 +34,8 @@ class AIChatPdfFragmentTest {
         fragment.arguments = Bundle().apply {
             putLong("courseId", 123L)
             putLong("contentId", 456L)
+            putString("pdfUrl", "https://example.com/test.pdf")
+            putString("pdfTitle", "Test PDF")
         }
         
         assertNotNull(fragment)

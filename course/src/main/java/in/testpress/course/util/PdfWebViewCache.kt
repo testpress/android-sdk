@@ -84,12 +84,13 @@ object PdfWebViewCache {
      * Creates new instance if not cached (one-time setup cost).
      * 
      * @param contentId Unique identifier for the PDF content
-     * @param url PDF URL to load
+     * @param url PDF URL to load (or cache key if loadUrl = false)
+     * @param loadUrl Whether to call loadUrl() - set false if configure lambda loads HTML data
      * @param configure Configuration lambda called ONLY when creating new WebView
      * @return WebView instance ready for attachment
      * @throws IllegalStateException if cache not initialized (should never happen in production)
      */
-    fun acquire(contentId: Long, url: String, configure: (WebView) -> Unit): WebView {
+    fun acquire(contentId: Long, url: String, loadUrl: Boolean = true, configure: (WebView) -> Unit): WebView {
         if (!::appContext.isInitialized) {
             throw IllegalStateException(
                 "PdfWebViewCache not initialized. ContentProvider should have auto-initialized it. " +
@@ -100,28 +101,25 @@ object PdfWebViewCache {
         synchronized(cache) {
             val cached = cache[contentId]
             
-            // Cache hit with matching URL - return immediately
             if (cached != null && cached.url == url) {
                 return cached.webView
             }
             
-            // Cache hit but URL changed - reload with new URL
             if (cached != null && cached.url != url) {
-                loadUrlWithAuth(cached.webView, url)
+                if (loadUrl) {
+                    loadUrlWithAuth(cached.webView, url)
+                }
                 cached.url = url
                 return cached.webView
             }
             
-            // Cache miss - create new WebView
             val webView = createWebView()
-            
-            // Configure WebView clients (called only once)
             configure(webView)
             
-            // Load URL with authentication
-            loadUrlWithAuth(webView, url)
+            if (loadUrl) {
+                loadUrlWithAuth(webView, url)
+            }
             
-            // Add to cache
             cache[contentId] = CachedWebView(webView, url)
             return webView
         }
@@ -177,18 +175,11 @@ object PdfWebViewCache {
      */
     fun attach(container: ViewGroup, webView: WebView) {
         try {
-            // Remove from previous parent
             (webView.parent as? ViewGroup)?.removeView(webView)
-            
-            // Remove only WebView children (not all views - might have overlays)
             container.children.filterIsInstance<WebView>().forEach {
                 container.removeView(it)
             }
-            
-            // Add to new container
             container.addView(webView)
-            
-            // Resume WebView (important for CPU/battery)
             webView.onResume()
         } catch (e: Exception) {
             Log.e(TAG, "Failed to attach WebView (non-fatal)", e)
@@ -204,10 +195,7 @@ object PdfWebViewCache {
     fun detach(webView: WebView?) {
         try {
             webView?.let {
-                // Pause WebView to save CPU/battery (important!)
                 it.onPause()
-                
-                // Remove from parent
                 (it.parent as? ViewGroup)?.removeView(it)
             }
         } catch (e: Exception) {

@@ -248,6 +248,24 @@ class PdfWebViewCacheTest {
         assertSame(webView1, webView2)
     }
 
+    @Test
+    fun acquireWithLoadUrlFalseShouldNotLoadUrl() {
+        val webView = PdfWebViewCache.acquire(1L, "cache_key", loadUrl = false) { wv ->
+            wv.tag = "configured"
+        }
+        
+        assertNotNull(webView)
+        assertEquals("configured", webView.tag)
+    }
+
+    @Test
+    fun acquireDefaultsToLoadUrlTrue() {
+        val webView1 = PdfWebViewCache.acquire(1L, "https://example.com/pdf1.pdf") { }
+        val webView2 = PdfWebViewCache.acquire(1L, "https://example.com/pdf1.pdf", loadUrl = true) { }
+        
+        assertSame(webView1, webView2)
+    }
+
     private fun assertDoesNotThrow(block: () -> Unit) {
         try {
             block()
