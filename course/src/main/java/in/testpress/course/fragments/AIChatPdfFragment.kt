@@ -9,7 +9,6 @@ import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import android.graphics.Bitmap
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -18,23 +17,15 @@ import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
-import android.webkit.WebChromeClient
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import java.io.File
 
-/**
- * Displays PDF content in AI chat view using cached WebView instances.
- * 
- * Leverages PdfWebViewCache for instant switching between PDFs without reloading.
- * Includes loading states, error handling, and retry functionality.
- */
 class AIChatPdfFragment : Fragment(), EmptyViewListener {
     
     companion object {
-        private const val TAG = "AIChatPdfFragment"
         private const val ARG_CONTENT_ID = "contentId"
         private const val ARG_COURSE_ID = "courseId"
         private const val ARG_PDF_URL = "pdfUrl"
@@ -46,7 +37,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     private var progressBar: ProgressBar? = null
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
-    
     private val errorList = linkedMapOf<String, WebResourceResponse?>()
     
     override fun onCreateView(
@@ -99,7 +89,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     private fun configureWebView(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
         enableFileAccess(wv)
         wv.webViewClient = AIChatWebViewClient()
-        wv.webChromeClient = AIChatWebChromeClient()
         loadLearnLensHtml(wv, pdfUrl, pdfTitle, pdfId)
     }
     
@@ -161,7 +150,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         showLoading()
         webView?.reload()
     }
-
+    
     private inner class AIChatWebViewClient : WebViewClient() {
         
         override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
@@ -174,19 +163,15 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         override fun onPageFinished(view: WebView?, url: String?) {
             if (isAdded) {
                 hideLoading()
-                checkWebViewHasError()
+                checkWebViewHasError(view)
             }
         }
         
-        override fun onReceivedError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            error: WebResourceError?
-        ) {
+        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
             if (!isAdded) return
             
             val requestUrl = request?.url.toString()
-            val currentWebViewUrl = webView?.url.toString()
+            val currentWebViewUrl = view?.url.toString()
             if (requestUrl == currentWebViewUrl) {
                 showErrorView(TestpressException.unexpectedWebViewError(
                     Exception("WebView error ${error?.errorCode}")
@@ -194,21 +179,16 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
             }
         }
         
-        override fun onReceivedHttpError(
-            view: WebView?,
-            request: WebResourceRequest?,
-            errorResponse: WebResourceResponse?
-        ) {
+        override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
             request?.url?.toString()?.let { url ->
                 errorList[url] = errorResponse
             }
         }
         
-        private fun checkWebViewHasError() {
+        private fun checkWebViewHasError(view: WebView?) {
             if (!isAdded) return
             
-            val currentWebViewUrl = webView?.url?.toString() ?: return
-            
+            val currentWebViewUrl = view?.url?.toString() ?: return
             errorList[currentWebViewUrl]?.let { response ->
                 val statusCode = response.statusCode
                 val reasonPhrase = response.reasonPhrase ?: "Unknown Error"
@@ -218,21 +198,4 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         }
     }
     
-
-    private inner class AIChatWebChromeClient : WebChromeClient() {
-        
-        override fun onProgressChanged(view: WebView?, newProgress: Int) {
-            super.onProgressChanged(view, newProgress)
-            if (isAdded && newProgress == 100) {
-                hideLoading()
-            }
-        }
-        
-        override fun onConsoleMessage(consoleMessage: android.webkit.ConsoleMessage?): Boolean {
-            consoleMessage?.let {
-                Log.d(TAG, "${it.message()} -- From line ${it.lineNumber()} of ${it.sourceId()}")
-            }
-            return true
-        }
-    }
 }
