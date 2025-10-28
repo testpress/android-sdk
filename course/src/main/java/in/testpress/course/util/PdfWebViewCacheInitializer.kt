@@ -15,8 +15,9 @@ class PdfWebViewCacheInitializer : ContentProvider() {
     
     override fun onCreate(): Boolean {
         return try {
-            context?.let { 
-                PdfWebViewCache.init(it.applicationContext)
+            context?.let { ctx ->
+                PdfWebViewCache.init(ctx.applicationContext)
+                LocalWebFileCache.clearAll(ctx.applicationContext)
             }
             true
         } catch (e: Exception) {

@@ -1,8 +1,8 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.course.R
-import `in`.testpress.course.util.LearnLensAssetManager
 import `in`.testpress.course.util.PdfWebViewCache
+import `in`.testpress.course.util.LocalWebFileCache
+import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.fragments.EmptyViewFragment
@@ -30,6 +30,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         private const val ARG_COURSE_ID = "courseId"
         private const val ARG_PDF_URL = "pdfUrl"
         private const val ARG_PDF_TITLE = "pdfTitle"
+        
+        private const val LEARNLENS_JS_URL = "https://static.testpress.in/static-staging/learnlens/learnlens-pdfchat.iife.js"
+        private const val LEARNLENS_CSS_URL = "https://static.testpress.in/static-staging/learnlens/learnlens-frontend.css"
+        private const val LEARNLENS_JS_FILE = "learnlens.js"
+        private const val LEARNLENS_CSS_FILE = "learnlens.css"
     }
     
     private var webView: WebView? = null
@@ -64,7 +69,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         emptyViewContainer = view.findViewById(R.id.empty_view_container)
         
         initializeEmptyViewFragment()
-        LearnLensAssetManager.downloadAssetsInBackground(requireContext())
+        downloadLearnLensAssets()
         
         val cacheKey = "learnlens_$contentId"
         val isNewWebView = !PdfWebViewCache.isCached(contentId, cacheKey)
@@ -99,12 +104,30 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         WebView.setWebContentsDebuggingEnabled(true)
     }
     
+    private fun downloadLearnLensAssets() {
+        val assets = listOf(
+            LEARNLENS_JS_URL to LEARNLENS_JS_FILE,
+            LEARNLENS_CSS_URL to LEARNLENS_CSS_FILE
+        )
+        LocalWebFileCache.downloadMultipleInBackground(requireContext(), assets)
+    }
+    
     private fun loadLearnLensHtml(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
-        val html = LearnLensAssetManager.generateLearnLensHtml(
-            requireContext(), pdfUrl, pdfTitle, pdfId, authToken
-        )
-        val cacheDir = File(requireContext().filesDir, "learnlens_cache")
+        
+        val jsPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_JS_FILE, LEARNLENS_JS_URL)
+        val cssPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_CSS_FILE, LEARNLENS_CSS_URL)
+        
+        val html = LocalWebFileCache.loadTemplate(requireContext(), "learnlens.html", mapOf(
+            "JS_URL" to jsPath,
+            "CSS_URL" to cssPath,
+            "PDF_URL" to pdfUrl,
+            "PDF_ID" to pdfId,
+            "AUTH_TOKEN" to authToken,
+            "PDF_TITLE" to pdfTitle
+        ))
+        
+        val cacheDir = File(requireContext().filesDir, "web_assets")
         wv.loadDataWithBaseURL("file://${cacheDir.absolutePath}/", html, "text/html", "UTF-8", null)
     }
     
