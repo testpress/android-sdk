@@ -196,13 +196,22 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/rounded_border_edittext"
             android:gravity="top"
-            android:hint="Describe your concern (optional)"
+            android:hint="Describe your concern (minimum 100 characters required)"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:lines="4"
             android:padding="16dp"
             android:textColor="@color/testpress_black"
             android:textSize="16sp" />
+
+        <TextView
+            android:id="@+id/description_error"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="8dp"
+            android:text="Please enter at least 100 characters to describe your concern."
+            android:textColor="#d9534f"
+            android:visibility="gone" />
 
         <androidx.appcompat.widget.AppCompatButton
             android:id="@+id/submit_button"
