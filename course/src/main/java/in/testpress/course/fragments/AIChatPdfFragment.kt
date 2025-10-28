@@ -115,7 +115,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val jsPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_JS_FILE, LEARNLENS_JS_URL)
         val cssPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_CSS_FILE, LEARNLENS_CSS_URL)
         
-        val html = LocalWebFileCache.loadTemplate(requireContext(), "learnlens.html", mapOf(
+        val html = LocalWebFileCache.loadTemplate(requireContext(), "learnlens_template.html", mapOf(
             "JS_URL" to jsPath,
             "CSS_URL" to cssPath,
             "PDF_URL" to pdfUrl,
