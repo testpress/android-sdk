@@ -80,15 +80,36 @@ class ReportQuestionFragment : Fragment() {
         binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
             onChange(checkedId)
         }
+        binding.discriptionInput.setOnFocusChangeListener { view, hasFocus ->
+            if (hasFocus) {
+                binding.descriptionError.isVisible = false
+            }
+        }
     }
 
     private fun submit() {
+        var hasError = false
+        
         if (position == -1) {
             binding.radioButtonError.isVisible = true
+            hasError = true
+        } else {
+            binding.radioButtonError.isVisible = false
+        }
+        
+        val description = binding.discriptionInput.text.toString().trim()
+        if (description.length < 100) {
+            binding.descriptionError.isVisible = true
+            hasError = true
+        } else {
+            binding.descriptionError.isVisible = false
+        }
+        
+        if (hasError) {
             return
         }
         viewModel.submitReportQuestion(
-            binding.discriptionInput.text.toString(),
+            description,
             examId,
             ++position
         )
@@ -103,6 +124,7 @@ class ReportQuestionFragment : Fragment() {
 
     private fun onChange(checkedId: Int) {
         position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
+        binding.radioButtonError.isVisible = false
     }
 
     private fun initializeViewModelObserves() {
