@@ -9,7 +9,7 @@ import androidx.core.view.children
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.util.UserAgentProvider
 
-object PdfWebViewCache {
+object WebViewCache {
     private const val MAX_SIZE = 3
     
     private lateinit var appContext: Context
@@ -51,7 +51,7 @@ object PdfWebViewCache {
     fun acquire(contentId: Long, url: String, loadUrl: Boolean = true, configure: (WebView) -> Unit): WebView {
         if (!::appContext.isInitialized) {
             throw IllegalStateException(
-                "PdfWebViewCache not initialized. ContentProvider should have auto-initialized it. " +
+                "WebViewCache not initialized. ContentProvider should have auto-initialized it. " +
                 "This is a configuration error - check AndroidManifest merging."
             )
         }

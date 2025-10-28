@@ -132,8 +132,8 @@
         </receiver>
 
         <provider
-            android:name=".util.PdfWebViewCacheInitializer"
-            android:authorities="${applicationId}.pdfwebviewcache"
+            android:name=".util.WebViewCacheInitializer"
+            android:authorities="${applicationId}.webviewcache"
             android:exported="false" />
 
     </application>

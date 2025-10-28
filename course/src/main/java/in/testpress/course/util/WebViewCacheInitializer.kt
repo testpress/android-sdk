@@ -7,21 +7,21 @@ import android.net.Uri
 import android.util.Log
 
 
-class PdfWebViewCacheInitializer : ContentProvider() {
+class WebViewCacheInitializer : ContentProvider() {
     
     companion object {
-        private const val TAG = "PdfCacheInit"
+        private const val TAG = "WebViewCacheInit"
     }
     
     override fun onCreate(): Boolean {
         return try {
             context?.let { ctx ->
-                PdfWebViewCache.init(ctx.applicationContext)
+                WebViewCache.init(ctx.applicationContext)
                 LocalWebFileCache.clearAll(ctx.applicationContext)
             }
             true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize PdfWebViewCache (non-fatal)", e)
+            Log.e(TAG, "Failed to initialize WebViewCache (non-fatal)", e)
             true
         }
     }

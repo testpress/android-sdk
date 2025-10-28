@@ -1,6 +1,6 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.course.util.PdfWebViewCache
+import `in`.testpress.course.util.WebViewCache
 import `in`.testpress.course.util.LocalWebFileCache
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
@@ -72,13 +72,13 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         downloadLearnLensAssets()
         
         val cacheKey = "learnlens_$contentId"
-        val isNewWebView = !PdfWebViewCache.isCached(contentId, cacheKey)
+        val isNewWebView = !WebViewCache.isCached(contentId, cacheKey)
         
         if (isNewWebView) {
             showLoading()
         }
         
-        webView = PdfWebViewCache.acquire(contentId, cacheKey, loadUrl = false) { wv ->
+        webView = WebViewCache.acquire(contentId, cacheKey, loadUrl = false) { wv ->
             configureWebView(wv, pdfUrl, pdfTitle, contentId.toString())
         }
         
@@ -87,7 +87,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         }
         
         container?.let { cont -> 
-            webView?.let { wv -> PdfWebViewCache.attach(cont, wv) }
+            webView?.let { wv -> WebViewCache.attach(cont, wv) }
         }
     }
     
@@ -133,7 +133,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     
     override fun onDestroyView() {
         super.onDestroyView()
-        PdfWebViewCache.detach(webView)
+        WebViewCache.detach(webView)
         errorList.clear()
         webView = null
         container = null
