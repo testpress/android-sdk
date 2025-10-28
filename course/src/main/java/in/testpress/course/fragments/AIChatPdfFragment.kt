@@ -163,16 +163,16 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         override fun onPageFinished(view: WebView?, url: String?) {
             if (isAdded) {
                 hideLoading()
-                checkWebViewHasError(view)
+                if (errorList.isNotEmpty()) {
+                    checkWebViewHasError(view)
+                }
             }
         }
         
         override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
             if (!isAdded) return
             
-            val requestUrl = request?.url.toString()
-            val currentWebViewUrl = view?.url.toString()
-            if (requestUrl == currentWebViewUrl) {
+            if (request?.isForMainFrame == true) {
                 showErrorView(TestpressException.unexpectedWebViewError(
                     Exception("WebView error ${error?.errorCode}")
                 ))
@@ -188,12 +188,12 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         private fun checkWebViewHasError(view: WebView?) {
             if (!isAdded) return
             
-            val currentWebViewUrl = view?.url?.toString() ?: return
-            errorList[currentWebViewUrl]?.let { response ->
+            val currentUrl = view?.url ?: return
+            errorList[currentUrl]?.let { response ->
                 val statusCode = response.statusCode
                 val reasonPhrase = response.reasonPhrase ?: "Unknown Error"
                 showErrorView(TestpressException.httpError(statusCode, reasonPhrase))
-                errorList.clear()
+                errorList.remove(currentUrl)
             }
         }
     }
