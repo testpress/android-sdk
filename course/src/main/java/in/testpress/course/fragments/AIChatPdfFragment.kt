@@ -1,29 +1,27 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.course.util.WebViewCache
+import `in`.testpress.course.util.CacheWebView
 import `in`.testpress.course.util.LocalWebFileCache
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
-import android.graphics.Bitmap
+import `in`.testpress.util.webview.WebViewEventListener
+import `in`.testpress.util.webview.WebViewClient
+import `in`.testpress.util.webview.CustomWebView
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebResourceError
-import android.webkit.WebResourceRequest
-import android.webkit.WebResourceResponse
-import android.webkit.WebView
-import android.webkit.WebViewClient
+import android.webkit.WebView as AndroidWebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import java.io.File
 
-class AIChatPdfFragment : Fragment(), EmptyViewListener {
+class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     companion object {
         private const val ARG_CONTENT_ID = "contentId"
@@ -37,12 +35,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         private const val LEARNLENS_CSS_FILE = "learnlens.css"
     }
     
-    private var webView: WebView? = null
+    private var webView: AndroidWebView? = null
     private var container: FrameLayout? = null
     private var progressBar: ProgressBar? = null
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
-    private val errorList = linkedMapOf<String, WebResourceResponse?>()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -72,13 +69,18 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         downloadLearnLensAssets()
         
         val cacheKey = "learnlens_$contentId"
-        val isNewWebView = !WebViewCache.isCached(contentId, cacheKey)
+        val isNewWebView = !CacheWebView.isCached(contentId, cacheKey)
         
         if (isNewWebView) {
             showLoading()
         }
         
-        webView = WebViewCache.acquire(contentId, cacheKey, loadUrl = false) { wv ->
+        webView = CacheWebView.acquire(
+            contentId = contentId,
+            url = cacheKey,
+            loadUrl = false,
+            createWebView = { CustomWebView(requireContext()) }
+        ) { wv ->
             configureWebView(wv, pdfUrl, pdfTitle, contentId.toString())
         }
         
@@ -87,21 +89,16 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         }
         
         container?.let { cont -> 
-            webView?.let { wv -> WebViewCache.attach(cont, wv) }
+            webView?.let { wv -> CacheWebView.attach(cont, wv) }
         }
     }
     
-    private fun configureWebView(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
-        enableFileAccess(wv)
-        wv.webViewClient = AIChatWebViewClient()
+    private fun configureWebView(wv: AndroidWebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+        if (wv is CustomWebView) {
+            wv.enableFileAccess()
+        }
+        wv.webViewClient = WebViewClient(this)
         loadLearnLensHtml(wv, pdfUrl, pdfTitle, pdfId)
-    }
-    
-    private fun enableFileAccess(wv: WebView) {
-        wv.settings.allowFileAccess = true
-        wv.settings.allowFileAccessFromFileURLs = true
-        wv.settings.allowUniversalAccessFromFileURLs = true
-        WebView.setWebContentsDebuggingEnabled(true)
     }
     
     private fun downloadLearnLensAssets() {
@@ -112,7 +109,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         LocalWebFileCache.downloadMultipleInBackground(requireContext(), assets)
     }
     
-    private fun loadLearnLensHtml(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+    private fun loadLearnLensHtml(wv: AndroidWebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         
         val jsPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_JS_FILE, LEARNLENS_JS_URL)
@@ -133,8 +130,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
     
     override fun onDestroyView() {
         super.onDestroyView()
-        WebViewCache.detach(webView)
-        errorList.clear()
+        CacheWebView.detach(webView)
         webView = null
         container = null
         progressBar = null
@@ -174,51 +170,20 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener {
         webView?.reload()
     }
     
-    private inner class AIChatWebViewClient : WebViewClient() {
-        
-        override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
-            if (isAdded) {
-                errorList.clear()
-                showLoading()
-            }
-        }
-        
-        override fun onPageFinished(view: WebView?, url: String?) {
-            if (isAdded) {
-                hideLoading()
-                if (errorList.isNotEmpty()) {
-                    checkWebViewHasError(view)
-                }
-            }
-        }
-        
-        override fun onReceivedError(view: WebView?, request: WebResourceRequest?, error: WebResourceError?) {
-            if (!isAdded) return
-            
-            if (request?.isForMainFrame == true) {
-                showErrorView(TestpressException.unexpectedWebViewError(
-                    Exception("WebView error ${error?.errorCode}")
-                ))
-            }
-        }
-        
-        override fun onReceivedHttpError(view: WebView?, request: WebResourceRequest?, errorResponse: WebResourceResponse?) {
-            request?.url?.toString()?.let { url ->
-                errorList[url] = errorResponse
-            }
-        }
-        
-        private fun checkWebViewHasError(view: WebView?) {
-            if (!isAdded) return
-            
-            val currentUrl = view?.url ?: return
-            errorList[currentUrl]?.let { response ->
-                val statusCode = response.statusCode
-                val reasonPhrase = response.reasonPhrase ?: "Unknown Error"
-                showErrorView(TestpressException.httpError(statusCode, reasonPhrase))
-                errorList.remove(currentUrl)
-            }
-        }
+    override fun onLoadingStarted() {
+        showLoading()
+    }
+    
+    override fun onLoadingFinished() {
+        hideLoading()
+    }
+    
+    override fun onError(exception: TestpressException) {
+        showErrorView(exception)
+    }
+    
+    override fun isViewActive(): Boolean {
+        return isAdded
     }
     
 }

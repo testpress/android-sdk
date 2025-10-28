@@ -9,7 +9,7 @@ import androidx.core.view.children
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.util.UserAgentProvider
 
-object WebViewCache {
+object CacheWebView {
     private const val MAX_SIZE = 3
     
     private lateinit var appContext: Context
@@ -48,10 +48,16 @@ object WebViewCache {
         }
     }
     
-    fun acquire(contentId: Long, url: String, loadUrl: Boolean = true, configure: (WebView) -> Unit): WebView {
+    fun acquire(
+        contentId: Long, 
+        url: String, 
+        loadUrl: Boolean = true,
+        createWebView: () -> WebView,
+        configure: (WebView) -> Unit
+    ): WebView {
         if (!::appContext.isInitialized) {
             throw IllegalStateException(
-                "WebViewCache not initialized. ContentProvider should have auto-initialized it. " +
+                "CacheWebView not initialized. ContentProvider should have auto-initialized it. " +
                 "This is a configuration error - check AndroidManifest merging."
             )
         }
@@ -80,32 +86,6 @@ object WebViewCache {
             
             cache[contentId] = CachedWebView(webView, url)
             return webView
-        }
-    }
-    
-    private fun createWebView(): WebView {
-        return WebView(appContext).apply {
-            layoutParams = ViewGroup.LayoutParams(
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.MATCH_PARENT
-            )
-            
-            settings.apply {
-                javaScriptEnabled = true
-                allowFileAccess = true
-                useWideViewPort = false
-                loadWithOverviewMode = true
-                domStorageEnabled = true
-                builtInZoomControls = false
-                cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-                setSupportZoom(false)
-                userAgentString += " TestpressAndroidApp/WebView"
-            }
-            
-            clearCache(true)
-            clearHistory()
-            
-            CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
         }
     }
     
