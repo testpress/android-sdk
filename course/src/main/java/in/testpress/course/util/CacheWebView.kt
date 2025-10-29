@@ -4,10 +4,11 @@ import android.content.Context
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.WebView as AndroidWebView
 import androidx.core.view.children
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.util.UserAgentProvider
+import `in`.testpress.util.webview.WebView
 
 object CacheWebView {
     private const val MAX_SIZE = 3

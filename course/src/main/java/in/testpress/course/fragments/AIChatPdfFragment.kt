@@ -9,12 +9,11 @@ import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.util.webview.WebViewEventListener
 import `in`.testpress.util.webview.BaseWebViewClient
-import `in`.testpress.util.webview.CustomWebView
+import `in`.testpress.util.webview.WebView
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.webkit.WebView as AndroidWebView
 import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
@@ -35,7 +34,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         private const val LEARNLENS_CSS_FILE = "learnlens.css"
     }
     
-    private var webView: AndroidWebView? = null
+    private var webView: WebView? = null
     private var container: FrameLayout? = null
     private var progressBar: ProgressBar? = null
     private var emptyViewContainer: FrameLayout? = null
@@ -79,7 +78,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             contentId = contentId,
             url = cacheKey,
             loadUrl = false,
-            createWebView = { CustomWebView(requireContext()) }
+            createWebView = { WebView(requireContext()) }
         ) { wv ->
             configureWebView(wv, pdfUrl, pdfTitle, contentId.toString())
         }
@@ -93,10 +92,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
     }
     
-    private fun configureWebView(wv: AndroidWebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
-        if (wv is CustomWebView) {
-            wv.enableFileAccess()
-        }
+    private fun configureWebView(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+        wv.enableFileAccess()
         wv.webViewClient = BaseWebViewClient(this)
         loadLearnLensHtml(wv, pdfUrl, pdfTitle, pdfId)
     }
@@ -109,7 +106,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         LocalWebFileCache.downloadMultipleInBackground(requireContext(), assets)
     }
     
-    private fun loadLearnLensHtml(wv: AndroidWebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+    private fun loadLearnLensHtml(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         
         val jsPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_JS_FILE, LEARNLENS_JS_URL)

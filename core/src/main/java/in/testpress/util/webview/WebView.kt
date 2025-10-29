@@ -4,13 +4,13 @@ import android.content.Context
 import android.util.AttributeSet
 import android.webkit.CookieManager
 import android.webkit.WebSettings
-import android.webkit.WebView
+import android.webkit.WebView as AndroidWebView
 
-open class CustomWebView @JvmOverloads constructor(
+open class WebView @JvmOverloads constructor(
     context: Context,
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
-) : WebView(context, attrs, defStyleAttr) {
+) : AndroidWebView(context, attrs, defStyleAttr) {
     
     init {
         configureDefaultSettings()
