@@ -8,7 +8,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.util.webview.WebViewEventListener
-import `in`.testpress.util.webview.WebViewClient
+import `in`.testpress.util.webview.BaseWebViewClient
 import `in`.testpress.util.webview.CustomWebView
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -97,7 +97,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         if (wv is CustomWebView) {
             wv.enableFileAccess()
         }
-        wv.webViewClient = WebViewClient(this)
+        wv.webViewClient = BaseWebViewClient(this)
         loadLearnLensHtml(wv, pdfUrl, pdfTitle, pdfId)
     }
     

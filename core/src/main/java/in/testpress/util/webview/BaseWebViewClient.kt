@@ -5,12 +5,12 @@ import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
 import android.webkit.WebView
-import android.webkit.WebViewClient as AndroidWebViewClient
+import android.webkit.WebViewClient
 import `in`.testpress.core.TestpressException
 
-class WebViewClient(
+class BaseWebViewClient(
     private val listener: WebViewEventListener
-) : AndroidWebViewClient() {
+) : WebViewClient() {
     
     private val errorList = linkedMapOf<String, WebResourceResponse?>()
     
