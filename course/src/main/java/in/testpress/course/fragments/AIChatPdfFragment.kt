@@ -1,7 +1,6 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.util.CacheWebView
-import `in`.testpress.course.util.LocalWebFileCache
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
@@ -23,15 +22,12 @@ import java.io.File
 class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     companion object {
-        private const val ARG_CONTENT_ID = "contentId"
-        private const val ARG_COURSE_ID = "courseId"
-        private const val ARG_PDF_URL = "pdfUrl"
-        private const val ARG_PDF_TITLE = "pdfTitle"
-        
-        private const val LEARNLENS_JS_URL = "https://static.testpress.in/static-staging/learnlens/learnlens-pdfchat.iife.js"
-        private const val LEARNLENS_CSS_URL = "https://static.testpress.in/static-staging/learnlens/learnlens-frontend.css"
-        private const val LEARNLENS_JS_FILE = "learnlens.js"
-        private const val LEARNLENS_CSS_FILE = "learnlens.css"
+        const val ARG_CONTENT_ID = "contentId"
+        const val ARG_COURSE_ID = "courseId"
+        const val ARG_PDF_URL = "pdfUrl"
+        const val ARG_PDF_TITLE = "pdfTitle"
+        const val ARG_TEMPLATE_NAME = "templateName"
+        const val DEFAULT_TEMPLATE = "learnlens_template.html"
     }
     
     private var webView: WebView? = null
@@ -55,6 +51,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
         val pdfUrl = requireArguments().getString(ARG_PDF_URL)
         val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
+        val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
         
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
@@ -65,9 +62,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         emptyViewContainer = view.findViewById(R.id.empty_view_container)
         
         initializeEmptyViewFragment()
-        downloadLearnLensAssets()
         
-        val cacheKey = "learnlens_$contentId"
+        val cacheKey = "pdf_template_$contentId"
         val isNewWebView = !CacheWebView.isCached(contentId, cacheKey)
         
         if (isNewWebView) {
@@ -80,7 +76,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             loadUrl = false,
             createWebView = { WebView(requireContext()) }
         ) { wv ->
-            configureWebView(wv, pdfUrl, pdfTitle, contentId.toString())
+            configureWebView(wv, pdfUrl, pdfTitle, contentId.toString(), templateName)
         }
         
         if (!isNewWebView) {
@@ -92,37 +88,23 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
     }
     
-    private fun configureWebView(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+    private fun configureWebView(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String, templateName: String) {
         wv.enableFileAccess()
         wv.webViewClient = BaseWebViewClient(this)
-        loadLearnLensHtml(wv, pdfUrl, pdfTitle, pdfId)
-    }
-    
-    private fun downloadLearnLensAssets() {
-        val assets = listOf(
-            LEARNLENS_JS_URL to LEARNLENS_JS_FILE,
-            LEARNLENS_CSS_URL to LEARNLENS_CSS_FILE
-        )
-        LocalWebFileCache.downloadMultipleInBackground(requireContext(), assets)
-    }
-    
-    private fun loadLearnLensHtml(wv: WebView, pdfUrl: String, pdfTitle: String, pdfId: String) {
+        
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
-        
-        val jsPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_JS_FILE, LEARNLENS_JS_URL)
-        val cssPath = LocalWebFileCache.getLocalPath(requireContext(), LEARNLENS_CSS_FILE, LEARNLENS_CSS_URL)
-        
-        val html = LocalWebFileCache.loadTemplate(requireContext(), "learnlens_template.html", mapOf(
-            "JS_URL" to jsPath,
-            "CSS_URL" to cssPath,
-            "PDF_URL" to pdfUrl,
-            "PDF_ID" to pdfId,
-            "AUTH_TOKEN" to authToken,
-            "PDF_TITLE" to pdfTitle
-        ))
-        
         val cacheDir = File(requireContext().filesDir, "web_assets")
-        wv.loadDataWithBaseURL("file://${cacheDir.absolutePath}/", html, "text/html", "UTF-8", null)
+        
+        wv.loadTemplateAndCacheResources(
+            templateName = templateName,
+            replacements = mapOf(
+                "PDF_URL" to pdfUrl,
+                "PDF_ID" to pdfId,
+                "AUTH_TOKEN" to authToken,
+                "PDF_TITLE" to pdfTitle
+            ),
+            baseUrl = "file://${cacheDir.absolutePath}/"
+        )
     }
     
     override fun onDestroyView() {

@@ -5,6 +5,7 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
+import `in`.testpress.util.LocalWebFileCache
 
 
 class CacheWebViewInitializer : ContentProvider() {

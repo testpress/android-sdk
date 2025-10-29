@@ -1,4 +1,4 @@
-package `in`.testpress.course.util
+package `in`.testpress.util
 
 import android.content.Context
 import kotlinx.coroutines.CoroutineScope

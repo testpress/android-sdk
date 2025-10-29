@@ -5,6 +5,8 @@ import android.util.AttributeSet
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView as AndroidWebView
+import `in`.testpress.util.HtmlResourceProcessor
+import `in`.testpress.util.LocalWebFileCache
 
 open class WebView @JvmOverloads constructor(
     context: Context,
@@ -40,6 +42,28 @@ open class WebView @JvmOverloads constructor(
             allowFileAccessFromFileURLs = true
             allowUniversalAccessFromFileURLs = true
         }
+    }
+    
+    fun loadTemplateAndCacheResources(
+        templateName: String,
+        replacements: Map<String, String>,
+        baseUrl: String
+    ) {
+        val template = LocalWebFileCache.loadTemplate(context, templateName, replacements)
+        
+        val resources = HtmlResourceProcessor.extractExternalResources(template)
+        
+        if (resources.isNotEmpty()) {
+            LocalWebFileCache.downloadMultipleInBackground(context, resources)
+        }
+        
+        val localPaths = resources.associate { (url, fileName) ->
+            url to LocalWebFileCache.getLocalPath(context, fileName, url)
+        }
+        
+        val processedHtml = HtmlResourceProcessor.replaceUrls(template, localPaths)
+        
+        loadDataWithBaseURL(baseUrl, processedHtml, "text/html", "UTF-8", null)
     }
 }
 
