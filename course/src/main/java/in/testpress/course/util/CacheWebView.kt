@@ -1,6 +1,7 @@
 package `in`.testpress.course.util
 
 import android.content.Context
+import android.util.Log
 import android.view.ViewGroup
 import android.webkit.CookieManager
 import android.webkit.WebSettings
@@ -11,6 +12,7 @@ import `in`.testpress.util.UserAgentProvider
 import `in`.testpress.util.webview.WebView
 
 object CacheWebView {
+    private const val TAG = "CacheWebView"
     private const val MAX_SIZE = 3
     
     private lateinit var appContext: Context
@@ -28,11 +30,16 @@ object CacheWebView {
     fun init(context: Context?): Boolean {
         return try {
             if (context == null) return false
-            if (::appContext.isInitialized) return true
+            if (::appContext.isInitialized) {
+                Log.d(TAG, "Already initialized")
+                return true
+            }
             
             appContext = context.applicationContext
+            Log.d(TAG, "✓ Initialized successfully")
             true
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to initialize", e)
             false
         }
     }
@@ -67,10 +74,12 @@ object CacheWebView {
             val cached = cache[contentId]
             
             if (cached != null && cached.url == url) {
+                Log.d(TAG, "✓ Cache HIT: contentId=$contentId (reusing existing WebView)")
                 return cached.webView
             }
             
             if (cached != null && cached.url != url) {
+                Log.d(TAG, "⚠ Cache URL changed: contentId=$contentId (old=${cached.url}, new=$url)")
                 if (loadUrl) {
                     loadUrlWithAuth(cached.webView, url)
                 }
@@ -78,6 +87,7 @@ object CacheWebView {
                 return cached.webView
             }
             
+            Log.d(TAG, "✗ Cache MISS: contentId=$contentId (creating new WebView)")
             val webView = createWebView()
             configure(webView)
             
@@ -86,6 +96,7 @@ object CacheWebView {
             }
             
             cache[contentId] = CachedWebView(webView, url)
+            Log.d(TAG, "✓ WebView cached: contentId=$contentId (cache size: ${cache.size})")
             return webView
         }
     }
@@ -108,7 +119,9 @@ object CacheWebView {
             }
             container.addView(webView)
             webView.onResume()
+            Log.d(TAG, "✓ WebView attached to container")
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to attach WebView", e)
         }
     }
     
@@ -117,18 +130,23 @@ object CacheWebView {
             webView?.let {
                 it.onPause()
                 (it.parent as? ViewGroup)?.removeView(it)
+                Log.d(TAG, "✓ WebView detached from container")
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to detach WebView", e)
         }
     }
     
     fun clearAll() {
         try {
             synchronized(cache) {
+                val count = cache.size
                 cache.values.forEach { it.destroy() }
                 cache.clear()
+                Log.d(TAG, "🗑 Cleared all cached WebViews ($count instances)")
             }
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to clear cache", e)
         }
     }
     

@@ -10,6 +10,7 @@ import `in`.testpress.util.webview.WebViewEventListener
 import `in`.testpress.util.webview.BaseWebViewClient
 import `in`.testpress.util.webview.WebView
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -22,6 +23,7 @@ import java.io.File
 class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     companion object {
+        private const val TAG = "AIChatPdfFragment"
         const val ARG_CONTENT_ID = "contentId"
         const val ARG_COURSE_ID = "courseId"
         const val ARG_PDF_URL = "pdfUrl"
@@ -30,6 +32,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         const val DEFAULT_TEMPLATE = "learnlens_template.html"
     }
     
+    private var startTime: Long = 0
     private var webView: WebView? = null
     private var container: FrameLayout? = null
     private var progressBar: ProgressBar? = null
@@ -47,11 +50,17 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        startTime = System.currentTimeMillis()
+        
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
         val pdfUrl = requireArguments().getString(ARG_PDF_URL)
         val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
         val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
+        
+        Log.d(TAG, "═══════════════════════════════════════")
+        Log.d(TAG, "📱 Loading PDF: $pdfTitle (ID: $contentId)")
+        Log.d(TAG, "📄 Template: $templateName")
         
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
@@ -65,6 +74,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         
         val cacheKey = "pdf_template_$contentId"
         val isNewWebView = !CacheWebView.isCached(contentId, cacheKey)
+        
+        val status = if (isNewWebView) "NEW" else "CACHED"
+        Log.d(TAG, "🔍 WebView Status: $status")
         
         if (isNewWebView) {
             showLoading()
@@ -81,6 +93,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         
         if (!isNewWebView) {
             hideLoading()
+            val switchTime = System.currentTimeMillis() - startTime
+            Log.d(TAG, "⚡ INSTANT SWITCH: ${switchTime}ms")
+            Log.d(TAG, "═══════════════════════════════════════")
         }
         
         container?.let { cont -> 
@@ -151,10 +166,14 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onLoadingStarted() {
         showLoading()
+        Log.d(TAG, "⏳ Page loading started...")
     }
     
     override fun onLoadingFinished() {
         hideLoading()
+        val totalTime = System.currentTimeMillis() - startTime
+        Log.d(TAG, "✓ Page loaded successfully (${totalTime}ms)")
+        Log.d(TAG, "═══════════════════════════════════════")
     }
     
     override fun onError(exception: TestpressException) {

@@ -1,6 +1,9 @@
 package `in`.testpress.util
 
+import android.util.Log
+
 object HtmlResourceProcessor {
+    private const val TAG = "HtmlResourceProcessor"
     
     private val SCRIPT_SRC_PATTERN = Regex("""<script[^>]+src=["']([^"']+)["']""")
     private val LINK_HREF_PATTERN = Regex("""<link[^>]+href=["']([^"']+)["']""")
@@ -24,6 +27,7 @@ object HtmlResourceProcessor {
             }
         }
         
+        Log.d(TAG, "📄 Extracted ${resources.size} external resources from HTML")
         return resources
     }
     
@@ -32,6 +36,7 @@ object HtmlResourceProcessor {
         replacements.forEach { (originalUrl, localPath) ->
             processedHtml = processedHtml.replace(originalUrl, localPath)
         }
+        Log.d(TAG, "🔄 Replaced ${replacements.size} URLs with local paths")
         return processedHtml
     }
     

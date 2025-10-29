@@ -1,6 +1,7 @@
 package `in`.testpress.util
 
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -18,6 +19,7 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 object LocalWebFileCache {
+    private const val TAG = "LocalWebFileCache"
     
     private const val CACHE_DIR_NAME = "web_assets"
     private const val DEFAULT_MAX_AGE_HOURS = 12L
@@ -78,12 +80,16 @@ object LocalWebFileCache {
         maxAgeHours: Long? = DEFAULT_MAX_AGE_HOURS
     ) {
         if (!forceRefresh && downloadedFiles.contains(fileName)) {
+            Log.d(TAG, "File already downloaded in session: $fileName")
             return
         }
         
         if (!forceRefresh && isCached(context, fileName)) {
             if (maxAgeHours == null || !isFileExpired(context, fileName, maxAgeHours)) {
+                Log.d(TAG, "✓ Cache HIT: $fileName")
                 return
+            } else {
+                Log.d(TAG, "⚠ Cache EXPIRED: $fileName (max age: ${maxAgeHours}h)")
             }
         }
         
@@ -94,13 +100,18 @@ object LocalWebFileCache {
             
             if (!forceRefresh && isCached(context, fileName)) {
                 if (maxAgeHours == null || !isFileExpired(context, fileName, maxAgeHours)) {
+                    Log.d(TAG, "✓ Cache HIT (after lock): $fileName")
                     return
                 }
             }
             
             try {
+                Log.d(TAG, "⬇ Downloading: $fileName from $url")
+                val startTime = System.currentTimeMillis()
                 download(context, url, fileName)
                 downloadedFiles.add(fileName)
+                val duration = System.currentTimeMillis() - startTime
+                Log.d(TAG, "✓ Downloaded: $fileName (${duration}ms)")
             } catch (e: Exception) {
                 throw e
             }
@@ -118,15 +129,24 @@ object LocalWebFileCache {
     
     fun getLocalPath(context: Context, fileName: String, fallbackUrl: String): String {
         val file = File(File(context.filesDir, CACHE_DIR_NAME), fileName)
-        return if (file.exists()) "file://${file.absolutePath}" else fallbackUrl
+        return if (file.exists()) {
+            Log.d(TAG, "→ Using local: $fileName")
+            "file://${file.absolutePath}"
+        } else {
+            Log.d(TAG, "→ Using remote: $fallbackUrl")
+            fallbackUrl
+        }
     }
     
     fun clearAll(context: Context) {
         try {
             val cacheDir = File(context.filesDir, CACHE_DIR_NAME)
+            val fileCount = cacheDir.listFiles()?.size ?: 0
             cacheDir.deleteRecursively()
             downloadedFiles.clear()
+            Log.d(TAG, "🗑 Cleared cache: $fileCount files deleted")
         } catch (e: Exception) {
+            Log.e(TAG, "Failed to clear cache", e)
         }
     }
     

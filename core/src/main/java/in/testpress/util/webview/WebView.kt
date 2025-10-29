@@ -2,6 +2,7 @@ package `in`.testpress.util.webview
 
 import android.content.Context
 import android.util.AttributeSet
+import android.util.Log
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView as AndroidWebView
@@ -13,6 +14,10 @@ open class WebView @JvmOverloads constructor(
     attrs: AttributeSet? = null,
     defStyleAttr: Int = 0
 ) : AndroidWebView(context, attrs, defStyleAttr) {
+    
+    companion object {
+        private const val TAG = "TestpressWebView"
+    }
     
     init {
         configureDefaultSettings()
@@ -49,11 +54,15 @@ open class WebView @JvmOverloads constructor(
         replacements: Map<String, String>,
         baseUrl: String
     ) {
+        Log.d(TAG, "📄 Loading template: $templateName")
+        val startTime = System.currentTimeMillis()
+        
         val template = LocalWebFileCache.loadTemplate(context, templateName, replacements)
         
         val resources = HtmlResourceProcessor.extractExternalResources(template)
         
         if (resources.isNotEmpty()) {
+            Log.d(TAG, "⬇ Starting download for ${resources.size} resources")
             LocalWebFileCache.downloadMultipleInBackground(context, resources)
         }
         
@@ -64,6 +73,9 @@ open class WebView @JvmOverloads constructor(
         val processedHtml = HtmlResourceProcessor.replaceUrls(template, localPaths)
         
         loadDataWithBaseURL(baseUrl, processedHtml, "text/html", "UTF-8", null)
+        
+        val duration = System.currentTimeMillis() - startTime
+        Log.d(TAG, "✓ Template loaded and resources processed (${duration}ms)")
     }
 }
 
