@@ -153,10 +153,10 @@ object LocalWebFileCache {
         
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                throw IOException("Download failed with code: ${response.code}")
+                throw IOException("Download failed with code: ${response.code()}")
             }
             
-            response.body?.byteStream()?.use { input ->
+            response.body()?.byteStream()?.use { input ->
                 File(cacheDir, fileName).outputStream().use { output ->
                     input.copyTo(output)
                 }
