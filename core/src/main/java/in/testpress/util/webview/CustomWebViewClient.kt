@@ -5,12 +5,14 @@ import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.util.extension.openUrlInBrowser
 import android.graphics.Bitmap
 import android.webkit.*
+import android.webkit.WebView as AndroidWebView
+import android.webkit.WebViewClient as AndroidWebViewClient
 
-class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
+class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient() {
 
     private var errorList = linkedMapOf<WebResourceRequest?,WebResourceResponse?>()
 
-    override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
+    override fun shouldOverrideUrlLoading(view: AndroidWebView?, request: WebResourceRequest?): Boolean {
         val url = request?.url.toString()
         return when {
             isPDFUrl(url) -> {
@@ -35,18 +37,18 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
         }
     }
 
-    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+    override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
         if (fragment.showLoadingBetweenPages) fragment.showLoading()
     }
 
-    override fun onPageFinished(view: WebView?, url: String?) {
+    override fun onPageFinished(view: AndroidWebView?, url: String?) {
         fragment.hideLoading()
         fragment.hideEmptyViewShowWebView()
         checkWebViewHasError()
     }
 
     override fun onReceivedError(
-        view: WebView?,
+        view: AndroidWebView?,
         request: WebResourceRequest?,
         error: WebResourceError?
     ) {
@@ -58,7 +60,7 @@ class CustomWebViewClient(val fragment: WebViewFragment) : WebViewClient() {
     }
 
     override fun onReceivedHttpError(
-        view: WebView?,
+        view: AndroidWebView?,
         request: WebResourceRequest?,
         errorResponse: WebResourceResponse?
     ) {

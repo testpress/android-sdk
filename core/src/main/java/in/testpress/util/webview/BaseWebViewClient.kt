@@ -4,7 +4,7 @@ import android.graphics.Bitmap
 import android.webkit.WebResourceError
 import android.webkit.WebResourceRequest
 import android.webkit.WebResourceResponse
-import android.webkit.WebView
+import android.webkit.WebView as AndroidWebView
 import android.webkit.WebViewClient
 import `in`.testpress.core.TestpressException
 
@@ -14,14 +14,14 @@ class BaseWebViewClient(
     
     private val errorList = linkedMapOf<String, WebResourceResponse?>()
     
-    override fun onPageStarted(view: WebView?, url: String?, favicon: Bitmap?) {
+    override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
         if (listener.isViewActive()) {
             errorList.clear()
             listener.onLoadingStarted()
         }
     }
     
-    override fun onPageFinished(view: WebView?, url: String?) {
+    override fun onPageFinished(view: AndroidWebView?, url: String?) {
         if (listener.isViewActive()) {
             listener.onLoadingFinished()
             if (errorList.isNotEmpty()) {
@@ -31,7 +31,7 @@ class BaseWebViewClient(
     }
     
     override fun onReceivedError(
-        view: WebView?, 
+        view: AndroidWebView?, 
         request: WebResourceRequest?, 
         error: WebResourceError?
     ) {
@@ -47,7 +47,7 @@ class BaseWebViewClient(
     }
     
     override fun onReceivedHttpError(
-        view: WebView?,
+        view: AndroidWebView?,
         request: WebResourceRequest?,
         errorResponse: WebResourceResponse?
     ) {
@@ -56,7 +56,7 @@ class BaseWebViewClient(
         }
     }
     
-    private fun checkWebViewHasError(view: WebView?) {
+    private fun checkWebViewHasError(view: AndroidWebView?) {
         if (!listener.isViewActive()) return
         
         val currentUrl = view?.url ?: return

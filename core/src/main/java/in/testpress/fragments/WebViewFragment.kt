@@ -6,7 +6,8 @@ import `in`.testpress.databinding.WebviewFragmentBinding
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.BaseJavaScriptInterface
 import `in`.testpress.util.UserAgentProvider
-import `in`.testpress.util.webview.*
+import `in`.testpress.util.webview.CustomWebViewClient
+import `in`.testpress.util.webview.CustomWebChromeClient
 import android.annotation.SuppressLint
 import android.net.Uri
 import android.os.Bundle
@@ -25,7 +26,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     val TAG = "WebViewFragment"
     private var _layout: WebviewFragmentBinding? = null
     private val layout: WebviewFragmentBinding get() = _layout!!
-    lateinit var webView: WebView
+    lateinit var webView: android.webkit.WebView
     var instituteSettings: InstituteSettings? = null
     private var listener : Listener? = null
     var imagePath: String? = null
