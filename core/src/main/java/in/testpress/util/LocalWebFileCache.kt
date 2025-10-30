@@ -111,6 +111,12 @@ object LocalWebFileCache {
         return html
     }
     
+    fun clearAll(context: Context) {
+        val cacheDir = getCacheDir(context)
+        cacheDir.listFiles()?.forEach { it.delete() }
+        downloadedFiles.clear()
+    }
+    
     private fun getCacheFile(context: Context, fileName: String): File {
         return File(getCacheDir(context), fileName)
     }
