@@ -265,6 +265,35 @@ class WebViewFactoryTest {
         
         assertSame(webView1, webView2)
     }
+    
+    @Test
+    fun attachShouldMarkWebViewAsActive() {
+        val container = FrameLayout(context)
+        val webView = WebViewFactory.createCached(1L, "cache_key", createWebView = { WebView(context) }) { }
+        
+        WebViewFactory.attach(container, webView)
+        
+        assertNotNull(webView.parent)
+    }
+    
+    @Test
+    fun detachShouldMarkWebViewAsInactive() {
+        val container = FrameLayout(context)
+        val webView = WebViewFactory.createCached(1L, "cache_key", createWebView = { WebView(context) }) { }
+        
+        WebViewFactory.attach(container, webView)
+        WebViewFactory.detach(webView)
+        
+        assertNull(webView.parent)
+    }
+    
+    @Test
+    fun createShouldReturnNewWebViewWithoutCaching() {
+        val webView1 = WebViewFactory.create(context)
+        val webView2 = WebViewFactory.create(context)
+        
+        assertNotSame(webView1, webView2)
+    }
 
     private fun assertDoesNotThrow(block: () -> Unit) {
         try {

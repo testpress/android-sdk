@@ -1,7 +1,6 @@
 package `in`.testpress.util
 
 import android.content.Context
-import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -19,10 +18,10 @@ import java.io.IOException
 import java.util.concurrent.TimeUnit
 
 object LocalWebFileCache {
-    private const val TAG = "LocalWebFileCache"
     
     private const val CACHE_DIR_NAME = "web_assets"
     private const val DEFAULT_MAX_AGE_HOURS = 12L
+    private const val DOWNLOAD_TIMEOUT_SECONDS = 30L
     
     @Volatile
     private var downloadedFiles = mutableSetOf<String>()
@@ -31,17 +30,14 @@ object LocalWebFileCache {
     private val downloadMutex = Mutex()
     
     fun downloadInBackground(
-        context: Context, 
-        url: String, 
-        fileName: String, 
+        context: Context,
+        url: String,
+        fileName: String,
         forceRefresh: Boolean = false,
         maxAgeHours: Long? = DEFAULT_MAX_AGE_HOURS
     ) {
         scope.launch {
-            try {
-                downloadIfNeeded(context, url, fileName, forceRefresh, maxAgeHours)
-            } catch (e: Exception) {
-            }
+            downloadIfNeeded(context, url, fileName, forceRefresh, maxAgeHours)
         }
     }
     
@@ -53,101 +49,58 @@ object LocalWebFileCache {
         onComplete: (() -> Unit)? = null
     ) {
         scope.launch {
-            try {
-                coroutineScope {
-                    files.map { (url, fileName) ->
-                        async {
-                            downloadIfNeeded(context, url, fileName, forceRefresh, maxAgeHours)
-                        }
-                    }.awaitAll()
-                }
-                onComplete?.invoke()
-            } catch (e: Exception) {
+            coroutineScope {
+                files.map { (url, fileName) ->
+                    async { downloadIfNeeded(context, url, fileName, forceRefresh, maxAgeHours) }
+                }.awaitAll()
             }
+            onComplete?.invoke()
         }
     }
     
-    fun isCached(context: Context, fileName: String): Boolean {
-        val file = File(File(context.filesDir, CACHE_DIR_NAME), fileName)
-        return file.exists()
-    }
-    
     suspend fun downloadIfNeeded(
-        context: Context, 
-        url: String, 
+        context: Context,
+        url: String,
         fileName: String,
         forceRefresh: Boolean = false,
         maxAgeHours: Long? = DEFAULT_MAX_AGE_HOURS
     ) {
-        if (!forceRefresh && downloadedFiles.contains(fileName)) {
-            Log.d(TAG, "File already downloaded in session: $fileName")
-            return
-        }
-        
-        if (!forceRefresh && isCached(context, fileName)) {
-            if (maxAgeHours == null || !isFileExpired(context, fileName, maxAgeHours)) {
-                Log.d(TAG, "✓ Cache HIT: $fileName")
-                return
-            } else {
-                Log.d(TAG, "⚠ Cache EXPIRED: $fileName (max age: ${maxAgeHours}h)")
-            }
-        }
+        if (shouldSkipDownload(context, fileName, forceRefresh, maxAgeHours)) return
         
         downloadMutex.withLock {
-            if (!forceRefresh && downloadedFiles.contains(fileName)) {
-                return
-            }
-            
-            if (!forceRefresh && isCached(context, fileName)) {
-                if (maxAgeHours == null || !isFileExpired(context, fileName, maxAgeHours)) {
-                    Log.d(TAG, "✓ Cache HIT (after lock): $fileName")
-                    return
-                }
-            }
-            
-            try {
-                Log.d(TAG, "⬇ Downloading: $fileName from $url")
-                val startTime = System.currentTimeMillis()
-                download(context, url, fileName)
-                downloadedFiles.add(fileName)
-                val duration = System.currentTimeMillis() - startTime
-                Log.d(TAG, "✓ Downloaded: $fileName (${duration}ms)")
-            } catch (e: Exception) {
-                throw e
-            }
+            if (shouldSkipDownload(context, fileName, forceRefresh, maxAgeHours)) return
+            download(context, url, fileName)
+            downloadedFiles.add(fileName)
         }
+    }
+    
+    private fun shouldSkipDownload(
+        context: Context,
+        fileName: String,
+        forceRefresh: Boolean,
+        maxAgeHours: Long?
+    ): Boolean {
+        if (forceRefresh) return false
+        if (downloadedFiles.contains(fileName)) return true
+        if (!isCached(context, fileName)) return false
+        return maxAgeHours == null || !isFileExpired(context, fileName, maxAgeHours)
+    }
+    
+    private fun isCached(context: Context, fileName: String): Boolean {
+        return getCacheFile(context, fileName).exists()
     }
     
     private fun isFileExpired(context: Context, fileName: String, maxAgeHours: Long): Boolean {
-        val file = File(File(context.filesDir, CACHE_DIR_NAME), fileName)
+        val file = getCacheFile(context, fileName)
         if (!file.exists()) return true
-        
-        val fileAge = System.currentTimeMillis() - file.lastModified()
-        val maxAgeMillis = maxAgeHours * 60 * 60 * 1000
-        return fileAge > maxAgeMillis
+        val fileAgeMs = System.currentTimeMillis() - file.lastModified()
+        val maxAgeMs = maxAgeHours * 60 * 60 * 1000
+        return fileAgeMs > maxAgeMs
     }
     
     fun getLocalPath(context: Context, fileName: String, fallbackUrl: String): String {
-        val file = File(File(context.filesDir, CACHE_DIR_NAME), fileName)
-        return if (file.exists()) {
-            Log.d(TAG, "→ Using local: $fileName")
-            "file://${file.absolutePath}"
-        } else {
-            Log.d(TAG, "→ Using remote: $fallbackUrl")
-            fallbackUrl
-        }
-    }
-    
-    fun clearAll(context: Context) {
-        try {
-            val cacheDir = File(context.filesDir, CACHE_DIR_NAME)
-            val fileCount = cacheDir.listFiles()?.size ?: 0
-            cacheDir.deleteRecursively()
-            downloadedFiles.clear()
-            Log.d(TAG, "🗑 Cleared cache: $fileCount files deleted")
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to clear cache", e)
-        }
+        val file = getCacheFile(context, fileName)
+        return if (file.exists()) "file://${file.absolutePath}" else fallbackUrl
     }
     
     fun loadTemplate(context: Context, templateName: String, replacements: Map<String, String>): String {
@@ -158,30 +111,32 @@ object LocalWebFileCache {
         return html
     }
     
+    private fun getCacheFile(context: Context, fileName: String): File {
+        return File(getCacheDir(context), fileName)
+    }
+    
+    private fun getCacheDir(context: Context): File {
+        return File(context.filesDir, CACHE_DIR_NAME).apply { mkdirs() }
+    }
+    
     private suspend fun download(context: Context, url: String, fileName: String) = withContext(Dispatchers.IO) {
-        val cacheDir = File(context.filesDir, CACHE_DIR_NAME)
-        if (!cacheDir.exists()) {
-            cacheDir.mkdirs()
-        }
-        
         val client = OkHttpClient.Builder()
-            .connectTimeout(30, TimeUnit.SECONDS)
-            .readTimeout(30, TimeUnit.SECONDS)
+            .connectTimeout(DOWNLOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+            .readTimeout(DOWNLOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
             .build()
         
         val request = Request.Builder().url(url).build()
         
         client.newCall(request).execute().use { response ->
             if (!response.isSuccessful) {
-                throw IOException("Download failed with code: ${response.code()}")
+                throw IOException("Download failed: ${response.code()}")
             }
             
             response.body()?.byteStream()?.use { input ->
-                File(cacheDir, fileName).outputStream().use { output ->
+                getCacheFile(context, fileName).outputStream().use { output ->
                     input.copyTo(output)
                 }
-            } ?: throw IOException("Response body is null")
+            } ?: throw IOException("Empty response body")
         }
     }
 }
-

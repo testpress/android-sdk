@@ -22,17 +22,18 @@ class BaseWebViewClient(
     }
     
     override fun onPageFinished(view: AndroidWebView?, url: String?) {
-        if (listener.isViewActive()) {
-            listener.onLoadingFinished()
-            if (errorList.isNotEmpty()) {
-                checkWebViewHasError(view)
-            }
+        if (!listener.isViewActive()) return
+        
+        listener.onLoadingFinished()
+        
+        if (errorList.isNotEmpty()) {
+            checkForPageError(view)
         }
     }
     
     override fun onReceivedError(
-        view: AndroidWebView?, 
-        request: WebResourceRequest?, 
+        view: AndroidWebView?,
+        request: WebResourceRequest?,
         error: WebResourceError?
     ) {
         if (!listener.isViewActive()) return
@@ -56,16 +57,18 @@ class BaseWebViewClient(
         }
     }
     
-    private fun checkWebViewHasError(view: AndroidWebView?) {
+    private fun checkForPageError(view: AndroidWebView?) {
         if (!listener.isViewActive()) return
         
         val currentUrl = view?.url ?: return
         errorList[currentUrl]?.let { response ->
-            val statusCode = response.statusCode
-            val reasonPhrase = response.reasonPhrase ?: "Unknown Error"
-            listener.onError(TestpressException.httpError(statusCode, reasonPhrase))
+            listener.onError(
+                TestpressException.httpError(
+                    response.statusCode,
+                    response.reasonPhrase ?: "Unknown Error"
+                )
+            )
             errorList.remove(currentUrl)
         }
     }
 }
-

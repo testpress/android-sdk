@@ -4,31 +4,12 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import android.util.Log
 
-/**
- * SDK auto-initializer using ContentProvider
- * - Initializes WebViewFactory with dynamic memory management
- * - Runs before Application.onCreate()
- * - No user action required
- */
 class SdkInitializer : ContentProvider() {
     
-    companion object {
-        private const val TAG = "SdkInitializer"
-    }
-    
     override fun onCreate(): Boolean {
-        return try {
-            context?.let { ctx ->
-                WebViewFactory.init(ctx.applicationContext)
-                Log.d(TAG, "✓ SDK components initialized")
-            }
-            true
-        } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize SDK components (non-fatal)", e)
-            true
-        }
+        context?.let { WebViewFactory.init(it.applicationContext) }
+        return true
     }
     
     override fun query(uri: Uri, projection: Array<out String>?, selection: String?, 
@@ -39,4 +20,3 @@ class SdkInitializer : ContentProvider() {
     override fun update(uri: Uri, values: ContentValues?, selection: String?, 
                        selectionArgs: Array<out String>?): Int = 0
 }
-
