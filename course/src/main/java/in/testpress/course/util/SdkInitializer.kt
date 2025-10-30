@@ -9,8 +9,10 @@ import `in`.testpress.util.LocalWebFileCache
 class SdkInitializer : ContentProvider() {
     
     override fun onCreate(): Boolean {
-        context?.let { WebViewFactory.init(it.applicationContext) }
-        LocalWebFileCache.clearAll(ctx.applicationContext)
+        context?.applicationContext?.let { appCtx ->
+            LocalWebFileCache.clearAll(appCtx)
+            WebViewFactory.init(appCtx)
+        }
         return true
     }
     
