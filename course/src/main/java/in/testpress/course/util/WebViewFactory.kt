@@ -185,13 +185,13 @@ object WebViewFactory {
             
             val cacheFile = File(diskCacheDir, "webview_$contentId.mht")
             
-            webView.saveWebArchive(cacheFile.absolutePath) { filename ->
-                if (filename != null) {
-                    val fileSize = cacheFile.length() / 1024
-                    Log.d(TAG, "💾 Saved to disk: contentId=$contentId (${fileSize}KB)")
-                } else {
-                    Log.w(TAG, "⚠ Failed to save to disk: contentId=$contentId")
-                }
+            webView.saveWebArchive(cacheFile.absolutePath)
+            
+            if (cacheFile.exists()) {
+                val fileSize = cacheFile.length() / 1024
+                Log.d(TAG, "💾 Saved to disk: contentId=$contentId (${fileSize}KB)")
+            } else {
+                Log.w(TAG, "⚠ Failed to save to disk: contentId=$contentId")
             }
         } catch (e: Exception) {
             Log.e(TAG, "Error saving to disk: contentId=$contentId", e)
