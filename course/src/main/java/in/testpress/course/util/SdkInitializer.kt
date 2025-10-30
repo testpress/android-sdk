@@ -5,9 +5,13 @@ import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
 import android.util.Log
-import `in`.testpress.util.LocalWebFileCache
 
-
+/**
+ * SDK auto-initializer using ContentProvider
+ * - Initializes WebViewFactory with dynamic memory management
+ * - Runs before Application.onCreate()
+ * - No user action required
+ */
 class SdkInitializer : ContentProvider() {
     
     companion object {
@@ -18,7 +22,7 @@ class SdkInitializer : ContentProvider() {
         return try {
             context?.let { ctx ->
                 WebViewFactory.init(ctx.applicationContext)
-                LocalWebFileCache.clearAll(ctx.applicationContext)
+                Log.d(TAG, "✓ SDK components initialized")
             }
             true
         } catch (e: Exception) {
