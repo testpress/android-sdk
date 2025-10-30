@@ -82,7 +82,7 @@ object WebViewFactory {
             val cached = cache[contentId]
             
             if (cached != null && cached.cacheKey == cacheKey) {
-                Log.d(TAG, "✓ RAM Cache HIT: contentId=$contentId (instant)")
+                Log.w(TAG, "⚡⚡⚡ RAM CACHE HIT: contentId=$contentId (INSTANT <50ms) ⚡⚡⚡")
                 return cached.webView
             }
             
@@ -99,7 +99,7 @@ object WebViewFactory {
             if (diskCached != null) {
                 configure(diskCached)
                 cache[contentId] = CachedWebView(diskCached, cacheKey)
-                Log.d(TAG, "✓ Disk Cache HIT: contentId=$contentId (fast ~200ms)")
+                Log.w(TAG, "💾💾💾 DISK CACHE HIT: contentId=$contentId 💾💾💾")
                 return diskCached
             }
             
@@ -203,8 +203,10 @@ object WebViewFactory {
             val diskCacheDir = File(appContext.filesDir, DISK_CACHE_DIR)
             val cacheFile = File(diskCacheDir, "webview_$contentId.mht")
             
+            Log.d(TAG, "💾 Checking disk cache: ${cacheFile.absolutePath}")
+            
             if (!cacheFile.exists()) {
-                Log.d(TAG, "💾 Disk cache MISS: contentId=$contentId")
+                Log.d(TAG, "💾 Disk cache MISS: contentId=$contentId (file not found)")
                 return null
             }
             
@@ -216,10 +218,13 @@ object WebViewFactory {
             }
             
             val webView = create(appContext)
+            
+            val startLoad = System.currentTimeMillis()
             webView.loadUrl("file://${cacheFile.absolutePath}")
+            val loadTime = System.currentTimeMillis() - startLoad
             
             val fileSize = cacheFile.length() / 1024
-            Log.d(TAG, "💾 Loaded from disk: contentId=$contentId (${fileSize}KB, age: ${ageHours}h)")
+            Log.w(TAG, "💾 LOADING FROM DISK: contentId=$contentId (${fileSize}KB, ${loadTime}ms, age: ${ageHours}h)")
             
             webView
         } catch (e: Exception) {
