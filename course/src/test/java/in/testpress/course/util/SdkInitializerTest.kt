@@ -9,15 +9,15 @@ import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
 
 @RunWith(RobolectricTestRunner::class)
-class CacheWebViewInitializerTest {
+class SdkInitializerTest {
 
     private lateinit var context: Context
-    private lateinit var initializer: CacheWebViewInitializer
+    private lateinit var initializer: SdkInitializer
 
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
-        initializer = CacheWebViewInitializer()
+        initializer = SdkInitializer()
     }
 
     @Test
@@ -44,7 +44,7 @@ class CacheWebViewInitializerTest {
         initializer.onCreate()
         
         // Verify cache is usable
-        val webView = CacheWebView.acquire(1L, "https://example.com/test.pdf", createWebView = { WebView(context) }) { }
+        val webView = WebViewFactory.createCached(1L, "https://example.com/test.pdf", createWebView = { WebView(context) }) { }
         assertNotNull(webView)
     }
 

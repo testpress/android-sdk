@@ -132,8 +132,8 @@
         </receiver>
 
         <provider
-            android:name=".util.CacheWebViewInitializer"
-            android:authorities="${applicationId}.cachewebview"
+            android:name=".util.SdkInitializer"
+            android:authorities="${applicationId}.sdkinitializer"
             android:exported="false" />
 
     </application>

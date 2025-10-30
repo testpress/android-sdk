@@ -11,8 +11,8 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.util.UserAgentProvider
 import `in`.testpress.util.webview.WebView
 
-object CacheWebView {
-    private const val TAG = "CacheWebView"
+object WebViewFactory {
+    private const val TAG = "WebViewFactory"
     private const val MAX_SIZE = 3
     
     private lateinit var appContext: Context
@@ -44,28 +44,32 @@ object CacheWebView {
         }
     }
     
-    fun isCached(contentId: Long, url: String): Boolean {
+    fun isCached(contentId: Long, cacheKey: String): Boolean {
         return try {
             if (!::appContext.isInitialized) return false
             synchronized(cache) {
                 val cached = cache[contentId]
-                cached != null && cached.url == url
+                cached != null && cached.cacheKey == cacheKey
             }
         } catch (e: Exception) {
             false
         }
     }
     
-    fun acquire(
+    fun create(context: Context): WebView {
+        return WebView(context)
+    }
+    
+    fun createCached(
         contentId: Long, 
-        url: String, 
+        cacheKey: String, 
         loadUrl: Boolean = true,
         createWebView: () -> WebView,
         configure: (WebView) -> Unit
     ): WebView {
         if (!::appContext.isInitialized) {
             throw IllegalStateException(
-                "CacheWebView not initialized. ContentProvider should have auto-initialized it. " +
+                "WebViewFactory not initialized. ContentProvider should have auto-initialized it. " +
                 "This is a configuration error - check AndroidManifest merging."
             )
         }
@@ -73,17 +77,17 @@ object CacheWebView {
         synchronized(cache) {
             val cached = cache[contentId]
             
-            if (cached != null && cached.url == url) {
+            if (cached != null && cached.cacheKey == cacheKey) {
                 Log.d(TAG, "✓ Cache HIT: contentId=$contentId (reusing existing WebView)")
                 return cached.webView
             }
             
-            if (cached != null && cached.url != url) {
-                Log.d(TAG, "⚠ Cache URL changed: contentId=$contentId (old=${cached.url}, new=$url)")
+            if (cached != null && cached.cacheKey != cacheKey) {
+                Log.d(TAG, "⚠ Cache key changed: contentId=$contentId (old=${cached.cacheKey}, new=$cacheKey)")
                 if (loadUrl) {
-                    loadUrlWithAuth(cached.webView, url)
+                    loadUrlWithAuth(cached.webView, cacheKey)
                 }
-                cached.url = url
+                cached.cacheKey = cacheKey
                 return cached.webView
             }
             
@@ -92,10 +96,10 @@ object CacheWebView {
             configure(webView)
             
             if (loadUrl) {
-                loadUrlWithAuth(webView, url)
+                loadUrlWithAuth(webView, cacheKey)
             }
             
-            cache[contentId] = CachedWebView(webView, url)
+            cache[contentId] = CachedWebView(webView, cacheKey)
             Log.d(TAG, "✓ WebView cached: contentId=$contentId (cache size: ${cache.size})")
             return webView
         }
@@ -150,7 +154,7 @@ object CacheWebView {
         }
     }
     
-    private data class CachedWebView(val webView: WebView, var url: String) {
+    private data class CachedWebView(val webView: WebView, var cacheKey: String) {
         fun destroy() {
             try {
                 webView.loadUrl("about:blank")

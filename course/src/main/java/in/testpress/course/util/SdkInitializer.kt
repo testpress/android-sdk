@@ -8,21 +8,21 @@ import android.util.Log
 import `in`.testpress.util.LocalWebFileCache
 
 
-class CacheWebViewInitializer : ContentProvider() {
+class SdkInitializer : ContentProvider() {
     
     companion object {
-        private const val TAG = "CacheWebViewInit"
+        private const val TAG = "SdkInitializer"
     }
     
     override fun onCreate(): Boolean {
         return try {
             context?.let { ctx ->
-                CacheWebView.init(ctx.applicationContext)
+                WebViewFactory.init(ctx.applicationContext)
                 LocalWebFileCache.clearAll(ctx.applicationContext)
             }
             true
         } catch (e: Exception) {
-            Log.e(TAG, "Failed to initialize CacheWebView (non-fatal)", e)
+            Log.e(TAG, "Failed to initialize SDK components (non-fatal)", e)
             true
         }
     }

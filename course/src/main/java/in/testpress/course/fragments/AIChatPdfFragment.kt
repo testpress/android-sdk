@@ -1,6 +1,6 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.course.util.CacheWebView
+import `in`.testpress.course.util.WebViewFactory
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
@@ -73,7 +73,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         initializeEmptyViewFragment()
         
         val cacheKey = "pdf_template_$contentId"
-        val isNewWebView = !CacheWebView.isCached(contentId, cacheKey)
+        val isNewWebView = !WebViewFactory.isCached(contentId, cacheKey)
         
         val status = if (isNewWebView) "NEW" else "CACHED"
         Log.d(TAG, "🔍 WebView Status: $status")
@@ -82,9 +82,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             showLoading()
         }
         
-        webView = CacheWebView.acquire(
+        webView = WebViewFactory.createCached(
             contentId = contentId,
-            url = cacheKey,
+            cacheKey = cacheKey,
             loadUrl = false,
             createWebView = { WebView(requireContext()) }
         ) { wv ->
@@ -99,7 +99,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
         
         container?.let { cont -> 
-            webView?.let { wv -> CacheWebView.attach(cont, wv) }
+            webView?.let { wv -> WebViewFactory.attach(cont, wv) }
         }
     }
     
@@ -124,7 +124,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onDestroyView() {
         super.onDestroyView()
-        CacheWebView.detach(webView)
+        WebViewFactory.detach(webView)
         webView = null
         container = null
         progressBar = null

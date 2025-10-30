@@ -3,7 +3,7 @@ package `in`.testpress.course.fragments
 import android.content.Context
 import android.os.Bundle
 import androidx.test.core.app.ApplicationProvider
-import `in`.testpress.course.util.CacheWebView
+import `in`.testpress.course.util.WebViewFactory
 import org.junit.After
 import org.junit.Assert.*
 import org.junit.Before
@@ -20,13 +20,13 @@ class AIChatPdfFragmentTest {
     @Before
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
-        CacheWebView.init(context)
+        WebViewFactory.init(context)
         fragment = AIChatPdfFragment()
     }
 
     @After
     fun tearDown() {
-        CacheWebView.clearAll()
+        WebViewFactory.clearAll()
     }
 
     @Test
