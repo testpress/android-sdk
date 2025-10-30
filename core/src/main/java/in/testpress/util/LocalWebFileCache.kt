@@ -69,8 +69,12 @@ object LocalWebFileCache {
         
         downloadMutex.withLock {
             if (shouldSkipDownload(context, fileName, forceRefresh, maxAgeHours)) return
-            download(context, url, fileName)
-            downloadedFiles.add(fileName)
+            try {
+                download(context, url, fileName)
+                downloadedFiles.add(fileName)
+            } catch (e: Exception) {
+                // Silent fail - use fallback URL in getLocalPath
+            }
         }
     }
     
