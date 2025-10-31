@@ -1,22 +1,15 @@
 package `in`.testpress.util.webview
 
 import android.view.View
-import android.view.Window
 import android.webkit.PermissionRequest
 import android.webkit.WebChromeClient
 import android.widget.FrameLayout
-import androidx.activity.OnBackPressedDispatcher
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
-import androidx.lifecycle.LifecycleOwner
-import androidx.test.core.app.ApplicationProvider
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito.*
-import org.mockito.MockitoAnnotations
 import org.robolectric.Robolectric
 import org.robolectric.RobolectricTestRunner
 
@@ -26,20 +19,10 @@ class BaseWebChromeClientTest {
     private lateinit var chromeClient: BaseWebChromeClient
     private lateinit var fragment: Fragment
     private lateinit var activity: FragmentActivity
-    
-    @Mock
-    private lateinit var customView: View
-    
-    @Mock
-    private lateinit var customViewCallback: WebChromeClient.CustomViewCallback
-    
-    @Mock
-    private lateinit var permissionRequest: PermissionRequest
+    private lateinit var testView: View
 
     @Before
     fun setup() {
-        MockitoAnnotations.openMocks(this)
-        
         activity = Robolectric.buildActivity(FragmentActivity::class.java)
             .create()
             .start()
@@ -52,54 +35,58 @@ class BaseWebChromeClientTest {
             .commitNow()
         
         chromeClient = BaseWebChromeClient(fragment)
+        testView = View(activity)
     }
 
     @Test
-    fun onShowCustomViewShouldEnterFullscreen() {
-        chromeClient.onShowCustomView(customView, customViewCallback)
+    fun onShowCustomViewShouldAddViewToDecorView() {
+        val callback = TestCustomViewCallback()
+        val initialChildCount = (activity.window.decorView as FrameLayout).childCount
         
-        val decorView = activity.window.decorView as FrameLayout
-        assertTrue(decorView.childCount > 0)
+        chromeClient.onShowCustomView(testView, callback)
         
-        verify(customViewCallback, never()).onCustomViewHidden()
+        val finalChildCount = (activity.window.decorView as FrameLayout).childCount
+        assertTrue(finalChildCount > initialChildCount)
+        assertFalse(callback.wasHidden)
     }
 
     @Test
     fun onShowCustomViewShouldRejectIfAlreadyInFullscreen() {
-        chromeClient.onShowCustomView(customView, customViewCallback)
+        val firstCallback = TestCustomViewCallback()
+        chromeClient.onShowCustomView(testView, firstCallback)
         
-        val secondCallback = mock(WebChromeClient.CustomViewCallback::class.java)
-        val secondView = mock(View::class.java)
-        
+        val secondCallback = TestCustomViewCallback()
+        val secondView = View(activity)
         chromeClient.onShowCustomView(secondView, secondCallback)
         
-        verify(secondCallback).onCustomViewHidden()
+        assertTrue(secondCallback.wasHidden)
     }
 
     @Test
-    fun onHideCustomViewShouldExitFullscreen() {
-        chromeClient.onShowCustomView(customView, customViewCallback)
+    fun onHideCustomViewShouldRemoveViewAndCallCallback() {
+        val callback = TestCustomViewCallback()
+        chromeClient.onShowCustomView(testView, callback)
         
         chromeClient.onHideCustomView()
         
-        verify(customViewCallback).onCustomViewHidden()
+        assertTrue(callback.wasHidden)
     }
 
     @Test
     fun onHideCustomViewShouldDoNothingIfNotInFullscreen() {
+        // Should not crash
         chromeClient.onHideCustomView()
-        
-        verify(customViewCallback, never()).onCustomViewHidden()
     }
 
     @Test
     fun onPermissionRequestShouldGrantAudioAndVideoPermissions() {
-        chromeClient.onPermissionRequest(permissionRequest)
+        val request = TestPermissionRequest()
         
-        verify(permissionRequest).grant(argThat { permissions ->
-            permissions.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) &&
-            permissions.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE)
-        })
+        chromeClient.onPermissionRequest(request)
+        
+        assertTrue(request.wasGranted)
+        assertTrue(request.grantedPermissions?.contains(PermissionRequest.RESOURCE_AUDIO_CAPTURE) == true)
+        assertTrue(request.grantedPermissions?.contains(PermissionRequest.RESOURCE_VIDEO_CAPTURE) == true)
     }
 
     @Test
@@ -110,11 +97,12 @@ class BaseWebChromeClientTest {
 
     @Test
     fun cleanupShouldExitFullscreenIfActive() {
-        chromeClient.onShowCustomView(customView, customViewCallback)
+        val callback = TestCustomViewCallback()
+        chromeClient.onShowCustomView(testView, callback)
         
         chromeClient.cleanup()
         
-        verify(customViewCallback).onCustomViewHidden()
+        assertTrue(callback.wasHidden)
     }
 
     @Test
@@ -125,11 +113,35 @@ class BaseWebChromeClientTest {
 
     @Test
     fun backButtonShouldExitFullscreen() {
-        chromeClient.onShowCustomView(customView, customViewCallback)
+        val callback = TestCustomViewCallback()
+        chromeClient.onShowCustomView(testView, callback)
         
         activity.onBackPressedDispatcher.onBackPressed()
         
-        verify(customViewCallback).onCustomViewHidden()
+        assertTrue(callback.wasHidden)
+    }
+    
+    private class TestCustomViewCallback : WebChromeClient.CustomViewCallback {
+        var wasHidden = false
+        
+        override fun onCustomViewHidden() {
+            wasHidden = true
+        }
+    }
+    
+    private class TestPermissionRequest : PermissionRequest() {
+        var wasGranted = false
+        var grantedPermissions: Array<out String>? = null
+        
+        override fun getOrigin() = null
+        override fun getResources() = emptyArray<String>()
+        
+        override fun grant(resources: Array<out String>?) {
+            wasGranted = true
+            grantedPermissions = resources
+        }
+        
+        override fun deny() {}
     }
 }
 
