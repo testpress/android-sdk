@@ -19,7 +19,6 @@
         android:id="@+id/aiPdf_view_fragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@id/bottom_navigation_fragment"
         android:visibility="gone"/>
 
     <!-- Error view container (same as WebViewFragment) -->
@@ -27,13 +26,6 @@
         android:id="@+id/empty_view_container"
         android:visibility="gone"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_above="@id/bottom_navigation_fragment" />
-
-    <FrameLayout
-        android:id="@+id/bottom_navigation_fragment"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"/>
+        android:layout_height="match_parent" />
 
 </RelativeLayout>
