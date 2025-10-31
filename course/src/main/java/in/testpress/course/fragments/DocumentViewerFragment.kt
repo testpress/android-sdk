@@ -133,6 +133,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             args.putString(AIChatPdfFragment.ARG_PDF_URL, pdfUrl)
             args.putString(AIChatPdfFragment.ARG_PDF_TITLE, content.attachment?.title ?: DEFAULT_ATTACHMENT_TITLE)
             args.putString(AIChatPdfFragment.ARG_TEMPLATE_NAME, AIChatPdfFragment.DEFAULT_TEMPLATE)
+            content.learnlensAssetId?.let { args.putString(AIChatPdfFragment.ARG_LEARNLENS_ASSET_ID, it) }
             aiChatFragment?.arguments = args
             
             childFragmentManager.beginTransaction()

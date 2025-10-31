@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 75;
+    private static final int VERSION = 76;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -380,6 +380,9 @@ public class TestpressSDKDaoGenerator {
         content.addBooleanProperty("isAIEnabled")
                 .columnName("IS_AI_ENABLED")
                 .codeBeforeField("@SerializedName(\"is_ai_enabled\")");
+        content.addStringProperty("learnlensAssetId")
+                .columnName("LEARNLENS_ASSET_ID")
+                .codeBeforeField("@SerializedName(\"learnlens_asset_id\")");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }

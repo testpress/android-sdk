@@ -659,7 +659,6 @@ public class Attempt implements android.os.Parcelable {
     public boolean isAttemptTypeQuiz() {
         return this.getAttemptType() != null && this.getAttemptType() == 1;
     }
-
     // KEEP METHODS END
 
 }

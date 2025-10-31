@@ -481,7 +481,6 @@ public class Course {
         }
         return filteredCourses;
     }
-
     // KEEP METHODS END
 
 }
