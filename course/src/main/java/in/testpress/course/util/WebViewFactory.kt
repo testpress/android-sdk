@@ -15,10 +15,10 @@ import `in`.testpress.util.webview.WebView
 
 object WebViewFactory {
     
-    private const val WEBVIEW_AVG_SIZE_MB = 300
+    private const val WEBVIEW_AVG_SIZE_MB = 250
     private const val MIN_FREE_MEMORY_MB = 200
     private const val MEMORY_CHECK_INTERVAL_MS = 30_000L
-    private const val AVAILABLE_RAM_PERCENTAGE = 0.30
+    private const val AVAILABLE_RAM_PERCENTAGE = 0.25
     
     private lateinit var appContext: Context
     @Volatile
@@ -97,7 +97,10 @@ object WebViewFactory {
         }
     }
     
-    fun create(context: Context): WebView = WebView(context)
+    fun create(context: Context): WebView {
+        checkMainThread()
+        return WebView(context)
+    }
     
     fun createCached(
         contentId: Long,
@@ -106,6 +109,7 @@ object WebViewFactory {
         createWebView: () -> WebView,
         configure: (WebView) -> Unit
     ): WebView {
+        checkMainThread()
         checkInitialized()
         
         synchronized(cache) {
@@ -132,6 +136,12 @@ object WebViewFactory {
         }
     }
     
+    private fun checkMainThread() {
+        if (android.os.Looper.myLooper() != android.os.Looper.getMainLooper()) {
+            throw IllegalStateException("WebViewFactory methods must be called from the main thread")
+        }
+    }
+    
     private fun checkInitialized() {
         if (!::appContext.isInitialized) {
             throw IllegalStateException("WebViewFactory not initialized")
@@ -153,6 +163,7 @@ object WebViewFactory {
     }
     
     fun attach(container: ViewGroup, webView: WebView) {
+        checkMainThread()
         (webView.parent as? ViewGroup)?.removeView(webView)
         container.children.filterIsInstance<WebView>().forEach { container.removeView(it) }
         container.addView(webView)
@@ -274,10 +285,14 @@ object WebViewFactory {
     
     private data class CachedWebView(val webView: WebView, var cacheKey: String) {
         fun destroy() {
-            webView.loadUrl("about:blank")
-            webView.stopLoading()
-            webView.removeAllViews()
-            webView.destroy()
+            try {
+                webView.loadUrl("about:blank")
+                webView.stopLoading()
+                webView.removeAllViews()
+                webView.destroy()
+            } catch (e: Exception) {
+                // Swallow WebView destruction errors on buggy OEM implementations
+            }
         }
     }
 }
