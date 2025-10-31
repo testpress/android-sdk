@@ -32,7 +32,7 @@ object WebViewFactory {
         override fun removeEldestEntry(eldest: MutableMap.MutableEntry<Long, CachedWebView>?): Boolean {
             val shouldRemove = size > maxSize
             if (shouldRemove && eldest != null) {
-                eldest.value.destroy()
+                destroyOnMainThread(eldest.value)
             }
             return shouldRemove
         }
@@ -188,9 +188,10 @@ object WebViewFactory {
     
     fun clearAll() {
         synchronized(cache) {
-            cache.values.forEach { it.destroy() }
+            val webViewsToDestroy = cache.values.toList()
             cache.clear()
             activeContentId = null
+            webViewsToDestroy.forEach { destroyOnMainThread(it) }
         }
     }
     
@@ -223,8 +224,9 @@ object WebViewFactory {
     }
     
     private fun removeFromCache(entry: MutableMap.MutableEntry<Long, CachedWebView>) {
-        entry.value.destroy()
+        val webViewToDestroy = entry.value
         cache.remove(entry.key)
+        destroyOnMainThread(webViewToDestroy)
     }
     
     private fun checkWebViewMemoryGrowth() {
@@ -260,6 +262,14 @@ object WebViewFactory {
         val estimatedUsageMB = cache.size * WEBVIEW_AVG_SIZE_MB
         val maxAllowedMB = (availableMB * AVAILABLE_RAM_PERCENTAGE).toLong()
         return estimatedUsageMB > maxAllowedMB
+    }
+    
+    private fun destroyOnMainThread(cachedWebView: CachedWebView) {
+        if (android.os.Looper.myLooper() == android.os.Looper.getMainLooper()) {
+            cachedWebView.destroy()
+        } else {
+            memoryCheckHandler.post { cachedWebView.destroy() }
+        }
     }
     
     private data class CachedWebView(val webView: WebView, var cacheKey: String) {
