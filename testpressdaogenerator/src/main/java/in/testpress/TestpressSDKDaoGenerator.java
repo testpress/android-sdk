@@ -380,6 +380,9 @@ public class TestpressSDKDaoGenerator {
         content.addBooleanProperty("isAIEnabled")
                 .columnName("IS_AI_ENABLED")
                 .codeBeforeField("@SerializedName(\"is_ai_enabled\")");
+        content.addStringProperty("learnlensAssetId")
+                .columnName("LEARNLENS_ASSET_ID")
+                .codeBeforeField("@SerializedName(\"learnlens_asset_id\")");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
