@@ -16,7 +16,7 @@ object HtmlResourceProcessor {
     
     private fun extractScriptResources(html: String, resources: MutableList<Pair<String, String>>) {
         SCRIPT_SRC_PATTERN.findAll(html).forEach { match ->
-            val url = match.groupValues[1]
+            val url = match.groupValues[1].trim()
             if (url.startsWith("http")) {
                 resources.add(url to extractFileName(url, ".js"))
             }
@@ -25,7 +25,7 @@ object HtmlResourceProcessor {
     
     private fun extractLinkResources(html: String, resources: MutableList<Pair<String, String>>) {
         LINK_HREF_PATTERN.findAll(html).forEach { match ->
-            val url = match.groupValues[1]
+            val url = match.groupValues[1].trim()
             if (url.startsWith("http")) {
                 resources.add(url to extractFileName(url, ".css"))
             }
@@ -35,7 +35,12 @@ object HtmlResourceProcessor {
     fun replaceUrls(html: String, replacements: Map<String, String>): String {
         var processedHtml = html
         replacements.forEach { (originalUrl, localPath) ->
-            processedHtml = processedHtml.replace(originalUrl, localPath)
+            val escapedUrl = Regex.escape(originalUrl)
+            val pattern = Regex("""(src|href)=["'](\s*$escapedUrl\s*)["']""")
+            processedHtml = pattern.replace(processedHtml) { matchResult ->
+                val attribute = matchResult.groupValues[1]
+                """$attribute="$localPath""""
+            }
         }
         return processedHtml
     }
