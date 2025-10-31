@@ -2,7 +2,7 @@ package `in`.testpress.course.util
 
 import android.content.Context
 import android.view.ViewGroup
-import android.webkit.WebView
+import android.webkit.WebView as AndroidWebView
 import android.widget.FrameLayout
 import androidx.test.core.app.ApplicationProvider
 import org.junit.After
@@ -11,6 +11,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import `in`.testpress.util.webview.WebView
 
 @RunWith(RobolectricTestRunner::class)
 class WebViewFactoryTest {
@@ -21,6 +22,13 @@ class WebViewFactoryTest {
     fun setup() {
         context = ApplicationProvider.getApplicationContext()
         WebViewFactory.init(context)
+        setMaxSize(3)
+    }
+    
+    private fun setMaxSize(size: Int) {
+        val maxSizeField = WebViewFactory::class.java.getDeclaredField("maxSize")
+        maxSizeField.isAccessible = true
+        maxSizeField.setInt(WebViewFactory, size)
     }
 
     @After
@@ -226,11 +234,22 @@ class WebViewFactoryTest {
         val webView = WebViewFactory.createCached(1L, "https://example.com/pdf1.pdf", createWebView = { WebView(context) }) { }
         
         assertTrue(webView.settings.javaScriptEnabled)
-        assertTrue(webView.settings.allowFileAccess)
+        assertFalse(webView.settings.allowFileAccess)
         assertFalse(webView.settings.useWideViewPort)
         assertTrue(webView.settings.loadWithOverviewMode)
         assertTrue(webView.settings.domStorageEnabled)
         assertFalse(webView.settings.builtInZoomControls)
+    }
+    
+    @Test
+    fun enableFileAccessShouldEnableAllFileAccessSettings() {
+        val webView = WebViewFactory.createCached(1L, "https://example.com/pdf1.pdf", createWebView = { WebView(context) }) { wv ->
+            wv.enableFileAccess()
+        }
+        
+        assertTrue(webView.settings.allowFileAccess)
+        assertTrue(webView.settings.allowFileAccessFromFileURLs)
+        assertTrue(webView.settings.allowUniversalAccessFromFileURLs)
     }
 
     @Test

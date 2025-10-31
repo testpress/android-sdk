@@ -16,6 +16,9 @@
     <script src="https://static.testpress.in/static-staging/learnlens/lib/learnlens-pdfchat.iife.js"></script>
     <script>
         let isInitialized = false;
+        let pollAttempts = 0;
+        const MAX_POLL_ATTEMPTS = 50;
+        const POLL_INTERVAL = 100;
         
         function initLearnLens() {
             if (isInitialized) return;
@@ -28,18 +31,15 @@
                     authToken: "{{AUTH_TOKEN}}",
                     pdfTitle: "{{PDF_TITLE}}",
                 });
+            } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
+                pollAttempts++;
+                setTimeout(initLearnLens, POLL_INTERVAL);
+            } else {
+                console.error("LearnLens library failed to load after " + (MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000) + " seconds");
             }
         }
         
-        document.addEventListener('DOMContentLoaded', function() {
-            setTimeout(initLearnLens, 1000);
-        });
-        
-        window.addEventListener('load', function() {
-            setTimeout(initLearnLens, 500);
-        });
-        
-        setTimeout(initLearnLens, 3000);
+        initLearnLens();
     </script>
 </body>
 </html>
