@@ -1,0 +1,67 @@
+package `in`.testpress.course.fragments
+
+import android.content.Context
+import android.os.Bundle
+import androidx.test.core.app.ApplicationProvider
+import `in`.testpress.course.util.WebViewFactory
+import org.junit.After
+import org.junit.Assert.*
+import org.junit.Before
+import org.junit.Test
+import org.junit.runner.RunWith
+import org.robolectric.RobolectricTestRunner
+
+@RunWith(RobolectricTestRunner::class)
+class AIChatPdfFragmentTest {
+
+    private lateinit var context: Context
+    private lateinit var fragment: AIChatPdfFragment
+
+    @Before
+    fun setup() {
+        context = ApplicationProvider.getApplicationContext()
+        WebViewFactory.init(context)
+        fragment = AIChatPdfFragment()
+    }
+
+    @After
+    fun tearDown() {
+        WebViewFactory.clearAll()
+    }
+
+    @Test
+    fun fragmentShouldCreateSuccessfully() {
+        fragment.arguments = Bundle().apply {
+            putLong(AIChatPdfFragment.ARG_COURSE_ID, 123L)
+            putLong(AIChatPdfFragment.ARG_CONTENT_ID, 456L)
+            putString(AIChatPdfFragment.ARG_PDF_URL, "https://example.com/test.pdf")
+            putString(AIChatPdfFragment.ARG_PDF_TITLE, "Test PDF")
+        }
+        
+        assertNotNull(fragment)
+        assertNotNull(fragment.arguments)
+    }
+
+    @Test
+    fun fragmentShouldNotCrashOnDestroyViewWithoutCreation() {
+        assertDoesNotThrow {
+            fragment.onDestroyView()
+        }
+    }
+
+    @Test
+    fun fragmentShouldNotCrashOnRetryClick() {
+        assertDoesNotThrow {
+            fragment.onRetryClick()
+        }
+    }
+
+    private fun assertDoesNotThrow(block: () -> Unit) {
+        try {
+            block()
+        } catch (e: Exception) {
+            fail("Should not throw exception: ${e.message}")
+        }
+    }
+}
+

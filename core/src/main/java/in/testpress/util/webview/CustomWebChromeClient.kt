@@ -15,7 +15,7 @@ import android.view.ViewGroup
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebView
+import android.webkit.WebView as AndroidWebView
 import android.widget.FrameLayout
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -71,7 +71,7 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
     }
 
     override fun onShowFileChooser(
-        webView: WebView?, filePathCallback: ValueCallback<Array<Uri>?>?,
+        webView: AndroidWebView?, filePathCallback: ValueCallback<Array<Uri>?>?,
         fileChooserParams: FileChooserParams?
     ): Boolean {
         if (fragment.filePathCallback != null) {

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LearnLens PDF Chat</title>
+    <link rel="stylesheet" href="https://static.testpress.in/static/learnlens/lib/learnlens-pdfchat.css">
+    <style>
+        body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
+        #learnlens-pdf-chat { width: 100%; height: 100vh; }
+    </style>
+</head>
+<body>
+    <div id="learnlens-pdf-chat"></div>
+    <script src="https://static.testpress.in/static/learnlens/lib/learnlens-pdfchat.iife.js"></script>
+    <script>
+        let isInitialized = false;
+        let pollAttempts = 0;
+        const MAX_POLL_ATTEMPTS = 50;
+        const POLL_INTERVAL = 100;
+        
+        function initLearnLens() {
+            if (isInitialized) return;
+            
+            if (window.LearnLens && window.LearnLens.mountPdfChat) {
+                isInitialized = true;
+                window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
+                    pdfUrl: "{{PDF_URL}}",
+                    pdfId: "{{PDF_ID}}",
+                    authToken: "{{AUTH_TOKEN}}",
+                    pdfTitle: "{{PDF_TITLE}}",
+                });
+            } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
+                pollAttempts++;
+                setTimeout(initLearnLens, POLL_INTERVAL);
+            } else {
+                console.error("LearnLens library failed to load after " + (MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000) + " seconds");
+            }
+        }
+        
+        initLearnLens();
+    </script>
+</body>
+</html>
+

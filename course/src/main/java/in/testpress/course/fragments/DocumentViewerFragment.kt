@@ -117,19 +117,33 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         if (aiChatFragment == null) {
             aiChatFragment = AIChatPdfFragment()
             val args = Bundle()
-            args.putLong("contentId", contentId)
-            args.putLong("courseId", content.courseId ?: -1L)
+            args.putLong(AIChatPdfFragment.ARG_CONTENT_ID, contentId)
+            args.putLong(AIChatPdfFragment.ARG_COURSE_ID, content.courseId ?: -1L)
+            
+            val localPdfFile = if (::pdfDownloadManager.isInitialized && pdfDownloadManager.isDownloaded()) {
+                pdfDownloadManager.get()
+            } else {
+                null
+            }
+            
+            val pdfUrl = localPdfFile?.let { "file://${it.absolutePath}" } 
+                ?: content.attachment?.attachmentUrl
+                ?: throw IllegalStateException("PDF URL not available")
+            
+            args.putString(AIChatPdfFragment.ARG_PDF_URL, pdfUrl)
+            args.putString(AIChatPdfFragment.ARG_PDF_TITLE, content.attachment?.title ?: DEFAULT_ATTACHMENT_TITLE)
+            args.putString(AIChatPdfFragment.ARG_TEMPLATE_NAME, AIChatPdfFragment.DEFAULT_TEMPLATE)
             aiChatFragment?.arguments = args
+            
+            childFragmentManager.beginTransaction()
+                .add(R.id.aiPdf_view_fragment, aiChatFragment!!)
+                .commit()
         }
 
         binding.pdfView.visibility = View.GONE
         binding.bottomNavigationFragment.visibility = View.GONE
         binding.askAiFab.visibility = View.GONE
         binding.aiPdfViewFragment.visibility = View.VISIBLE
-
-        childFragmentManager.beginTransaction()
-            .replace(R.id.aiPdf_view_fragment, aiChatFragment!!)
-            .commit()
 
         isAIView = true
         activity?.invalidateOptionsMenu()
@@ -140,13 +154,6 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         binding.bottomNavigationFragment.visibility = View.VISIBLE
         binding.askAiFab.visibility = View.VISIBLE
         binding.aiPdfViewFragment.visibility = View.GONE
-
-        aiChatFragment?.let {
-            childFragmentManager.beginTransaction()
-                .remove(it)
-                .commitNow()
-        }
-
         isAIView = false
         activity?.invalidateOptionsMenu()
     }
