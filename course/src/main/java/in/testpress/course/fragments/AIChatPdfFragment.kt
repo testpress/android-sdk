@@ -28,6 +28,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         const val ARG_PDF_URL = "pdfUrl"
         const val ARG_PDF_TITLE = "pdfTitle"
         const val ARG_TEMPLATE_NAME = "templateName"
+        const val ARG_LEARNLENS_ASSET_ID = "learnlensAssetId"
         const val DEFAULT_TEMPLATE = "learnlens_template.html"
     }
     
@@ -62,12 +63,13 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfUrl = requireArguments().getString(ARG_PDF_URL)
         val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
         val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
+        val learnlensAssetId = requireArguments().getString(ARG_LEARNLENS_ASSET_ID)
         
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
         }
         
-        return PdfArguments(contentId, courseId, pdfUrl, pdfTitle, templateName)
+        return PdfArguments(contentId, courseId, pdfUrl, pdfTitle, templateName, learnlensAssetId)
     }
     
     private fun initializeViews(view: View) {
@@ -112,12 +114,13 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         val cacheDir = File(requireContext().filesDir, "web_assets")
+        val pdfId = args.learnlensAssetId ?: args.contentId.toString()
         
         wv.loadTemplateAndCacheResources(
             templateName = args.templateName,
             replacements = mapOf(
                 "PDF_URL" to args.pdfUrl,
-                "PDF_ID" to args.contentId.toString(),
+                "PDF_ID" to pdfId,
                 "AUTH_TOKEN" to authToken,
                 "PDF_TITLE" to args.pdfTitle
             ),
@@ -171,6 +174,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val courseId: Long,
         val pdfUrl: String,
         val pdfTitle: String,
-        val templateName: String
+        val templateName: String,
+        val learnlensAssetId: String?
     )
 }
