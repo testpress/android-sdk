@@ -50,6 +50,7 @@ open class BaseWebChromeClient(private val fragment: Fragment) : WebChromeClient
         
         (fragment.requireActivity().window.decorView as? FrameLayout)?.removeView(fullscreenView)
         fullscreenView = null
+        fullscreenCallback?.onCustomViewHidden()
         fullscreenCallback = null
         
         showSystemUI()
