@@ -4,13 +4,11 @@ import android.content.ContentProvider
 import android.content.ContentValues
 import android.database.Cursor
 import android.net.Uri
-import `in`.testpress.util.LocalWebFileCache
 
 class SdkInitializer : ContentProvider() {
     
     override fun onCreate(): Boolean {
         context?.applicationContext?.let { appCtx ->
-            LocalWebFileCache.clearAll(appCtx)
             WebViewFactory.init(appCtx)
         }
         return true

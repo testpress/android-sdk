@@ -21,6 +21,7 @@ object WebViewFactory {
     private const val AVAILABLE_RAM_PERCENTAGE = 0.30
     
     private lateinit var appContext: Context
+    @Volatile
     private var maxSize: Int = 2
     private val memoryCheckHandler = android.os.Handler(android.os.Looper.getMainLooper())
     
@@ -61,9 +62,17 @@ object WebViewFactory {
         if (context == null || ::appContext.isInitialized) return true
         
         appContext = context.applicationContext
-        maxSize = calculateOptimalCacheSize()
-        appContext.registerComponentCallbacks(memoryListener)
-        memoryCheckHandler.postDelayed(memoryCheckRunnable, MEMORY_CHECK_INTERVAL_MS)
+        
+        Thread {
+            val calculatedSize = calculateOptimalCacheSize()
+            
+            memoryCheckHandler.post {
+                maxSize = calculatedSize
+                appContext.registerComponentCallbacks(memoryListener)
+                memoryCheckHandler.postDelayed(memoryCheckRunnable, MEMORY_CHECK_INTERVAL_MS)
+            }
+        }.start()
+        
         return true
     }
     

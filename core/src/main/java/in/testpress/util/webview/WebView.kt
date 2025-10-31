@@ -33,7 +33,10 @@ open class WebView @JvmOverloads constructor(
         clearCache(true)
         clearHistory()
         CookieManager.getInstance().setAcceptThirdPartyCookies(this, true)
-        setWebContentsDebuggingEnabled(true)
+        
+        if (0 != (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)) {
+            setWebContentsDebuggingEnabled(true)
+        }
     }
     
     fun enableFileAccess() {
