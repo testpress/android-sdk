@@ -33,14 +33,15 @@ open class BaseWebChromeClient(private val fragment: Fragment) : WebChromeClient
         
         hideSystemUI()
         
-        fullscreenBackCallback = object : OnBackPressedCallback(true) {
+        val backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 fullscreenCallback?.onCustomViewHidden()
             }
         }
+        fullscreenBackCallback = backCallback
         fragment.requireActivity().onBackPressedDispatcher.addCallback(
             fragment.viewLifecycleOwner,
-            fullscreenBackCallback!!
+            backCallback
         )
     }
     
@@ -49,7 +50,6 @@ open class BaseWebChromeClient(private val fragment: Fragment) : WebChromeClient
         
         (fragment.requireActivity().window.decorView as? FrameLayout)?.removeView(fullscreenView)
         fullscreenView = null
-        fullscreenCallback?.onCustomViewHidden()
         fullscreenCallback = null
         
         showSystemUI()

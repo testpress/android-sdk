@@ -63,13 +63,15 @@ class BaseWebChromeClientTest {
     }
 
     @Test
-    fun onHideCustomViewShouldRemoveViewAndCallCallback() {
+    fun onHideCustomViewShouldRemoveView() {
         val callback = TestCustomViewCallback()
+        val initialChildCount = (activity.window.decorView as FrameLayout).childCount
         chromeClient.onShowCustomView(testView, callback)
         
         chromeClient.onHideCustomView()
         
-        assertTrue(callback.wasHidden)
+        val finalChildCount = (activity.window.decorView as FrameLayout).childCount
+        assertEquals(initialChildCount, finalChildCount)
     }
 
     @Test

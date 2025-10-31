@@ -52,6 +52,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val args = extractArguments()
         initializeViews(view)
         initializeEmptyViewFragment()
+        webChromeClient = BaseWebChromeClient(this)
         loadPdfInWebView(args)
     }
     
@@ -80,8 +81,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         childFragmentManager.beginTransaction()
             .replace(R.id.empty_view_container, emptyViewFragment)
             .commit()
-        
-        webChromeClient = BaseWebChromeClient(this)
     }
     
     private fun loadPdfInWebView(args: PdfArguments) {
