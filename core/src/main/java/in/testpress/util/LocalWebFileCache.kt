@@ -28,6 +28,10 @@ object LocalWebFileCache {
     
     private val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private val downloadMutex = Mutex()
+    private val client = OkHttpClient.Builder()
+        .connectTimeout(DOWNLOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .readTimeout(DOWNLOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
+        .build()
     
     fun downloadInBackground(
         context: Context,
@@ -130,11 +134,6 @@ object LocalWebFileCache {
     }
     
     private suspend fun download(context: Context, url: String, fileName: String) = withContext(Dispatchers.IO) {
-        val client = OkHttpClient.Builder()
-            .connectTimeout(DOWNLOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .readTimeout(DOWNLOAD_TIMEOUT_SECONDS, TimeUnit.SECONDS)
-            .build()
-        
         val request = Request.Builder().url(url).build()
         
         client.newCall(request).execute().use { response ->
