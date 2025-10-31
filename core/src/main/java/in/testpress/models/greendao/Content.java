@@ -64,9 +64,6 @@ public class Content implements android.os.Parcelable {
     @SerializedName("is_ai_enabled")
     @Property(nameInDb = "IS_AI_ENABLED")
     private Boolean isAIEnabled;
-
-    @SerializedName("learnlens_asset_id")
-    @Property(nameInDb = "LEARNLENS_ASSET_ID")
     private String learnlensAssetId;
     private Long courseId;
     private Long chapterId;
