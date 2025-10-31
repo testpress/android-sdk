@@ -8,6 +8,7 @@ import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.util.webview.WebViewEventListener
 import `in`.testpress.util.webview.BaseWebViewClient
+import `in`.testpress.util.webview.BaseWebChromeClient
 import `in`.testpress.util.webview.WebView
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -35,6 +36,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private var progressBar: ProgressBar? = null
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
+    private lateinit var webChromeClient: BaseWebChromeClient
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -78,6 +80,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         childFragmentManager.beginTransaction()
             .replace(R.id.empty_view_container, emptyViewFragment)
             .commit()
+        
+        webChromeClient = BaseWebChromeClient(this)
     }
     
     private fun loadPdfInWebView(args: PdfArguments) {
@@ -105,6 +109,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private fun configureWebView(wv: WebView, args: PdfArguments) {
         wv.enableFileAccess()
         wv.webViewClient = BaseWebViewClient(this)
+        wv.webChromeClient = webChromeClient
         
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         val cacheDir = File(requireContext().filesDir, "web_assets")
@@ -123,6 +128,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onDestroyView() {
         super.onDestroyView()
+        webChromeClient.cleanup()
         WebViewFactory.detach(webView)
         webView = null
         container = null
