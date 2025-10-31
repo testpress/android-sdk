@@ -39,7 +39,7 @@ object HtmlResourceProcessor {
             val pattern = Regex("""(src|href)=["'](\s*$escapedUrl\s*)["']""")
             processedHtml = pattern.replace(processedHtml) { matchResult ->
                 val attribute = matchResult.groupValues[1]
-                """$attribute="$localPath""""
+                "$attribute=\"$localPath\""
             }
         }
         return processedHtml

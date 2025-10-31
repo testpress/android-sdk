@@ -94,7 +94,7 @@ object LocalWebFileCache {
         return maxAgeHours == null || !isFileExpired(context, fileName, maxAgeHours)
     }
     
-    private fun isCached(context: Context, fileName: String): Boolean {
+    internal fun isCached(context: Context, fileName: String): Boolean {
         return getCacheFile(context, fileName).exists()
     }
     
