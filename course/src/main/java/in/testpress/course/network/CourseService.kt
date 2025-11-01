@@ -11,6 +11,7 @@ import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Course
 import `in`.testpress.network.RetrofitCall
+import `in`.testpress.course.network.NetworkVideoQuestionResponse
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.v2_4.models.ContentsListResponse
@@ -102,6 +103,11 @@ interface CourseService {
         @Path(value = "exam_id", encoded = true) examId: Long,
         @Body arguments: HashMap<String, Any>
     ): RetrofitCall<HashMap<String,String>>
+
+    @GET("api/v2.5/video_contents/{video_content_id}/questions/")
+    fun getVideoQuestions(
+        @Path(value = "video_content_id", encoded = true) videoContentId: Long
+    ): RetrofitCall<NetworkVideoQuestionResponse>
 }
 
 
@@ -117,6 +123,10 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         queryParams: HashMap<String, Int> = hashMapOf()
     ): RetrofitCall<NetworkContentAttempt> {
         return getCourseService().createContentAttempt(contentId, queryParams)
+    }
+
+    fun getVideoQuestions(videoContentId: Long): RetrofitCall<NetworkVideoQuestionResponse> {
+        return getCourseService().getVideoQuestions(videoContentId)
     }
 
     fun getContentAttempts(url: String): RetrofitCall<TestpressApiResponse<NetworkContentAttempt>> {
