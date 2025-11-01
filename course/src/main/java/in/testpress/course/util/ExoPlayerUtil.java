@@ -46,6 +46,7 @@ import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
+import com.google.android.exoplayer2.PlayerMessage;
 import com.google.android.exoplayer2.audio.AudioAttributes;
 import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSession;
@@ -155,6 +156,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private long lastApiCallTime = System.currentTimeMillis() / 1000;
     long throttleTimeRemaining = 0;
     private ProfileDetails profileDetails = null;
+
+    private Handler quizCallbackHandler = null;
+    private List<Integer> quizPositions = new ArrayList<>();
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -431,6 +435,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         player.addAnalyticsListener(new ExoplayerAnalyticsListener(this));
         player.setAudioAttributes(AudioAttributes.DEFAULT,true);
         playerView.setPlayer(player);
+
+        if (quizCallbackHandler != null) {
+            scheduleQuizTriggers();
+        }
+
         player.setPlayWhenReady(playWhenReady);
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
         player.setMediaItem(mediaItem);
@@ -847,6 +856,49 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     @Override
     public DrmSessionManager get(MediaItem mediaItem) {
         return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
+    }
+
+    public void setupQuiz(List<Integer> positions, Handler callbackHandler) {
+        this.quizPositions = positions;
+        this.quizCallbackHandler = callbackHandler;
+
+        if (player != null) {
+            scheduleQuizTriggers();
+        }
+    }
+
+    private void scheduleQuizTriggers() {
+        if (player == null || quizCallbackHandler == null || quizPositions.isEmpty()) {
+            return;
+        }
+
+        PlayerMessage.Target target = new PlayerMessage.Target() {
+            public void handleMessage(int messageType, Object payload) {
+                int positionInSeconds = messageType;
+
+                quizCallbackHandler.obtainMessage(positionInSeconds).sendToTarget();
+            }
+        };
+
+        for (int position : quizPositions) {
+            player.createMessage(target)
+                .setPosition(position * 1000L)
+                .setType(position)
+                .setPayload(null)
+                .send();
+        }
+    }
+
+    public void pauseVideo() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+        }
+    }
+
+    public void playVideo() {
+        if (player != null) {
+            player.setPlayWhenReady(true);
+        }
     }
 
     private class PlayerEventListener implements Player.Listener, DRMLicenseFetchCallback {

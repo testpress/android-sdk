@@ -18,6 +18,8 @@ import android.app.AlertDialog
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.view.LayoutInflater
 import android.view.Menu
 import android.view.MenuInflater
@@ -30,10 +32,15 @@ import androidx.core.text.HtmlCompat
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import `in`.testpress.course.repository.ContentRepository
+import `in`.testpress.course.viewmodels.VideoQuizViewModel
+import `in`.testpress.course.network.NetworkVideoQuestion
+import `in`.testpress.enums.Status
 import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.util.regex.Pattern
 
-open class VideoContentFragment : BaseContentDetailFragment() {
+open class VideoContentFragment : BaseContentDetailFragment(), VideoQuizDialogFragment.OnQuizCompleteListener {
+    
     protected lateinit var titleView: TextView
     protected lateinit var description: TextView
     protected lateinit var titleLayout: LinearLayout
@@ -43,6 +50,15 @@ open class VideoContentFragment : BaseContentDetailFragment() {
     protected lateinit var menu: Menu
     protected lateinit var instituteSettings: InstituteSettings;
     protected var remainingDownloadCount :Int? = null
+
+    private lateinit var contentRepository: ContentRepository
+    private lateinit var videoQuizViewModel: VideoQuizViewModel
+
+    private val quizCallbackHandler = Handler(Looper.getMainLooper()) { message ->
+        val positionInSeconds = message.what.toLong()
+        handleQuizTrigger(positionInSeconds)
+        true
+    }
 
     override var isBookmarkEnabled: Boolean
         get() = false
@@ -56,6 +72,9 @@ open class VideoContentFragment : BaseContentDetailFragment() {
                 return OfflineVideoViewModel(OfflineVideoRepository(requireContext())) as T
             }
         }).get(OfflineVideoViewModel::class.java)
+
+        videoQuizViewModel = ViewModelProvider(this).get(VideoQuizViewModel::class.java)
+        contentRepository = ContentRepository(requireContext())
     }
 
     override fun onCreateView(
@@ -211,6 +230,7 @@ open class VideoContentFragment : BaseContentDetailFragment() {
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
+        fetchVideoQuestions()
     }
 
     override fun onResume() {
@@ -274,6 +294,67 @@ open class VideoContentFragment : BaseContentDetailFragment() {
         super.onActivityResult(requestCode, resultCode, data)
         if(requestCode == WebViewConstants.REQUEST_SELECT_FILE && resultCode == RESULT_OK){
             videoWidgetFragment.onActivityResult(requestCode, resultCode, data)
+        }
+    }
+
+
+    private fun fetchVideoQuestions() {
+        content.video?.id?.let { videoId ->
+            contentRepository.loadVideoQuestions(videoContentId = videoId).observe(viewLifecycleOwner, Observer { resource ->
+                when (resource.status) {
+                    Status.SUCCESS -> {
+                        resource.data?.let { questions ->
+                            if (questions.isNotEmpty()) {
+                                setupQuizLogic(questions)
+                            }
+                        }
+                    }
+                    Status.ERROR -> {
+                        // Handle or log error
+                    }
+                    Status.LOADING -> {
+                        // Handle or log error
+                    }
+                }
+            })
+        }
+    }
+
+    private fun setupQuizLogic(questions: List<NetworkVideoQuestion>) {
+        val validQuestions = questions.filter { q ->
+            !(q.question.type == "G" && q.question.answers.isNullOrEmpty())
+        }
+
+        videoQuizViewModel.setQuestions(validQuestions)
+        val positions = videoQuizViewModel.getUniquePositions()
+        videoWidgetFragment.setupQuiz(
+            positions,
+            quizCallbackHandler
+        )
+    }
+
+    private fun handleQuizTrigger(position: Long) {
+        val question = videoQuizViewModel.getNextQuestionForPosition(position.toInt())
+
+        if (question == null) {
+            return
+        }
+
+        videoWidgetFragment.pauseVideo()
+
+        VideoQuizDialogFragment.newInstance(question)
+            .show(childFragmentManager, "VideoQuizDialogFragment")
+    }
+
+    override fun onQuizCompleted(questionId: Long) {
+        val position = videoQuizViewModel.markQuestionAsCompleted(questionId)
+        val nextQuestion = videoQuizViewModel.getNextQuestionForPosition(position)
+
+        if (nextQuestion != null) {
+            VideoQuizDialogFragment.newInstance(nextQuestion)
+                .show(childFragmentManager, "VideoQuizDialogFragment")
+        } else {
+             videoWidgetFragment.playVideo()
         }
     }
 }
