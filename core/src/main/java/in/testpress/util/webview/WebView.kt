@@ -43,21 +43,19 @@ open class WebView @JvmOverloads constructor(
     }
     
     private fun configureFocusAndTouch() {
-        // Input and focus handling (matches XML defaults for interactive views)
         isFocusable = true
         isFocusableInTouchMode = true
         isClickable = true
         isLongClickable = true
         isSaveEnabled = true
         
-        // Accessibility (Android O+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
         }
         importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
         
-        // Request initial focus
-        requestFocus()
+        // Note: requestFocus() should be called AFTER the view is attached to the hierarchy
+        // (e.g., in the fragment after WebViewFactory.attach())
     }
     
     fun enableFileAccess() {
