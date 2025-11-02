@@ -1,7 +1,9 @@
 package `in`.testpress.util.webview
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
+import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView as AndroidWebView
@@ -16,6 +18,7 @@ open class WebView @JvmOverloads constructor(
     
     init {
         configureDefaultSettings()
+        configureFocusAndTouch()
     }
     
     private fun configureDefaultSettings() {
@@ -37,6 +40,22 @@ open class WebView @JvmOverloads constructor(
         if (0 != (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)) {
             setWebContentsDebuggingEnabled(true)
         }
+    }
+    
+    private fun configureFocusAndTouch() {
+        isFocusable = true
+        isFocusableInTouchMode = true
+        isClickable = true
+        isLongClickable = true
+        isSaveEnabled = true
+        
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
+        }
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        
+        // Note: requestFocus() should be called AFTER the view is attached to the hierarchy
+        // (e.g., in the fragment after WebViewFactory.attach())
     }
     
     fun enableFileAccess() {
