@@ -16,6 +16,7 @@ open class WebView @JvmOverloads constructor(
     
     init {
         configureDefaultSettings()
+        configureFocusAndTouch()
     }
     
     private fun configureDefaultSettings() {
@@ -37,6 +38,13 @@ open class WebView @JvmOverloads constructor(
         if (0 != (context.applicationInfo.flags and android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE)) {
             setWebContentsDebuggingEnabled(true)
         }
+    }
+    
+    private fun configureFocusAndTouch() {
+        isFocusable = true
+        isFocusableInTouchMode = true
+        isClickable = true
+        requestFocus()
     }
     
     fun enableFileAccess() {

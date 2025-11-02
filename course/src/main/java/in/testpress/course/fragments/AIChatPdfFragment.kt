@@ -103,7 +103,10 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         if (!isNewWebView) hideLoading()
         
         container?.let { cont -> 
-            webView?.let { wv -> WebViewFactory.attach(cont, wv) }
+            webView?.let { wv -> 
+                WebViewFactory.attach(cont, wv)
+                wv.requestFocus()
+            }
         }
     }
     
