@@ -1,7 +1,9 @@
 package `in`.testpress.util.webview
 
 import android.content.Context
+import android.os.Build
 import android.util.AttributeSet
+import android.view.View
 import android.webkit.CookieManager
 import android.webkit.WebSettings
 import android.webkit.WebView as AndroidWebView
@@ -41,9 +43,20 @@ open class WebView @JvmOverloads constructor(
     }
     
     private fun configureFocusAndTouch() {
+        // Input and focus handling (matches XML defaults for interactive views)
         isFocusable = true
         isFocusableInTouchMode = true
         isClickable = true
+        isLongClickable = true
+        isSaveEnabled = true
+        
+        // Accessibility (Android O+)
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            importantForAutofill = View.IMPORTANT_FOR_AUTOFILL_YES
+        }
+        importantForAccessibility = View.IMPORTANT_FOR_ACCESSIBILITY_YES
+        
+        // Request initial focus
         requestFocus()
     }
     
