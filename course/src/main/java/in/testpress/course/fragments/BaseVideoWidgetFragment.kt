@@ -31,6 +31,7 @@ open class BaseVideoWidgetFragment : Fragment() {
 
     open fun setupQuiz(
         positions: List<Int>,
+        positionsMs: LongArray,
         callbackHandler: Handler
     ) {}
     open fun pauseVideo() {}

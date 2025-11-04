@@ -327,8 +327,10 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuizDialogFr
 
         videoQuizViewModel.setQuestions(validQuestions)
         val positions = videoQuizViewModel.getUniquePositions()
+        val positionsMs = videoQuizViewModel.getUniquePositionMs()
         videoWidgetFragment.setupQuiz(
             positions,
+            positionsMs,
             quizCallbackHandler
         )
     }

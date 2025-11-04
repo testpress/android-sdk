@@ -28,4 +28,8 @@ class VideoQuizViewModel : ViewModel() {
     fun getUniquePositions(): List<Int> {
         return allQuestions.map { it.position }.distinct()
     }
+
+    fun getUniquePositionMs(): LongArray {
+        return allQuestions.map { it.position * 1000L }.distinct().toLongArray()
+    }
 }
