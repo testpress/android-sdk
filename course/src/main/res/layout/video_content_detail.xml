@@ -55,6 +55,14 @@
 
                 </LinearLayout>
 
+                <Button
+                    android:id="@+id/test_quiz_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center_horizontal"
+                    android:layout_margin="16dp"
+                    android:text="Run Quiz Test" />
+
                 <androidx.core.widget.NestedScrollView
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
