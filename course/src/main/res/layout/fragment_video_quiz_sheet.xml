@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:fillViewport="true"
+    android:background="@color/testpress_white">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="24dp"
+        android:paddingBottom="32dp">
+
+        <TextView
+            android:id="@+id/quiz_title"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Quiz"
+            android:textSize="@dimen/testpress_text_size_large"
+            android:textStyle="bold"
+            android:textColor="@color/testpress_black" />
+
+        <FrameLayout
+            android:id="@+id/quiz_question_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/quiz_title"
+            android:layout_marginTop="16dp" />
+
+        <LinearLayout
+            android:id="@+id/quiz_options_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/quiz_question_container"
+            android:orientation="vertical"
+            android:layout_marginTop="8dp" />
+
+        <TextView
+            android:id="@+id/quiz_feedback_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/quiz_options_container"
+            android:layout_toStartOf="@id/quiz_action_button"
+            android:layout_marginTop="16dp"
+            android:visibility="gone"
+            android:textSize="@dimen/testpress_text_size_medium"
+            android:textColor="@color/testpress_text_gray_dark" />
+
+        <TextView
+            android:id="@+id/quiz_action_button"
+            style="@style/TestpressSmallButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/quiz_feedback_text"
+            android:layout_alignParentEnd="true"
+            android:layout_marginTop="20dp"
+            android:text="@string/quiz_button_check"
+            android:enabled="false"
+            android:background="@drawable/testpress_green_curved_edge_background" />
+
+    </RelativeLayout>
+</ScrollView>
