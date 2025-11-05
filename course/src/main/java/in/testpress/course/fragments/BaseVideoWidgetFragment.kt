@@ -31,7 +31,6 @@ open class BaseVideoWidgetFragment : Fragment() {
 
     open fun setupQuestion(
         positions: List<Int>,
-        positionsMs: LongArray,
         callbackHandler: Handler
     ) {}
 
