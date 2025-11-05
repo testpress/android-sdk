@@ -34,7 +34,6 @@ open class ContentRepository(
     val courseNetwork = CourseNetwork(context)
 
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
-    private val videoQuestions = MutableLiveData<Resource<List<NetworkVideoQuestion>>>()
 
     fun loadContent(
         contentId: Long,
@@ -112,6 +111,7 @@ open class ContentRepository(
     }
 
     fun loadVideoQuestions(videoContentId: Long): LiveData<Resource<List<NetworkVideoQuestion>>> {
+        val videoQuestions = MutableLiveData<Resource<List<NetworkVideoQuestion>>>()
         videoQuestions.value = Resource.loading(null)
         courseNetwork.getVideoQuestions(videoContentId)
             .enqueue(object : TestpressCallback<NetworkVideoQuestionResponse>() {
