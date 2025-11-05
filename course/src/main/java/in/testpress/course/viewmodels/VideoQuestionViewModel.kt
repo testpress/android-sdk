@@ -1,3 +1,4 @@
+
 package `in`.testpress.course.viewmodels
 
 import androidx.lifecycle.ViewModel
@@ -29,10 +30,6 @@ class VideoQuestionViewModel : ViewModel() {
 
     fun getUniquePositions(): List<Int> {
         return questionsByPosition.keys.sorted()
-    }
-
-    fun getUniquePositionMs(): LongArray {
-        return questionsByPosition.keys.map { it * 1000L }.sorted().toLongArray()
     }
 }
 
