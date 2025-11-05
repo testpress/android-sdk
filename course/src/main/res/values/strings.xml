@@ -129,4 +129,7 @@
     <string name="exoplayer_audio_track_error">An AudioTrack error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_drm_error">A DRM error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
 
+    <string name="quiz_button_check">Check</string>
+    <string name="quiz_button_continue">Continue</string>
+    <string name="quiz_correct_answer">Correct answer is: %1$s</string>
 </resources>
