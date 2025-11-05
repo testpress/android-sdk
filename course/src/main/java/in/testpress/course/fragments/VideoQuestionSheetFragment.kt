@@ -40,6 +40,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
     private var selectedAnswerIds = mutableListOf<Long>()
     private var isCorrect = false
     private var gapFillResults = mutableListOf<Boolean>()
+    private var isAnswerChecked = false
 
     interface OnQuizCompleteListener {
         fun onQuizCompleted(questionId: Long)
@@ -142,11 +143,12 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
         buildQuestionUI(layoutInflater, questionContainer, optionsContainer, question)
 
         actionButton?.setOnClickListener {
-            if (actionButton?.text.toString().equals(getString(R.string.quiz_button_check), ignoreCase = true)) {
+            if (!isAnswerChecked) {
                 isCorrect = checkAnswers()
                 showFeedback(isCorrect)
                 disableOptions()
                 actionButton?.text = getString(R.string.quiz_button_continue)
+                isAnswerChecked = true
             } else {
                 listener?.onQuizCompleted(question.id)
                 dismiss()
@@ -193,6 +195,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                     }
                     
                     choiceContainer.addView(radioButton)
+                    optionView.tag = radioButton
                     radioGroup!!.addView(optionView)
                     answerViews.add(optionView)
                 }
@@ -230,14 +233,13 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
 
                     checkBox.setOnCheckedChangeListener { _, _ ->
                         val hasSelection = answerViews.any { view ->
-                            val frame = view.findViewById<FrameLayout>(R.id.choice_container)
-                            val cb = frame?.getChildAt(0) as? CheckBox
-                            cb?.isChecked == true
+                            (view.tag as? CheckBox)?.isChecked == true
                         }
                         actionButton?.isEnabled = hasSelection
                     }
                     
                     choiceContainer.addView(checkBox)
+                    optionView.tag = checkBox
                     optionsContainer.addView(optionView)
                     answerViews.add(optionView)
                 }
@@ -315,21 +317,21 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
         when (question.question.type) {
             "R" -> {
                 answerViews.forEach { view ->
-                    val choiceContainer = view.findViewById<FrameLayout>(R.id.choice_container)
-                    val radioButton = choiceContainer?.getChildAt(0) as? RadioButton
+                    val radioButton = view.tag as? RadioButton
                     if (radioButton != null && radioButton.isChecked) {
-                        val selectedAnswer = radioButton.tag as NetworkAnswer
-                        selectedAnswerIds.add(selectedAnswer.id)
+                        (radioButton.tag as? NetworkAnswer)?.let { selectedAnswer ->
+                            selectedAnswerIds.add(selectedAnswer.id)
+                        }
                     }
                 }
             }
             "C" -> {
                 answerViews.forEach { view ->
-                    val choiceContainer = view.findViewById<FrameLayout>(R.id.choice_container)
-                    val checkBox = choiceContainer?.getChildAt(0) as? CheckBox
+                    val checkBox = view.tag as? CheckBox
                     if (checkBox != null && checkBox.isChecked) {
-                        val selectedAnswer = checkBox.tag as NetworkAnswer
-                        selectedAnswerIds.add(selectedAnswer.id)
+                        (checkBox.tag as? NetworkAnswer)?.let { selectedAnswer ->
+                            selectedAnswerIds.add(selectedAnswer.id)
+                        }
                     }
                 }
             }
@@ -353,16 +355,11 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
 
     private fun disableOptions() {
         answerViews.forEach { view ->
-            val choiceContainer = view.findViewById<FrameLayout>(R.id.choice_container)
-            if (choiceContainer != null) {
-                val child = choiceContainer.getChildAt(0)
-                when (child) {
-                    is RadioButton -> child.isEnabled = false
-                    is CheckBox -> child.isEnabled = false
-                }
-            }
             if (view is EditText) {
                 view.isEnabled = false
+            } else {
+                val button = view.tag as? CompoundButton
+                button?.isEnabled = false
             }
             view.findViewById<LinearLayout>(R.id.option_root)?.isEnabled = false
         }
@@ -379,18 +376,13 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                 answerViews.forEach { view ->
                     val optionRoot = view.findViewById<LinearLayout>(R.id.option_root)
                     val icon = view.findViewById<ImageView>(R.id.quiz_icon)
-                    val choiceContainer = view.findViewById<FrameLayout>(R.id.choice_container)
-                    val button = choiceContainer?.getChildAt(0) as? View
+                    val button = view.tag as? CompoundButton
                     
                     if (button == null || optionRoot == null) return@forEach
                     
                     val answer = button.tag as? NetworkAnswer ?: return@forEach
                     
-                    val isSelected = when (button) {
-                        is RadioButton -> button.isChecked
-                        is CheckBox -> button.isChecked
-                        else -> selectedAnswerIds.contains(answer.id)
-                    }
+                    val isSelected = button.isChecked
 
                     if (answer.isCorrect) {
                         optionRoot.setBackgroundResource(R.drawable.quiz_border_correct)
