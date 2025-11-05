@@ -10,6 +10,8 @@ import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.course.network.NetworkVideoQuestion
+import `in`.testpress.course.network.NetworkVideoQuestionResponse
 import `in`.testpress.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
@@ -32,6 +34,7 @@ open class ContentRepository(
     val courseNetwork = CourseNetwork(context)
 
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
+    private val videoQuestions = MutableLiveData<Resource<List<NetworkVideoQuestion>>>()
 
     fun loadContent(
         contentId: Long,
@@ -106,6 +109,21 @@ open class ContentRepository(
                 }
             })
         return contentAttempt
+    }
+
+    fun loadVideoQuestions(videoContentId: Long): LiveData<Resource<List<NetworkVideoQuestion>>> {
+        videoQuestions.value = Resource.loading(null)
+        courseNetwork.getVideoQuestions(videoContentId)
+            .enqueue(object : TestpressCallback<NetworkVideoQuestionResponse>() {
+                override fun onSuccess(result: NetworkVideoQuestionResponse) {
+                    videoQuestions.value = Resource.success(result.results)
+                }
+
+                override fun onException(exception: TestpressException) {
+                    videoQuestions.value = Resource.error(exception, null)
+                }
+            })
+        return videoQuestions
     }
 
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
