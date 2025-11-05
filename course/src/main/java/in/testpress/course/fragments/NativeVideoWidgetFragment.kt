@@ -152,10 +152,9 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     override fun setupQuestion(
         positions: List<Int>,
-        positionsMs: LongArray,
         callbackHandler: Handler
     ) {
-        exoPlayerUtil?.setupQuestion(positions, positionsMs, callbackHandler)
+        exoPlayerUtil?.setupQuestion(positions, callbackHandler)
     }
 
     override fun pauseVideo() {

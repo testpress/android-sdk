@@ -860,12 +860,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
     }
 
-    public void setupQuestion(List<Integer> positions, long[] positionsMs, Handler callbackHandler) {
+    public void setupQuestion(List<Integer> positions, Handler callbackHandler) {
         this.questionPositions = positions;
         this.questionCallbackHandler = callbackHandler;
-        this.questionPositionMs = positionsMs;
+        this.questionPositionMs = positions.stream().mapToLong(i -> i * 1000L).toArray();
 
-        addQuestionPositionMarkers(positionsMs);
+        addQuestionPositionMarkers(this.questionPositionMs);
 
         if (player != null) {
             registerQuestionPositionCallbacks();
@@ -877,12 +877,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             return;
         }
 
-        PlayerMessage.Target target = new PlayerMessage.Target() {
-            public void handleMessage(int messageType, Object payload) {
-                int positionInSeconds = messageType;
-                questionCallbackHandler.obtainMessage(positionInSeconds).sendToTarget();
-            }
-        };
+        PlayerMessage.Target target = (messageType, payload) -> questionCallbackHandler.obtainMessage(messageType).sendToTarget();
 
         for (int position : questionPositions) {
             player.createMessage(target)
@@ -919,10 +914,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
         if (playerControlView != null) {
             boolean[] playedMarkers = new boolean[positionsMs.length];
-            for (int i = 0; i < playedMarkers.length; i++) {
-                playedMarkers[i] = false;
-            }
-
             playerControlView.setExtraAdGroupMarkers(positionsMs, playedMarkers);
         }
     }
