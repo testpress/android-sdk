@@ -13,7 +13,7 @@ object TimeUtils {
         var minutes = 1L
 
         while (durationList.size > 0) {
-            seconds += minutes * durationList.removeLast().toLong()
+            seconds += minutes * durationList.removeAt(durationList.lastIndex).toLong()
             minutes *= 60
         }
 

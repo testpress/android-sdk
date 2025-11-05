@@ -53,7 +53,7 @@ object DateUtils {
         var minutes = 1
 
         while (durationList.size > 0) {
-            seconds += minutes * durationList.removeLast().toInt()
+            seconds += minutes * durationList.removeAt(durationList.lastIndex).toInt()
             minutes *= 60
         }
 
