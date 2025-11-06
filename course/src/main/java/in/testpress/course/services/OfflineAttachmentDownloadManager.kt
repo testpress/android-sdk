@@ -32,9 +32,8 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
             return
         }
         val fileName =
-            "${domainAttachmentContent.title}${getFileExtensionFromUrl(domainAttachmentContent.attachmentUrl)}"
-        val sanitizedFileName = fileName.sanitizeFileName()
-        val request = getDownloadManagerRequest(domainAttachmentContent.attachmentUrl, sanitizedFileName)
+            "${domainAttachmentContent.title}${getFileExtensionFromUrl(domainAttachmentContent.attachmentUrl)}".sanitizeFileName()
+        val request = getDownloadManagerRequest(domainAttachmentContent.attachmentUrl, fileName)
 
         val downloadId = downloadManager.enqueue(request)
 
