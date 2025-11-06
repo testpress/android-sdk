@@ -24,6 +24,7 @@ import android.view.MenuInflater
 import android.view.MenuItem
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.core.text.HtmlCompat
@@ -33,7 +34,9 @@ import androidx.lifecycle.ViewModelProvider
 import io.netopen.hotbitmapgg.library.view.RingProgressBar
 import java.util.regex.Pattern
 
-open class VideoContentFragment : BaseContentDetailFragment() {
+// vvv Make your fragment implement the new listener vvv
+open class VideoContentFragment : BaseContentDetailFragment(), VideoQuizSheetFragment.OnQuizCompleteListener {
+    
     protected lateinit var titleView: TextView
     protected lateinit var description: TextView
     protected lateinit var titleLayout: LinearLayout
@@ -43,6 +46,11 @@ open class VideoContentFragment : BaseContentDetailFragment() {
     protected lateinit var menu: Menu
     protected lateinit var instituteSettings: InstituteSettings;
     protected var remainingDownloadCount :Int? = null
+
+    private var mockQuestionIndex = 0
+    private val mockQuestions = createMockQuestions()
+    private var quizTriggerHandler: android.os.Handler? = null
+    private var quizTriggerRunnable: Runnable? = null
 
     override var isBookmarkEnabled: Boolean
         get() = false
@@ -74,6 +82,14 @@ open class VideoContentFragment : BaseContentDetailFragment() {
         initializeListeners()
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
         initializeRemainingDownloadsCount()
+
+        view.findViewById<Button>(R.id.test_quiz_button)?.setOnClickListener {
+            mockQuestionIndex = 0 // Reset the test
+            showMockQuestion(mockQuestionIndex)
+        }
+        
+        // Auto-trigger quiz after 5 seconds of video playback (for testing)
+        startQuizAutoTrigger()
     }
 
     private fun initializeRemainingDownloadsCount(){
@@ -218,6 +234,13 @@ open class VideoContentFragment : BaseContentDetailFragment() {
         if(isContentInitialized() && instituteSettings.isVideoDownloadEnabled && content.video!!.isDownloadable()) {
             showDownloadStatus()
         }
+        // Re-trigger quiz auto-trigger if needed
+        startQuizAutoTrigger()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopQuizAutoTrigger()
     }
 
     private fun showDownloadStatus() {
@@ -275,6 +298,111 @@ open class VideoContentFragment : BaseContentDetailFragment() {
         if(requestCode == WebViewConstants.REQUEST_SELECT_FILE && resultCode == RESULT_OK){
             videoWidgetFragment.onActivityResult(requestCode, resultCode, data)
         }
+    }
+    private fun showMockQuestion(index: Int) {
+        val question = mockQuestions.getOrNull(index)
+        if (question != null) {
+            VideoQuizSheetFragment.newInstance(question)
+                .show(requireActivity().supportFragmentManager, "VideoQuizSheetFragment")
+        }
+    }
+ 
+    private fun startQuizAutoTrigger() {
+        stopQuizAutoTrigger() // Cancel any existing trigger
+        
+        quizTriggerHandler = android.os.Handler(android.os.Looper.getMainLooper())
+        quizTriggerRunnable = Runnable {
+            mockQuestionIndex = 0 // Reset to first question
+            showMockQuestion(mockQuestionIndex)
+        }
+        // Trigger after 5 seconds (5000ms)
+        quizTriggerHandler?.postDelayed(quizTriggerRunnable!!, 2000)
+    }
+
+    private fun stopQuizAutoTrigger() {
+        quizTriggerRunnable?.let { quizTriggerHandler?.removeCallbacks(it) }
+        quizTriggerRunnable = null
+    }
+    
+    override fun onDestroyView() {
+        super.onDestroyView()
+        stopQuizAutoTrigger()
+    }
+    override fun onQuizCompleted(questionId: Long) {
+        mockQuestionIndex++
+        showMockQuestion(mockQuestionIndex)
+    }
+
+    private fun createMockQuestions(): List<DummyQuestion> {
+        // RadioButton (R) question with long question and long answers
+        val rAnswers = listOf(
+            DummyAnswer(1, "A. This is a very long answer option that tests how the UI handles multiple lines of text when the answer text is quite extensive and needs to wrap properly within the layout constraints", true),
+            DummyAnswer(2, "B. This is another long wrong answer option that demonstrates how incorrect answers are displayed when they contain substantial amounts of text that needs to be rendered across multiple lines", false),
+            DummyAnswer(3, "C. Short option", false),
+            DummyAnswer(4, "D. Yet another incorrect answer option with a moderate amount of text to test the layout rendering capabilities", false)
+        )
+        val rQuestion = DummyQuestion(
+            101, 
+            "This is a comprehensive test question with a very long question text that spans multiple lines to verify how the quiz bottom sheet handles extensive content. The question asks: What are the key considerations when designing a user interface that must accommodate varying amounts of text content while maintaining readability and visual appeal?", 
+            "R", 
+            rAnswers
+        )
+
+        // CheckBox (C) question with long question and long answers
+        val cAnswers = listOf(
+            DummyAnswer(5, "A. First correct answer option with extensive text content that demonstrates how multiple selection options appear when they contain long descriptions that need to wrap properly", true),
+            DummyAnswer(6, "B. Second correct answer option with detailed explanation text that shows how the checkbox layout handles substantial amounts of text content spanning multiple lines", true),
+            DummyAnswer(7, "C. This is an incorrect multiple choice option with considerable text length to test the visual rendering and spacing of checkbox items when they contain lengthy descriptions", false),
+            DummyAnswer(8, "D. Another wrong answer option with moderate text length to ensure proper alignment and spacing in the checkbox list layout", false),
+            DummyAnswer(9, "E. Final incorrect option with brief text", false)
+        )
+        val cQuestion = DummyQuestion(
+            102, 
+            "Select all the correct statements from the following options. This question contains a substantial amount of text to test how the quiz interface handles lengthy question content: When designing responsive user interfaces, developers must consider various factors including screen sizes, content variability, user interaction patterns, accessibility requirements, and performance optimization strategies. Which of the following options correctly describe these considerations?", 
+            "C", 
+            cAnswers
+        )
+
+        // Gap-fill (G) question with 3 boxes
+        val gAnswers = listOf(
+            DummyAnswer(10, "quick", true),
+            DummyAnswer(11, "brown", true),
+            DummyAnswer(12, "fox", true)
+        )
+        val gQuestion = DummyQuestion(
+            103, 
+            "The [quick] [brown] [fox] jumps over the lazy dog.", 
+            "G", 
+            gAnswers
+        )
+
+        // Another RadioButton question with medium length
+        val r2Answers = listOf(
+            DummyAnswer(13, "A. Answer option with moderate text length to test spacing and alignment", true),
+            DummyAnswer(14, "B. Wrong answer", false),
+            DummyAnswer(15, "C. Another wrong option", false),
+            DummyAnswer(16, "D. Yet another incorrect choice", false)
+        )
+        val r2Question = DummyQuestion(
+            104,
+            "This is a medium-length question that tests how the quiz handles questions with moderate amounts of text content.",
+            "R",
+            r2Answers
+        )
+
+        // Another Gap-fill question with 2 boxes
+        val g2Answers = listOf(
+            DummyAnswer(17, "cat", true),
+            DummyAnswer(18, "mat", true)
+        )
+        val g2Question = DummyQuestion(
+            105,
+            "The [cat] sat on the [mat].",
+            "G",
+            g2Answers
+        )
+
+        return listOf(rQuestion, cQuestion, gQuestion, r2Question, g2Question)
     }
 }
 
