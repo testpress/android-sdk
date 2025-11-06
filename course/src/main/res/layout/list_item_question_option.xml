@@ -17,7 +17,7 @@
         android:layout_weight="1" />
 
     <ImageView
-        android:id="@+id/quiz_icon"
+        android:id="@+id/question_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:visibility="gone" />

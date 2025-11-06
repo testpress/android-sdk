@@ -30,7 +30,7 @@ import java.util.regex.Pattern
 class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
 
     private lateinit var question: NetworkVideoQuestion
-    private var listener: OnQuizCompleteListener? = null
+    private var listener: OnQuestionCompleteListener? = null
 
     private var answerViews = mutableListOf<View>()
     private var actionButton: TextView? = null
@@ -42,8 +42,8 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
     private var gapFillResults = mutableListOf<Boolean>()
     private var isAnswerChecked = false
 
-    interface OnQuizCompleteListener {
-        fun onQuizCompleted(questionId: Long)
+    interface OnQuestionCompleteListener {
+        fun onQuestionCompleted(questionId: Long)
     }
 
     companion object {
@@ -59,10 +59,10 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (parentFragment is OnQuizCompleteListener) {
-            listener = parentFragment as OnQuizCompleteListener
+        if (parentFragment is OnQuestionCompleteListener) {
+            listener = parentFragment as OnQuestionCompleteListener
         } else {
-            throw RuntimeException("$parentFragment must implement OnQuizCompleteListener")
+            throw RuntimeException("$parentFragment must implement OnQuestionCompleteListener")
         }
     }
 
@@ -81,7 +81,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View? {
-        return inflater.inflate(R.layout.fragment_video_quiz_sheet, container, false)
+        return inflater.inflate(R.layout.fragment_video_question_sheet, container, false)
     }
     
     override fun onStart() {
@@ -134,10 +134,10 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val questionContainer: FrameLayout = view.findViewById(R.id.quiz_question_container)
-        val optionsContainer: LinearLayout = view.findViewById(R.id.quiz_options_container)
-        actionButton = view.findViewById(R.id.quiz_action_button)
-        feedbackText = view.findViewById(R.id.quiz_feedback_text)
+        val questionContainer: FrameLayout = view.findViewById(R.id.question_question_container)
+        val optionsContainer: LinearLayout = view.findViewById(R.id.question_options_container)
+        actionButton = view.findViewById(R.id.question_action_button)
+        feedbackText = view.findViewById(R.id.question_feedback_text)
 
         answerViews.clear()
         buildQuestionUI(layoutInflater, questionContainer, optionsContainer, question)
@@ -147,10 +147,10 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                 isCorrect = checkAnswers()
                 showFeedback(isCorrect)
                 disableOptions()
-                actionButton?.text = getString(R.string.quiz_button_continue)
+                actionButton?.text = getString(R.string.question_button_continue)
                 isAnswerChecked = true
             } else {
-                listener?.onQuizCompleted(question.id)
+                listener?.onQuestionCompleted(question.id)
                 dismiss()
             }
         }
@@ -179,7 +179,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                 }
 
                 question.question.answers?.forEach { answer ->
-                    val optionView = inflater.inflate(R.layout.list_item_quiz_option, radioGroup, false)
+                    val optionView = inflater.inflate(R.layout.list_item_question_option, radioGroup, false)
                     val choiceContainer = optionView.findViewById<FrameLayout>(R.id.choice_container)
                     
                     val radioButton = MaterialRadioButton(context).apply {
@@ -211,7 +211,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                 questionContainer.addView(questionTextView)
 
                 question.question.answers?.forEach { answer ->
-                    val optionView = inflater.inflate(R.layout.list_item_quiz_option, optionsContainer, false)
+                    val optionView = inflater.inflate(R.layout.list_item_question_option, optionsContainer, false)
                     val choiceContainer = optionView.findViewById<FrameLayout>(R.id.choice_container)
 
                     val checkBox = MaterialCheckBox(context).apply {
@@ -375,7 +375,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                 
                 answerViews.forEach { view ->
                     val optionRoot = view.findViewById<LinearLayout>(R.id.option_root)
-                    val icon = view.findViewById<ImageView>(R.id.quiz_icon)
+                    val icon = view.findViewById<ImageView>(R.id.question_icon)
                     val button = view.tag as? CompoundButton
                     
                     if (button == null || optionRoot == null) return@forEach
@@ -385,13 +385,13 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                     val isSelected = button.isChecked
 
                     if (answer.isCorrect) {
-                        optionRoot.setBackgroundResource(R.drawable.quiz_border_correct)
+                        optionRoot.setBackgroundResource(R.drawable.question_border_correct)
                         icon.setImageResource(R.drawable.ic_baseline_done_24)
                         icon.setColorFilter(ContextCompat.getColor(context, R.color.testpress_green))
                         icon.visibility = View.VISIBLE
                     } 
                     else if (isSelected) {
-                        optionRoot.setBackgroundResource(R.drawable.quiz_border_incorrect)
+                        optionRoot.setBackgroundResource(R.drawable.question_border_incorrect)
                         icon.setImageResource(R.drawable.ic_baseline_error_24)
                         icon.setColorFilter(ContextCompat.getColor(context, R.color.testpress_red_incorrect))
                         icon.visibility = View.VISIBLE
@@ -404,16 +404,16 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                     val isBoxCorrect = gapFillResults.getOrNull(index) ?: false
                     
                     if (isBoxCorrect) {
-                        editText.setBackgroundResource(R.drawable.quiz_border_correct)
+                        editText.setBackgroundResource(R.drawable.question_border_correct)
                     } else {
-                        editText.setBackgroundResource(R.drawable.quiz_border_incorrect)
+                        editText.setBackgroundResource(R.drawable.question_border_incorrect)
                     }
                 }
                 
                 if (!isCorrect) {
                     feedbackText?.visibility = View.VISIBLE
                     val correctAnswers = question.question.answers?.joinToString(", ") { it.textHtml } ?: ""
-                    feedbackText?.text = getString(R.string.quiz_correct_answer, correctAnswers)
+                    feedbackText?.text = getString(R.string.question_correct_answer, correctAnswers)
                     feedbackText?.setTextColor(ContextCompat.getColor(context, R.color.testpress_red_incorrect))
                 } else {
                     feedbackText?.visibility = View.GONE
