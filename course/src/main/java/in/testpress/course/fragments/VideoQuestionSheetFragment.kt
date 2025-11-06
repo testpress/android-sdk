@@ -134,7 +134,7 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val questionContainer: FrameLayout = view.findViewById(R.id.question_question_container)
+        val questionContainer: FrameLayout = view.findViewById(R.id.question_container)
         val optionsContainer: LinearLayout = view.findViewById(R.id.question_options_container)
         actionButton = view.findViewById(R.id.question_action_button)
         feedbackText = view.findViewById(R.id.question_feedback_text)
