@@ -13,13 +13,13 @@
     <FrameLayout
         android:id="@+id/choice_container"
         android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:layout_weight="1" />
 
     <ImageView
         android:id="@+id/question_icon"
         android:layout_width="24dp"
         android:layout_height="24dp"
-        android:visibility="gone" />
+        android:visibility="invisible" />
 
 </LinearLayout>

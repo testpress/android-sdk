@@ -6,6 +6,7 @@ import android.graphics.Typeface
 import android.os.Bundle
 import android.text.Editable
 import android.text.InputType
+import android.text.TextUtils
 import android.text.TextWatcher
 import android.util.TypedValue
 import android.view.LayoutInflater
@@ -17,6 +18,7 @@ import androidx.core.text.HtmlCompat
 import com.google.android.flexbox.AlignItems
 import com.google.android.flexbox.FlexWrap
 import com.google.android.flexbox.FlexboxLayout
+import com.google.android.flexbox.FlexboxLayout.LayoutParams
 import com.google.android.material.bottomsheet.BottomSheetBehavior
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import com.google.android.material.checkbox.MaterialCheckBox
@@ -166,7 +168,8 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
         when (question.question.type) {
             "R" -> {
                 val questionTextView = TextView(context).apply {
-                    text = HtmlCompat.fromHtml(question.question.questionHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    val htmlText = HtmlCompat.fromHtml(question.question.questionHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    text = htmlText.subSequence(0, TextUtils.getTrimmedLength(htmlText))
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.testpress_text_size_large))
                     setTypeface(null, Typeface.BOLD)
                     setTextColor(ContextCompat.getColor(context, R.color.testpress_black))
@@ -177,6 +180,9 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                     orientation = LinearLayout.VERTICAL
                     id = View.generateViewId()
                 }
+
+                val radioButtons = mutableListOf<RadioButton>()
+                var isUpdatingRadioButtons = false
 
                 question.question.answers?.forEach { answer ->
                     val optionView = inflater.inflate(R.layout.list_item_question_option, radioGroup, false)
@@ -190,10 +196,22 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                         setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.testpress_text_size_xmedium))
                     }
                     
-                    radioButton.setOnCheckedChangeListener { _, isChecked ->
-                        if (isChecked) actionButton?.isEnabled = true
+                    radioButton.setOnCheckedChangeListener { buttonView, isChecked ->
+                        if (isUpdatingRadioButtons) return@setOnCheckedChangeListener
+                        
+                        if (isChecked) {
+                            isUpdatingRadioButtons = true
+                            radioButtons.forEach { rb ->
+                                if (rb != buttonView && rb.isChecked) {
+                                    rb.isChecked = false
+                                }
+                            }
+                            isUpdatingRadioButtons = false
+                            actionButton?.isEnabled = true
+                        }
                     }
                     
+                    radioButtons.add(radioButton)
                     choiceContainer.addView(radioButton)
                     optionView.tag = radioButton
                     radioGroup!!.addView(optionView)
@@ -203,7 +221,8 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
             }
             "C" -> {
                 val questionTextView = TextView(context).apply {
-                    text = HtmlCompat.fromHtml(question.question.questionHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    val htmlText = HtmlCompat.fromHtml(question.question.questionHtml, HtmlCompat.FROM_HTML_MODE_LEGACY)
+                    text = htmlText.subSequence(0, TextUtils.getTrimmedLength(htmlText))
                     setTextSize(TypedValue.COMPLEX_UNIT_PX, resources.getDimension(R.dimen.testpress_text_size_large))
                     setTypeface(null, Typeface.BOLD)
                     setTextColor(ContextCompat.getColor(context, R.color.testpress_black))
@@ -287,7 +306,13 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                         }
                     })
                     
-                    flexboxLayout.addView(editText)
+                    val layoutParams = LayoutParams(
+                        ViewGroup.LayoutParams.WRAP_CONTENT,
+                        ViewGroup.LayoutParams.WRAP_CONTENT
+                    ).apply {
+                        topMargin = resources.getDimensionPixelSize(R.dimen.testpress_horizontal_margin)
+                    }
+                    flexboxLayout.addView(editText, layoutParams)
                     answerViews.add(editText)
                     lastEnd = matcher.end()
                 }
@@ -395,6 +420,8 @@ class VideoQuestionSheetFragment : BottomSheetDialogFragment() {
                         icon.setImageResource(R.drawable.ic_baseline_error_24)
                         icon.setColorFilter(ContextCompat.getColor(context, R.color.testpress_red_incorrect))
                         icon.visibility = View.VISIBLE
+                    } else {
+                        icon.visibility = View.INVISIBLE
                     }
                 }
             }
