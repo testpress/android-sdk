@@ -27,7 +27,10 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
-
+    private var pendingPositions: List<Int>? = null
+    private var pendingCallbackHandler: Handler? = null
+    private var pendingMarkerPositions: List<Int>? = null
+    
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
     }
@@ -100,7 +103,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.getPlaybackURL(), 0F)
         exoPlayerUtil?.setContent(greenDaoContent!!)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
-
+        registerPendingCallbacks()
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
                 when(resource.status) {
@@ -156,11 +159,39 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         positions: List<Int>,
         callbackHandler: Handler
     ) {
-        exoPlayerUtil?.registerPositionCallbacks(positions, callbackHandler)
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil?.registerPositionCallbacks(positions, callbackHandler)
+            pendingMarkerPositions?.let {
+                exoPlayerUtil?.addPlaybackMarkers(it)
+                pendingMarkerPositions = null
+            }
+        } else {
+            pendingPositions = positions
+            pendingCallbackHandler = callbackHandler
+        }
     }
 
     fun addPlaybackMarkers(positions: List<Int>) {
-        exoPlayerUtil?.addPlaybackMarkers(positions)
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil?.addPlaybackMarkers(positions)
+        } else {
+            pendingMarkerPositions = positions
+        }
+    }
+    private fun registerPendingCallbacks() {
+        if (exoPlayerUtil != null) {
+            pendingPositions?.let { positions ->
+                pendingCallbackHandler?.let { handler ->
+                    exoPlayerUtil?.registerPositionCallbacks(positions, handler)
+                    pendingPositions = null
+                    pendingCallbackHandler = null
+                }
+            }
+            pendingMarkerPositions?.let { positions ->
+                exoPlayerUtil?.addPlaybackMarkers(positions)
+                pendingMarkerPositions = null
+            }
+        }
     }
 
     fun pauseVideo() {

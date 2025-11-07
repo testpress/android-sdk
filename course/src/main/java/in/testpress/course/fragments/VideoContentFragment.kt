@@ -38,6 +38,8 @@ import `in`.testpress.course.repository.ContentRepository
 import `in`.testpress.course.viewmodels.VideoQuestionViewModel
 import `in`.testpress.course.network.NetworkVideoQuestion
 import `in`.testpress.enums.Status
+import `in`.testpress.core.TestpressException
+import android.widget.Toast
 
 import java.util.regex.Pattern
 
@@ -312,7 +314,31 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
                         }
                     }
                     Status.ERROR -> {
-                        Log.e("VideoContentFragment", "Failed to load video questions", resource.exception)
+                        val exception = resource.exception
+                        val errorMessage = when {
+                            exception is TestpressException -> {
+                                when (exception.kind) {
+                                    TestpressException.Kind.HTTP -> {
+                                        val statusCode = exception.response?.code() ?: 0
+                                        "API Error: $statusCode - ${exception.message}"
+                                    }
+                                    TestpressException.Kind.NETWORK -> {
+                                        "Network Error: ${exception.message}"
+                                    }
+                                    else -> {
+                                        "API Error: ${exception.message}"
+                                    }
+                                }
+                            }
+                            exception?.message?.contains("database", ignoreCase = true) == true ||
+                            exception?.message?.contains("Database", ignoreCase = true) == true -> {
+                                "Database Error: ${exception.message}"
+                            }
+                            else -> {
+                                "Error: ${exception?.message ?: "Unknown error occurred"}"
+                            }
+                        }
+                        Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_LONG).show()
                     }
                     else -> {}
                 }

@@ -16,6 +16,8 @@ import `in`.testpress.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.VideoQuestion
+import `in`.testpress.database.dao.VideoQuestionDao
 import `in`.testpress.enums.Status
 import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.models.greendao.Content
@@ -25,6 +27,11 @@ import `in`.testpress.network.RetrofitCall
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
+import com.google.gson.reflect.TypeToken
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 
 open class ContentRepository(
     val context: Context
@@ -32,6 +39,9 @@ open class ContentRepository(
     val roomContentDao = TestpressDatabase(context).contentDao()
     val contentDao = TestpressSDKDatabase.getContentDao(context)
     val courseNetwork = CourseNetwork(context)
+    private val videoQuestionDao: VideoQuestionDao = TestpressDatabase(context).videoQuestionDao()
+    private val gson = Gson()
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
 
@@ -110,20 +120,62 @@ open class ContentRepository(
         return contentAttempt
     }
 
-    fun loadVideoQuestions(videoContentId: Long): LiveData<Resource<List<NetworkVideoQuestion>>> {
-        val videoQuestions = MutableLiveData<Resource<List<NetworkVideoQuestion>>>()
-        videoQuestions.value = Resource.loading(null)
-        courseNetwork.getVideoQuestions(videoContentId)
-            .enqueue(object : TestpressCallback<NetworkVideoQuestionResponse>() {
-                override fun onSuccess(result: NetworkVideoQuestionResponse) {
-                    videoQuestions.value = Resource.success(result.results)
+    fun loadVideoQuestions(
+        videoContentId: Long,
+        forceRefresh: Boolean = false
+    ): LiveData<Resource<List<NetworkVideoQuestion>>> {
+        return object : NetworkBoundResource<List<NetworkVideoQuestion>, NetworkVideoQuestionResponse>() {
+            override fun saveNetworkResponseToDB(item: NetworkVideoQuestionResponse) {
+                kotlinx.coroutines.runBlocking {
+                    storeVideoQuestionsToDB(videoContentId, item.results)
                 }
+            }
 
-                override fun onException(exception: TestpressException) {
-                    videoQuestions.value = Resource.error(exception, null)
+            override fun shouldFetch(data: List<NetworkVideoQuestion>?): Boolean {
+                val shouldFetch = forceRefresh || data == null || data.isEmpty()
+                return shouldFetch
+            }
+
+            override fun loadFromDb(): LiveData<List<NetworkVideoQuestion>> {
+                val liveData = MutableLiveData<List<NetworkVideoQuestion>>()
+                scope.launch {
+                    try {
+                        val questions = getVideoQuestionsFromDB(videoContentId)
+                        liveData.postValue(questions)
+                    } catch (e: Exception) {
+                        liveData.postValue(null)
+                    }
                 }
-            })
-        return videoQuestions
+                return liveData
+            }
+
+            override fun createCall(): RetrofitCall<NetworkVideoQuestionResponse> {
+                return courseNetwork.getVideoQuestions(videoContentId)
+            }
+        }.asLiveData()
+    }
+
+    private suspend fun storeVideoQuestionsToDB(videoContentId: Long, videoQuestions: List<NetworkVideoQuestion>) {
+        try {
+            val json = gson.toJson(videoQuestions)
+            val videoQuestion = VideoQuestion(
+                videoContentId = videoContentId,
+                questionsJson = json
+            )
+            videoQuestionDao.insert(videoQuestion)
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    private suspend fun getVideoQuestionsFromDB(videoContentId: Long): List<NetworkVideoQuestion>? {
+        try {
+            val videoQuestion = videoQuestionDao.getByVideoContentId(videoContentId) ?: return null
+            val type = object : TypeToken<List<NetworkVideoQuestion>>() {}.type
+            return gson.fromJson<List<NetworkVideoQuestion>>(videoQuestion.questionsJson, type)
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {
