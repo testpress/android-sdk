@@ -231,7 +231,9 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.commit()
-        fetchVideoQuestions()
+        if (videoWidgetFragment.enabledVideoQuestion) {
+            fetchVideoQuestions()
+        }
     }
 
     override fun onResume() {
@@ -328,11 +330,13 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         videoQuestionViewModel.setQuestions(validQuestions)
         val positions = videoQuestionViewModel.getUniquePositions()
 
-        videoWidgetFragment.registerPositionCallbacks(
-            positions,
-            questionCallbackHandler
-        )
-        videoWidgetFragment.addPlaybackMarkers(positions)
+        (videoWidgetFragment as? NativeVideoWidgetFragment)?.let {
+            it.registerPositionCallbacks(
+                positions,
+                questionCallbackHandler
+            )
+            it.addPlaybackMarkers(positions)
+        }
     }
 
     private fun handleQuestionTrigger(position: Long) {
@@ -342,7 +346,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
             return
         }
 
-        videoWidgetFragment.pauseVideo()
+        (videoWidgetFragment as? NativeVideoWidgetFragment)?.pauseVideo()
         VideoQuestionSheetFragment.newInstance(question)
             .show(childFragmentManager, "VideoQuestionSheetFragment")
     }
@@ -355,7 +359,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
             VideoQuestionSheetFragment.newInstance(nextQuestion)
                 .show(childFragmentManager, "VideoQuestionSheetFragment")
         } else {
-             videoWidgetFragment.playVideo()
+            (videoWidgetFragment as? NativeVideoWidgetFragment)?.playVideo()
         }
     }
 }

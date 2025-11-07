@@ -150,22 +150,24 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoplayerFullscreenHelper?.disableOrientationListener()
     }
 
-    override fun registerPositionCallbacks(
+    override val enabledVideoQuestion: Boolean = true
+
+    fun registerPositionCallbacks(
         positions: List<Int>,
         callbackHandler: Handler
     ) {
         exoPlayerUtil?.registerPositionCallbacks(positions, callbackHandler)
     }
 
-    override fun addPlaybackMarkers(positions: List<Int>) {
+    fun addPlaybackMarkers(positions: List<Int>) {
         exoPlayerUtil?.addPlaybackMarkers(positions)
     }
 
-    override fun pauseVideo() {
+    fun pauseVideo() {
         exoPlayerUtil?.pauseVideo()
     }
 
-    override fun playVideo() {
+    fun playVideo() {
         exoPlayerUtil?.playVideo()
     }
 }
