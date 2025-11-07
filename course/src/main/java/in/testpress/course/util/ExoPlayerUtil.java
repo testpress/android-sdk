@@ -157,10 +157,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private long lastApiCallTime = System.currentTimeMillis() / 1000;
     long throttleTimeRemaining = 0;
     private ProfileDetails profileDetails = null;
-
-    private long[] questionPositionMs = null;
-    private Handler questionCallbackHandler = null;
-    private List<Integer> questionPositions = new ArrayList<>();
+    private Handler positionCallbackHandler = null;
+    private List<Integer> callbackPositions = new ArrayList<>();
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -438,8 +436,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         player.setAudioAttributes(AudioAttributes.DEFAULT,true);
         playerView.setPlayer(player);
 
-        if (questionCallbackHandler != null) {
-            registerQuestionPositionCallbacks();
+        if (positionCallbackHandler != null && !callbackPositions.isEmpty()) {
+            registerPositionCallbacks(callbackPositions, positionCallbackHandler);
         }
 
         player.setPlayWhenReady(playWhenReady);
@@ -860,31 +858,33 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
     }
 
-    public void setupQuestion(List<Integer> positions, Handler callbackHandler) {
-        this.questionPositions = positions;
-        this.questionCallbackHandler = callbackHandler;
-        this.questionPositionMs = positions.stream().mapToLong(i -> i * 1000L).toArray();
+    public void registerPositionCallbacks(List<Integer> positions, Handler callbackHandler) {
+        this.callbackPositions = positions;
+        this.positionCallbackHandler = callbackHandler;
 
-        addQuestionPositionMarkers(this.questionPositionMs);
-
-        if (player != null) {
-            registerQuestionPositionCallbacks();
+        if (player != null && callbackHandler != null && !positions.isEmpty()) {
+            PlayerMessage.Target target = (messageType, payload) -> callbackHandler.obtainMessage(messageType).sendToTarget();
+            for (int position : positions) {
+                player.createMessage(target)
+                    .setPosition(position * 1000L)
+                    .setType(position)
+                    .setPayload(null)
+                    .send();
+            }
         }
     }
 
-    private void registerQuestionPositionCallbacks() {
-        if (player == null || questionCallbackHandler == null || questionPositions.isEmpty()) {
+    public void addPlaybackMarkers(List<Integer> positions) {
+        if (positions == null || positions.isEmpty() || playerView == null) {
             return;
         }
 
-        PlayerMessage.Target target = (messageType, payload) -> questionCallbackHandler.obtainMessage(messageType).sendToTarget();
+        long[] positionsMs = positions.stream().mapToLong(i -> i * 1000L).toArray();
+        PlayerControlView playerControlView = playerView.findViewById(R.id.exo_controller);
 
-        for (int position : questionPositions) {
-            player.createMessage(target)
-                .setPosition(position * 1000L)
-                .setType(position)
-                .setPayload(null)
-                .send();
+        if (playerControlView != null) {
+            boolean[] playedMarkers = new boolean[positionsMs.length];
+            playerControlView.setExtraAdGroupMarkers(positionsMs, playedMarkers);
         }
     }
 
@@ -897,24 +897,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     public void playVideo() {
         if (player != null) {
             player.setPlayWhenReady(true);
-        }
-    }
-
-    public void addQuestionPositionMarkers(long[] positionsMs) {
-        if (playerView == null) {
-            return;
-        }
-
-        if (positionsMs == null || positionsMs.length == 0) {
-            return;
-        }
-
-        PlayerControlView playerControlView =
-            playerView.findViewById(R.id.exo_controller);
-
-        if (playerControlView != null) {
-            boolean[] playedMarkers = new boolean[positionsMs.length];
-            playerControlView.setExtraAdGroupMarkers(positionsMs, playedMarkers);
         }
     }
 

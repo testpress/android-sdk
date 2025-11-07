@@ -29,10 +29,12 @@ open class BaseVideoWidgetFragment : Fragment() {
 
     open fun seekTo(milliSeconds: Long?) {}
 
-    open fun setupQuestion(
+    open fun registerPositionCallbacks(
         positions: List<Int>,
         callbackHandler: Handler
     ) {}
+
+    open fun addPlaybackMarkers(positions: List<Int>) {}
 
     open fun pauseVideo() {}
 

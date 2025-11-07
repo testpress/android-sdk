@@ -328,10 +328,11 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         videoQuestionViewModel.setQuestions(validQuestions)
         val positions = videoQuestionViewModel.getUniquePositions()
 
-        videoWidgetFragment.setupQuestion(
+        videoWidgetFragment.registerPositionCallbacks(
             positions,
             questionCallbackHandler
         )
+        videoWidgetFragment.addPlaybackMarkers(positions)
     }
 
     private fun handleQuestionTrigger(position: Long) {
