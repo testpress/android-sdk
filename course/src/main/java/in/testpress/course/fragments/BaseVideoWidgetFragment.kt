@@ -4,6 +4,7 @@ import `in`.testpress.course.TestpressCourse
 import `in`.testpress.course.di.InjectorUtils
 import `in`.testpress.course.viewmodels.ContentViewModel
 import android.os.Bundle
+import android.os.Handler
 import androidx.annotation.VisibleForTesting
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModel
@@ -27,4 +28,12 @@ open class BaseVideoWidgetFragment : Fragment() {
     }
 
     open fun seekTo(milliSeconds: Long?) {}
+
+    open fun setupQuiz(
+        positions: List<Int>,
+        positionsMs: LongArray,
+        callbackHandler: Handler
+    ) {}
+    open fun pauseVideo() {}
+    open fun playVideo() {}
 }

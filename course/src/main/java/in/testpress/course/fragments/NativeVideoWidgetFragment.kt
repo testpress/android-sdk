@@ -9,6 +9,7 @@ import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -147,5 +148,21 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     override fun onDestroy() {
         super.onDestroy()
         exoplayerFullscreenHelper?.disableOrientationListener()
+    }
+
+    override fun setupQuiz(
+        positions: List<Int>,
+        positionsMs: LongArray,
+        callbackHandler: Handler
+    ) {
+        exoPlayerUtil?.setupQuiz(positions, positionsMs, callbackHandler)
+    }
+
+    override fun pauseVideo() {
+        exoPlayerUtil?.pauseVideo()
+    }
+
+    override fun playVideo() {
+        exoPlayerUtil?.playVideo()
     }
 }
