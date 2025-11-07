@@ -44,8 +44,9 @@ import `in`.testpress.database.roommigration.RoomMigration35To36.MIGRATION_35_36
 import `in`.testpress.database.roommigration.RoomMigration36To37.MIGRATION_36_37
 import `in`.testpress.database.roommigration.RoomMigration37To38.MIGRATION_37_38
 import `in`.testpress.database.roommigration.RoomMigration38To39.MIGRATION_38_39
+import `in`.testpress.database.roommigration.RoomMigration39To40.MIGRATION_39_40
 
-@Database(version = 39,
+@Database(version = 40,
         entities = [
             ContentEntity::class,
             OfflineVideo::class,
@@ -68,7 +69,8 @@ import `in`.testpress.database.roommigration.RoomMigration38To39.MIGRATION_38_39
             ProductLiteEntity::class,
             ProductEntity::class,
             PriceEntity::class,
-            OfflineAttachment::class
+            OfflineAttachment::class,
+            VideoQuestion::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -91,6 +93,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun productLiteEntityDao(): ProductLiteEntityDao
     abstract fun productEntityDao(): ProductEntityDao
     abstract fun offlineAttachmentDao(): OfflineAttachmentsDao
+    abstract fun videoQuestionDao(): VideoQuestionDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
@@ -102,7 +105,8 @@ abstract class TestpressDatabase : RoomDatabase() {
             MIGRATION_19_20, MIGRATION_20_21, MIGRATION_21_22, MIGRATION_22_23, MIGRATION_23_24,
             MIGRATION_24_25, MIGRATION_25_26, MIGRATION_26_27, MIGRATION_27_28, MIGRATION_28_29,
             MIGRATION_29_30, MIGRATION_30_31, MIGRATION_31_32, MIGRATION_32_33, MIGRATION_33_34,
-            MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39
+            MIGRATION_34_35, MIGRATION_35_36, MIGRATION_36_37, MIGRATION_37_38, MIGRATION_38_39,
+            MIGRATION_39_40
         )
 
         operator fun invoke(context: Context): TestpressDatabase {
