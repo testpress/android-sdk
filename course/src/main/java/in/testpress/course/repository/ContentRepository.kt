@@ -29,6 +29,7 @@ import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.network.NetworkBoundResource
 import `in`.testpress.network.RetrofitCall
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -129,35 +130,99 @@ open class ContentRepository(
         videoContentId: Long,
         forceRefresh: Boolean = false
     ): LiveData<Resource<List<NetworkVideoQuestion>>> {
-        return object : NetworkBoundResource<List<NetworkVideoQuestion>, NetworkVideoQuestionResponse>() {
-            override fun saveNetworkResponseToDB(item: NetworkVideoQuestionResponse) {
-                runBlocking(Dispatchers.IO) {
-                    storeVideoQuestionsToDB(videoContentId, item.results)
+        val result = MutableLiveData<Resource<List<NetworkVideoQuestion>>>()
+        
+        scope.launch {
+            val dbQuestions = try {
+                getVideoQuestionsFromDB(videoContentId)
+            } catch (e: Exception) {
+                null
+            }
+            
+            if (forceRefresh) {
+                result.postValue(Resource.loading(dbQuestions))
+                fetchQuestionsFromApiAndStoreToDB(videoContentId, result)
+            } else if (!dbQuestions.isNullOrEmpty()) {
+                result.postValue(Resource.success(dbQuestions))
+                refreshQuestionsInBackground(videoContentId, dbQuestions, result)
+            } else {
+                result.postValue(Resource.loading(null))
+                fetchQuestionsFromApiAndStoreToDB(videoContentId, result)
+            }
+        }
+        
+        return result
+    }
+    
+    private suspend fun fetchQuestionsFromApiAndStoreToDB(
+        videoContentId: Long,
+        result: MutableLiveData<Resource<List<NetworkVideoQuestion>>>
+    ) {
+        try {
+            val sortedApiQuestions = fetchQuestionsFromApi(videoContentId)
+            storeVideoQuestionsToDB(videoContentId, sortedApiQuestions)
+            result.postValue(Resource.success(sortedApiQuestions))
+        } catch (e: Exception) {
+            val exception = when (e) {
+                is TestpressException -> e
+                else -> TestpressException.unexpectedError(e)
+            }
+            result.postValue(Resource.error(exception, null))
+        }
+    }
+    
+    private fun refreshQuestionsInBackground(
+        videoContentId: Long,
+        dbQuestions: List<NetworkVideoQuestion>,
+        result: MutableLiveData<Resource<List<NetworkVideoQuestion>>>
+    ) {
+        scope.launch {
+            try {
+                val sortedApiQuestions = fetchQuestionsFromApi(videoContentId)
+                
+                if (hasDataChanged(dbQuestions, sortedApiQuestions)) {
+                    storeVideoQuestionsToDB(videoContentId, sortedApiQuestions)
+                    result.postValue(Resource.success(sortedApiQuestions))
                 }
+            } catch (e: Exception) {
+                Log.e("ContentRepository", "Failed to sync video questions in background for videoContentId: $videoContentId", e)
             }
-
-            override fun shouldFetch(data: List<NetworkVideoQuestion>?): Boolean {
-                val shouldFetch = forceRefresh || data == null || data.isEmpty()
-                return shouldFetch
+        }
+    }
+    
+    private suspend fun fetchQuestionsFromApi(videoContentId: Long): List<NetworkVideoQuestion> {
+        val response = courseNetwork.getVideoQuestions(videoContentId).execute()
+        if (!response.isSuccessful) {
+            throw TestpressException.httpError(response)
+        }
+        
+        val apiQuestions = response.body()?.results ?: emptyList()
+        return apiQuestions.sortedBy { it.order }
+    }
+    
+    private fun hasDataChanged(
+        dbQuestions: List<NetworkVideoQuestion>,
+        apiQuestions: List<NetworkVideoQuestion>
+    ): Boolean {
+        if (dbQuestions.size != apiQuestions.size) {
+            return true
+        }
+        
+        val dbQuestionsMap = dbQuestions.associateBy { it.id }
+        
+        if (dbQuestionsMap.keys != apiQuestions.map { it.id }.toSet()) {
+            return true
+        }
+        
+        for (apiQuestion in apiQuestions) {
+            val dbQuestion = dbQuestionsMap[apiQuestion.id]!!
+            if (dbQuestion.question.questionHtml != apiQuestion.question.questionHtml ||
+                dbQuestion.position != apiQuestion.position ||
+                dbQuestion.order != apiQuestion.order) {
+                return true
             }
-
-            override fun loadFromDb(): LiveData<List<NetworkVideoQuestion>> {
-                val liveData = MutableLiveData<List<NetworkVideoQuestion>>()
-                scope.launch {
-                    try {
-                        val questions = getVideoQuestionsFromDB(videoContentId)
-                        liveData.postValue(questions)
-                    } catch (e: Exception) {
-                        liveData.postValue(null)
-                    }
-                }
-                return liveData
-            }
-
-            override fun createCall(): RetrofitCall<NetworkVideoQuestionResponse> {
-                return courseNetwork.getVideoQuestions(videoContentId)
-            }
-        }.asLiveData()
+        }
+        return false
     }
 
     private suspend fun storeVideoQuestionsToDB(videoContentId: Long, videoQuestions: List<NetworkVideoQuestion>) {
