@@ -126,9 +126,7 @@ open class ContentRepository(
     ): LiveData<Resource<List<NetworkVideoQuestion>>> {
         return object : NetworkBoundResource<List<NetworkVideoQuestion>, NetworkVideoQuestionResponse>() {
             override fun saveNetworkResponseToDB(item: NetworkVideoQuestionResponse) {
-                kotlinx.coroutines.runBlocking {
                     storeVideoQuestionsToDB(videoContentId, item.results)
-                }
             }
 
             override fun shouldFetch(data: List<NetworkVideoQuestion>?): Boolean {
@@ -155,7 +153,7 @@ open class ContentRepository(
         }.asLiveData()
     }
 
-    private suspend fun storeVideoQuestionsToDB(videoContentId: Long, videoQuestions: List<NetworkVideoQuestion>) {
+    private fun storeVideoQuestionsToDB(videoContentId: Long, videoQuestions: List<NetworkVideoQuestion>) {
         try {
             val json = gson.toJson(videoQuestions)
             val videoQuestion = VideoQuestion(
