@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 40,
-    "identityHash": "944940c0beb644a3b3ff92333c95f5c4",
+    "identityHash": "0bf2c837643dee8520e2449295c8cfe4",
     "entities": [
       {
         "tableName": "ContentEntity",
@@ -1922,7 +1922,7 @@
       },
       {
         "tableName": "VideoQuestion",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`videoContentId` INTEGER NOT NULL, `questionsJson` TEXT NOT NULL, PRIMARY KEY(`videoContentId`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`videoContentId` INTEGER NOT NULL, `id` INTEGER NOT NULL, `position` INTEGER NOT NULL, `order` INTEGER NOT NULL, `questionId` INTEGER NOT NULL, `questionType` TEXT NOT NULL, `questionHtml` TEXT NOT NULL, PRIMARY KEY(`videoContentId`, `id`))",
         "fields": [
           {
             "fieldPath": "videoContentId",
@@ -1931,26 +1931,128 @@
             "notNull": true
           },
           {
-            "fieldPath": "questionsJson",
-            "columnName": "questionsJson",
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "position",
+            "columnName": "position",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "order",
+            "columnName": "order",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "questionId",
+            "columnName": "questionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "questionType",
+            "columnName": "questionType",
+            "affinity": "TEXT",
+            "notNull": true
+          },
+          {
+            "fieldPath": "questionHtml",
+            "columnName": "questionHtml",
             "affinity": "TEXT",
             "notNull": true
           }
         ],
         "primaryKey": {
           "columnNames": [
-            "videoContentId"
+            "videoContentId",
+            "id"
           ],
           "autoGenerate": false
         },
         "indices": [],
         "foreignKeys": []
+      },
+      {
+        "tableName": "VideoAnswer",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`videoContentId` INTEGER NOT NULL, `videoQuestionId` INTEGER NOT NULL, `id` INTEGER NOT NULL, `isCorrect` INTEGER NOT NULL, `textHtml` TEXT NOT NULL, PRIMARY KEY(`videoContentId`, `videoQuestionId`, `id`), FOREIGN KEY(`videoContentId`, `videoQuestionId`) REFERENCES `VideoQuestion`(`videoContentId`, `id`) ON UPDATE NO ACTION ON DELETE CASCADE )",
+        "fields": [
+          {
+            "fieldPath": "videoContentId",
+            "columnName": "videoContentId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "videoQuestionId",
+            "columnName": "videoQuestionId",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "isCorrect",
+            "columnName": "isCorrect",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "textHtml",
+            "columnName": "textHtml",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "columnNames": [
+            "videoContentId",
+            "videoQuestionId",
+            "id"
+          ],
+          "autoGenerate": false
+        },
+        "indices": [
+          {
+            "name": "index_VideoAnswer_videoContentId_videoQuestionId",
+            "unique": false,
+            "columnNames": [
+              "videoContentId",
+              "videoQuestionId"
+            ],
+            "orders": [],
+            "createSql": "CREATE INDEX IF NOT EXISTS `index_VideoAnswer_videoContentId_videoQuestionId` ON `${TABLE_NAME}` (`videoContentId`, `videoQuestionId`)"
+          }
+        ],
+        "foreignKeys": [
+          {
+            "table": "VideoQuestion",
+            "onDelete": "CASCADE",
+            "onUpdate": "NO ACTION",
+            "columns": [
+              "videoContentId",
+              "videoQuestionId"
+            ],
+            "referencedColumns": [
+              "videoContentId",
+              "id"
+            ]
+          }
+        ]
       }
     ],
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '944940c0beb644a3b3ff92333c95f5c4')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0bf2c837643dee8520e2449295c8cfe4')"
     ]
   }
 }

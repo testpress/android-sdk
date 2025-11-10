@@ -70,7 +70,8 @@ import `in`.testpress.database.roommigration.RoomMigration39To40.MIGRATION_39_40
             ProductEntity::class,
             PriceEntity::class,
             OfflineAttachment::class,
-            VideoQuestion::class
+            VideoQuestion::class,
+            VideoAnswer::class
         ], exportSchema = true)
 @TypeConverters(Converters::class)
 abstract class TestpressDatabase : RoomDatabase() {
@@ -94,6 +95,7 @@ abstract class TestpressDatabase : RoomDatabase() {
     abstract fun productEntityDao(): ProductEntityDao
     abstract fun offlineAttachmentDao(): OfflineAttachmentsDao
     abstract fun videoQuestionDao(): VideoQuestionDao
+    abstract fun videoAnswerDao(): VideoAnswerDao
 
     companion object {
         private lateinit var INSTANCE: TestpressDatabase
