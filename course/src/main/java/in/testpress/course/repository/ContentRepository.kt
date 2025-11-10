@@ -29,6 +29,7 @@ import `in`.testpress.models.greendao.ContentDao
 import `in`.testpress.network.NetworkBoundResource
 import `in`.testpress.network.RetrofitCall
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import com.google.gson.Gson
@@ -132,68 +133,71 @@ open class ContentRepository(
         val result = MutableLiveData<Resource<List<NetworkVideoQuestion>>>()
         
         scope.launch {
-            try {
-                val dbQuestions = getVideoQuestionsFromDB(videoContentId)
-                
-                if (forceRefresh) {
-                    result.postValue(Resource.loading(dbQuestions))
-                    fetchFromApi(videoContentId, result)
-                } else if (dbQuestions != null && dbQuestions.isNotEmpty()) {
-                    result.postValue(Resource.success(dbQuestions))
-                    fetchAndUpdateInBackground(videoContentId, dbQuestions, result)
-                } else {
-                    result.postValue(Resource.loading(null))
-                    fetchFromApi(videoContentId, result)
-                }
+            val dbQuestions = try {
+                getVideoQuestionsFromDB(videoContentId)
             } catch (e: Exception) {
+                null
+            }
+            
+            if (forceRefresh) {
+                result.postValue(Resource.loading(dbQuestions))
+                fetchQuestionsFromApiAndStoreToDB(videoContentId, result)
+            } else if (!dbQuestions.isNullOrEmpty()) {
+                result.postValue(Resource.success(dbQuestions))
+                refreshQuestionsInBackground(videoContentId, dbQuestions, result)
+            } else {
                 result.postValue(Resource.loading(null))
-                fetchFromApi(videoContentId, result)
+                fetchQuestionsFromApiAndStoreToDB(videoContentId, result)
             }
         }
         
         return result
     }
     
-    private suspend fun fetchFromApi(
+    private suspend fun fetchQuestionsFromApiAndStoreToDB(
         videoContentId: Long,
         result: MutableLiveData<Resource<List<NetworkVideoQuestion>>>
     ) {
         try {
-            val response = courseNetwork.getVideoQuestions(videoContentId).execute()
-            if (response.isSuccessful) {
-                val apiQuestions = response.body()?.results ?: emptyList()
-                storeVideoQuestionsToDB(videoContentId, apiQuestions)
-                val updatedQuestions = getVideoQuestionsFromDB(videoContentId)
-                result.postValue(Resource.success(updatedQuestions))
-            } else {
-                val exception = TestpressException.httpError(response)
-                result.postValue(Resource.error(exception, null))
-            }
+            val sortedApiQuestions = fetchQuestionsFromApi(videoContentId)
+            storeVideoQuestionsToDB(videoContentId, sortedApiQuestions)
+            result.postValue(Resource.success(sortedApiQuestions))
         } catch (e: Exception) {
-            val exception = TestpressException.unexpectedError(e)
+            val exception = when (e) {
+                is TestpressException -> e
+                else -> TestpressException.unexpectedError(e)
+            }
             result.postValue(Resource.error(exception, null))
         }
     }
     
-    private fun fetchAndUpdateInBackground(
+    private fun refreshQuestionsInBackground(
         videoContentId: Long,
         dbQuestions: List<NetworkVideoQuestion>,
         result: MutableLiveData<Resource<List<NetworkVideoQuestion>>>
     ) {
         scope.launch {
             try {
-                val response = courseNetwork.getVideoQuestions(videoContentId).execute()
-                if (response.isSuccessful) {
-                    val apiQuestions = response.body()?.results ?: emptyList()
-                    
-                    if (hasDataChanged(dbQuestions, apiQuestions)) {
-                        storeVideoQuestionsToDB(videoContentId, apiQuestions)
-                    }
+                val sortedApiQuestions = fetchQuestionsFromApi(videoContentId)
+                
+                if (hasDataChanged(dbQuestions, sortedApiQuestions)) {
+                    storeVideoQuestionsToDB(videoContentId, sortedApiQuestions)
+                    result.postValue(Resource.success(sortedApiQuestions))
                 }
             } catch (e: Exception) {
-                throw e
+                Log.e("ContentRepository", "Failed to sync video questions in background for videoContentId: $videoContentId", e)
             }
         }
+    }
+    
+    private suspend fun fetchQuestionsFromApi(videoContentId: Long): List<NetworkVideoQuestion> {
+        val response = courseNetwork.getVideoQuestions(videoContentId).execute()
+        if (!response.isSuccessful) {
+            throw TestpressException.httpError(response)
+        }
+        
+        val apiQuestions = response.body()?.results ?: emptyList()
+        return apiQuestions.sortedBy { it.order }
     }
     
     private fun hasDataChanged(
@@ -204,17 +208,15 @@ open class ContentRepository(
             return true
         }
         
-        val dbQuestionIds = dbQuestions.map { it.id }.toSet()
-        val apiQuestionIds = apiQuestions.map { it.id }.toSet()
+        val dbQuestionsMap = dbQuestions.associateBy { it.id }
         
-        if (dbQuestionIds != apiQuestionIds) {
+        if (dbQuestionsMap.keys != apiQuestions.map { it.id }.toSet()) {
             return true
         }
         
         for (apiQuestion in apiQuestions) {
-            val dbQuestion = dbQuestions.find { it.id == apiQuestion.id }
-            if (dbQuestion == null || 
-                dbQuestion.question.questionHtml != apiQuestion.question.questionHtml ||
+            val dbQuestion = dbQuestionsMap[apiQuestion.id]!!
+            if (dbQuestion.question.questionHtml != apiQuestion.question.questionHtml ||
                 dbQuestion.position != apiQuestion.position ||
                 dbQuestion.order != apiQuestion.order) {
                 return true
