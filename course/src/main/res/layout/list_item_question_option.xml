@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/option_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:background="@drawable/testpress_gray_border"
+    android:padding="12dp"
+    android:layout_marginTop="8dp"
+    android:gravity="center_vertical">
+
+    <FrameLayout
+        android:id="@+id/choice_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <ImageView
+        android:id="@+id/question_icon"
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:visibility="invisible" />
+
+</LinearLayout>

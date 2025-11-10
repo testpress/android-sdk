@@ -27,4 +27,6 @@ open class BaseVideoWidgetFragment : Fragment() {
     }
 
     open fun seekTo(milliSeconds: Long?) {}
+
+    open val enabledVideoQuestion: Boolean = false
 }

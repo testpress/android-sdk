@@ -10,10 +10,18 @@ import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContent
 import `in`.testpress.course.network.NetworkContentAttempt
+import `in`.testpress.course.network.NetworkAnswer
+import `in`.testpress.course.network.NetworkQuestion
+import `in`.testpress.course.network.NetworkVideoQuestion
+import `in`.testpress.course.network.NetworkVideoQuestionResponse
 import `in`.testpress.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
 import `in`.testpress.database.TestpressDatabase
+import `in`.testpress.database.entities.VideoQuestion
+import `in`.testpress.database.entities.VideoAnswer
+import `in`.testpress.database.dao.VideoQuestionDao
+import `in`.testpress.database.dao.VideoAnswerDao
 import `in`.testpress.enums.Status
 import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.models.greendao.Content
@@ -23,6 +31,11 @@ import `in`.testpress.network.RetrofitCall
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import com.google.gson.Gson
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 
 open class ContentRepository(
     val context: Context
@@ -30,6 +43,10 @@ open class ContentRepository(
     val roomContentDao = TestpressDatabase(context).contentDao()
     val contentDao = TestpressSDKDatabase.getContentDao(context)
     val courseNetwork = CourseNetwork(context)
+    private val videoQuestionDao: VideoQuestionDao = TestpressDatabase(context).videoQuestionDao()
+    private val videoAnswerDao: VideoAnswerDao = TestpressDatabase(context).videoAnswerDao()
+    private val gson = Gson()
+    private val scope = CoroutineScope(Dispatchers.IO)
 
     private var contentAttempt: MutableLiveData<Resource<NetworkContentAttempt>> = MutableLiveData()
 
@@ -106,6 +123,115 @@ open class ContentRepository(
                 }
             })
         return contentAttempt
+    }
+
+    fun loadVideoQuestions(
+        videoContentId: Long,
+        forceRefresh: Boolean = false
+    ): LiveData<Resource<List<NetworkVideoQuestion>>> {
+        return object : NetworkBoundResource<List<NetworkVideoQuestion>, NetworkVideoQuestionResponse>() {
+            override fun saveNetworkResponseToDB(item: NetworkVideoQuestionResponse) {
+                runBlocking(Dispatchers.IO) {
+                    storeVideoQuestionsToDB(videoContentId, item.results)
+                }
+            }
+
+            override fun shouldFetch(data: List<NetworkVideoQuestion>?): Boolean {
+                val shouldFetch = forceRefresh || data == null || data.isEmpty()
+                return shouldFetch
+            }
+
+            override fun loadFromDb(): LiveData<List<NetworkVideoQuestion>> {
+                val liveData = MutableLiveData<List<NetworkVideoQuestion>>()
+                scope.launch {
+                    try {
+                        val questions = getVideoQuestionsFromDB(videoContentId)
+                        liveData.postValue(questions)
+                    } catch (e: Exception) {
+                        liveData.postValue(null)
+                    }
+                }
+                return liveData
+            }
+
+            override fun createCall(): RetrofitCall<NetworkVideoQuestionResponse> {
+                return courseNetwork.getVideoQuestions(videoContentId)
+            }
+        }.asLiveData()
+    }
+
+    private suspend fun storeVideoQuestionsToDB(videoContentId: Long, videoQuestions: List<NetworkVideoQuestion>) {
+        try {
+            val videoQuestionEntities = videoQuestions.map { networkQuestion ->
+                VideoQuestion(
+                    videoContentId = videoContentId,
+                    id = networkQuestion.id,
+                    position = networkQuestion.position,
+                    order = networkQuestion.order,
+                    questionId = networkQuestion.question.id,
+                    questionType = networkQuestion.question.type,
+                    questionHtml = networkQuestion.question.questionHtml
+                )
+            }
+            
+            videoQuestionDao.insertAll(videoQuestionEntities)
+            
+            val videoAnswerEntities = videoQuestions.flatMap { networkQuestion ->
+                networkQuestion.question.answers?.map { networkAnswer ->
+                    VideoAnswer(
+                        videoContentId = videoContentId,
+                        videoQuestionId = networkQuestion.id,
+                        id = networkAnswer.id,
+                        isCorrect = networkAnswer.isCorrect,
+                        textHtml = networkAnswer.textHtml
+                    )
+                } ?: emptyList()
+            }
+            
+            if (videoAnswerEntities.isNotEmpty()) {
+                videoAnswerDao.insertAll(videoAnswerEntities)
+            }
+        } catch (e: Exception) {
+            throw e
+        }
+    }
+
+    private suspend fun getVideoQuestionsFromDB(videoContentId: Long): List<NetworkVideoQuestion>? {
+        try {
+            val videoQuestionEntities = videoQuestionDao.getByVideoContentId(videoContentId)
+            if (videoQuestionEntities.isEmpty()) {
+                return null
+            }
+            
+            return videoQuestionEntities.map { entity ->
+                val answerEntities = videoAnswerDao.getByVideoQuestionId(videoContentId, entity.id)
+                val answers = if (answerEntities.isNotEmpty()) {
+                    answerEntities.map { answerEntity ->
+                        NetworkAnswer(
+                            id = answerEntity.id,
+                            isCorrect = answerEntity.isCorrect,
+                            textHtml = answerEntity.textHtml
+                        )
+                    }
+                } else {
+                    null
+                }
+                
+                NetworkVideoQuestion(
+                    id = entity.id,
+                    position = entity.position,
+                    order = entity.order,
+                    question = NetworkQuestion(
+                        id = entity.questionId,
+                        type = entity.questionType,
+                        questionHtml = entity.questionHtml,
+                        answers = answers
+                    )
+                )
+            }
+        } catch (e: Exception) {
+            throw e
+        }
     }
 
     fun storeBookmarkIdToContent(bookmarkId: Long?, contentId: Long) {

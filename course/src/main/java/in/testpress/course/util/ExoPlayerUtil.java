@@ -44,6 +44,8 @@ import com.google.android.exoplayer2.DefaultRenderersFactory;
 import com.google.android.exoplayer2.ExoPlayer;
 import com.google.android.exoplayer2.MediaItem;
 import com.google.android.exoplayer2.PlaybackException;
+import com.google.android.exoplayer2.PlayerMessage;
+import com.google.android.exoplayer2.ui.PlayerControlView;
 import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.audio.AudioAttributes;
@@ -155,6 +157,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private long lastApiCallTime = System.currentTimeMillis() / 1000;
     long throttleTimeRemaining = 0;
     private ProfileDetails profileDetails = null;
+    private Handler positionCallbackHandler = null;
+    private List<Integer> callbackPositions = new ArrayList<>();
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -431,6 +435,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         player.addAnalyticsListener(new ExoplayerAnalyticsListener(this));
         player.setAudioAttributes(AudioAttributes.DEFAULT,true);
         playerView.setPlayer(player);
+
+        if (positionCallbackHandler != null && !callbackPositions.isEmpty()) {
+            registerPositionCallbacks(callbackPositions, positionCallbackHandler);
+        }
+
         player.setPlayWhenReady(playWhenReady);
         player.setPlaybackParameters(new PlaybackParameters(speedRate));
         player.setMediaItem(mediaItem);
@@ -847,6 +856,48 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     @Override
     public DrmSessionManager get(MediaItem mediaItem) {
         return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
+    }
+
+    public void registerPositionCallbacks(List<Integer> positions, Handler callbackHandler) {
+        this.callbackPositions = positions;
+        this.positionCallbackHandler = callbackHandler;
+
+        if (player != null && callbackHandler != null && !positions.isEmpty()) {
+            PlayerMessage.Target target = (messageType, payload) -> callbackHandler.obtainMessage(messageType).sendToTarget();
+            for (int position : positions) {
+                player.createMessage(target)
+                    .setPosition(position * 1000L)
+                    .setType(position)
+                    .setPayload(null)
+                    .send();
+            }
+        }
+    }
+
+    public void addPlaybackMarkers(List<Integer> positions) {
+        if (positions == null || positions.isEmpty() || playerView == null) {
+            return;
+        }
+
+        long[] positionsMs = positions.stream().mapToLong(i -> i * 1000L).toArray();
+        PlayerControlView playerControlView = playerView.findViewById(R.id.exo_controller);
+
+        if (playerControlView != null) {
+            boolean[] playedMarkers = new boolean[positionsMs.length];
+            playerControlView.setExtraAdGroupMarkers(positionsMs, playedMarkers);
+        }
+    }
+
+    public void pauseVideo() {
+        if (player != null) {
+            player.setPlayWhenReady(false);
+        }
+    }
+
+    public void playVideo() {
+        if (player != null) {
+            player.setPlayWhenReady(true);
+        }
     }
 
     private class PlayerEventListener implements Player.Listener, DRMLicenseFetchCallback {

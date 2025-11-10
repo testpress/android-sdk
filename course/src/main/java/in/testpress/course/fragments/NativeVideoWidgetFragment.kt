@@ -9,6 +9,7 @@ import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import android.os.Bundle
+import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -26,7 +27,10 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
-
+    private var pendingPositions: List<Int>? = null
+    private var pendingCallbackHandler: Handler? = null
+    private var pendingMarkerPositions: List<Int>? = null
+    
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
     }
@@ -99,7 +103,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.getPlaybackURL(), 0F)
         exoPlayerUtil?.setContent(greenDaoContent!!)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
-
+        registerPendingCallbacks()
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
                 when(resource.status) {
@@ -147,5 +151,54 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     override fun onDestroy() {
         super.onDestroy()
         exoplayerFullscreenHelper?.disableOrientationListener()
+    }
+
+    override val enabledVideoQuestion: Boolean = true
+
+    fun registerPositionCallbacks(
+        positions: List<Int>,
+        callbackHandler: Handler
+    ) {
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil?.registerPositionCallbacks(positions, callbackHandler)
+            pendingMarkerPositions?.let {
+                exoPlayerUtil?.addPlaybackMarkers(it)
+                pendingMarkerPositions = null
+            }
+        } else {
+            pendingPositions = positions
+            pendingCallbackHandler = callbackHandler
+        }
+    }
+
+    fun addPlaybackMarkers(positions: List<Int>) {
+        if (exoPlayerUtil != null) {
+            exoPlayerUtil?.addPlaybackMarkers(positions)
+        } else {
+            pendingMarkerPositions = positions
+        }
+    }
+    private fun registerPendingCallbacks() {
+        if (exoPlayerUtil != null) {
+            pendingPositions?.let { positions ->
+                pendingCallbackHandler?.let { handler ->
+                    exoPlayerUtil?.registerPositionCallbacks(positions, handler)
+                    pendingPositions = null
+                    pendingCallbackHandler = null
+                }
+            }
+            pendingMarkerPositions?.let { positions ->
+                exoPlayerUtil?.addPlaybackMarkers(positions)
+                pendingMarkerPositions = null
+            }
+        }
+    }
+
+    fun pauseVideo() {
+        exoPlayerUtil?.pauseVideo()
+    }
+
+    fun playVideo() {
+        exoPlayerUtil?.playVideo()
     }
 }
