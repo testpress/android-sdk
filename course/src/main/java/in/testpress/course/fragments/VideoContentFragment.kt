@@ -348,7 +348,11 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
 
     private fun setupQuestionLogic(questions: List<NetworkVideoQuestion>) {
         val validQuestions = questions.filter { q ->
-            !(q.question.type == "G" && q.question.answers.isNullOrEmpty())
+            when (q.question.type) {
+                "G" -> !q.question.answers.isNullOrEmpty()
+                "R", "C" -> true
+                else -> false
+            }
         }
         
         if(validQuestions.isEmpty()) return
