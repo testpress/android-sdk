@@ -68,6 +68,10 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         )
     }
 
+    private fun getStartButton(): Button? {
+        return view?.findViewById(R.id.start_button)
+    }
+
     override fun display() {
         val videoConference = content.videoConference
 
@@ -98,24 +102,33 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
         initializeVideoConferenceHandler(videoConference)
 
-        startButton.visibility = View.VISIBLE
-        startButton.setOnClickListener {
-            showLoadingAndDisableStartButton("JOINING")
-            joinMeeting()
+        val button = getStartButton()
+        if (button != null && isAdded && view != null) {
+            button.visibility = View.VISIBLE
+            button.setOnClickListener(null)
+            button.setOnClickListener {
+                if (isAdded && view != null) {
+                    showLoadingAndDisableStartButton("JOINING")
+                    joinMeeting()
+                }
+            }
         }
     }
 
     private fun hideLoadingAndEnableStartButton() {
-        if (!isVisible) return
-        startButton.isEnabled = true
-        startButton.text = "START"
-        startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_color_primary))
+        if (!isVisible || !isAdded || view == null) return
+        val button = getStartButton() ?: return
+        button.isEnabled = true
+        button.text = "START"
+        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_color_primary))
     }
 
     private fun showLoadingAndDisableStartButton(loadingText: String="LOADING") {
-        startButton.isEnabled = false
-        startButton.text = loadingText
-        startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_text_gray))
+        if (!isAdded || view == null) return
+        val button = getStartButton() ?: return
+        button.isEnabled = false
+        button.text = loadingText
+        button.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_text_gray))
     }
 
     private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
@@ -172,7 +185,13 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
     override fun onResume() {
         super.onResume()
-        hideLoadingAndEnableStartButton()
+        val button = getStartButton()
+        if (button != null && button.text.toString().uppercase() == "LOADING") {
+            return
+        }
+        if (button != null && !button.isEnabled) {
+            hideLoadingAndEnableStartButton()
+        }
     }
 
     override fun onDestroy() {
@@ -181,6 +200,10 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun joinMeeting() {
+        if (videoConferenceHandler == null) {
+            hideLoadingAndEnableStartButton()
+            return
+        }
         videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
             override fun onSuccess() {
                 viewModel.createContentAttempt(contentId)
