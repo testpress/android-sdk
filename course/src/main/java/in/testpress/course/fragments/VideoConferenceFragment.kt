@@ -35,6 +35,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private var profileDetails: ProfileDetails? = null
     private var reloadContent = 0
     private val maxReloadContent = 3
+    private var isRetryingAfterFailure = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -100,7 +101,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
 
         startButton.visibility = View.VISIBLE
         startButton.setOnClickListener {
-            showLoadingAndDisableStartButton("JOINING")
+            showLoadingAndDisableStartButton()
             joinMeeting()
         }
     }
@@ -140,21 +141,38 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         })
     }
 
-    private fun initVideoConferenceHandler(videoConference: DomainVideoConferenceContent?, profileDetails: ProfileDetails) {
+    private fun initVideoConferenceHandler(
+        videoConference: DomainVideoConferenceContent?, 
+        profileDetails: ProfileDetails,
+        onInitComplete: (() -> Unit)? = null
+    ) {
         try {
             videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
             videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
                 override fun onSuccess() {
-                    hideLoadingAndEnableStartButton()
+                    if (!isRetryingAfterFailure) {
+                        hideLoadingAndEnableStartButton()
+                    }
+                    onInitComplete?.invoke()
                 }
 
                 override fun onFailure() {
-                    hideLoadingAndEnableStartButton()
+                    if (!isRetryingAfterFailure) {
+                        hideLoadingAndEnableStartButton()
+                    }
+                    onInitComplete?.invoke()
                 }
             })
         } catch (e: NoClassDefFoundError) {
+            if (!isRetryingAfterFailure) {
+                hideLoadingAndEnableStartButton()
+            }
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
+            onInitComplete?.invoke()
         } catch (e: NullPointerException) {
+            if (!isRetryingAfterFailure) {
+                hideLoadingAndEnableStartButton()
+            }
             Sentry.captureException(e) { scope ->
                 scope.setTag("user_name", profileDetails?.username?:"")
                 scope.setContexts(
@@ -167,6 +185,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     }
                 )
             }
+            onInitComplete?.invoke()
         }
     }
 
@@ -181,14 +200,108 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun joinMeeting() {
+        val videoConference = content.videoConference
+        
+        if (needsDataRefresh(videoConference)) {
+            forceReloadContent {
+                val refreshedConference = content.videoConference
+                if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null) {
+                    videoConferenceHandler?.destroy()
+                    profileDetails?.let {
+                        initVideoConferenceHandler(refreshedConference, it) {
+                            attemptJoin()
+                        }
+                    } ?: run {
+                        hideLoadingAndEnableStartButton()
+                        Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
+                    }
+                } else {
+                    hideLoadingAndEnableStartButton()
+                    val message = if (videoConference?.conferenceId == null || videoConference?.password == null) {
+                        "Meeting has not started yet. Please try again after the meeting starts."
+                    } else {
+                        "Unable to join meeting. Please try again."
+                    }
+                    Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                }
+            }
+        } else {
+            attemptJoin()
+        }
+    }
+    
+    private fun needsDataRefresh(videoConference: DomainVideoConferenceContent?): Boolean {
+        if (videoConference?.conferenceId == null || videoConference.password == null) {
+            return true
+        }
+        
+        return videoConference.accessToken?.let { token ->
+            try {
+                JWT(token).isExpired(10)
+            } catch (e: Exception) {
+                true
+            }
+        } ?: true
+    }
+    
+    private fun attemptJoin() {
+        if (videoConferenceHandler == null) {
+            hideLoadingAndEnableStartButton()
+            Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
+            return
+        }
+        
         videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
             override fun onSuccess() {
+                isRetryingAfterFailure = false
                 viewModel.createContentAttempt(contentId)
                 hideLoadingAndEnableStartButton()
             }
 
             override fun onFailure() {
-                hideLoadingAndEnableStartButton()
+                if (!isRetryingAfterFailure) {
+                    isRetryingAfterFailure = true
+                    forceReloadContent {
+                        val videoConference = content.videoConference
+                        profileDetails?.let {
+                            if (videoConference != null && videoConference.conferenceId != null && videoConference.password != null) {
+                                videoConferenceHandler?.destroy()
+                                initVideoConferenceHandler(videoConference, it) {
+                                    videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
+                                        override fun onSuccess() {
+                                            isRetryingAfterFailure = false
+                                            viewModel.createContentAttempt(contentId)
+                                            hideLoadingAndEnableStartButton()
+                                        }
+
+                                        override fun onFailure() {
+                                            isRetryingAfterFailure = false
+                                            hideLoadingAndEnableStartButton()
+                                            Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
+                                        }
+                                    })
+                                }
+                            } else {
+                                isRetryingAfterFailure = false
+                                hideLoadingAndEnableStartButton()
+                                val message = if (videoConference?.conferenceId == null || videoConference?.password == null) {
+                                    "Meeting has not started yet. Please try again after the meeting starts."
+                                } else {
+                                    "Could not join meeting. Please refresh the page and try again."
+                                }
+                                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                            }
+                        } ?: run {
+                            isRetryingAfterFailure = false
+                            hideLoadingAndEnableStartButton()
+                            Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                } else {
+                    isRetryingAfterFailure = false
+                    hideLoadingAndEnableStartButton()
+                    Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
+                }
             }
         })
     }
