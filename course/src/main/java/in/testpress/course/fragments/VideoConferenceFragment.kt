@@ -147,7 +147,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         onInitComplete: (() -> Unit)? = null
     ) {
         try {
-            videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference!!, profileDetails)
+            videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference ?: throw NullPointerException("videoConference is null during initialization"), profileDetails)
             videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
                 override fun onSuccess() {
                     if (!isRetryingAfterFailure) {
@@ -174,7 +174,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 hideLoadingAndEnableStartButton()
             }
             Sentry.captureException(e) { scope ->
-                scope.setTag("user_name", profileDetails?.username?:"")
+                scope.setTag("user_name", profileDetails.username?:"")
                 scope.setContexts(
                     "Video Conference Error",
                     object : HashMap<String?, Any?>() {
@@ -217,7 +217,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     }
                 } else {
                     hideLoadingAndEnableStartButton()
-                    val message = if (videoConference?.conferenceId == null || videoConference?.password == null) {
+                    val message = if (refreshedConference?.conferenceId == null || refreshedConference?.password == null) {
                         "Meeting has not started yet. Please try again after the meeting starts."
                     } else {
                         "Unable to join meeting. Please try again."
@@ -253,9 +253,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         
         videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
             override fun onSuccess() {
-                isRetryingAfterFailure = false
-                viewModel.createContentAttempt(contentId)
-                hideLoadingAndEnableStartButton()
+                handleJoinSuccess()
             }
 
             override fun onFailure() {
@@ -269,15 +267,11 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                                 initVideoConferenceHandler(videoConference, it) {
                                     videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
                                         override fun onSuccess() {
-                                            isRetryingAfterFailure = false
-                                            viewModel.createContentAttempt(contentId)
-                                            hideLoadingAndEnableStartButton()
+                                            handleJoinSuccess()
                                         }
 
                                         override fun onFailure() {
-                                            isRetryingAfterFailure = false
-                                            hideLoadingAndEnableStartButton()
-                                            Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
+                                            handleFinalJoinFailure()
                                         }
                                     })
                                 }
@@ -298,11 +292,21 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                         }
                     }
                 } else {
-                    isRetryingAfterFailure = false
-                    hideLoadingAndEnableStartButton()
-                    Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
+                    handleFinalJoinFailure()
                 }
             }
         })
+    }
+    
+    private fun handleJoinSuccess() {
+        isRetryingAfterFailure = false
+        viewModel.createContentAttempt(contentId)
+        hideLoadingAndEnableStartButton()
+    }
+    
+    private fun handleFinalJoinFailure() {
+        isRetryingAfterFailure = false
+        hideLoadingAndEnableStartButton()
+        Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
     }
 }
