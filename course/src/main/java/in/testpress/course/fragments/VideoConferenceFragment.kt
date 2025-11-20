@@ -202,14 +202,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private fun joinMeeting() {
         val videoConference = content.videoConference
         
-        if (needsDataRefresh(videoConference)) {
+        if (!isConferenceDataValid(videoConference)) {
             forceReloadContent {
                 val refreshedConference = content.videoConference
                 if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null) {
                     videoConferenceHandler?.destroy()
                     profileDetails?.let {
                         initVideoConferenceHandler(refreshedConference, it) {
-                            attemptJoin()
+                            performJoinAttempt()
                         }
                     } ?: run {
                         hideLoadingAndEnableStartButton()
@@ -226,25 +226,25 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 }
             }
         } else {
-            attemptJoin()
+            performJoinAttempt()
         }
     }
     
-    private fun needsDataRefresh(videoConference: DomainVideoConferenceContent?): Boolean {
+    private fun isConferenceDataValid(videoConference: DomainVideoConferenceContent?): Boolean {
         if (videoConference?.conferenceId == null || videoConference.password == null) {
-            return true
+            return false
         }
         
         return videoConference.accessToken?.let { token ->
             try {
-                JWT(token).isExpired(10)
+                !JWT(token).isExpired(10)
             } catch (e: Exception) {
-                true
+                false
             }
-        } ?: true
+        } ?: false
     }
     
-    private fun attemptJoin() {
+    private fun performJoinAttempt() {
         if (videoConferenceHandler == null) {
             hideLoadingAndEnableStartButton()
             Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
@@ -271,7 +271,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                                         }
 
                                         override fun onFailure() {
-                                            handleFinalJoinFailure()
+                                            notifyJoinFailure()
                                         }
                                     })
                                 }
@@ -292,7 +292,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                         }
                     }
                 } else {
-                    handleFinalJoinFailure()
+                    notifyJoinFailure()
                 }
             }
         })
@@ -304,7 +304,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         hideLoadingAndEnableStartButton()
     }
     
-    private fun handleFinalJoinFailure() {
+    private fun notifyJoinFailure() {
         isRetryingAfterFailure = false
         hideLoadingAndEnableStartButton()
         Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
