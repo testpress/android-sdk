@@ -274,6 +274,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getBookmarkService().bookmark(params);
     }
 
+    public RetrofitCall<Bookmark> createBookmarkWithDetails(Map<String, Object> params) {
+        return getBookmarkService().bookmark(params);
+    }
+
     public RetrofitCall<Bookmark> updateBookmark(long bookmarkId, String folder) {
         HashMap<String, Object> params = new HashMap<>();
         params.put("folder", folder);

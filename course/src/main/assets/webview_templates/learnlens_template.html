@@ -18,27 +18,446 @@
         let pollAttempts = 0;
         const MAX_POLL_ATTEMPTS = 50;
         const POLL_INTERVAL = 100;
+        let pendingAnnotations = null;
+        let initTimeout = null;
+        const MAX_WAIT_FOR_ANNOTATIONS = 3000; // Wait up to 3 seconds for annotations
+        
+        // Store annotations to be injected when LearnLens is ready
+        window.setAnnotationsForLearnLens = function(highlights, bookmarks) {
+            console.log('[LearnLens] setAnnotationsForLearnLens called');
+            console.log('[LearnLens] Highlights count:', highlights ? highlights.length : 0);
+            console.log('[LearnLens] Bookmarks count:', bookmarks ? bookmarks.length : 0);
+            console.log('[LearnLens] isInitialized:', isInitialized);
+            console.log('[LearnLens] LearnLens available:', !!window.LearnLens);
+            console.log('[LearnLens] setAnnotations available:', !!(window.LearnLens && window.LearnLens.setAnnotations));
+            
+            pendingAnnotations = { highlights: highlights || [], bookmarks: bookmarks || [] };
+            
+            // If LearnLens is already initialized, try to apply annotations
+            if (isInitialized && window.LearnLens) {
+                console.log('[LearnLens] LearnLens already initialized, attempting to apply annotations');
+                if (window.LearnLens.setAnnotations) {
+                    try {
+                        console.log('[LearnLens] Calling setAnnotations with', pendingAnnotations.highlights.length, 'highlights and', pendingAnnotations.bookmarks.length, 'bookmarks');
+                        window.LearnLens.setAnnotations(pendingAnnotations.highlights, pendingAnnotations.bookmarks);
+                        console.log('[LearnLens] Annotations applied to initialized LearnLens successfully');
+                    } catch (e) {
+                        console.error('[LearnLens] Error applying annotations to LearnLens:', e);
+                    }
+                } else {
+                    console.warn('[LearnLens] LearnLens.setAnnotations not available, annotations may not be applied');
+                }
+            } else {
+                console.log('[LearnLens] LearnLens not yet initialized, annotations will be applied on init');
+                // Clear any pending timeout and initialize immediately with annotations
+                if (initTimeout) {
+                    console.log('[LearnLens] Clearing pending timeout, initializing now with annotations');
+                    clearTimeout(initTimeout);
+                    initTimeout = null;
+                }
+                // Try to initialize now if LearnLens is available
+                if (window.LearnLens && window.LearnLens.mountPdfChat && !isInitialized) {
+                    console.log('[LearnLens] LearnLens library ready, initializing now with pending annotations');
+                    initLearnLens();
+                } else {
+                    console.log('[LearnLens] LearnLens library not ready yet, will initialize when ready');
+                }
+            }
+        };
         
         function initLearnLens() {
-            if (isInitialized) return;
+            console.log('[LearnLens] initLearnLens called, isInitialized:', isInitialized);
+            if (isInitialized) {
+                console.log('[LearnLens] Already initialized, skipping');
+                return;
+            }
             
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
+                console.log('[LearnLens] LearnLens library available, starting initialization');
                 isInitialized = true;
+                
+                // Use pending annotations if available, otherwise use initial ones from template
+                var templateHighlights = {{INITIAL_HIGHLIGHTS_JSON}} || [];
+                var templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+                const initialHighlights = (pendingAnnotations && pendingAnnotations.highlights) ? pendingAnnotations.highlights : templateHighlights;
+                const initialBookmarks = (pendingAnnotations && pendingAnnotations.bookmarks) ? pendingAnnotations.bookmarks : templateBookmarks;
+                
+                console.log('[LearnLens] Template highlights:', templateHighlights.length, 'Template bookmarks:', templateBookmarks.length);
+                console.log('[LearnLens] Pending highlights:', pendingAnnotations ? pendingAnnotations.highlights.length : 0, 'Pending bookmarks:', pendingAnnotations ? pendingAnnotations.bookmarks.length : 0);
+                console.log('[LearnLens] Initializing with highlights:', initialHighlights.length, 'bookmarks:', initialBookmarks.length);
+                
                 window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
                     pdfUrl: "{{PDF_URL}}",
                     pdfId: "{{PDF_ID}}",
                     authToken: "{{AUTH_TOKEN}}",
                     pdfTitle: "{{PDF_TITLE}}",
+                    initialHighlights: initialHighlights,
+                    initialBookmarks: initialBookmarks,
+                    onHighlightCreate: function(highlight) {
+                        if (window.AndroidBridge && window.AndroidBridge.onHighlightCreate) {
+                            window.AndroidBridge.onHighlightCreate(JSON.stringify(highlight));
+                        }
+                    },
+                    onHighlightDelete: function(highlightId) {
+                        if (window.AndroidBridge && window.AndroidBridge.onHighlightDelete) {
+                            window.AndroidBridge.onHighlightDelete(highlightId);
+                        }
+                    },
+                    onBookmarkCreate: function(bookmark) {
+                        return new Promise(function(resolve, reject) {
+                            if (window.AndroidBridge && window.AndroidBridge.onBookmarkCreate) {
+                                // Store the original bookmark for error handling
+                                var originalBookmark = bookmark;
+                                
+                                // Log what LearnLens sends (both to console and Android)
+                                var logMsg = '[LearnLens] onBookmarkCreate called with: ' + (typeof bookmark === 'number' ? 'number: ' + bookmark : JSON.stringify(bookmark));
+                                console.log(logMsg);
+                                if (window.AndroidBridge && window.AndroidBridge.log) {
+                                    window.AndroidBridge.log(logMsg);
+                                }
+                                
+                                // Ensure bookmark has preview_text if LearnLens provides it
+                                // If LearnLens only sends a page number, try to extract preview text
+                                var bookmarkToSend = bookmark;
+                                var pageNumber = typeof bookmark === 'number' ? bookmark : (bookmark && (bookmark.page || bookmark.pageNumber || bookmark.page_number));
+                                
+                                // Check if preview text is already provided
+                                var hasPreviewText = bookmark && typeof bookmark === 'object' && (bookmark.preview_text || bookmark.previewText);
+                                
+                                if (!hasPreviewText && pageNumber) {
+                                    var logMsg = '[LearnLens] Bookmark missing preview text, attempting to extract from page: ' + pageNumber;
+                                    console.log(logMsg);
+                                    if (window.AndroidBridge && window.AndroidBridge.log) {
+                                        window.AndroidBridge.log(logMsg);
+                                    }
+                                    
+                                    // Try multiple methods to extract text from PDF page
+                                    var previewText = '';
+                                    
+                                    // Method 1: Check if LearnLens provides getPageText or similar methods
+                                    try {
+                                        if (window.LearnLens) {
+                                            // Try various LearnLens methods
+                                            if (typeof window.LearnLens.getPageText === 'function') {
+                                                previewText = window.LearnLens.getPageText(pageNumber);
+                                                console.log('[LearnLens] getPageText result:', previewText ? previewText.substring(0, 50) : 'null');
+                                            } else if (typeof window.LearnLens.getTextContent === 'function') {
+                                                previewText = window.LearnLens.getTextContent(pageNumber);
+                                                console.log('[LearnLens] getTextContent result:', previewText ? previewText.substring(0, 50) : 'null');
+                                            } else if (window.LearnLens.pdfViewer && typeof window.LearnLens.pdfViewer.getPageText === 'function') {
+                                                previewText = window.LearnLens.pdfViewer.getPageText(pageNumber);
+                                                console.log('[LearnLens] pdfViewer.getPageText result:', previewText ? previewText.substring(0, 50) : 'null');
+                                            }
+                                        }
+                                    } catch (e) {
+                                        console.warn('[LearnLens] Error with LearnLens API:', e);
+                                    }
+                                    
+                                    // Method 2: Try to get text from the rendered page element
+                                    if (!previewText) {
+                                        try {
+                                            // Look for text elements in the PDF viewer - try multiple selectors
+                                            var pdfViewer = document.querySelector('#learnlens-pdf-chat');
+                                            var logMsg = '[LearnLens] PDF viewer element found: ' + !!pdfViewer;
+                                            console.log(logMsg);
+                                            if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                window.AndroidBridge.log(logMsg);
+                                            }
+                                            
+                                            if (pdfViewer) {
+                                                // Try to find the currently visible/active page first (might be the one being bookmarked)
+                                                var pageElement = null;
+                                                
+                                                // Method 2a: Try various data attribute selectors
+                                                var selectors = [
+                                                    '[data-page-number="' + pageNumber + '"]',
+                                                    '[data-page="' + pageNumber + '"]',
+                                                    '[data-page-index="' + (pageNumber - 1) + '"]',
+                                                    '.page[data-page-number="' + pageNumber + '"]',
+                                                    '.page[data-page="' + pageNumber + '"]',
+                                                    '.pdfPage[data-page-number="' + pageNumber + '"]',
+                                                    'div[data-page-number="' + pageNumber + '"]',
+                                                    'section[data-page-number="' + pageNumber + '"]'
+                                                ];
+                                                
+                                                for (var i = 0; i < selectors.length && !pageElement; i++) {
+                                                    pageElement = pdfViewer.querySelector(selectors[i]);
+                                                    if (pageElement) {
+                                                        logMsg = '[LearnLens] Found page element with selector: ' + selectors[i];
+                                                        console.log(logMsg);
+                                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                            window.AndroidBridge.log(logMsg);
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                                
+                                                // Method 2b: Try to find all possible page containers with broader selectors
+                                                if (!pageElement) {
+                                                    var allPossiblePages = pdfViewer.querySelectorAll('div, section, article, canvas').length;
+                                                    logMsg = '[LearnLens] Total divs/sections in viewer: ' + allPossiblePages;
+                                                    console.log(logMsg);
+                                                    if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                        window.AndroidBridge.log(logMsg);
+                                                    }
+                                                    
+                                                    // Try finding pages by class names
+                                                    var pageClasses = ['.page', '.pdf-page', '.pdfPage', '.page-container', '[class*="page"]'];
+                                                    for (var j = 0; j < pageClasses.length && !pageElement; j++) {
+                                                        var pages = pdfViewer.querySelectorAll(pageClasses[j]);
+                                                        logMsg = '[LearnLens] Found ' + pages.length + ' elements with class: ' + pageClasses[j];
+                                                        console.log(logMsg);
+                                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                            window.AndroidBridge.log(logMsg);
+                                                        }
+                                                        if (pages.length >= pageNumber) {
+                                                            pageElement = pages[pageNumber - 1];
+                                                            logMsg = '[LearnLens] Using page element by index from class ' + pageClasses[j] + ': ' + (pageNumber - 1);
+                                                            console.log(logMsg);
+                                                            if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                                window.AndroidBridge.log(logMsg);
+                                                            }
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // Method 2c: Try to find any element with data attributes
+                                                if (!pageElement) {
+                                                    var allDataPages = pdfViewer.querySelectorAll('[data-page-number], [data-page], [data-page-index]');
+                                                    logMsg = '[LearnLens] Found ' + allDataPages.length + ' elements with data-page attributes';
+                                                    console.log(logMsg);
+                                                    if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                        window.AndroidBridge.log(logMsg);
+                                                    }
+                                                    
+                                                    // Check each one for matching page number
+                                                    for (var k = 0; k < allDataPages.length; k++) {
+                                                        var elem = allDataPages[k];
+                                                        var pageAttr = elem.getAttribute('data-page-number') || 
+                                                                      elem.getAttribute('data-page') || 
+                                                                      (elem.getAttribute('data-page-index') ? parseInt(elem.getAttribute('data-page-index')) + 1 : null);
+                                                        if (pageAttr == pageNumber || pageAttr == (pageNumber - 1)) {
+                                                            pageElement = elem;
+                                                            logMsg = '[LearnLens] Found page element by data attribute: ' + pageAttr;
+                                                            console.log(logMsg);
+                                                            if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                                window.AndroidBridge.log(logMsg);
+                                                            }
+                                                            break;
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                // Method 2d: Try to get text from the entire viewer (fallback)
+                                                if (!pageElement) {
+                                                    logMsg = '[LearnLens] No specific page element found, trying to extract from viewer content';
+                                                    console.log(logMsg);
+                                                    if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                        window.AndroidBridge.log(logMsg);
+                                                    }
+                                                    // Get all text from viewer and try to extract a meaningful snippet
+                                                    var allText = pdfViewer.innerText || pdfViewer.textContent || '';
+                                                    if (allText && allText.trim().length > 0) {
+                                                        // Take first meaningful chunk
+                                                        previewText = allText.trim().split(/\s+/).slice(0, 20).join(' ');
+                                                        logMsg = '[LearnLens] Extracted text from viewer (fallback): ' + (previewText ? previewText.substring(0, 50) : 'null');
+                                                        console.log(logMsg);
+                                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                            window.AndroidBridge.log(logMsg);
+                                                        }
+                                                    }
+                                                } else {
+                                                    // Found page element, try to extract text
+                                                    // Try to find text layer
+                                                    var textLayer = pageElement.querySelector('.textLayer, .text-layer, .textContent, canvas + div, [class*="text"]');
+                                                    if (textLayer) {
+                                                        previewText = textLayer.innerText || textLayer.textContent || '';
+                                                        logMsg = '[LearnLens] Extracted text from text layer: ' + (previewText ? previewText.substring(0, 50) : 'null');
+                                                        console.log(logMsg);
+                                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                            window.AndroidBridge.log(logMsg);
+                                                        }
+                                                    } else {
+                                                        // Fallback: get all text from page element
+                                                        previewText = pageElement.innerText || pageElement.textContent || '';
+                                                        logMsg = '[LearnLens] Extracted text from page element (no text layer): ' + (previewText ? previewText.substring(0, 50) : 'null');
+                                                        console.log(logMsg);
+                                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                            window.AndroidBridge.log(logMsg);
+                                                        }
+                                                    }
+                                                }
+                                                
+                                                if (!previewText) {
+                                                    logMsg = '[LearnLens] Could not extract preview text for page ' + pageNumber;
+                                                    console.warn(logMsg);
+                                                    if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                        window.AndroidBridge.log(logMsg);
+                                                    }
+                                                }
+                                            }
+                                        } catch (e) {
+                                            var errorMsg = '[LearnLens] Error extracting text from DOM: ' + e.message;
+                                            console.warn(errorMsg);
+                                            if (window.AndroidBridge && window.AndroidBridge.log) {
+                                                window.AndroidBridge.log(errorMsg);
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Method 3: Try PDF.js directly if available
+                                    if (!previewText && window.pdfjsLib) {
+                                        try {
+                                            console.log('[LearnLens] Attempting PDF.js text extraction');
+                                            // This would require the PDF document reference, which might not be easily accessible
+                                        } catch (e) {
+                                            console.warn('[LearnLens] PDF.js extraction failed:', e);
+                                        }
+                                    }
+                                    
+                                    // Clean and truncate preview text
+                                    if (previewText) {
+                                        previewText = previewText.trim().replace(/\s+/g, ' '); // Normalize whitespace
+                                        // Remove very short or meaningless text
+                                        if (previewText.length < 3) {
+                                            previewText = '';
+                                        } else {
+                                            // Take first 100 characters, but try to end at word boundary
+                                            if (previewText.length > 100) {
+                                                var truncated = previewText.substring(0, 100);
+                                                var lastSpace = truncated.lastIndexOf(' ');
+                                                if (lastSpace > 50) {
+                                                    previewText = truncated.substring(0, lastSpace);
+                                                } else {
+                                                    previewText = truncated;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Create bookmark object with preview text
+                                    if (typeof bookmark === 'number') {
+                                        bookmarkToSend = { 
+                                            page: pageNumber, 
+                                            pageNumber: pageNumber, 
+                                            previewText: previewText || '', 
+                                            preview_text: previewText || '' 
+                                        };
+                                    } else {
+                                        bookmarkToSend = Object.assign({}, bookmark, { 
+                                            previewText: previewText || '', 
+                                            preview_text: previewText || '' 
+                                        });
+                                    }
+                                    
+                                    if (previewText) {
+                                        logMsg = '[LearnLens] Successfully extracted preview text: ' + previewText;
+                                        console.log(logMsg);
+                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                            window.AndroidBridge.log(logMsg);
+                                        }
+                                    } else {
+                                        logMsg = '[LearnLens] Could not extract preview text, will send empty string';
+                                        console.warn(logMsg);
+                                        if (window.AndroidBridge && window.AndroidBridge.log) {
+                                            window.AndroidBridge.log(logMsg);
+                                        }
+                                    }
+                                } else if (hasPreviewText) {
+                                    logMsg = '[LearnLens] Bookmark already has preview text: ' + (bookmark.preview_text || bookmark.previewText);
+                                    console.log(logMsg);
+                                    if (window.AndroidBridge && window.AndroidBridge.log) {
+                                        window.AndroidBridge.log(logMsg);
+                                    }
+                                }
+                                
+                                // Log what we're sending to Android
+                                var finalLogMsg = '[LearnLens] Sending bookmark to Android: ' + JSON.stringify(bookmarkToSend);
+                                console.log(finalLogMsg);
+                                if (window.AndroidBridge && window.AndroidBridge.log) {
+                                    window.AndroidBridge.log(finalLogMsg);
+                                }
+                                
+                                // Set up success/error handlers
+                                var successHandler = function(createdBookmark) {
+                                    // LearnLens expects the bookmark object with ID
+                                    if (createdBookmark && createdBookmark.id) {
+                                        resolve(createdBookmark);
+                                    } else {
+                                        reject(new Error('Bookmark created but ID is missing'));
+                                    }
+                                };
+                                
+                                var errorHandler = function(error) {
+                                    reject(new Error(error.error || 'Failed to create bookmark'));
+                                };
+                                
+                                // Temporarily attach handlers
+                                window.LearnLens.onBookmarkCreateSuccess = successHandler;
+                                window.LearnLens.onBookmarkCreateError = errorHandler;
+                                
+                                // Call Android bridge with the bookmark object (including preview text if available)
+                                console.log('[LearnLens] Sending bookmark to Android:', JSON.stringify(bookmarkToSend));
+                                window.AndroidBridge.onBookmarkCreate(JSON.stringify(bookmarkToSend));
+                                
+                                // Clean up handlers after timeout (safety)
+                                setTimeout(function() {
+                                    if (window.LearnLens.onBookmarkCreateSuccess === successHandler) {
+                                        delete window.LearnLens.onBookmarkCreateSuccess;
+                                    }
+                                    if (window.LearnLens.onBookmarkCreateError === errorHandler) {
+                                        delete window.LearnLens.onBookmarkCreateError;
+                                    }
+                                }, 10000);
+                            } else {
+                                reject(new Error('Android bridge not available'));
+                            }
+                        });
+                    },
+                    onBookmarkDelete: function(bookmarkId) {
+                        if (window.AndroidBridge && window.AndroidBridge.onBookmarkDelete) {
+                            window.AndroidBridge.onBookmarkDelete(bookmarkId);
+                        }
+                    }
                 });
+                console.log('[LearnLens] mountPdfChat called successfully');
             } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
                 pollAttempts++;
+                console.log('[LearnLens] LearnLens not ready yet, poll attempt', pollAttempts, '/', MAX_POLL_ATTEMPTS);
                 setTimeout(initLearnLens, POLL_INTERVAL);
             } else {
-                console.error("LearnLens library failed to load after " + (MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000) + " seconds");
+                console.error("[LearnLens] Library failed to load after " + (MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000) + " seconds");
             }
         }
         
-        initLearnLens();
+        // Wait for annotations to arrive before initializing LearnLens
+        // This ensures annotations are available when LearnLens initializes
+        // But don't wait forever - initialize after timeout if annotations haven't arrived
+        console.log('[LearnLens] Script loaded, checking for initial annotations');
+        var templateHighlights = {{INITIAL_HIGHLIGHTS_JSON}} || [];
+        var templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+        
+        console.log('[LearnLens] Template highlights count:', templateHighlights.length);
+        console.log('[LearnLens] Template bookmarks count:', templateBookmarks.length);
+        
+        // If template already has annotations, initialize immediately
+        if (templateHighlights.length > 0 || templateBookmarks.length > 0) {
+            console.log('[LearnLens] Template has annotations, initializing LearnLens immediately');
+            initLearnLens();
+        } else {
+            // No annotations in template, wait for them to arrive
+            console.log('[LearnLens] No annotations in template, waiting for annotations to arrive (max ' + MAX_WAIT_FOR_ANNOTATIONS + 'ms)');
+            initTimeout = setTimeout(function() {
+                if (!isInitialized) {
+                    console.log('[LearnLens] Timeout reached after', MAX_WAIT_FOR_ANNOTATIONS, 'ms, initializing LearnLens with available annotations');
+                    console.log('[LearnLens] Pending annotations at timeout:', pendingAnnotations ? 'Yes (' + pendingAnnotations.highlights.length + ' highlights, ' + pendingAnnotations.bookmarks.length + ' bookmarks)' : 'No');
+                    initLearnLens();
+                } else {
+                    console.log('[LearnLens] Timeout reached but LearnLens already initialized');
+                }
+            }, MAX_WAIT_FOR_ANNOTATIONS);
+        }
     </script>
 </body>
 </html>
