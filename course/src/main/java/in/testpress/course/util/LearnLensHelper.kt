@@ -40,12 +40,14 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
     }
     
     fun injectBookmarks(bookmarks: List<NetworkBookmark>) {
-        val bookmarksForLearnLens = bookmarks.map { bookmark ->
-            mapOf(
-                "id" to (bookmark.id ?: 0L),
-                "page_number" to (bookmark.pageNumber ?: 0),
-                "preview_text" to (bookmark.previewText ?: "")
-            )
+        val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
+            bookmark.id?.let {
+                mapOf(
+                    "id" to it,
+                    "page_number" to (bookmark.pageNumber ?: 0),
+                    "preview_text" to (bookmark.previewText ?: "")
+                )
+            }
         }
         
         val bookmarksJson = gson.toJson(bookmarksForLearnLens)
@@ -54,12 +56,14 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
     }
     
     fun convertBookmarksToJson(bookmarks: List<NetworkBookmark>): String {
-        val bookmarksForLearnLens = bookmarks.map { bookmark ->
-            mapOf(
-                "id" to (bookmark.id ?: 0L),
-                "page_number" to (bookmark.pageNumber ?: 0),
-                "preview_text" to (bookmark.previewText ?: "")
-            )
+        val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
+            bookmark.id?.let {
+                mapOf(
+                    "id" to it,
+                    "page_number" to (bookmark.pageNumber ?: 0),
+                    "preview_text" to (bookmark.previewText ?: "")
+                )
+            }
         }
         return gson.toJson(bookmarksForLearnLens)
     }
@@ -107,6 +111,7 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
                     try {
                         window.LearnLens.setAnnotations([], bookmarks);
                     } catch (e) {
+                        console.error("LearnLens.setAnnotations failed:", e);
                     }
                 } else {
                     var attempts = 0;
@@ -121,6 +126,7 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
                             try {
                                 window.LearnLens.setAnnotations([], bookmarks);
                             } catch (e) {
+                                console.error("LearnLens.setAnnotations failed:", e);
                             }
                         } else if (attempts >= maxAttempts) {
                             clearInterval(interval);

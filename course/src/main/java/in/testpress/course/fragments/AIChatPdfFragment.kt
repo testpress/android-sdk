@@ -194,7 +194,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
         
-        learnLensHelper = LearnLensHelper(requireContext(), wv)
+        initializeHelper(wv)
         val replacements = learnLensHelper?.buildTemplateReplacements(
             args.pdfUrl, pdfId, authToken, args.pdfTitle, bookmarks
         ) ?: emptyMap()

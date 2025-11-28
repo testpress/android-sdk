@@ -11,6 +11,7 @@ import `in`.testpress.course.network.NetworkBookmark
 import `in`.testpress.util.BaseJavaScriptInterface
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
+import android.util.Log
 
 class LearnLensBridge(
     private val activity: Activity,
@@ -90,13 +91,12 @@ class LearnLensBridge(
                     val pageNumber = response.pageNumber ?: 0
                     val previewText = response.previewText ?: ""
                     
-                    val escapedPreviewText = previewText
-                        .replace("\\", "\\\\")
-                        .replace("\"", "\\\"")
-                        .replace("\n", "\\n")
-                        .replace("\r", "\\r")
-                    
-                    val resultJson = """{"id":$bookmarkId,"page_number":$pageNumber,"preview_text":"$escapedPreviewText"}"""
+                    val result = mapOf(
+                        "id" to bookmarkId,
+                        "page_number" to pageNumber,
+                        "preview_text" to previewText
+                    )
+                    val resultJson = gson.toJson(result)
                     
                     evaluateJavascript("""
                         (function() {
@@ -123,25 +123,7 @@ class LearnLensBridge(
     @JavascriptInterface
     fun onBookmarkDelete(bookmarkId: String) {
         try {
-            val id = when {
-                bookmarkId.contains("\"") || bookmarkId.trim().startsWith("{") -> {
-                    try {
-                        val trimmed = bookmarkId.trim()
-                        val jsonStr = if (trimmed.startsWith("{")) trimmed else bookmarkId
-                        val bookmarkObj = gson.fromJson(jsonStr, Map::class.java) as? Map<*, *>
-                        if (bookmarkObj != null) {
-                            (bookmarkObj["id"] as? Number)?.toLong()
-                                ?: (bookmarkObj["id"] as? String)?.toLongOrNull()
-                                ?: bookmarkId.toLongOrNull()
-                        } else {
-                            bookmarkId.toLongOrNull()
-                        }
-                    } catch (e: Exception) {
-                        bookmarkId.toLongOrNull()
-                    }
-                }
-                else -> bookmarkId.toLongOrNull()
-            }
+            val id = parseBookmarkId(bookmarkId)
             
             if (id == null) {
                 val errorJson = gson.toJson(mapOf("error" to "Invalid bookmark ID"))
@@ -162,6 +144,29 @@ class LearnLensBridge(
         } catch (e: Exception) {
             val errorJson = gson.toJson(mapOf("error" to (e.message ?: "Unknown error")))
             evaluateJavascript("window.LearnLens?.onBookmarkDeleteError?.($errorJson);")
+        }
+    }
+
+    private fun parseBookmarkId(bookmarkId: String): Long? {
+        return when {
+            bookmarkId.contains("\"") || bookmarkId.trim().startsWith("{") -> {
+                try {
+                    val trimmed = bookmarkId.trim()
+                    val jsonStr = if (trimmed.startsWith("{")) trimmed else bookmarkId
+                    val bookmarkObj = gson.fromJson(jsonStr, Map::class.java) as? Map<*, *>
+                    if (bookmarkObj != null) {
+                        (bookmarkObj["id"] as? Number)?.toLong()
+                            ?: (bookmarkObj["id"] as? String)?.toLongOrNull()
+                            ?: bookmarkId.toLongOrNull()
+                    } else {
+                        bookmarkId.toLongOrNull()
+                    }
+                } catch (e: Exception) {
+                    Log.e("LearnLensBridge", "Failed to parse bookmark ID from JSON: $bookmarkId", e)
+                    bookmarkId.toLongOrNull()
+                }
+            }
+            else -> bookmarkId.toLongOrNull()
         }
     }
 

@@ -30,6 +30,7 @@
                     try {
                         window.LearnLens.setAnnotations([], pendingAnnotations.bookmarks);
                     } catch (e) {
+                        console.error("LearnLens.setAnnotations failed:", e);
                     }
                 }
             } else {
@@ -57,12 +58,13 @@
                     return window.LearnLens.pdfViewer.getPageText(pageNumber) || '';
                 }
             } catch (e) {
+                console.error("tryLearnLensApi failed for page", pageNumber, ":", e);
             }
             return '';
         }
         
         function findPageElement(pdfViewer, pageNumber) {
-            var selectors = [
+            const selectors = [
                 '[data-page-number="' + pageNumber + '"]',
                 '[data-page="' + pageNumber + '"]',
                 '[data-page-index="' + (pageNumber - 1) + '"]',
@@ -73,25 +75,25 @@
                 'section[data-page-number="' + pageNumber + '"]'
             ];
             
-            for (var i = 0; i < selectors.length; i++) {
-                var element = pdfViewer.querySelector(selectors[i]);
+            for (let i = 0; i < selectors.length; i++) {
+                const element = pdfViewer.querySelector(selectors[i]);
                 if (element) return element;
             }
             
-            var pageClasses = ['.page', '.pdf-page', '.pdfPage', '.page-container', '[class*="page"]'];
-            for (var j = 0; j < pageClasses.length; j++) {
-                var pages = pdfViewer.querySelectorAll(pageClasses[j]);
+            const pageClasses = ['.page', '.pdf-page', '.pdfPage', '.page-container', '[class*="page"]'];
+            for (let j = 0; j < pageClasses.length; j++) {
+                const pages = pdfViewer.querySelectorAll(pageClasses[j]);
                 if (pages.length >= pageNumber) {
                     return pages[pageNumber - 1];
                 }
             }
             
-            var allDataPages = pdfViewer.querySelectorAll('[data-page-number], [data-page], [data-page-index]');
-            for (var k = 0; k < allDataPages.length; k++) {
-                var elem = allDataPages[k];
-                var pageAttr = elem.getAttribute('data-page-number') || 
+            const allDataPages = pdfViewer.querySelectorAll('[data-page-number], [data-page], [data-page-index]');
+            for (let k = 0; k < allDataPages.length; k++) {
+                const elem = allDataPages[k];
+                const pageAttr = elem.getAttribute('data-page-number') || 
                               elem.getAttribute('data-page') || 
-                              (elem.getAttribute('data-page-index') ? parseInt(elem.getAttribute('data-page-index')) + 1 : null);
+                              (elem.getAttribute('data-page-index') ? parseInt(elem.getAttribute('data-page-index'), 10) + 1 : null);
                 if (pageAttr == pageNumber || pageAttr == (pageNumber - 1)) {
                     return elem;
                 }
@@ -102,14 +104,14 @@
         
         function extractTextFromPageElement(pageElement, pdfViewer) {
             if (pageElement) {
-                var textLayer = pageElement.querySelector('.textLayer, .text-layer, .textContent, canvas + div, [class*="text"]');
+                const textLayer = pageElement.querySelector('.textLayer, .text-layer, .textContent, canvas + div, [class*="text"]');
                 if (textLayer) {
                     return textLayer.innerText || textLayer.textContent || '';
                 }
                 return pageElement.innerText || pageElement.textContent || '';
             }
             
-            var allText = pdfViewer.innerText || pdfViewer.textContent || '';
+            const allText = pdfViewer.innerText || pdfViewer.textContent || '';
             if (allText && allText.trim().length > 0) {
                 return allText.trim().split(/\s+/).slice(0, 20).join(' ');
             }
@@ -119,17 +121,18 @@
         function extractPreviewText(pageNumber) {
             if (!pageNumber) return '';
             
-            var text = tryLearnLensApi(pageNumber);
+            let text = tryLearnLensApi(pageNumber);
             if (text) return normalizePreviewText(text);
             
             try {
-                var pdfViewer = document.querySelector('#learnlens-pdf-chat');
+                const pdfViewer = document.querySelector('#learnlens-pdf-chat');
                 if (pdfViewer) {
-                    var pageElement = findPageElement(pdfViewer, pageNumber);
+                    const pageElement = findPageElement(pdfViewer, pageNumber);
                     text = extractTextFromPageElement(pageElement, pdfViewer);
                     return normalizePreviewText(text);
                 }
             } catch (e) {
+                console.error("extractPreviewText failed for page", pageNumber, ":", e);
             }
             
             return '';
@@ -140,8 +143,8 @@
             text = text.trim().replace(/\s+/g, ' ');
             if (text.length < 3) return '';
             if (text.length > 100) {
-                var truncated = text.substring(0, 100);
-                var lastSpace = truncated.lastIndexOf(' ');
+                const truncated = text.substring(0, 100);
+                const lastSpace = truncated.lastIndexOf(' ');
                 return lastSpace > 50 ? truncated.substring(0, lastSpace) : truncated;
             }
             return text;
@@ -168,7 +171,6 @@
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
                 isInitialized = true;
                 
-                var templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
                 const initialBookmarks = (pendingAnnotations && pendingAnnotations.bookmarks) ? pendingAnnotations.bookmarks : templateBookmarks;
                 
                 window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
@@ -184,18 +186,18 @@
                                 return;
                             }
                             
-                            var pageNumber = typeof bookmark === 'number' ? bookmark : 
+                            const pageNumber = typeof bookmark === 'number' ? bookmark : 
                                 (bookmark && (bookmark.page || bookmark.pageNumber || bookmark.page_number));
-                            var hasPreviewText = bookmark && typeof bookmark === 'object' && 
+                            const hasPreviewText = bookmark && typeof bookmark === 'object' && 
                                 (bookmark.preview_text || bookmark.previewText);
                             
-                            var bookmarkToSend = bookmark;
+                            let bookmarkToSend = bookmark;
                             if (!hasPreviewText && pageNumber) {
-                                var previewText = extractPreviewText(pageNumber);
+                                const previewText = extractPreviewText(pageNumber);
                                 bookmarkToSend = buildBookmarkObject(bookmark, pageNumber, previewText);
                             }
                             
-                            var successHandler = function(createdBookmark) {
+                            const successHandler = function(createdBookmark) {
                                 if (createdBookmark && createdBookmark.id) {
                                     resolve(createdBookmark);
                                 } else {
@@ -203,7 +205,7 @@
                                 }
                             };
                             
-                            var errorHandler = function(error) {
+                            const errorHandler = function(error) {
                                 reject(new Error(error.error || 'Failed to create bookmark'));
                             };
                             
@@ -234,9 +236,9 @@
             }
         }
         
-        var templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+        const templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
         
-        if (templateBookmarks.length > 0) {
+        if (templateBookmarks && templateBookmarks.length > 0) {
             initLearnLens();
         } else {
             initTimeout = setTimeout(function() {
