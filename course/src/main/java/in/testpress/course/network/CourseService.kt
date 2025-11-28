@@ -108,6 +108,21 @@ interface CourseService {
     fun getVideoQuestions(
         @Path(value = "video_content_id", encoded = true) videoContentId: Long
     ): RetrofitCall<NetworkVideoQuestionResponse>
+
+    @GET("/api/v3/bookmarks/")
+    fun getBookmarks(
+        @QueryMap queryParams: HashMap<String, Any>
+    ): RetrofitCall<ApiResponse<BookmarksListApiResponse>>
+
+    @POST("/api/v3/bookmarks/")
+    fun createBookmark(
+        @Body bookmark: HashMap<String, Any>
+    ): RetrofitCall<NetworkBookmark>
+
+    @DELETE("/api/v3/bookmarks/{id}/")
+    fun deleteBookmark(
+        @Path(value = "id", encoded = true) bookmarkId: Long
+    ): RetrofitCall<Void>
 }
 
 
@@ -201,5 +216,17 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
             "offline_answers" to offlineAnswers
         )
         return getCourseService().updateOfflineAnswers(examId, body)
+    }
+
+    fun getBookmarks(queryParams: HashMap<String, Any>): RetrofitCall<ApiResponse<BookmarksListApiResponse>> {
+        return getCourseService().getBookmarks(queryParams)
+    }
+
+    fun createBookmark(bookmark: HashMap<String, Any>): RetrofitCall<NetworkBookmark> {
+        return getCourseService().createBookmark(bookmark)
+    }
+
+    fun deleteBookmark(bookmarkId: Long): RetrofitCall<Void> {
+        return getCourseService().deleteBookmark(bookmarkId)
     }
 }
