@@ -152,6 +152,8 @@
             });
         }
         
+        const templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+        
         function initLearnLens() {
             if (isInitialized) {
                 return;
@@ -221,8 +223,6 @@
                 });
             }
         }
-        
-        const templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
         
         function tryInitLearnLens() {
             if (window.LearnLens && window.LearnLens.mountPdfChat) {

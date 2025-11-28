@@ -63,6 +63,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         
+        pendingBookmarks = null
+        learnLensHelper = null
+        isLearnLensReady = false
+        isCheckingLearnLens = false
+        
         val args = extractArguments()
         initializeViews(view)
         initializeEmptyViewFragment()
@@ -103,6 +108,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val wasCachedBefore = WebViewFactory.isCached(args.contentId, cacheKey)
         
         if (wasCachedBefore) {
+            val repository = BookmarkRepository(requireContext())
+            val cachedBookmarks = repository.getCachedBookmarks(args.contentId, "annotate")
+            
             var isNewWebView = false
             
             webView = WebViewFactory.createCached(
@@ -112,7 +120,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
                 createWebView = { WebView(requireContext()) }
             ) { wv ->
                 isNewWebView = true
-                configureWebView(wv, args, emptyList())
+                configureWebView(wv, args, cachedBookmarks)
             }
             
             isWebViewCached = !isNewWebView
@@ -131,7 +139,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
                 }
                 fetchBookmarks(args.contentId) { bookmarks ->
                     pendingBookmarks = bookmarks
-                    injectAnnotations(bookmarks)
+                    val bookmarksChanged = bookmarks.size != cachedBookmarks.size || 
+                        bookmarks.map { it.id }.toSet() != cachedBookmarks.map { it.id }.toSet()
+                    if (bookmarksChanged && bookmarks.isNotEmpty()) {
+                        injectAnnotations(bookmarks)
+                    }
                 }
             }
         } else {
@@ -161,13 +173,15 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             }
             
             fetchBookmarks(args.contentId) { bookmarks ->
-                val bookmarksChanged = bookmarks.size != cachedBookmarks.size || 
-                    bookmarks.map { it.id }.toSet() != cachedBookmarks.map { it.id }.toSet()
-                if (bookmarksChanged) {
-                    pendingBookmarks = bookmarks
-                    webView?.let { wv ->
-                        initializeHelper(wv)
-                        learnLensHelper?.injectBookmarks(bookmarks)
+                pendingBookmarks = bookmarks
+                if (bookmarks.isNotEmpty()) {
+                    val bookmarksChanged = bookmarks.size != cachedBookmarks.size || 
+                        bookmarks.map { it.id }.toSet() != cachedBookmarks.map { it.id }.toSet()
+                    if (bookmarksChanged || cachedBookmarks.isEmpty()) {
+                        webView?.let { wv ->
+                            initializeHelper(wv)
+                            learnLensHelper?.injectBookmarks(bookmarks)
+                        }
                     }
                 }
             }
@@ -218,9 +232,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         repository.getBookmarks(queryParams, object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
             override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
                 val bookmarks = response.results?.bookmarks ?: emptyList()
-                if (cachedBookmarks.isEmpty()) {
-                    onComplete(bookmarks)
-                } else {
+                if (cachedBookmarks.isEmpty() || bookmarks.isNotEmpty()) {
                     onComplete(bookmarks)
                 }
             }
@@ -275,6 +287,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         super.onDestroyView()
         isCheckingLearnLens = false
         isLearnLensReady = false
+        pendingBookmarks = null
         webChromeClient.cleanup()
         WebViewFactory.detach(webView)
         webView = null
@@ -334,16 +347,28 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
                 }
                 hideLoading()
                 injectPendingAnnotations()
+                if (pendingBookmarks == null) {
+                    webView?.postDelayed({
+                        injectPendingAnnotations()
+                    }, 500)
+                }
             }
         } ?: run {
             hideLoading()
             injectPendingAnnotations()
+            if (pendingBookmarks == null) {
+                webView?.postDelayed({
+                    injectPendingAnnotations()
+                }, 500)
+            }
         }
     }
     
     private fun injectPendingAnnotations() {
         pendingBookmarks?.let { bookmarks ->
-            injectAnnotations(bookmarks)
+            if (bookmarks.isNotEmpty()) {
+                injectAnnotations(bookmarks)
+            }
         }
     }
     override fun onError(exception: TestpressException) = showErrorView(exception)
