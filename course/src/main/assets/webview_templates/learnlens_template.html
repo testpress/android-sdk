@@ -18,27 +18,233 @@
         let pollAttempts = 0;
         const MAX_POLL_ATTEMPTS = 50;
         const POLL_INTERVAL = 100;
+        let pendingAnnotations = null;
+        let initTimeout = null;
+        const MAX_WAIT_FOR_ANNOTATIONS = 2000;
+        
+        window.setAnnotationsForLearnLens = function(bookmarks) {
+            pendingAnnotations = { bookmarks: bookmarks || [] };
+            
+            if (isInitialized && window.LearnLens) {
+                if (window.LearnLens.setAnnotations) {
+                    try {
+                        window.LearnLens.setAnnotations([], pendingAnnotations.bookmarks);
+                    } catch (e) {
+                    }
+                }
+            } else {
+                if (initTimeout) {
+                    clearTimeout(initTimeout);
+                    initTimeout = null;
+                }
+                if (window.LearnLens && window.LearnLens.mountPdfChat && !isInitialized) {
+                    initLearnLens();
+                }
+            }
+        };
+        
+        function tryLearnLensApi(pageNumber) {
+            if (!window.LearnLens) return '';
+            
+            try {
+                if (typeof window.LearnLens.getPageText === 'function') {
+                    return window.LearnLens.getPageText(pageNumber) || '';
+                }
+                if (typeof window.LearnLens.getTextContent === 'function') {
+                    return window.LearnLens.getTextContent(pageNumber) || '';
+                }
+                if (window.LearnLens.pdfViewer && typeof window.LearnLens.pdfViewer.getPageText === 'function') {
+                    return window.LearnLens.pdfViewer.getPageText(pageNumber) || '';
+                }
+            } catch (e) {
+            }
+            return '';
+        }
+        
+        function findPageElement(pdfViewer, pageNumber) {
+            var selectors = [
+                '[data-page-number="' + pageNumber + '"]',
+                '[data-page="' + pageNumber + '"]',
+                '[data-page-index="' + (pageNumber - 1) + '"]',
+                '.page[data-page-number="' + pageNumber + '"]',
+                '.page[data-page="' + pageNumber + '"]',
+                '.pdfPage[data-page-number="' + pageNumber + '"]',
+                'div[data-page-number="' + pageNumber + '"]',
+                'section[data-page-number="' + pageNumber + '"]'
+            ];
+            
+            for (var i = 0; i < selectors.length; i++) {
+                var element = pdfViewer.querySelector(selectors[i]);
+                if (element) return element;
+            }
+            
+            var pageClasses = ['.page', '.pdf-page', '.pdfPage', '.page-container', '[class*="page"]'];
+            for (var j = 0; j < pageClasses.length; j++) {
+                var pages = pdfViewer.querySelectorAll(pageClasses[j]);
+                if (pages.length >= pageNumber) {
+                    return pages[pageNumber - 1];
+                }
+            }
+            
+            var allDataPages = pdfViewer.querySelectorAll('[data-page-number], [data-page], [data-page-index]');
+            for (var k = 0; k < allDataPages.length; k++) {
+                var elem = allDataPages[k];
+                var pageAttr = elem.getAttribute('data-page-number') || 
+                              elem.getAttribute('data-page') || 
+                              (elem.getAttribute('data-page-index') ? parseInt(elem.getAttribute('data-page-index')) + 1 : null);
+                if (pageAttr == pageNumber || pageAttr == (pageNumber - 1)) {
+                    return elem;
+                }
+            }
+            
+            return null;
+        }
+        
+        function extractTextFromPageElement(pageElement, pdfViewer) {
+            if (pageElement) {
+                var textLayer = pageElement.querySelector('.textLayer, .text-layer, .textContent, canvas + div, [class*="text"]');
+                if (textLayer) {
+                    return textLayer.innerText || textLayer.textContent || '';
+                }
+                return pageElement.innerText || pageElement.textContent || '';
+            }
+            
+            var allText = pdfViewer.innerText || pdfViewer.textContent || '';
+            if (allText && allText.trim().length > 0) {
+                return allText.trim().split(/\s+/).slice(0, 20).join(' ');
+            }
+            return '';
+        }
+        
+        function extractPreviewText(pageNumber) {
+            if (!pageNumber) return '';
+            
+            var text = tryLearnLensApi(pageNumber);
+            if (text) return normalizePreviewText(text);
+            
+            try {
+                var pdfViewer = document.querySelector('#learnlens-pdf-chat');
+                if (pdfViewer) {
+                    var pageElement = findPageElement(pdfViewer, pageNumber);
+                    text = extractTextFromPageElement(pageElement, pdfViewer);
+                    return normalizePreviewText(text);
+                }
+            } catch (e) {
+            }
+            
+            return '';
+        }
+        
+        function normalizePreviewText(text) {
+            if (!text) return '';
+            text = text.trim().replace(/\s+/g, ' ');
+            if (text.length < 3) return '';
+            if (text.length > 100) {
+                var truncated = text.substring(0, 100);
+                var lastSpace = truncated.lastIndexOf(' ');
+                return lastSpace > 50 ? truncated.substring(0, lastSpace) : truncated;
+            }
+            return text;
+        }
+        
+        function buildBookmarkObject(bookmark, pageNumber, previewText) {
+            if (typeof bookmark === 'number') {
+                return {
+                    page: pageNumber,
+                    pageNumber: pageNumber,
+                    previewText: previewText,
+                    preview_text: previewText
+                };
+            }
+            return Object.assign({}, bookmark, {
+                previewText: previewText,
+                preview_text: previewText
+            });
+        }
         
         function initLearnLens() {
             if (isInitialized) return;
             
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
                 isInitialized = true;
+                
+                var templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+                const initialBookmarks = (pendingAnnotations && pendingAnnotations.bookmarks) ? pendingAnnotations.bookmarks : templateBookmarks;
+                
                 window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
                     pdfUrl: "{{PDF_URL}}",
                     pdfId: "{{PDF_ID}}",
                     authToken: "{{AUTH_TOKEN}}",
                     pdfTitle: "{{PDF_TITLE}}",
+                    initialBookmarks: initialBookmarks,
+                    onBookmarkCreate: function(bookmark) {
+                        return new Promise(function(resolve, reject) {
+                            if (!window.AndroidBridge || !window.AndroidBridge.onBookmarkCreate) {
+                                reject(new Error('Android bridge not available'));
+                                return;
+                            }
+                            
+                            var pageNumber = typeof bookmark === 'number' ? bookmark : 
+                                (bookmark && (bookmark.page || bookmark.pageNumber || bookmark.page_number));
+                            var hasPreviewText = bookmark && typeof bookmark === 'object' && 
+                                (bookmark.preview_text || bookmark.previewText);
+                            
+                            var bookmarkToSend = bookmark;
+                            if (!hasPreviewText && pageNumber) {
+                                var previewText = extractPreviewText(pageNumber);
+                                bookmarkToSend = buildBookmarkObject(bookmark, pageNumber, previewText);
+                            }
+                            
+                            var successHandler = function(createdBookmark) {
+                                if (createdBookmark && createdBookmark.id) {
+                                    resolve(createdBookmark);
+                                } else {
+                                    reject(new Error('Bookmark created but ID is missing'));
+                                }
+                            };
+                            
+                            var errorHandler = function(error) {
+                                reject(new Error(error.error || 'Failed to create bookmark'));
+                            };
+                            
+                            window.LearnLens.onBookmarkCreateSuccess = successHandler;
+                            window.LearnLens.onBookmarkCreateError = errorHandler;
+                            
+                            window.AndroidBridge.onBookmarkCreate(JSON.stringify(bookmarkToSend));
+                            
+                            setTimeout(function() {
+                                if (window.LearnLens.onBookmarkCreateSuccess === successHandler) {
+                                    delete window.LearnLens.onBookmarkCreateSuccess;
+                                }
+                                if (window.LearnLens.onBookmarkCreateError === errorHandler) {
+                                    delete window.LearnLens.onBookmarkCreateError;
+                                }
+                            }, 10000);
+                        });
+                    },
+                    onBookmarkDelete: function(bookmarkId) {
+                        if (window.AndroidBridge && window.AndroidBridge.onBookmarkDelete) {
+                            window.AndroidBridge.onBookmarkDelete(bookmarkId);
+                        }
+                    }
                 });
             } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
                 pollAttempts++;
                 setTimeout(initLearnLens, POLL_INTERVAL);
-            } else {
-                console.error("LearnLens library failed to load after " + (MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000) + " seconds");
             }
         }
         
-        initLearnLens();
+        var templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+        
+        if (templateBookmarks.length > 0) {
+            initLearnLens();
+        } else {
+            initTimeout = setTimeout(function() {
+                if (!isInitialized) {
+                    initLearnLens();
+                }
+            }, MAX_WAIT_FOR_ANNOTATIONS);
+        }
     </script>
 </body>
 </html>
