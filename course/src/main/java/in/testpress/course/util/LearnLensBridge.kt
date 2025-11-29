@@ -31,24 +31,8 @@ class LearnLensBridge(
                 throw IllegalArgumentException("Bookmark JSON cannot be empty")
             }
 
-            val trimmedJson = bookmarkJson.trim()
-            val bookmarkMap: Map<*, *> = when {
-                trimmedJson.matches(Regex("^-?\\d+$")) -> {
-                    val pageNumber = trimmedJson.toIntOrNull()
-                    if (pageNumber != null) {
-                        mapOf("pageNumber" to pageNumber)
-                    } else {
-                        throw IllegalArgumentException("Invalid bookmark format: expected JSON object or page number")
-                    }
-                }
-                trimmedJson.startsWith("{") && trimmedJson.endsWith("}") -> {
-                    val parsed = gson.fromJson(bookmarkJson, Map::class.java) as? Map<*, *>
-                    parsed ?: throw IllegalArgumentException("Failed to parse bookmark JSON as object")
-                }
-                else -> {
-                    throw IllegalArgumentException("Bookmark JSON must be a valid JSON object or page number")
-                }
-            }
+            val bookmarkMap = gson.fromJson(bookmarkJson, Map::class.java) as? Map<*, *>
+                ?: throw IllegalArgumentException("Failed to parse bookmark JSON as object")
 
             val requestBody = hashMapOf<String, Any>().apply {
                 put("content_type", "chapter_content")
@@ -56,27 +40,17 @@ class LearnLensBridge(
                 put("bookmark_type", "annotate")
                 put("category", "attachment")
                 
-                bookmarkMap.forEach { (key, value) ->
-                    if (value != null) {
-                        val keyStr = key.toString()
-                        when (keyStr) {
-                            "page", "pageNumber" -> put("page_number", (value as? Number)?.toInt() ?: value)
-                            "previewText", "preview_text" -> put("preview_text", value.toString())
-                            "category" -> put("category", value)
-                            else -> put(keyStr, value)
-                        }
-                    }
+                val pageNumber = (bookmarkMap["page_number"] as? Number)?.toInt()
+                    ?: throw IllegalArgumentException("Page number must be provided and greater than 0")
+                
+                if (pageNumber <= 0) {
+                    throw IllegalArgumentException("Page number must be greater than 0")
                 }
                 
-                val pageNumber = get("page_number") as? Int
-                if (pageNumber == null || pageNumber <= 0) {
-                    throw IllegalArgumentException("Page number must be provided and greater than 0")
-                }
+                put("page_number", pageNumber)
                 
-                if (!containsKey("preview_text") || (get("preview_text") as? String).isNullOrBlank()) {
-                    val pageNum = get("page_number") as? Int ?: pageNumber
-                    put("preview_text", "Page $pageNum")
-                }
+                val previewText = bookmarkMap["preview_text"] as? String ?: ""
+                put("preview_text", previewText)
             }
 
             bookmarkRepository.createBookmark(requestBody, object : TestpressCallback<NetworkBookmark>() {

@@ -24,18 +24,12 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
         contentId: Long,
         callback: (List<NetworkBookmark>) -> Unit
     ) {
-        val queryParams = hashMapOf<String, Any>(
-            "content_type" to "chapter_content",
-            "object_id" to contentId,
-            "bookmark_type" to "annotate"
-        )
-        
+        val queryParams = createBookmarkQueryParams(contentId)
         bookmarkRepository.getBookmarks(
             queryParams,
             object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
                 override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
-                    val bookmarks = response.results?.bookmarks ?: emptyList()
-                    callback(bookmarks)
+                    callback(response.results?.bookmarks ?: emptyList())
                 }
                 
                 override fun onException(exception: TestpressException?) {
@@ -44,6 +38,52 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
             }
         )
     }
+    
+    fun fetchBookmarksWithCallback(
+        contentId: Long,
+        onSuccess: (List<NetworkBookmark>) -> Unit,
+        onException: (TestpressException?) -> Unit = {}
+    ) {
+        val queryParams = createBookmarkQueryParams(contentId)
+        bookmarkRepository.getBookmarks(
+            queryParams,
+            object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
+                override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
+                    onSuccess(response.results?.bookmarks ?: emptyList())
+                }
+                
+                override fun onException(exception: TestpressException?) {
+                    onException(exception)
+                }
+            }
+        )
+    }
+    
+    fun injectBookmarksWhenReady(
+        bookmarks: List<NetworkBookmark>,
+        retryCount: Int = 0,
+        maxRetries: Int = 20,
+        onComplete: (() -> Unit)? = null
+    ) {
+        if (retryCount >= maxRetries) return
+        
+        val progress = webView.progress
+        if (progress < 100 && retryCount < 5) {
+            webView.postDelayed({
+                injectBookmarksWhenReady(bookmarks, retryCount + 1, maxRetries, onComplete)
+            }, 300)
+            return
+        }
+        
+        injectBookmarks(bookmarks)
+        onComplete?.invoke()
+    }
+    
+    private fun createBookmarkQueryParams(contentId: Long) = hashMapOf<String, Any>(
+        "content_type" to "chapter_content",
+        "object_id" to contentId,
+        "bookmark_type" to "annotate"
+    )
     
     fun injectBookmarks(bookmarks: List<NetworkBookmark>) {
         val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
@@ -108,37 +148,24 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
     
     private fun buildInjectionScript(bookmarksJson: String): String {
         return """
-            (function injectAnnotations() {
+            (function() {
                 var bookmarks = $bookmarksJson;
-                
-                if (window.setAnnotationsForLearnLens) {
-                    window.setAnnotationsForLearnLens(bookmarks);
-                } else if (window.LearnLens && window.LearnLens.setAnnotations) {
-                    try {
-                        window.LearnLens.setAnnotations([], bookmarks);
-                    } catch (e) {
-                        console.error("LearnLens.setAnnotations failed:", e);
-                    }
-                } else {
-                    var attempts = 0;
-                    var maxAttempts = 20;
-                    var interval = setInterval(function() {
-                        attempts++;
-                        if (window.setAnnotationsForLearnLens) {
-                            clearInterval(interval);
-                            window.setAnnotationsForLearnLens(bookmarks);
-                        } else if (window.LearnLens && window.LearnLens.setAnnotations) {
-                            clearInterval(interval);
-                            try {
-                                window.LearnLens.setAnnotations([], bookmarks);
-                            } catch (e) {
-                                console.error("LearnLens.setAnnotations failed:", e);
-                            }
-                        } else if (attempts >= maxAttempts) {
-                            clearInterval(interval);
-                        }
-                    }, 100);
+                if (!bookmarks || !Array.isArray(bookmarks) || bookmarks.length === 0) {
+                    return;
                 }
+                
+                // Wait for setAnnotationsForLearnLens to be available, then call it
+                var attempts = 0;
+                var maxAttempts = 50; // 5 seconds
+                var interval = setInterval(function() {
+                    attempts++;
+                    if (typeof window.setAnnotationsForLearnLens === 'function') {
+                        clearInterval(interval);
+                        window.setAnnotationsForLearnLens(bookmarks);
+                    } else if (attempts >= maxAttempts) {
+                        clearInterval(interval);
+                    }
+                }, 100);
             })();
         """.trimIndent()
     }
