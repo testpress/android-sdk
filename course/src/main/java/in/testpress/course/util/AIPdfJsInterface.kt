@@ -13,7 +13,7 @@ import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 import android.util.Log
 
-class LearnLensBridge(
+class AIPdfJsInterface(
     private val activity: Activity,
     private val webView: WebView,
     private val contentId: Long
@@ -136,7 +136,7 @@ class LearnLensBridge(
                 null
             }
         } catch (e: Exception) {
-            Log.e("LearnLensBridge", "Failed to parse bookmark ID from JSON: $bookmarkId", e)
+            Log.e("AIPdfJsInterface", "Failed to parse bookmark ID from JSON: $bookmarkId", e)
             null
         }
     }
@@ -151,3 +151,4 @@ class LearnLensBridge(
         }
     }
 }
+

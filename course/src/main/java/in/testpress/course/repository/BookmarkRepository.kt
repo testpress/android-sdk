@@ -23,76 +23,6 @@ class BookmarkRepository(private val context: Context) {
     private val bookmarkDao = database.bookmarkDao()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    fun getBookmarks(
-        queryParams: HashMap<String, Any>,
-        callback: TestpressCallback<ApiResponse<BookmarksListApiResponse>>
-    ) {
-        val contentId = (queryParams["object_id"] as? Number)?.toLong()
-        val bookmarkType = queryParams["bookmark_type"] as? String ?: "annotate"
-        
-        if (contentId != null) {
-            scope.launch {
-                try {
-                    val cachedBookmarks = bookmarkDao.getBookmarksByContent(contentId, bookmarkType)
-                    if (cachedBookmarks.isNotEmpty()) {
-                        val networkBookmarks = cachedBookmarks.map { it.toNetworkBookmark() }
-                        val bookmarksResponse = BookmarksListApiResponse(bookmarks = networkBookmarks)
-                        val response = ApiResponse<BookmarksListApiResponse>().apply {
-                            setResults(bookmarksResponse)
-                        }
-                        withContext(Dispatchers.Main) {
-                            callback.onSuccess(response)
-                        }
-                    }
-                } catch (e: Exception) {
-                    Log.e(
-                        "BookmarkRepository",
-                        "Failed to load cached bookmarks for contentId=$contentId, type=$bookmarkType",
-                        e
-                    )
-                }
-            }
-        }
-        
-        courseNetwork.getBookmarks(queryParams).enqueue(object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
-            override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
-                scope.launch {
-                    try {
-                        val bookmarks = response.results?.bookmarks ?: emptyList()
-                        if (contentId != null) {
-                            bookmarkDao.deleteByContent(contentId, bookmarkType)
-                            val entities = bookmarks.mapNotNull { bookmark ->
-                                bookmark.id?.let { id ->
-                                    BookmarkEntity(
-                                        id = id,
-                                        contentId = contentId,
-                                        bookmarkType = bookmarkType,
-                                        pageNumber = bookmark.pageNumber,
-                                        previewText = bookmark.previewText
-                                    )
-                                }
-                            }
-                            if (entities.isNotEmpty()) {
-                                bookmarkDao.insertAll(entities)
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Log.e(
-                            "BookmarkRepository",
-                            "Failed to update local cache after network bookmarks fetch for contentId=$contentId, type=$bookmarkType",
-                            e
-                        )
-                    }
-                }
-                callback.onSuccess(response)
-            }
-
-            override fun onException(exception: TestpressException?) {
-                callback.onException(exception)
-            }
-        })
-    }
-
     fun createBookmark(
         bookmark: HashMap<String, Any>,
         callback: TestpressCallback<NetworkBookmark>
@@ -172,6 +102,75 @@ class BookmarkRepository(private val context: Context) {
             }
         }
     }
+    
+    fun fetchBookmarks(
+        contentId: Long,
+        onSuccess: (List<NetworkBookmark>) -> Unit,
+        onException: ((TestpressException?) -> Unit)? = null
+    ) {
+        val bookmarkType = "annotate"
+        val queryParams = createBookmarkQueryParams(contentId)
+        
+        scope.launch {
+            try {
+                val cachedBookmarks = bookmarkDao.getBookmarksByContent(contentId, bookmarkType)
+                if (cachedBookmarks.isNotEmpty()) {
+                    val networkBookmarks = cachedBookmarks.map { it.toNetworkBookmark() }
+                    withContext(Dispatchers.Main) {
+                        onSuccess(networkBookmarks)
+                    }
+                }
+            } catch (e: Exception) {
+                Log.e(
+                    "BookmarkRepository",
+                    "Failed to load cached bookmarks for contentId=$contentId, type=$bookmarkType",
+                    e
+                )
+            }
+        }
+        
+        courseNetwork.getBookmarks(queryParams).enqueue(object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
+            override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
+                scope.launch {
+                    try {
+                        val bookmarks = response.results?.bookmarks ?: emptyList()
+                        bookmarkDao.deleteByContent(contentId, bookmarkType)
+                        val entities = bookmarks.mapNotNull { bookmark ->
+                            bookmark.id?.let { id ->
+                                BookmarkEntity(
+                                    id = id,
+                                    contentId = contentId,
+                                    bookmarkType = bookmarkType,
+                                    pageNumber = bookmark.pageNumber,
+                                    previewText = bookmark.previewText
+                                )
+                            }
+                        }
+                        if (entities.isNotEmpty()) {
+                            bookmarkDao.insertAll(entities)
+                        }
+                    } catch (e: Exception) {
+                        Log.e(
+                            "BookmarkRepository",
+                            "Failed to update local cache after network bookmarks fetch for contentId=$contentId, type=$bookmarkType",
+                            e
+                        )
+                    }
+                }
+                onSuccess(response.results?.bookmarks ?: emptyList())
+            }
+
+            override fun onException(exception: TestpressException?) {
+                onException?.invoke(exception) ?: onSuccess(emptyList())
+            }
+        })
+    }
+    
+    private fun createBookmarkQueryParams(contentId: Long) = hashMapOf<String, Any>(
+        "content_type" to "chapter_content",
+        "object_id" to contentId,
+        "bookmark_type" to "annotate"
+    )
     
     private fun BookmarkEntity.toNetworkBookmark(): NetworkBookmark {
         return NetworkBookmark(

@@ -1,14 +1,14 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.util.WebViewFactory
-import `in`.testpress.course.util.LearnLensHelper
+import `in`.testpress.course.util.AIPdfJsInjector
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.course.network.NetworkBookmark
 import `in`.testpress.course.network.BookmarksListApiResponse
 import `in`.testpress.course.repository.BookmarkRepository
-import `in`.testpress.course.util.LearnLensBridge
+import `in`.testpress.course.util.AIPdfJsInterface
 import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -30,6 +30,8 @@ import `in`.testpress.core.TestpressException
 import java.io.File
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.GsonBuilder
 
 class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
@@ -52,8 +54,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private var isWebViewCached = false
     private var isLearnLensReady = false
     private var isCheckingLearnLens = false
-    private var learnLensHelper: LearnLensHelper? = null
+    private var jsInjector: AIPdfJsInjector? = null
     private var pendingBookmarks: List<NetworkBookmark>? = null
+    private val gson = GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -74,7 +79,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     private fun resetState() {
         pendingBookmarks = null
-        learnLensHelper = null
+        jsInjector = null
         isLearnLensReady = false
         isCheckingLearnLens = false
     }
@@ -122,27 +127,25 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     private fun fetchBookmarksForFirstLoad(args: PdfArguments, cacheKey: String, wasCachedBefore: Boolean) {
         val repository = BookmarkRepository(requireContext())
-        val queryParams = hashMapOf<String, Any>(
-            "content_type" to "chapter_content", "object_id" to args.contentId, "bookmark_type" to "annotate"
-        )
-        repository.getBookmarks(queryParams, object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
-            override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
-                pendingBookmarks = response.results?.bookmarks ?: emptyList()
-                setupWebView(args, cacheKey, pendingBookmarks ?: emptyList(), wasCachedBefore)
-            }
-            override fun onException(exception: TestpressException?) {
+        repository.fetchBookmarks(
+            contentId = args.contentId,
+            onSuccess = { bookmarks ->
+                pendingBookmarks = bookmarks
+                setupWebView(args, cacheKey, bookmarks, wasCachedBefore)
+            },
+            onException = {
                 setupWebView(args, cacheKey, emptyList(), wasCachedBefore)
             }
-        })
+        )
     }
     
     private fun checkLearnLensReadiness(onComplete: (Boolean) -> Unit) {
         if (isCheckingLearnLens) return
         
         webView?.let { wv ->
-            initializeHelper(wv)
+            initializeInjector(wv)
             isCheckingLearnLens = true
-            learnLensHelper?.checkReadiness(
+            jsInjector?.checkReadiness(
                 onReady = { isCheckingLearnLens = false; onComplete(true) },
                 onNotReady = { isCheckingLearnLens = false; onComplete(false) }
             )
@@ -167,41 +170,49 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private fun loadBookmarksForCachedWebView(args: PdfArguments, cachedBookmarks: List<NetworkBookmark>) {
         hideLoading()
         checkLearnLensReadiness { if (it) isLearnLensReady = true }
-        learnLensHelper?.fetchBookmarks(args.contentId) { bookmarks ->
-            pendingBookmarks = bookmarks
-            if (hasBookmarksChanged(bookmarks, cachedBookmarks) && bookmarks.isNotEmpty()) {
-                injectBookmarksWhenReady(bookmarks)
+        val repository = BookmarkRepository(requireContext())
+        repository.fetchBookmarks(
+            contentId = args.contentId,
+            onSuccess = { bookmarks ->
+                pendingBookmarks = bookmarks
+                if (hasBookmarksChanged(bookmarks, cachedBookmarks) && bookmarks.isNotEmpty()) {
+                    injectBookmarks(bookmarks)
+                }
             }
-        }
+        )
     }
 
     private fun loadBookmarksForNewWebView(args: PdfArguments, cachedBookmarks: List<NetworkBookmark>) {
-        webView?.let { initializeHelper(it) }
+        webView?.let { initializeInjector(it) }
         if (cachedBookmarks.isNotEmpty()) {
             pendingBookmarks = cachedBookmarks
-            injectBookmarksWhenReady(cachedBookmarks)
+            injectBookmarks(cachedBookmarks)
         } else {
-            learnLensHelper?.fetchBookmarks(args.contentId) { bookmarks ->
-                pendingBookmarks = bookmarks
-                if (bookmarks.isNotEmpty()) injectBookmarksWhenReady(bookmarks)
-            }
+            val repository = BookmarkRepository(requireContext())
+            repository.fetchBookmarks(
+                contentId = args.contentId,
+                onSuccess = { bookmarks ->
+                    pendingBookmarks = bookmarks
+                    if (bookmarks.isNotEmpty()) injectBookmarks(bookmarks)
+                }
+            )
         }
     }
     
-    private fun injectBookmarksWhenReady(bookmarks: List<NetworkBookmark>) {
+    private fun injectBookmarks(bookmarks: List<NetworkBookmark>) {
         webView?.let { wv ->
-            initializeHelper(wv)
-            learnLensHelper?.injectBookmarksWhenReady(bookmarks)
+            initializeInjector(wv)
+            jsInjector?.injectBookmarks(bookmarks)
         } ?: run {
-            view?.postDelayed({ injectBookmarksWhenReady(bookmarks) }, 500)
+            view?.postDelayed({ injectBookmarks(bookmarks) }, 500)
         }
     }
     
     private fun hasBookmarksChanged(new: List<NetworkBookmark>, old: List<NetworkBookmark>) =
         new.size != old.size || new.map { it.id }.toSet() != old.map { it.id }.toSet()
     
-    private fun initializeHelper(wv: WebView) {
-        if (learnLensHelper == null) learnLensHelper = LearnLensHelper(requireContext(), wv)
+    private fun initializeInjector(wv: WebView) {
+        if (jsInjector == null) jsInjector = AIPdfJsInjector(requireContext(), wv)
     }
     
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
@@ -209,16 +220,16 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         wv.enableFileAccess()
         wv.webViewClient = BaseWebViewClient(this)
         wv.webChromeClient = webChromeClient
-        initializeHelper(wv)
+        initializeInjector(wv)
         
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
-        val replacements = learnLensHelper?.buildTemplateReplacements(
+        val replacements = buildTemplateReplacements(
             args.pdfUrl, pdfId, authToken, args.pdfTitle, bookmarks
-        ) ?: emptyMap()
+        )
         
-        wv.addJavascriptInterface(LearnLensBridge(requireActivity(), wv, args.contentId), "AndroidBridge")
+        wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidBridge")
         wv.loadTemplateAndCacheResources(args.templateName, replacements, "file://${cacheDir.absolutePath}/")
     }
     
@@ -231,7 +242,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         container = null
         progressBar = null
         emptyViewContainer = null
-        learnLensHelper = null
+        jsInjector = null
     }
     
     private fun showLoading() {
@@ -267,21 +278,47 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         if (!isWebViewCached) {
             showLoading()
             pendingBookmarks?.let { bookmarks ->
-                webView?.let { initializeHelper(it); learnLensHelper?.injectBookmarks(bookmarks) }
+                webView?.let { initializeInjector(it); jsInjector?.injectBookmarks(bookmarks) }
             }
         }
     }
     
     override fun onLoadingFinished() {
         if (isWebViewCached || isCheckingLearnLens) return
-        webView?.let { initializeHelper(it); checkLearnLensReadiness { if (it) isLearnLensReady = true } }
+        webView?.let { initializeInjector(it); checkLearnLensReadiness { if (it) isLearnLensReady = true } }
         hideLoading()
         injectPendingAnnotations()
         if (pendingBookmarks == null) webView?.postDelayed({ injectPendingAnnotations() }, 500)
     }
     
     private fun injectPendingAnnotations() {
-        pendingBookmarks?.takeIf { it.isNotEmpty() }?.let { injectBookmarksWhenReady(it) }
+        pendingBookmarks?.takeIf { it.isNotEmpty() }?.let { injectBookmarks(it) }
+    }
+    
+    private fun buildTemplateReplacements(
+        pdfUrl: String,
+        pdfId: String,
+        authToken: String,
+        pdfTitle: String,
+        bookmarks: List<NetworkBookmark>
+    ): Map<String, String> {
+        val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
+            bookmark.id?.let {
+                mapOf(
+                    "id" to it,
+                    "page_number" to (bookmark.pageNumber ?: 0),
+                    "preview_text" to (bookmark.previewText ?: "")
+                )
+            }
+        }
+        val bookmarksJson = gson.toJson(bookmarksForLearnLens)
+        return mapOf(
+            "PDF_URL" to pdfUrl,
+            "PDF_ID" to pdfId,
+            "AUTH_TOKEN" to authToken,
+            "PDF_TITLE" to pdfTitle,
+            "INITIAL_BOOKMARKS_JSON" to bookmarksJson
+        )
     }
     
     private data class PdfArguments(
