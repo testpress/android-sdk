@@ -237,6 +237,11 @@
                         initLearnLens();
                     } else if (pollAttempts >= MAX_POLL_ATTEMPTS) {
                         clearInterval(pollInterval);
+                        console.error(
+                            "LearnLens library failed to load after " +
+                            (MAX_POLL_ATTEMPTS * 100 / 1000) +
+                            " seconds"
+                        );
                         initLearnLens();
                     }
                 }, 100);
