@@ -148,25 +148,22 @@ class LearnLensBridge(
     }
 
     private fun parseBookmarkId(bookmarkId: String): Long? {
-        return when {
-            bookmarkId.contains("\"") || bookmarkId.trim().startsWith("{") -> {
-                try {
-                    val trimmed = bookmarkId.trim()
-                    val jsonStr = if (trimmed.startsWith("{")) trimmed else bookmarkId
-                    val bookmarkObj = gson.fromJson(jsonStr, Map::class.java) as? Map<*, *>
-                    if (bookmarkObj != null) {
-                        (bookmarkObj["id"] as? Number)?.toLong()
-                            ?: (bookmarkObj["id"] as? String)?.toLongOrNull()
-                            ?: bookmarkId.toLongOrNull()
-                    } else {
-                        bookmarkId.toLongOrNull()
-                    }
-                } catch (e: Exception) {
-                    Log.e("LearnLensBridge", "Failed to parse bookmark ID from JSON: $bookmarkId", e)
-                    bookmarkId.toLongOrNull()
-                }
+        val directId = bookmarkId.trim().toLongOrNull()
+        if (directId != null) {
+            return directId
+        }
+
+        return try {
+            val bookmarkObj = gson.fromJson(bookmarkId, Map::class.java) as? Map<*, *>
+            if (bookmarkObj != null) {
+                (bookmarkObj["id"] as? Number)?.toLong()
+                    ?: (bookmarkObj["id"] as? String)?.toLongOrNull()
+            } else {
+                null
             }
-            else -> bookmarkId.toLongOrNull()
+        } catch (e: Exception) {
+            Log.e("LearnLensBridge", "Failed to parse bookmark ID from JSON: $bookmarkId", e)
+            null
         }
     }
 

@@ -20,23 +20,29 @@ class LearnLensHelper(private val context: Context, private val webView: WebView
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
     
-    fun fetchBookmarks(contentId: Long, callback: (List<NetworkBookmark>) -> Unit) {
+    fun fetchBookmarks(
+        contentId: Long,
+        callback: (List<NetworkBookmark>) -> Unit
+    ) {
         val queryParams = hashMapOf<String, Any>(
             "content_type" to "chapter_content",
             "object_id" to contentId,
             "bookmark_type" to "annotate"
         )
         
-        bookmarkRepository.getBookmarks(queryParams, object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
-            override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
-                val bookmarks = response.results?.bookmarks ?: emptyList()
-                callback(bookmarks)
+        bookmarkRepository.getBookmarks(
+            queryParams,
+            object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
+                override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
+                    val bookmarks = response.results?.bookmarks ?: emptyList()
+                    callback(bookmarks)
+                }
+                
+                override fun onException(exception: TestpressException?) {
+                    callback(emptyList())
+                }
             }
-            
-            override fun onException(exception: TestpressException?) {
-                callback(emptyList())
-            }
-        })
+        )
     }
     
     fun injectBookmarks(bookmarks: List<NetworkBookmark>) {

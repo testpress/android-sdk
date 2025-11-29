@@ -9,11 +9,11 @@ import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.BookmarkEntity
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import java.util.HashMap
 
@@ -45,6 +45,11 @@ class BookmarkRepository(private val context: Context) {
                         }
                     }
                 } catch (e: Exception) {
+                    Log.e(
+                        "BookmarkRepository",
+                        "Failed to load cached bookmarks for contentId=$contentId, type=$bookmarkType",
+                        e
+                    )
                 }
             }
         }
@@ -72,6 +77,11 @@ class BookmarkRepository(private val context: Context) {
                             }
                         }
                     } catch (e: Exception) {
+                        Log.e(
+                            "BookmarkRepository",
+                            "Failed to update local cache after network bookmarks fetch for contentId=$contentId, type=$bookmarkType",
+                            e
+                        )
                     }
                 }
                 callback.onSuccess(response)
@@ -106,6 +116,11 @@ class BookmarkRepository(private val context: Context) {
                             }
                         }
                     } catch (e: Exception) {
+                        Log.e(
+                            "BookmarkRepository",
+                            "Failed to cache created bookmark in database",
+                            e
+                        )
                     }
                 }
                 callback.onSuccess(response)
@@ -122,11 +137,16 @@ class BookmarkRepository(private val context: Context) {
         callback: TestpressCallback<Void>
     ) {
         courseNetwork.deleteBookmark(bookmarkId).enqueue(object : TestpressCallback<Void>() {
-            override fun onSuccess(response: Void) {
+            override fun onSuccess(response: Void?) {
                 scope.launch {
                     try {
                         bookmarkDao.deleteById(bookmarkId)
                     } catch (e: Exception) {
+                        Log.e(
+                            "BookmarkRepository",
+                            "Failed to delete bookmark with id=$bookmarkId from database",
+                            e
+                        )
                     }
                 }
                 callback.onSuccess(response)
@@ -138,14 +158,18 @@ class BookmarkRepository(private val context: Context) {
         })
     }
     
-    fun getCachedBookmarks(contentId: Long, bookmarkType: String = "annotate"): List<NetworkBookmark> {
-        return try {
-            val cached = runBlocking(Dispatchers.IO) {
-                bookmarkDao.getBookmarksByContent(contentId, bookmarkType)
+    suspend fun getCachedBookmarks(
+        contentId: Long,
+        bookmarkType: String = "annotate"
+    ): List<NetworkBookmark> {
+        return withContext(Dispatchers.IO) {
+            try {
+                bookmarkDao
+                    .getBookmarksByContent(contentId, bookmarkType)
+                    .map { it.toNetworkBookmark() }
+            } catch (e: Exception) {
+                emptyList()
             }
-            cached.map { it.toNetworkBookmark() }
-        } catch (e: Exception) {
-            emptyList()
         }
     }
     

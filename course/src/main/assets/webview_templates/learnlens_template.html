@@ -171,7 +171,7 @@
                     pdfTitle: "{{PDF_TITLE}}",
                     initialBookmarks: initialBookmarks,
                     onBookmarkCreate: function(bookmark) {
-                        return new Promise(function(resolve, reject) {
+                        const promise = new Promise(function(resolve, reject) {
                             if (!window.AndroidBridge || !window.AndroidBridge.onBookmarkCreate) {
                                 reject(new Error('Android bridge not available'));
                                 return;
@@ -204,16 +204,16 @@
                             window.LearnLens.onBookmarkCreateError = errorHandler;
                             
                             window.AndroidBridge.onBookmarkCreate(JSON.stringify(bookmarkToSend));
-                            
-                            setTimeout(function() {
-                                if (window.LearnLens.onBookmarkCreateSuccess === successHandler) {
-                                    delete window.LearnLens.onBookmarkCreateSuccess;
-                                }
-                                if (window.LearnLens.onBookmarkCreateError === errorHandler) {
-                                    delete window.LearnLens.onBookmarkCreateError;
-                                }
-                            }, 10000);
                         });
+
+                        return promise
+                            .then(function(result) {
+                                return result;
+                            })
+                            .finally(function() {
+                                delete window.LearnLens.onBookmarkCreateSuccess;
+                                delete window.LearnLens.onBookmarkCreateError;
+                            });
                     },
                     onBookmarkDelete: function(bookmarkId) {
                         if (window.AndroidBridge && window.AndroidBridge.onBookmarkDelete) {

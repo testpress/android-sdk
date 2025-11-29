@@ -4,9 +4,7 @@ import `in`.testpress.course.util.WebViewFactory
 import `in`.testpress.course.util.LearnLensHelper
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.core.TestpressCallback
 import `in`.testpress.course.network.NetworkBookmark
-import `in`.testpress.course.network.BookmarksListApiResponse
 import `in`.testpress.course.repository.BookmarkRepository
 import `in`.testpress.course.util.LearnLensBridge
 import `in`.testpress.v2_4.models.ApiResponse
@@ -27,6 +25,8 @@ import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import `in`.testpress.core.TestpressException
 import java.io.File
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 
 class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
@@ -106,85 +106,14 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private fun loadPdfInWebView(args: PdfArguments) {
         val cacheKey = "pdf_template_${args.contentId}"
         val wasCachedBefore = WebViewFactory.isCached(args.contentId, cacheKey)
-        
-        if (wasCachedBefore) {
-            val repository = BookmarkRepository(requireContext())
+
+        val repository = BookmarkRepository(requireContext())
+
+        viewLifecycleOwner.lifecycleScope.launch {
             val cachedBookmarks = repository.getCachedBookmarks(args.contentId, "annotate")
-            
-            var isNewWebView = false
-            
-            webView = WebViewFactory.createCached(
-                contentId = args.contentId,
-                cacheKey = cacheKey,
-                loadUrl = false,
-                createWebView = { WebView(requireContext()) }
-            ) { wv ->
-                isNewWebView = true
-                configureWebView(wv, args, cachedBookmarks)
-            }
-            
-            isWebViewCached = !isNewWebView
-            
-            container?.let { cont -> 
-                webView?.let { wv -> 
-                    WebViewFactory.attach(cont, wv)
-                    wv.requestFocus()
-                }
-            }
-            
-            hideLoading()
-            checkLearnLensReadiness { isReady ->
-                if (isReady) {
-                    isLearnLensReady = true
-                }
-                fetchBookmarks(args.contentId) { bookmarks ->
-                    pendingBookmarks = bookmarks
-                    val bookmarksChanged = bookmarks.size != cachedBookmarks.size || 
-                        bookmarks.map { it.id }.toSet() != cachedBookmarks.map { it.id }.toSet()
-                    if (bookmarksChanged && bookmarks.isNotEmpty()) {
-                        injectAnnotations(bookmarks)
-                    }
-                }
-            }
-        } else {
+
             showLoading()
-            
-            val repository = BookmarkRepository(requireContext())
-            val cachedBookmarks = repository.getCachedBookmarks(args.contentId, "annotate")
-            
-            var isNewWebView = false
-            webView = WebViewFactory.createCached(
-                contentId = args.contentId,
-                cacheKey = cacheKey,
-                loadUrl = false,
-                createWebView = { WebView(requireContext()) }
-            ) { wv ->
-                isNewWebView = true
-                configureWebView(wv, args, cachedBookmarks)
-            }
-            
-            isWebViewCached = !isNewWebView
-            
-            container?.let { cont -> 
-                webView?.let { wv -> 
-                    WebViewFactory.attach(cont, wv)
-                    wv.requestFocus()
-                }
-            }
-            
-            fetchBookmarks(args.contentId) { bookmarks ->
-                pendingBookmarks = bookmarks
-                if (bookmarks.isNotEmpty()) {
-                    val bookmarksChanged = bookmarks.size != cachedBookmarks.size || 
-                        bookmarks.map { it.id }.toSet() != cachedBookmarks.map { it.id }.toSet()
-                    if (bookmarksChanged || cachedBookmarks.isEmpty()) {
-                        webView?.let { wv ->
-                            initializeHelper(wv)
-                            learnLensHelper?.injectBookmarks(bookmarks)
-                        }
-                    }
-                }
-            }
+            setupWebView(args, cacheKey, cachedBookmarks, wasCachedBefore)
         }
     }
     
@@ -215,34 +144,79 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
     }
     
-    private fun fetchBookmarks(contentId: Long, onComplete: (List<NetworkBookmark>) -> Unit) {
-        val repository = BookmarkRepository(requireContext())
-        
-        val cachedBookmarks = repository.getCachedBookmarks(contentId, "annotate")
-        if (cachedBookmarks.isNotEmpty()) {
-            onComplete(cachedBookmarks)
+    private fun setupWebView(
+        args: PdfArguments,
+        cacheKey: String,
+        cachedBookmarks: List<NetworkBookmark>,
+        wasCachedBefore: Boolean
+    ) {
+        var isNewWebView = false
+
+        webView = WebViewFactory.createCached(
+            contentId = args.contentId,
+            cacheKey = cacheKey,
+            loadUrl = false,
+            createWebView = { WebView(requireContext()) }
+        ) { wv ->
+            isNewWebView = true
+            configureWebView(wv, args, cachedBookmarks)
         }
-        
-        val queryParams = hashMapOf<String, Any>(
-            "content_type" to "chapter_content",
-            "object_id" to contentId,
-            "bookmark_type" to "annotate"
-        )
-        
-        repository.getBookmarks(queryParams, object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
-            override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
-                val bookmarks = response.results?.bookmarks ?: emptyList()
-                if (cachedBookmarks.isEmpty() || bookmarks.isNotEmpty()) {
-                    onComplete(bookmarks)
+
+        isWebViewCached = !isNewWebView
+
+        container?.let { cont ->
+            webView?.let { wv ->
+                WebViewFactory.attach(cont, wv)
+                wv.requestFocus()
+            }
+        }
+
+        if (wasCachedBefore) {
+            loadBookmarksForCachedWebView(args, cachedBookmarks)
+        } else {
+            loadBookmarksForNewWebView(args, cachedBookmarks)
+        }
+    }
+
+    private fun loadBookmarksForCachedWebView(
+        args: PdfArguments,
+        cachedBookmarks: List<NetworkBookmark>
+    ) {
+        hideLoading()
+        checkLearnLensReadiness { isReady ->
+            if (isReady) {
+                isLearnLensReady = true
+            }
+            learnLensHelper?.fetchBookmarks(args.contentId) { bookmarks ->
+                pendingBookmarks = bookmarks
+                val bookmarksChanged = bookmarks.size != cachedBookmarks.size ||
+                    bookmarks.map { it.id }.toSet() !=
+                    cachedBookmarks.map { it.id }.toSet()
+                if (bookmarksChanged && bookmarks.isNotEmpty()) {
+                    injectAnnotations(bookmarks)
                 }
             }
-            
-            override fun onException(exception: TestpressException?) {
-                if (cachedBookmarks.isEmpty()) {
-                    onComplete(emptyList())
+        }
+    }
+
+    private fun loadBookmarksForNewWebView(
+        args: PdfArguments,
+        cachedBookmarks: List<NetworkBookmark>
+    ) {
+        learnLensHelper?.fetchBookmarks(args.contentId) { bookmarks ->
+            pendingBookmarks = bookmarks
+            if (bookmarks.isNotEmpty()) {
+                val bookmarksChanged = bookmarks.size != cachedBookmarks.size ||
+                    bookmarks.map { it.id }.toSet() !=
+                    cachedBookmarks.map { it.id }.toSet()
+                if (bookmarksChanged || cachedBookmarks.isEmpty()) {
+                    webView?.let { wv ->
+                        initializeHelper(wv)
+                        learnLensHelper?.injectBookmarks(bookmarks)
+                    }
                 }
             }
-        })
+        }
     }
     
     private fun initializeHelper(wv: WebView) {
