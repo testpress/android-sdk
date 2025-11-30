@@ -66,15 +66,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        resetState()
+        pendingBookmarks = null
         val args = extractArguments()
         initializeViews(view)
         webChromeClient = BaseWebChromeClient(this)
         loadPdfInWebView(args)
-    }
-    
-    private fun resetState() {
-        pendingBookmarks = null
     }
     
     private fun extractArguments(): PdfArguments {
@@ -195,13 +191,13 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onDestroyView() {
         super.onDestroyView()
-        resetState()
         webChromeClient.cleanup()
         WebViewFactory.detach(webView)
         webView = null
         container = null
         progressBar = null
         emptyViewContainer = null
+        pendingBookmarks = null
     }
     
     private fun showLoading() {

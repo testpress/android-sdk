@@ -36,9 +36,7 @@
         const templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
         
         function initLearnLens() {
-            if (isInitialized) {
-                return;
-            }
+            if (isInitialized) return;
             
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
                 isInitialized = true;
