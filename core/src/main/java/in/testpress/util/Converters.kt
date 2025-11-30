@@ -139,7 +139,7 @@ object Converters {
     @JvmStatic
     fun toDoubleList(value: String?): List<Double>? {
         if (value == null) return null
-        if (value.isEmpty()) return null
+        if (value.isEmpty()) return emptyList()
         return value.split(",").mapNotNull { it.toDoubleOrNull() }
     }
 }
