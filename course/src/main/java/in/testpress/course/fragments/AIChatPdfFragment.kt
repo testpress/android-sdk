@@ -79,11 +79,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
         val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
         val learnlensAssetId = requireArguments().getString(ARG_LEARNLENS_ASSET_ID)
-        
+
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
         }
-        
+
         return PdfArguments(contentId, courseId, pdfUrl, pdfTitle, templateName, learnlensAssetId)
     }
     
@@ -92,7 +92,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         progressBar = view.findViewById(R.id.pb_loading)
         emptyViewContainer = view.findViewById(R.id.empty_view_container)
     }
-    
+
     private fun initializeEmptyViewFragment() {
         emptyViewFragment = EmptyViewFragment()
         childFragmentManager.beginTransaction()

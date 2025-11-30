@@ -18,6 +18,7 @@
         let pollAttempts = 0;
         const MAX_POLL_ATTEMPTS = 50;
         const POLL_INTERVAL = 100;
+        let pendingAnnotations = null;
         
         const initialBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
         
