@@ -7,7 +7,9 @@ import android.webkit.WebView
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.course.repository.BookmarkRepository
+import `in`.testpress.course.repository.HighlightRepository
 import `in`.testpress.course.network.NetworkBookmark
+import `in`.testpress.course.network.NetworkHighlight
 import `in`.testpress.util.BaseJavaScriptInterface
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -20,6 +22,7 @@ class AIPdfJsInterface(
 ) : BaseJavaScriptInterface(activity) {
 
     private val bookmarkRepository = BookmarkRepository(activity)
+    private val highlightRepository = HighlightRepository(activity)
     private val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
@@ -114,8 +117,125 @@ class AIPdfJsInterface(
         }
     }
 
+    @JavascriptInterface
+    fun onHighlightCreate(highlightJson: String) {
+        try {
+            if (highlightJson.isBlank()) {
+                throw IllegalArgumentException("Highlight JSON cannot be empty")
+            }
+
+            val highlightMap = gson.fromJson(highlightJson, Map::class.java) as? Map<*, *>
+                ?: throw IllegalArgumentException("Failed to parse highlight JSON as object")
+
+            val requestBody = hashMapOf<String, Any>().apply {
+                val pageNumber = (highlightMap["page_number"] as? Number)?.toInt()
+                    ?: throw IllegalArgumentException("Page number must be provided and greater than 0")
+                
+                if (pageNumber <= 0) {
+                    throw IllegalArgumentException("Page number must be greater than 0")
+                }
+                
+                put("page_number", pageNumber)
+                
+                val position = highlightMap["position"]
+                    ?: throw IllegalArgumentException("Position is required for highlight")
+                put("position", position)
+                
+                put("selected_text", highlightMap["selected_text"] as? String ?: "")
+                put("notes", highlightMap["notes"] as? String ?: "")
+                put("color", highlightMap["color"] as? String ?: "#FFEB3B")
+            }
+
+            highlightRepository.createHighlight(contentId, requestBody, object : TestpressCallback<NetworkHighlight>() {
+                override fun onSuccess(response: NetworkHighlight) {
+                    if (response.id == null) {
+                        val errorJson = gson.toJson(mapOf("error" to "Highlight created but ID is missing"))
+                        evaluateJavascript("window.LearnLens?.onHighlightCreateError?.($errorJson);")
+                        return
+                    }
+                    
+                    val highlightId = response.id!!.toLong()
+                    val result = mapOf(
+                        "id" to highlightId,
+                        "page_number" to (response.pageNumber ?: 0),
+                        "selected_text" to (response.selectedText ?: ""),
+                        "notes" to (response.notes ?: ""),
+                        "color" to (response.color ?: "#FFEB3B"),
+                        "position" to (response.position ?: emptyList<Double>())
+                    )
+                    val resultJson = gson.toJson(result)
+                    
+                    evaluateJavascript("""
+                        (function() {
+                            var highlight = $resultJson;
+                            if (window.LearnLens && window.LearnLens.onHighlightCreateSuccess) {
+                                window.LearnLens.onHighlightCreateSuccess(highlight);
+                            }
+                        })();
+                    """.trimIndent())
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    val errorMessage = exception?.message ?: "Unknown error"
+                    val errorJson = gson.toJson(mapOf("error" to errorMessage))
+                    evaluateJavascript("window.LearnLens?.onHighlightCreateError?.($errorJson);")
+                }
+            })
+        } catch (e: Exception) {
+            val errorJson = gson.toJson(mapOf("error" to (e.message ?: "Unknown error")))
+            evaluateJavascript("window.LearnLens?.onHighlightCreateError?.($errorJson);")
+        }
+    }
+
+    @JavascriptInterface
+    fun onHighlightDelete(highlightId: String) {
+        try {
+            val id = parseHighlightId(highlightId)
+            
+            if (id == null) {
+                val errorJson = gson.toJson(mapOf("error" to "Invalid highlight ID"))
+                evaluateJavascript("window.LearnLens?.onHighlightDeleteError?.($errorJson);")
+                return
+            }
+            
+            highlightRepository.deleteHighlight(contentId, id, object : TestpressCallback<Void>() {
+                override fun onSuccess(response: Void?) {
+                    evaluateJavascript("window.LearnLens?.onHighlightDeleteSuccess?.('$highlightId');")
+                }
+
+                override fun onException(exception: TestpressException?) {
+                    val errorJson = gson.toJson(mapOf("error" to (exception?.message ?: "Unknown error")))
+                    evaluateJavascript("window.LearnLens?.onHighlightDeleteError?.($errorJson);")
+                }
+            })
+        } catch (e: Exception) {
+            val errorJson = gson.toJson(mapOf("error" to (e.message ?: "Unknown error")))
+            evaluateJavascript("window.LearnLens?.onHighlightDeleteError?.($errorJson);")
+        }
+    }
+
     private fun parseBookmarkId(bookmarkId: String): Long? {
         return bookmarkId.trim().toLongOrNull()
+    }
+
+    private fun parseHighlightId(highlightId: String): Long? {
+        val directId = highlightId.trim().toLongOrNull()
+        if (directId != null) {
+            return directId
+        }
+
+        return try {
+            val highlightObj = gson.fromJson(highlightId, Map::class.java) as? Map<*, *>
+            if (highlightObj != null) {
+                (highlightObj["id"] as? Number)?.toLong()
+                    ?: (highlightObj["id"] as? String)?.toLongOrNull()
+            } else {
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("AIPdfJsInterface", "Failed to parse highlight ID from JSON: $highlightId", e)
+            null
+        }
     }
 
     private fun evaluateJavascript(script: String) {

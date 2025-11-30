@@ -5,7 +5,9 @@ import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.network.NetworkBookmark
+import `in`.testpress.course.network.NetworkHighlight
 import `in`.testpress.course.repository.BookmarkRepository
+import `in`.testpress.course.repository.HighlightRepository
 import `in`.testpress.course.util.AIPdfJsInterface
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -170,7 +172,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             }
         }
     }
-    
+
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
     private fun configureWebView(wv: WebView, args: PdfArguments) {
         wv.enableFileAccess()
