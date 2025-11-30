@@ -219,8 +219,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         emptyViewFragment.displayError(exception)
     }
     
-    override fun onError(exception: TestpressException) = showErrorView(exception)
-    override fun isViewActive(): Boolean = isAdded
     
     override fun onRetryClick() {
         emptyViewContainer?.isVisible = false
@@ -229,18 +227,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         webView?.reload()
     }
     
-    override fun onLoadingStarted() {
-        if (!isWebViewCached) {
-            showLoading()
-            
-        }
-    }
-    
-    override fun onLoadingFinished() {
-        if (isWebViewCached) return
-        hideLoading()
-    }
-    
+    override fun onLoadingStarted() = showLoading()
+    override fun onLoadingFinished() = hideLoading()
+    override fun onError(exception: TestpressException) = showErrorView(exception)
+    override fun isViewActive(): Boolean = isAdded
+
     private fun buildTemplateReplacements(
         pdfUrl: String,
         pdfId: String,
