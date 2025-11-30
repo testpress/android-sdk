@@ -219,7 +219,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         emptyViewFragment.displayError(exception)
     }
     
-    
     override fun onRetryClick() {
         emptyViewContainer?.isVisible = false
         container?.isVisible = true
