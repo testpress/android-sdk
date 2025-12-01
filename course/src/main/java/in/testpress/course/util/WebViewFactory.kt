@@ -264,11 +264,11 @@ object WebViewFactory {
             }
         }
     }
-
+    
     private fun shouldEvictDueToLowMemory(availableMB: Long): Boolean {
         return availableMB < MIN_FREE_MEMORY_MB
     }
-
+    
     private fun shouldEvictDueToOverflow(availableMB: Long): Boolean {
         val estimatedUsageMB = cache.size * WEBVIEW_AVG_SIZE_MB
         val maxAllowedMB = (availableMB * AVAILABLE_RAM_PERCENTAGE).toLong()
