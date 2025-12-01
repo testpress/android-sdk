@@ -81,16 +81,7 @@ object WebViewFactory {
         val availableRamMB = memInfo.availMem / (1024 * 1024)
         val maxCacheMemoryMB = (availableRamMB * AVAILABLE_RAM_PERCENTAGE).toLong()
         val calculatedSize = (maxCacheMemoryMB / WEBVIEW_AVG_SIZE_MB).toInt()
-        
-        val maxAllowed = if (memInfo.lowMemory || availableRamMB < 1000) {
-            2 
-        } else if (availableRamMB < 2000) {
-            3 
-        } else {
-            3 
-        }
-        
-        return calculatedSize.coerceIn(2, maxAllowed)  // Changed: minimum 2 (not 1) for proper caching
+        return calculatedSize.coerceIn(2, 3)        
     }
     
     private fun getMemoryInfo(): ActivityManager.MemoryInfo {
@@ -134,7 +125,7 @@ object WebViewFactory {
                 return existing.webView
             }
             
-            if (!hasEnoughMemory() && cache.size > 3) clearOldest()
+            if (!hasEnoughMemory()) clearOldest()
             
             val webView = createWebView()
             configure(webView)
@@ -229,18 +220,11 @@ object WebViewFactory {
             
             val eldest = cache.entries.firstOrNull() ?: return
             val eldestContentId = eldest.key
-            val cacheSizeBefore = cache.size
             
-            if (isActive(eldestContentId)) {
-                val nonActiveEntry = cache.entries.find { !isActive(it.key) }
-                if (nonActiveEntry != null) {
-                    removeFromCache(nonActiveEntry)
-                    return
-                }
-                return
-            }
-            
-            if (cacheSizeBefore > maxSize) {
+            if (cache.size == 1) {
+                if (isActive(eldestContentId)) return
+                removeFromCache(eldest)
+            } else {
                 removeFromCache(eldest)
             }
         }
@@ -265,28 +249,30 @@ object WebViewFactory {
             val memInfo = getMemoryInfo()
             val availableMB = memInfo.availMem / (1024 * 1024)
             
-            if (availableMB < MIN_FREE_MEMORY_MB) {
+            if (shouldEvictDueToLowMemory(availableMB)) {
                 clearOldest()
                 return
             }
             
-            if (memInfo.lowMemory && cache.size > maxSize) {
+            if (memInfo.lowMemory) {
                 clearOldest()
                 return
             }
             
-            if (shouldEvictDueToOverflow(availableMB) && cache.size > maxSize) {
+            if (shouldEvictDueToOverflow(availableMB)) {
                 clearOldest()
             }
         }
     }
-    
+
+    private fun shouldEvictDueToLowMemory(availableMB: Long): Boolean {
+        return availableMB < MIN_FREE_MEMORY_MB
+    }
+
     private fun shouldEvictDueToOverflow(availableMB: Long): Boolean {
         val estimatedUsageMB = cache.size * WEBVIEW_AVG_SIZE_MB
         val maxAllowedMB = (availableMB * AVAILABLE_RAM_PERCENTAGE).toLong()
-        val threshold = (maxAllowedMB * 0.8).toLong()
-        val shouldEvict = estimatedUsageMB > threshold
-        return shouldEvict
+        return estimatedUsageMB > maxAllowedMB
     }
     
     private fun destroyOnMainThread(cachedWebView: CachedWebView) {
@@ -300,8 +286,6 @@ object WebViewFactory {
     private data class CachedWebView(val webView: WebView, var cacheKey: String) {
         fun destroy() {
             try {
-                webView.clearHistory()
-                webView.clearCache(true)
                 webView.loadUrl("about:blank")
                 webView.stopLoading()
                 webView.removeAllViews()

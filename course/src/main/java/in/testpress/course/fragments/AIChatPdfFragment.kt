@@ -2,13 +2,11 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.util.WebViewFactory
 import `in`.testpress.course.R
+import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
-import `in`.testpress.core.TestpressCallback
 import `in`.testpress.course.network.NetworkBookmark
-import `in`.testpress.course.network.BookmarksListApiResponse
 import `in`.testpress.course.repository.BookmarkRepository
 import `in`.testpress.course.util.AIPdfJsInterface
-import `in`.testpress.v2_4.models.ApiResponse
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.util.webview.WebViewEventListener
@@ -17,7 +15,6 @@ import `in`.testpress.util.webview.BaseWebChromeClient
 import `in`.testpress.util.webview.WebView
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -25,7 +22,6 @@ import android.widget.FrameLayout
 import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
-import `in`.testpress.core.TestpressException
 import java.io.File
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
@@ -69,34 +65,43 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         pendingBookmarks = null
         val args = extractArguments()
         initializeViews(view)
+        initializeEmptyViewFragment()
         webChromeClient = BaseWebChromeClient(this)
         loadPdfInWebView(args)
     }
     
     private fun extractArguments(): PdfArguments {
-        val args = requireArguments()
-        val contentId = args.getLong(ARG_CONTENT_ID, -1L)
-        val courseId = args.getLong(ARG_COURSE_ID, -1L)
-        val pdfUrl = args.getString(ARG_PDF_URL)
+        val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
+        val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
+        val pdfUrl = requireArguments().getString(ARG_PDF_URL)
+        val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
+        val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
+        val learnlensAssetId = requireArguments().getString(ARG_LEARNLENS_ASSET_ID)
+
+//        val args = requireArguments()
+//        val contentId = args.getLong(ARG_CONTENT_ID, -1L)
+//        val courseId = args.getLong(ARG_COURSE_ID, -1L)
+//        val pdfUrl = args.getString(ARG_PDF_URL)
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
         }
-        return PdfArguments(
-            contentId, courseId, pdfUrl,
-            args.getString(ARG_PDF_TITLE) ?: "PDF Document",
-            args.getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE,
-            args.getString(ARG_LEARNLENS_ASSET_ID)
-        )
+
+        return PdfArguments(contentId, courseId, pdfUrl, pdfTitle, templateName, learnlensAssetId)
     }
     
     private fun initializeViews(view: View) {
         container = view.findViewById(R.id.aiPdf_view_fragment)
         progressBar = view.findViewById(R.id.pb_loading)
         emptyViewContainer = view.findViewById(R.id.empty_view_container)
-        emptyViewFragment = EmptyViewFragment()
-        childFragmentManager.beginTransaction().replace(R.id.empty_view_container, emptyViewFragment).commit()
     }
-    
+
+    private fun initializeEmptyViewFragment() {
+        emptyViewFragment = EmptyViewFragment()
+        childFragmentManager.beginTransaction()
+            .replace(R.id.empty_view_container, emptyViewFragment)
+            .commit()
+    }
+
     private fun loadPdfInWebView(args: PdfArguments) {
         val cacheKey = "pdf_template_${args.contentId}"
         val wasCachedBefore = WebViewFactory.isCached(args.contentId, cacheKey)
@@ -185,7 +190,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             args.pdfUrl, pdfId, authToken, args.pdfTitle, bookmarks
         )
         
-        wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidBridge")
+        wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
         wv.loadTemplateAndCacheResources(args.templateName, replacements, "file://${cacheDir.absolutePath}/")
     }
     

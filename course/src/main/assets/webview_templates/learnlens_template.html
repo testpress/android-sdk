@@ -18,25 +18,8 @@
         let pollAttempts = 0;
         const MAX_POLL_ATTEMPTS = 50;
         const POLL_INTERVAL = 100;
-        let pendingAnnotations = null;
         
-        window.setAnnotationsForLearnLens = function(bookmarks) {
-            pendingAnnotations = { bookmarks: bookmarks || [] };
-            
-            if (!isInitialized && window.LearnLens && window.LearnLens.mountPdfChat) {
-                initLearnLens();
-            } else if (isInitialized && window.LearnLens && window.LearnLens.setAnnotations) {
-                try {
-                    window.LearnLens.setAnnotations([], pendingAnnotations.bookmarks);
-                } catch (e) {
-                    console.error("[Template] LearnLens.setAnnotations failed:", e);
-                }
-            } else {
-                console.log("[Template] Conditions not met - isInitialized:", isInitialized, "hasLearnLens:", !!window.LearnLens, "hasMountPdfChat:", !!(window.LearnLens && window.LearnLens.mountPdfChat), "hasSetAnnotations:", !!(window.LearnLens && window.LearnLens.setAnnotations));
-            }
-        };
-        
-        const templateBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+        const initialBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
         
         function initLearnLens() {
             if (isInitialized) return;
@@ -44,7 +27,7 @@
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
                 isInitialized = true;
                 
-                const initialBookmarks = (pendingAnnotations && pendingAnnotations.bookmarks) ? pendingAnnotations.bookmarks : templateBookmarks;
+                const callbacks = createBookmarkCallbacks();
                 
                 window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
                     pdfUrl: "{{PDF_URL}}",
@@ -52,50 +35,8 @@
                     authToken: "{{AUTH_TOKEN}}",
                     pdfTitle: "{{PDF_TITLE}}",
                     initialBookmarks: initialBookmarks,
-                    onBookmarkCreate: function(page, previewText) {
-                        const promise = new Promise(function(resolve, reject) {
-                            if (!window.AndroidBridge || !window.AndroidBridge.onBookmarkCreate) {
-                                reject(new Error('Android bridge not available'));
-                                return;
-                            }
-                            
-                            const bookmarkToSend = {
-                                page_number: page,
-                                preview_text: previewText || ''
-                            };
-                            
-                            const successHandler = function(createdBookmark) {
-                                if (createdBookmark && createdBookmark.id) {
-                                    resolve(createdBookmark);
-                                } else {
-                                    reject(new Error('Bookmark created but ID is missing'));
-                                }
-                            };
-                            
-                            const errorHandler = function(error) {
-                                reject(new Error(error.error || 'Failed to create bookmark'));
-                            };
-                            
-                            window.LearnLens.onBookmarkCreateSuccess = successHandler;
-                            window.LearnLens.onBookmarkCreateError = errorHandler;
-                            
-                            window.AndroidBridge.onBookmarkCreate(JSON.stringify(bookmarkToSend));
-                        });
-
-                        return promise
-                            .then(function(result) {
-                                return result;
-                            })
-                            .finally(function() {
-                                delete window.LearnLens.onBookmarkCreateSuccess;
-                                delete window.LearnLens.onBookmarkCreateError;
-                            });
-                    },
-                    onBookmarkDelete: function(bookmarkId) {
-                        if (window.AndroidBridge && window.AndroidBridge.onBookmarkDelete) {
-                            window.AndroidBridge.onBookmarkDelete(bookmarkId);
-                        }
-                    }
+                    onBookmarkCreate: callbacks.onBookmarkCreate,
+                    onBookmarkDelete: callbacks.onBookmarkDelete
                 });
             } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
                 pollAttempts++;
@@ -105,9 +46,57 @@
             }
         }
         
+        function createBookmarkCallbacks() {
+            return {
+                onBookmarkCreate: function(page, previewText) {
+                    return createBookmarkViaInterface(page, previewText);
+                },
+                onBookmarkDelete: function(bookmarkId) {
+                    deleteBookmarkViaInterface(bookmarkId);
+                }
+            };
+        }
+        
+        function createBookmarkViaInterface(page, previewText) {
+            if (!window.AndroidJsInterface || !window.AndroidJsInterface.onBookmarkCreate) {
+                return Promise.reject(new Error('Android JavaScript interface not available'));
+            }
+            
+            const bookmarkToSend = {
+                page_number: page,
+                preview_text: previewText || ''
+            };
+            
+            return new Promise(function(resolve, reject) {
+                const successHandler = function(createdBookmark) {
+                    if (createdBookmark && createdBookmark.id) {
+                        resolve(createdBookmark);
+                    } else {
+                        reject(new Error('Bookmark created but ID is missing'));
+                    }
+                };
+                
+                const errorHandler = function(error) {
+                    reject(new Error(error.error || 'Failed to create bookmark'));
+                };
+                
+                window.LearnLens.onBookmarkCreateSuccess = successHandler;
+                window.LearnLens.onBookmarkCreateError = errorHandler;
+                
+                window.AndroidJsInterface.onBookmarkCreate(JSON.stringify(bookmarkToSend));
+            }).finally(function() {
+                delete window.LearnLens.onBookmarkCreateSuccess;
+                delete window.LearnLens.onBookmarkCreateError;
+            });
+        }
+        
+        function deleteBookmarkViaInterface(bookmarkId) {
+            if (window.AndroidJsInterface && window.AndroidJsInterface.onBookmarkDelete) {
+                window.AndroidJsInterface.onBookmarkDelete(bookmarkId);
+            }
+        }
+        
         initLearnLens();
     </script>
 </body>
 </html>
-
-
