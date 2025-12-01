@@ -167,7 +167,7 @@ class HighlightRepository(private val context: Context) {
             }
 
             override fun onException(exception: TestpressException?) {
-                onException?.invoke(exception)
+                onException?.invoke(exception) ?: onSuccess(emptyList())
             }
         })
     }
