@@ -78,10 +78,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
         val learnlensAssetId = requireArguments().getString(ARG_LEARNLENS_ASSET_ID)
 
-//        val args = requireArguments()
-//        val contentId = args.getLong(ARG_CONTENT_ID, -1L)
-//        val courseId = args.getLong(ARG_COURSE_ID, -1L)
-//        val pdfUrl = args.getString(ARG_PDF_URL)
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
         }

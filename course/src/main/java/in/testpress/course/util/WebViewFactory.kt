@@ -81,7 +81,7 @@ object WebViewFactory {
         val availableRamMB = memInfo.availMem / (1024 * 1024)
         val maxCacheMemoryMB = (availableRamMB * AVAILABLE_RAM_PERCENTAGE).toLong()
         val calculatedSize = (maxCacheMemoryMB / WEBVIEW_AVG_SIZE_MB).toInt()
-        return calculatedSize.coerceIn(2, 3)        
+        return calculatedSize.coerceIn(2, 3)
     }
     
     private fun getMemoryInfo(): ActivityManager.MemoryInfo {
