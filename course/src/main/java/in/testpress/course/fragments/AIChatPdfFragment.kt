@@ -46,6 +46,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var webChromeClient: BaseWebChromeClient
+    private val bookmarkRepository by lazy { BookmarkRepository(requireContext()) }
     private val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
@@ -119,15 +120,13 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private fun createCacheKey(contentId: Long) = "pdf_template_$contentId"
     
     private suspend fun getCachedBookmarks(contentId: Long): List<NetworkBookmark> {
-        val repository = BookmarkRepository(requireContext())
-        return repository.getCachedBookmarks(contentId, "annotate")
+        return bookmarkRepository.getCachedBookmarks(contentId, "annotate")
     }
     
     private fun fetchBookmarksFromNetwork(args: PdfArguments, onComplete: (List<NetworkBookmark>) -> Unit) {
-        val repository = BookmarkRepository(requireContext())
         var hasReceivedCallback = false
         
-        repository.fetchBookmarks(
+        bookmarkRepository.fetchBookmarks(
             contentId = args.contentId,
             onSuccess = { bookmarks ->
                 if (!hasReceivedCallback) {
@@ -181,8 +180,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     }
 
     private fun refreshBookmarksCache(args: PdfArguments) {
-        val repository = BookmarkRepository(requireContext())
-        repository.fetchBookmarks(
+        bookmarkRepository.fetchBookmarks(
             contentId = args.contentId,
             onSuccess = { }
         )

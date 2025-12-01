@@ -52,8 +52,10 @@ class BookmarkRepository(private val context: Context) {
                             e
                         )
                     }
+                    withContext(Dispatchers.Main) {
+                        callback.onSuccess(response)
+                    }
                 }
-                callback.onSuccess(response)
             }
 
             override fun onException(exception: TestpressException?) {
@@ -78,8 +80,10 @@ class BookmarkRepository(private val context: Context) {
                             e
                         )
                     }
+                    withContext(Dispatchers.Main) {
+                        callback.onSuccess(response)
+                    }
                 }
-                callback.onSuccess(response)
             }
 
             override fun onException(exception: TestpressException?) {
@@ -161,7 +165,7 @@ class BookmarkRepository(private val context: Context) {
             }
 
             override fun onException(exception: TestpressException?) {
-                onException?.invoke(exception) ?: onSuccess(emptyList())
+                onException?.invoke(exception)
             }
         })
     }

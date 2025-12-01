@@ -52,7 +52,7 @@
                     return createBookmarkViaInterface(page, previewText);
                 },
                 onBookmarkDelete: function(bookmarkId) {
-                    deleteBookmarkViaInterface(bookmarkId);
+                    return deleteBookmarkViaInterface(bookmarkId);
                 }
             };
         }
@@ -91,9 +91,28 @@
         }
         
         function deleteBookmarkViaInterface(bookmarkId) {
-            if (window.AndroidJsInterface && window.AndroidJsInterface.onBookmarkDelete) {
-                window.AndroidJsInterface.onBookmarkDelete(bookmarkId);
+            if (!window.AndroidJsInterface || !window.AndroidJsInterface.onBookmarkDelete) {
+                return Promise.reject(new Error('Android JavaScript interface not available'));
             }
+
+            let normalizedId;
+            if (typeof bookmarkId === 'object' && bookmarkId !== null && bookmarkId.id !== undefined) {
+                normalizedId = String(bookmarkId.id);
+            } else {
+                normalizedId = String(bookmarkId);
+            }
+
+            return new Promise(function(resolve, reject) {
+                window.LearnLens.onBookmarkDeleteSuccess = resolve;
+                window.LearnLens.onBookmarkDeleteError = function(error) {
+                    reject(new Error(error.error || 'Failed to delete bookmark'));
+                };
+
+                window.AndroidJsInterface.onBookmarkDelete(normalizedId);
+            }).finally(function() {
+                delete window.LearnLens.onBookmarkDeleteSuccess;
+                delete window.LearnLens.onBookmarkDeleteError;
+            });
         }
         
         initLearnLens();

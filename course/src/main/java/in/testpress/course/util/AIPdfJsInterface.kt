@@ -122,23 +122,7 @@ class AIPdfJsInterface(
     }
 
     private fun parseBookmarkId(bookmarkId: String): Long? {
-        val directId = bookmarkId.trim().toLongOrNull()
-        if (directId != null) {
-            return directId
-        }
-
-        return try {
-            val bookmarkObj = gson.fromJson(bookmarkId, Map::class.java) as? Map<*, *>
-            if (bookmarkObj != null) {
-                (bookmarkObj["id"] as? Number)?.toLong()
-                    ?: (bookmarkObj["id"] as? String)?.toLongOrNull()
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("AIPdfJsInterface", "Failed to parse bookmark ID from JSON: $bookmarkId", e)
-            null
-        }
+        return bookmarkId.trim().toLongOrNull()
     }
 
     private fun evaluateJavascript(script: String) {
