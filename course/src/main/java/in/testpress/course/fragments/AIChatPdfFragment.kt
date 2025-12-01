@@ -46,8 +46,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var webChromeClient: BaseWebChromeClient
-    private var isWebViewCached = false
-    private var pendingBookmarks: List<NetworkBookmark>? = null
     private val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
@@ -62,7 +60,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        pendingBookmarks = null
         val args = extractArguments()
         initializeViews(view)
         initializeEmptyViewFragment()
@@ -99,79 +96,97 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     }
     
     private fun loadPdfInWebView(args: PdfArguments) {
-        val cacheKey = "pdf_template_${args.contentId}"
+        val cacheKey = createCacheKey(args.contentId)
         val wasCachedBefore = WebViewFactory.isCached(args.contentId, cacheKey)
-        val repository = BookmarkRepository(requireContext())
-
+        displayPdfWithCachedData(args, cacheKey, wasCachedBefore)
+    }
+    
+    private fun displayPdfWithCachedData(args: PdfArguments, cacheKey: String, wasCachedBefore: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val cachedBookmarks = repository.getCachedBookmarks(args.contentId, "annotate")
+            val cachedBookmarks = getCachedBookmarks(args.contentId)
             showLoading()
             
             if (cachedBookmarks.isEmpty() && !wasCachedBefore) {
-                fetchBookmarksForFirstLoad(args, cacheKey, wasCachedBefore)
+                fetchBookmarksFromNetwork(args) { bookmarks ->
+                    initializeWebView(args, cacheKey, bookmarks, wasCachedBefore)
+                }
             } else {
-                setupWebView(args, cacheKey, cachedBookmarks, wasCachedBefore)
+                initializeWebView(args, cacheKey, cachedBookmarks, wasCachedBefore)
             }
         }
     }
     
-    private fun fetchBookmarksForFirstLoad(args: PdfArguments, cacheKey: String, wasCachedBefore: Boolean) {
+    private fun createCacheKey(contentId: Long) = "pdf_template_$contentId"
+    
+    private suspend fun getCachedBookmarks(contentId: Long): List<NetworkBookmark> {
         val repository = BookmarkRepository(requireContext())
+        return repository.getCachedBookmarks(contentId, "annotate")
+    }
+    
+    private fun fetchBookmarksFromNetwork(args: PdfArguments, onComplete: (List<NetworkBookmark>) -> Unit) {
+        val repository = BookmarkRepository(requireContext())
+        var hasReceivedCallback = false
+        
         repository.fetchBookmarks(
             contentId = args.contentId,
             onSuccess = { bookmarks ->
-                pendingBookmarks = bookmarks
-                setupWebView(args, cacheKey, bookmarks, wasCachedBefore)
+                if (!hasReceivedCallback) {
+                    hasReceivedCallback = true
+                    onComplete(bookmarks)
+                }
             },
             onException = {
-                setupWebView(args, cacheKey, emptyList(), wasCachedBefore)
+                if (!hasReceivedCallback) {
+                    hasReceivedCallback = true
+                    onComplete(emptyList())
+                }
             }
         )
     }
     
-    private fun setupWebView(args: PdfArguments, cacheKey: String, cachedBookmarks: List<NetworkBookmark>, wasCachedBefore: Boolean) {
-        var isNewWebView = false
+    private fun initializeWebView(args: PdfArguments, cacheKey: String, cachedBookmarks: List<NetworkBookmark>, wasCachedBefore: Boolean) {
+        createWebView(args, cacheKey, cachedBookmarks)
+        attachWebView()
+        if (wasCachedBefore) hideLoading()
+        syncBookmarksCache(args, cachedBookmarks, wasCachedBefore)
+    }
+
+    private fun createWebView(args: PdfArguments, cacheKey: String, cachedBookmarks: List<NetworkBookmark>) {
         webView = WebViewFactory.createCached(
             contentId = args.contentId,
             cacheKey = cacheKey,
             loadUrl = false,
             createWebView = { WebView(requireContext()) }
-        ) { wv -> isNewWebView = true; configureWebView(wv, args, cachedBookmarks) }
-
-        isWebViewCached = !isNewWebView
-        container?.let { cont -> webView?.let { wv -> WebViewFactory.attach(cont, wv); wv.requestFocus() } }
-        if (wasCachedBefore) loadBookmarksForCachedWebView(args, cachedBookmarks)
-        else loadBookmarksForNewWebView(args, cachedBookmarks)
+        ) { wv -> 
+            configureWebView(wv, args, cachedBookmarks) 
+        }
     }
 
-    private fun loadBookmarksForCachedWebView(args: PdfArguments, cachedBookmarks: List<NetworkBookmark>) {
-        hideLoading()
+    private fun attachWebView() {
+        container?.let { cont -> 
+            webView?.let { wv -> 
+                WebViewFactory.attach(cont, wv)
+                wv.requestFocus() 
+            } 
+        }
+    }
+
+    private fun syncBookmarksCache(args: PdfArguments, cachedBookmarks: List<NetworkBookmark>, wasCachedBefore: Boolean) {
+        val isNewWebView = !wasCachedBefore
+        val hasCachedBookmarks = cachedBookmarks.isNotEmpty()
+        val shouldSkipSync = isNewWebView && hasCachedBookmarks
+        
+        if (shouldSkipSync) return
+        refreshBookmarksCache(args)
+    }
+
+    private fun refreshBookmarksCache(args: PdfArguments) {
         val repository = BookmarkRepository(requireContext())
         repository.fetchBookmarks(
             contentId = args.contentId,
-            onSuccess = { bookmarks ->
-                pendingBookmarks = bookmarks
-            }
+            onSuccess = { }
         )
     }
-
-    private fun loadBookmarksForNewWebView(args: PdfArguments, cachedBookmarks: List<NetworkBookmark>) {
-        if (cachedBookmarks.isNotEmpty()) {
-            pendingBookmarks = cachedBookmarks
-        } else {
-            val repository = BookmarkRepository(requireContext())
-            repository.fetchBookmarks(
-                contentId = args.contentId,
-                onSuccess = { bookmarks ->
-                    pendingBookmarks = bookmarks
-                }
-            )
-        }
-    }
-    
-    
-    private fun hasBookmarksChanged(new: List<NetworkBookmark>, old: List<NetworkBookmark>) =
-        new.size != old.size || new.map { it.id }.toSet() != old.map { it.id }.toSet()
     
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
     private fun configureWebView(wv: WebView, args: PdfArguments, bookmarks: List<NetworkBookmark>) {
@@ -198,7 +213,6 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         container = null
         progressBar = null
         emptyViewContainer = null
-        pendingBookmarks = null
     }
     
     private fun showLoading() {
