@@ -27,6 +27,7 @@ import androidx.fragment.app.Fragment
 import java.io.File
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -111,8 +112,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
 
     private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val bookmarks = getBookmarks(args, isNewWebView)
-            val highlights = getHighlights(args, isNewWebView)
+            val bookmarks = async { getBookmarks(args, isNewWebView) }.await()
+            val highlights = async { getHighlights(args, isNewWebView) }.await()
             val updatedArgs = args.copy(bookmarks = bookmarks, highlights = highlights)
 
             showLoading()
