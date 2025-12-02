@@ -219,23 +219,7 @@ class AIPdfJsInterface(
     }
 
     private fun parseHighlightId(highlightId: String): Long? {
-        val directId = highlightId.trim().toLongOrNull()
-        if (directId != null) {
-            return directId
-        }
-
-        return try {
-            val highlightObj = gson.fromJson(highlightId, Map::class.java) as? Map<*, *>
-            if (highlightObj != null) {
-                (highlightObj["id"] as? Number)?.toLong()
-                    ?: (highlightObj["id"] as? String)?.toLongOrNull()
-            } else {
-                null
-            }
-        } catch (e: Exception) {
-            Log.e("AIPdfJsInterface", "Failed to parse highlight ID from JSON: $highlightId", e)
-            null
-        }
+        return highlightId.trim().toLongOrNull()
     }
 
     private fun evaluateJavascript(script: String) {
