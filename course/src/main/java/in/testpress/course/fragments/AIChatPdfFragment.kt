@@ -66,7 +66,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        
         val args = extractArguments()
         initializeViews(view)
         initializeEmptyViewFragment()
@@ -81,11 +81,11 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfTitle = requireArguments().getString(ARG_PDF_TITLE) ?: "PDF Document"
         val templateName = requireArguments().getString(ARG_TEMPLATE_NAME) ?: DEFAULT_TEMPLATE
         val learnlensAssetId = requireArguments().getString(ARG_LEARNLENS_ASSET_ID)
-
+        
         require(contentId != -1L && courseId != -1L && !pdfUrl.isNullOrEmpty()) {
             "Required arguments are missing or invalid"
         }
-
+        
         return PdfArguments(contentId, courseId, pdfUrl, pdfTitle, templateName, learnlensAssetId)
     }
     
@@ -94,7 +94,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         progressBar = view.findViewById(R.id.pb_loading)
         emptyViewContainer = view.findViewById(R.id.empty_view_container)
     }
-
+    
     private fun initializeEmptyViewFragment() {
         emptyViewFragment = EmptyViewFragment()
         childFragmentManager.beginTransaction()
@@ -107,9 +107,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val isNewWebView = !WebViewFactory.isCached(args.contentId, cacheKey)
         initializeWebView(args, cacheKey, isNewWebView)
     }
-
+    
     private fun createCacheKey(contentId: Long) = "pdf_template_$contentId"
-
+    
     private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
             val bookmarks = async { getBookmarks(args, isNewWebView) }.await()
@@ -125,7 +125,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
 
     private suspend fun getBookmarks(args: PdfArguments, isNewWebView: Boolean): List<NetworkBookmark> {
         val storedBookmarks = getBookmarksFromDatabase(args.contentId)
-
+        
         return if (storedBookmarks.isEmpty() && isNewWebView) {
             fetchBookmarks(args)
         } else {
@@ -136,18 +136,18 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private suspend fun getBookmarksFromDatabase(contentId: Long): List<NetworkBookmark> {
         return bookmarkRepository.getStoredBookmarks(contentId, "annotate")
     }
-
+    
     private suspend fun fetchBookmarks(args: PdfArguments): List<NetworkBookmark> {
         return suspendCancellableCoroutine { continuation ->
             var isCompleted = false
-
+            
             fun complete(result: List<NetworkBookmark>) {
                 if (!isCompleted) {
                     isCompleted = true
                     continuation.resume(result) {}
                 }
             }
-
+            
             bookmarkRepository.fetchBookmarks(
                 contentId = args.contentId,
                 onSuccess = { bookmarks -> complete(bookmarks) },
@@ -201,14 +201,14 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     }
 
     private fun attachWebView() {
-        container?.let { cont ->
-            webView?.let { wv ->
+        container?.let { cont -> 
+            webView?.let { wv -> 
                 WebViewFactory.attach(cont, wv)
                 wv.requestFocus()
             }
         }
     }
-
+    
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
     private fun configureWebView(wv: WebView, args: PdfArguments) {
         wv.enableFileAccess()
