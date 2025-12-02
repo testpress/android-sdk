@@ -62,6 +62,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        
         val args = extractArguments()
         initializeViews(view)
         initializeEmptyViewFragment()
