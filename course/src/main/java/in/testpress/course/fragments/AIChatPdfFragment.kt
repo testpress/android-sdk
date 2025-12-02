@@ -157,8 +157,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             cacheKey = cacheKey,
             loadUrl = false,
             createWebView = { WebView(requireContext()) }
-        ) { wv -> 
-            configureWebView(wv, args) 
+        ) { wv ->
+            configureWebView(wv, args)
         }
     }
 
@@ -166,11 +166,10 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         container?.let { cont -> 
             webView?.let { wv -> 
                 WebViewFactory.attach(cont, wv)
-                wv.requestFocus() 
-            } 
+                wv.requestFocus()
+            }
         }
     }
-
     
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
     private fun configureWebView(wv: WebView, args: PdfArguments) {
