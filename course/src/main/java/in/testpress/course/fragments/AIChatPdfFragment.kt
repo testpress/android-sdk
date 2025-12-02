@@ -25,6 +25,7 @@ import androidx.fragment.app.Fragment
 import java.io.File
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
 
@@ -98,66 +99,65 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     private fun loadPdfInWebView(args: PdfArguments) {
         val cacheKey = createCacheKey(args.contentId)
-        val wasCachedBefore = WebViewFactory.isCached(args.contentId, cacheKey)
-        displayPdfWithCachedData(args, cacheKey, wasCachedBefore)
-    }
-    
-    private fun displayPdfWithCachedData(args: PdfArguments, cacheKey: String, wasCachedBefore: Boolean) {
-        viewLifecycleOwner.lifecycleScope.launch {
-            val cachedBookmarks = getCachedBookmarks(args.contentId)
-            showLoading()
-            
-            if (cachedBookmarks.isEmpty() && !wasCachedBefore) {
-                fetchBookmarksFromNetwork(args) { bookmarks ->
-                    initializeWebView(args, cacheKey, bookmarks, wasCachedBefore)
-                }
-            } else {
-                initializeWebView(args, cacheKey, cachedBookmarks, wasCachedBefore)
-            }
-        }
+        val isNewWebView = !WebViewFactory.isCached(args.contentId, cacheKey)
+        initializeWebView(args, cacheKey, isNewWebView)
     }
     
     private fun createCacheKey(contentId: Long) = "pdf_template_$contentId"
     
-    private suspend fun getCachedBookmarks(contentId: Long): List<NetworkBookmark> {
-        return bookmarkRepository.getCachedBookmarks(contentId, "annotate")
-    }
-    
-    private fun fetchBookmarksFromNetwork(args: PdfArguments, onComplete: (List<NetworkBookmark>) -> Unit) {
-        var hasReceivedCallback = false
-        
-        bookmarkRepository.fetchBookmarks(
-            contentId = args.contentId,
-            onSuccess = { bookmarks ->
-                if (!hasReceivedCallback) {
-                    hasReceivedCallback = true
-                    onComplete(bookmarks)
-                }
-            },
-            onException = {
-                if (!hasReceivedCallback) {
-                    hasReceivedCallback = true
-                    onComplete(emptyList())
-                }
-            }
-        )
-    }
-    
-    private fun initializeWebView(args: PdfArguments, cacheKey: String, cachedBookmarks: List<NetworkBookmark>, wasCachedBefore: Boolean) {
-        createWebView(args, cacheKey, cachedBookmarks)
-        attachWebView()
-        if (wasCachedBefore) hideLoading()
-        syncBookmarksCache(args, cachedBookmarks, wasCachedBefore)
+    private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val bookmarks = getBookmarks(args, isNewWebView)
+            val updatedArgs = args.copy(bookmarks = bookmarks)
+            
+            showLoading()
+            createWebView(updatedArgs, cacheKey)
+            attachWebView()
+            if (isNewWebView) hideLoading()
+        }
     }
 
-    private fun createWebView(args: PdfArguments, cacheKey: String, cachedBookmarks: List<NetworkBookmark>) {
+    private suspend fun getBookmarks(args: PdfArguments, isNewWebView: Boolean): List<NetworkBookmark> {
+        val storedBookmarks = getBookmarksFromDatabase(args.contentId)
+        
+        return if (storedBookmarks.isEmpty() && isNewWebView) {
+            fetchBookmarks(args)
+        } else {
+            storedBookmarks
+        }
+    }
+
+    private suspend fun getBookmarksFromDatabase(contentId: Long): List<NetworkBookmark> {
+        return bookmarkRepository.getStoredBookmarks(contentId, "annotate")
+    }
+    
+    private suspend fun fetchBookmarks(args: PdfArguments): List<NetworkBookmark> {
+        return suspendCancellableCoroutine { continuation ->
+            var isCompleted = false
+            
+            fun complete(result: List<NetworkBookmark>) {
+                if (!isCompleted) {
+                    isCompleted = true
+                    continuation.resume(result) {}
+                }
+            }
+            
+            bookmarkRepository.fetchBookmarks(
+                contentId = args.contentId,
+                onSuccess = { bookmarks -> complete(bookmarks) },
+                onException = { complete(emptyList()) }
+            )
+        }
+    }
+
+    private fun createWebView(args: PdfArguments, cacheKey: String) {
         webView = WebViewFactory.createCached(
             contentId = args.contentId,
             cacheKey = cacheKey,
             loadUrl = false,
             createWebView = { WebView(requireContext()) }
         ) { wv -> 
-            configureWebView(wv, args, cachedBookmarks) 
+            configureWebView(wv, args) 
         }
     }
 
@@ -170,24 +170,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
     }
 
-    private fun syncBookmarksCache(args: PdfArguments, cachedBookmarks: List<NetworkBookmark>, wasCachedBefore: Boolean) {
-        val isNewWebView = !wasCachedBefore
-        val hasCachedBookmarks = cachedBookmarks.isNotEmpty()
-        val shouldSkipSync = isNewWebView && hasCachedBookmarks
-        
-        if (shouldSkipSync) return
-        refreshBookmarksCache(args)
-    }
-
-    private fun refreshBookmarksCache(args: PdfArguments) {
-        bookmarkRepository.fetchBookmarks(
-            contentId = args.contentId,
-            onSuccess = { }
-        )
-    }
     
     @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
-    private fun configureWebView(wv: WebView, args: PdfArguments, bookmarks: List<NetworkBookmark>) {
+    private fun configureWebView(wv: WebView, args: PdfArguments) {
         wv.enableFileAccess()
         wv.webViewClient = BaseWebViewClient(this)
         wv.webChromeClient = webChromeClient
@@ -196,7 +181,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
         val replacements = buildTemplateReplacements(
-            args.pdfUrl, pdfId, authToken, args.pdfTitle, bookmarks
+            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks
         )
         
         wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
@@ -276,6 +261,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfUrl: String,
         val pdfTitle: String,
         val templateName: String,
-        val learnlensAssetId: String?
+        val learnlensAssetId: String?,
+        val bookmarks: List<NetworkBookmark> = emptyList()
     )
 }

@@ -92,7 +92,7 @@ class BookmarkRepository(private val context: Context) {
         })
     }
     
-    suspend fun getCachedBookmarks(
+    suspend fun getStoredBookmarks(
         contentId: Long,
         bookmarkType: String = "annotate"
     ): List<NetworkBookmark> {
@@ -117,9 +117,9 @@ class BookmarkRepository(private val context: Context) {
         
         scope.launch {
             try {
-                val cachedBookmarks = bookmarkDao.getBookmarksByContent(contentId, bookmarkType)
-                if (cachedBookmarks.isNotEmpty()) {
-                    val networkBookmarks = cachedBookmarks.map { it.toNetworkBookmark() }
+                val storedBookmarks = bookmarkDao.getBookmarksByContent(contentId, bookmarkType)
+                if (storedBookmarks.isNotEmpty()) {
+                    val networkBookmarks = storedBookmarks.map { it.toNetworkBookmark() }
                     withContext(Dispatchers.Main) {
                         onSuccess(networkBookmarks)
                     }
