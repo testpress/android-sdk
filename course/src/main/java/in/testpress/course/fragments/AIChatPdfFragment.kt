@@ -112,8 +112,10 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val bookmarks = async { getBookmarks(args, isNewWebView) }.await()
-            val highlights = async { getHighlights(args, isNewWebView) }.await()
+            val bookmarksDeferred = async { getBookmarks(args, isNewWebView) }
+            val highlightsDeferred = async { getHighlights(args, isNewWebView) }
+            val bookmarks = bookmarksDeferred.await()
+            val highlights = highlightsDeferred.await()
             val updatedArgs = args.copy(bookmarks = bookmarks, highlights = highlights)
 
             showLoading()
