@@ -22,13 +22,6 @@ class HighlightRepository(private val context: Context) {
     private val highlightDao = database.highlightDao()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    fun getHighlights(
-        contentId: Long,
-        callback: TestpressCallback<ApiResponse<List<NetworkHighlight>>>
-    ) {
-        courseNetwork.getHighlights(contentId).enqueue(callback)
-    }
-
     fun createHighlight(
         contentId: Long,
         highlight: HashMap<String, Any>,
@@ -59,8 +52,10 @@ class HighlightRepository(private val context: Context) {
                             e
                         )
                     }
+                    withContext(Dispatchers.Main) {
+                        callback.onSuccess(response)
+                    }
                 }
-                callback.onSuccess(response)
             }
 
             override fun onException(exception: TestpressException?) {
@@ -86,8 +81,10 @@ class HighlightRepository(private val context: Context) {
                             e
                         )
                     }
+                    withContext(Dispatchers.Main) {
+                        callback.onSuccess(response)
+                    }
                 }
-                callback.onSuccess(response)
             }
 
             override fun onException(exception: TestpressException?) {
@@ -95,8 +92,8 @@ class HighlightRepository(private val context: Context) {
             }
         })
     }
-
-    suspend fun getCachedHighlights(contentId: Long): List<NetworkHighlight> {
+    
+    suspend fun getStoredHighlights(contentId: Long): List<NetworkHighlight> {
         return withContext(Dispatchers.IO) {
             try {
                 highlightDao
@@ -107,7 +104,7 @@ class HighlightRepository(private val context: Context) {
             }
         }
     }
-
+    
     fun fetchHighlights(
         contentId: Long,
         onSuccess: (List<NetworkHighlight>) -> Unit,
@@ -115,9 +112,9 @@ class HighlightRepository(private val context: Context) {
     ) {
         scope.launch {
             try {
-                val cachedHighlights = highlightDao.getHighlightsByContent(contentId)
-                if (cachedHighlights.isNotEmpty()) {
-                    val networkHighlights = cachedHighlights.map { it.toNetworkHighlight() }
+                val storedHighlights = highlightDao.getHighlightsByContent(contentId)
+                if (storedHighlights.isNotEmpty()) {
+                    val networkHighlights = storedHighlights.map { it.toNetworkHighlight() }
                     withContext(Dispatchers.Main) {
                         onSuccess(networkHighlights)
                     }
@@ -130,7 +127,7 @@ class HighlightRepository(private val context: Context) {
                 )
             }
         }
-
+        
         courseNetwork.getHighlights(contentId).enqueue(object : TestpressCallback<ApiResponse<List<NetworkHighlight>>>() {
             override fun onSuccess(response: ApiResponse<List<NetworkHighlight>>) {
                 scope.launch {

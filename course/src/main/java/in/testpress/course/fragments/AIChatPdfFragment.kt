@@ -50,6 +50,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var webChromeClient: BaseWebChromeClient
     private val bookmarkRepository by lazy { BookmarkRepository(requireContext()) }
+    private val highlightRepository by lazy { HighlightRepository(requireContext()) }
     private val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
@@ -64,14 +65,14 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        
+
         val args = extractArguments()
         initializeViews(view)
         initializeEmptyViewFragment()
         webChromeClient = BaseWebChromeClient(this)
         loadPdfInWebView(args)
     }
-    
+
     private fun extractArguments(): PdfArguments {
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
@@ -105,14 +106,15 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val isNewWebView = !WebViewFactory.isCached(args.contentId, cacheKey)
         initializeWebView(args, cacheKey, isNewWebView)
     }
-    
+
     private fun createCacheKey(contentId: Long) = "pdf_template_$contentId"
-    
+
     private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
             val bookmarks = getBookmarks(args, isNewWebView)
-            val updatedArgs = args.copy(bookmarks = bookmarks)
-            
+            val highlights = getHighlights(args, isNewWebView)
+            val updatedArgs = args.copy(bookmarks = bookmarks, highlights = highlights)
+
             showLoading()
             createWebView(updatedArgs, cacheKey)
             attachWebView()
@@ -122,7 +124,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
 
     private suspend fun getBookmarks(args: PdfArguments, isNewWebView: Boolean): List<NetworkBookmark> {
         val storedBookmarks = getBookmarksFromDatabase(args.contentId)
-        
+
         return if (storedBookmarks.isEmpty() && isNewWebView) {
             fetchBookmarks(args)
         } else {
@@ -133,21 +135,54 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private suspend fun getBookmarksFromDatabase(contentId: Long): List<NetworkBookmark> {
         return bookmarkRepository.getStoredBookmarks(contentId, "annotate")
     }
-    
+
     private suspend fun fetchBookmarks(args: PdfArguments): List<NetworkBookmark> {
         return suspendCancellableCoroutine { continuation ->
             var isCompleted = false
-            
+
             fun complete(result: List<NetworkBookmark>) {
                 if (!isCompleted) {
                     isCompleted = true
                     continuation.resume(result) {}
                 }
             }
-            
+
             bookmarkRepository.fetchBookmarks(
                 contentId = args.contentId,
                 onSuccess = { bookmarks -> complete(bookmarks) },
+                onException = { complete(emptyList()) }
+            )
+        }
+    }
+
+    private suspend fun getHighlights(args: PdfArguments, isNewWebView: Boolean): List<NetworkHighlight> {
+        val storedHighlights = getHighlightsFromDatabase(args.contentId)
+
+        return if (storedHighlights.isEmpty() && isNewWebView) {
+            fetchHighlights(args)
+        } else {
+            storedHighlights
+        }
+    }
+
+    private suspend fun getHighlightsFromDatabase(contentId: Long): List<NetworkHighlight> {
+        return highlightRepository.getStoredHighlights(contentId)
+    }
+
+    private suspend fun fetchHighlights(args: PdfArguments): List<NetworkHighlight> {
+        return suspendCancellableCoroutine { continuation ->
+            var isCompleted = false
+
+            fun complete(result: List<NetworkHighlight>) {
+                if (!isCompleted) {
+                    isCompleted = true
+                    continuation.resume(result) {}
+                }
+            }
+
+            highlightRepository.fetchHighlights(
+                contentId = args.contentId,
+                onSuccess = { highlights -> complete(highlights) },
                 onException = { complete(emptyList()) }
             )
         }
@@ -165,8 +200,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     }
 
     private fun attachWebView() {
-        container?.let { cont -> 
-            webView?.let { wv -> 
+        container?.let { cont ->
+            webView?.let { wv ->
                 WebViewFactory.attach(cont, wv)
                 wv.requestFocus()
             }
@@ -183,9 +218,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
         val replacements = buildTemplateReplacements(
-            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks
+            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks, args.highlights
         )
-        
+
         wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
         wv.loadTemplateAndCacheResources(args.templateName, replacements, "file://${cacheDir.absolutePath}/")
     }
@@ -218,7 +253,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         emptyViewContainer?.isVisible = true
         emptyViewFragment.displayError(exception)
     }
-    
+
     override fun onRetryClick() {
         emptyViewContainer?.isVisible = false
         container?.isVisible = true
@@ -236,7 +271,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         pdfId: String,
         authToken: String,
         pdfTitle: String,
-        bookmarks: List<NetworkBookmark>
+        bookmarks: List<NetworkBookmark>,
+        highlights: List<NetworkHighlight>
     ): Map<String, String> {
         val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
             bookmark.id?.let {
@@ -248,15 +284,31 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             }
         }
         val bookmarksJson = gson.toJson(bookmarksForLearnLens)
+
+        val highlightsForLearnLens = highlights.mapNotNull { highlight ->
+            highlight.id?.let {
+                mapOf(
+                    "id" to it,
+                    "page_number" to (highlight.pageNumber ?: 0),
+                    "selected_text" to (highlight.selectedText ?: ""),
+                    "notes" to (highlight.notes ?: ""),
+                    "color" to (highlight.color ?: "#FFEB3B"),
+                    "position" to (highlight.position ?: emptyList<Double>())
+                )
+            }
+        }
+        val highlightsJson = gson.toJson(highlightsForLearnLens)
+
         return mapOf(
             "PDF_URL" to pdfUrl,
             "PDF_ID" to pdfId,
             "AUTH_TOKEN" to authToken,
             "PDF_TITLE" to pdfTitle,
-            "INITIAL_BOOKMARKS_JSON" to bookmarksJson
+            "INITIAL_BOOKMARKS_JSON" to bookmarksJson,
+            "INITIAL_HIGHLIGHTS_JSON" to highlightsJson
         )
     }
-    
+
     private data class PdfArguments(
         val contentId: Long,
         val courseId: Long,
@@ -264,6 +316,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfTitle: String,
         val templateName: String,
         val learnlensAssetId: String?,
-        val bookmarks: List<NetworkBookmark> = emptyList()
+        val bookmarks: List<NetworkBookmark> = emptyList(),
+        val highlights: List<NetworkHighlight> = emptyList()
     )
 }
