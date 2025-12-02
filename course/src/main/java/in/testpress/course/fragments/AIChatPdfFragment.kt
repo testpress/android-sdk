@@ -113,7 +113,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             showLoading()
             createWebView(updatedArgs, cacheKey)
             attachWebView()
-            if (isNewWebView) hideLoading()
+            if (!isNewWebView) hideLoading()
         }
     }
 
