@@ -128,4 +128,18 @@ object Converters {
         val listType = object : TypeToken<List<Image>>() {}.type
         return Gson().fromJson(value, listType)
     }
+
+    @TypeConverter
+    @JvmStatic
+    fun fromDoubleList(list: List<Double>?): String? {
+        return list?.joinToString(",")
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toDoubleList(value: String?): List<Double>? {
+        if (value == null) return null
+        if (value.isEmpty()) return emptyList()
+        return value.split(",").mapNotNull { it.toDoubleOrNull() }
+    }
 }
