@@ -4,12 +4,16 @@ import `in`.testpress.course.util.WebViewFactory
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
+import `in`.testpress.course.network.NetworkBookmark
+import `in`.testpress.course.repository.BookmarkRepository
+import `in`.testpress.course.util.AIPdfJsInterface
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.util.webview.WebViewEventListener
 import `in`.testpress.util.webview.BaseWebViewClient
 import `in`.testpress.util.webview.BaseWebChromeClient
 import `in`.testpress.util.webview.WebView
+import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,6 +23,11 @@ import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import java.io.File
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
+import com.google.gson.FieldNamingPolicy
+import com.google.gson.GsonBuilder
 
 class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
@@ -38,6 +47,10 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private var emptyViewContainer: FrameLayout? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var webChromeClient: BaseWebChromeClient
+    private val bookmarkRepository by lazy { BookmarkRepository(requireContext()) }
+    private val gson = GsonBuilder()
+        .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
+        .create()
     
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -86,11 +99,59 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     }
     
     private fun loadPdfInWebView(args: PdfArguments) {
-        val cacheKey = "pdf_template_${args.contentId}"
+        val cacheKey = createCacheKey(args.contentId)
         val isNewWebView = !WebViewFactory.isCached(args.contentId, cacheKey)
+        initializeWebView(args, cacheKey, isNewWebView)
+    }
+    
+    private fun createCacheKey(contentId: Long) = "pdf_template_$contentId"
+    
+    private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
+        viewLifecycleOwner.lifecycleScope.launch {
+            val bookmarks = getBookmarks(args, isNewWebView)
+            val updatedArgs = args.copy(bookmarks = bookmarks)
+            
+            showLoading()
+            createWebView(updatedArgs, cacheKey)
+            attachWebView()
+            if (!isNewWebView) hideLoading()
+        }
+    }
+
+    private suspend fun getBookmarks(args: PdfArguments, isNewWebView: Boolean): List<NetworkBookmark> {
+        val storedBookmarks = getBookmarksFromDatabase(args.contentId)
         
-        if (isNewWebView) showLoading()
-        
+        return if (storedBookmarks.isEmpty() && isNewWebView) {
+            fetchBookmarks(args)
+        } else {
+            storedBookmarks
+        }
+    }
+
+    private suspend fun getBookmarksFromDatabase(contentId: Long): List<NetworkBookmark> {
+        return bookmarkRepository.getStoredBookmarks(contentId, "annotate")
+    }
+    
+    private suspend fun fetchBookmarks(args: PdfArguments): List<NetworkBookmark> {
+        return suspendCancellableCoroutine { continuation ->
+            var isCompleted = false
+            
+            fun complete(result: List<NetworkBookmark>) {
+                if (!isCompleted) {
+                    isCompleted = true
+                    continuation.resume(result) {}
+                }
+            }
+            
+            bookmarkRepository.fetchBookmarks(
+                contentId = args.contentId,
+                onSuccess = { bookmarks -> complete(bookmarks) },
+                onException = { complete(emptyList()) }
+            )
+        }
+    }
+
+    private fun createWebView(args: PdfArguments, cacheKey: String) {
         webView = WebViewFactory.createCached(
             contentId = args.contentId,
             cacheKey = cacheKey,
@@ -99,9 +160,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         ) { wv ->
             configureWebView(wv, args)
         }
-        
-        if (!isNewWebView) hideLoading()
-        
+    }
+
+    private fun attachWebView() {
         container?.let { cont -> 
             webView?.let { wv -> 
                 WebViewFactory.attach(cont, wv)
@@ -110,6 +171,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
     }
     
+    @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
     private fun configureWebView(wv: WebView, args: PdfArguments) {
         wv.enableFileAccess()
         wv.webViewClient = BaseWebViewClient(this)
@@ -118,17 +180,12 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
-        
-        wv.loadTemplateAndCacheResources(
-            templateName = args.templateName,
-            replacements = mapOf(
-                "PDF_URL" to args.pdfUrl,
-                "PDF_ID" to pdfId,
-                "AUTH_TOKEN" to authToken,
-                "PDF_TITLE" to args.pdfTitle
-            ),
-            baseUrl = "file://${cacheDir.absolutePath}/"
+        val replacements = buildTemplateReplacements(
+            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks
         )
+        
+        wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
+        wv.loadTemplateAndCacheResources(args.templateName, replacements, "file://${cacheDir.absolutePath}/")
     }
     
     override fun onDestroyView() {
@@ -171,6 +228,32 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     override fun onLoadingFinished() = hideLoading()
     override fun onError(exception: TestpressException) = showErrorView(exception)
     override fun isViewActive(): Boolean = isAdded
+
+    private fun buildTemplateReplacements(
+        pdfUrl: String,
+        pdfId: String,
+        authToken: String,
+        pdfTitle: String,
+        bookmarks: List<NetworkBookmark>
+    ): Map<String, String> {
+        val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
+            bookmark.id?.let {
+                mapOf(
+                    "id" to it,
+                    "page_number" to (bookmark.pageNumber ?: 0),
+                    "preview_text" to (bookmark.previewText ?: "")
+                )
+            }
+        }
+        val bookmarksJson = gson.toJson(bookmarksForLearnLens)
+        return mapOf(
+            "PDF_URL" to pdfUrl,
+            "PDF_ID" to pdfId,
+            "AUTH_TOKEN" to authToken,
+            "PDF_TITLE" to pdfTitle,
+            "INITIAL_BOOKMARKS_JSON" to bookmarksJson
+        )
+    }
     
     private data class PdfArguments(
         val contentId: Long,
@@ -178,6 +261,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfUrl: String,
         val pdfTitle: String,
         val templateName: String,
-        val learnlensAssetId: String?
+        val learnlensAssetId: String?,
+        val bookmarks: List<NetworkBookmark> = emptyList()
     )
 }

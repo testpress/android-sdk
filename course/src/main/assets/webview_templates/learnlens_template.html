@@ -19,16 +19,24 @@
         const MAX_POLL_ATTEMPTS = 50;
         const POLL_INTERVAL = 100;
         
+        const initialBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
+        
         function initLearnLens() {
             if (isInitialized) return;
             
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
                 isInitialized = true;
+                
+                const callbacks = createBookmarkCallbacks();
+                
                 window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
                     pdfUrl: "{{PDF_URL}}",
                     pdfId: "{{PDF_ID}}",
                     authToken: "{{AUTH_TOKEN}}",
                     pdfTitle: "{{PDF_TITLE}}",
+                    initialBookmarks: initialBookmarks,
+                    onBookmarkCreate: callbacks.onBookmarkCreate,
+                    onBookmarkDelete: callbacks.onBookmarkDelete
                 });
             } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
                 pollAttempts++;
@@ -36,6 +44,75 @@
             } else {
                 console.error("LearnLens library failed to load after " + (MAX_POLL_ATTEMPTS * POLL_INTERVAL / 1000) + " seconds");
             }
+        }
+        
+        function createBookmarkCallbacks() {
+            return {
+                onBookmarkCreate: function(page, previewText) {
+                    return createBookmarkViaInterface(page, previewText);
+                },
+                onBookmarkDelete: function(bookmarkId) {
+                    return deleteBookmarkViaInterface(bookmarkId);
+                }
+            };
+        }
+        
+        function createBookmarkViaInterface(page, previewText) {
+            if (!window.AndroidJsInterface || !window.AndroidJsInterface.onBookmarkCreate) {
+                return Promise.reject(new Error('Android JavaScript interface not available'));
+            }
+            
+            const bookmarkToSend = {
+                page_number: page,
+                preview_text: previewText || ''
+            };
+            
+            return new Promise(function(resolve, reject) {
+                const successHandler = function(createdBookmark) {
+                    if (createdBookmark && createdBookmark.id) {
+                        resolve(createdBookmark);
+                    } else {
+                        reject(new Error('Bookmark created but ID is missing'));
+                    }
+                };
+                
+                const errorHandler = function(error) {
+                    reject(new Error(error.error || 'Failed to create bookmark'));
+                };
+                
+                window.LearnLens.onBookmarkCreateSuccess = successHandler;
+                window.LearnLens.onBookmarkCreateError = errorHandler;
+                
+                window.AndroidJsInterface.onBookmarkCreate(JSON.stringify(bookmarkToSend));
+            }).finally(function() {
+                delete window.LearnLens.onBookmarkCreateSuccess;
+                delete window.LearnLens.onBookmarkCreateError;
+            });
+        }
+        
+        function deleteBookmarkViaInterface(bookmarkId) {
+            if (!window.AndroidJsInterface || !window.AndroidJsInterface.onBookmarkDelete) {
+                return Promise.reject(new Error('Android JavaScript interface not available'));
+            }
+
+            let normalizedId;
+            if (typeof bookmarkId === 'object' && bookmarkId !== null && bookmarkId.id !== undefined) {
+                normalizedId = String(bookmarkId.id);
+            } else {
+                normalizedId = String(bookmarkId);
+            }
+
+            return new Promise(function(resolve, reject) {
+                window.LearnLens.onBookmarkDeleteSuccess = resolve;
+                window.LearnLens.onBookmarkDeleteError = function(error) {
+                    reject(new Error(error.error || 'Failed to delete bookmark'));
+                };
+
+                window.AndroidJsInterface.onBookmarkDelete(normalizedId);
+            }).finally(function() {
+                delete window.LearnLens.onBookmarkDeleteSuccess;
+                delete window.LearnLens.onBookmarkDeleteError;
+            });
         }
         
         initLearnLens();
