@@ -123,6 +123,23 @@ interface CourseService {
     fun deleteBookmark(
         @Path(value = "id", encoded = true) bookmarkId: Long
     ): RetrofitCall<Void>
+
+    @GET("/api/v3/contents/{content_id}/annotations/highlights/")
+    fun getHighlights(
+        @Path(value = "content_id", encoded = true) contentId: Long
+    ): RetrofitCall<ApiResponse<List<NetworkHighlight>>>
+
+    @POST("/api/v3/contents/{content_id}/annotations/highlights/")
+    fun createHighlight(
+        @Path(value = "content_id", encoded = true) contentId: Long,
+        @Body highlight: HashMap<String, Any>
+    ): RetrofitCall<NetworkHighlight>
+
+    @DELETE("/api/v3/contents/{content_id}/annotations/highlights/{id}/")
+    fun deleteHighlight(
+        @Path(value = "content_id", encoded = true) contentId: Long,
+        @Path(value = "id", encoded = true) highlightId: Long
+    ): RetrofitCall<Void>
 }
 
 
@@ -228,5 +245,20 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun deleteBookmark(bookmarkId: Long): RetrofitCall<Void> {
         return getCourseService().deleteBookmark(bookmarkId)
+    }
+
+    fun getHighlights(contentId: Long): RetrofitCall<ApiResponse<List<NetworkHighlight>>> {
+        return getCourseService().getHighlights(contentId)
+    }
+
+    fun createHighlight(
+        contentId: Long,
+        highlight: HashMap<String, Any>
+    ): RetrofitCall<NetworkHighlight> {
+        return getCourseService().createHighlight(contentId, highlight)
+    }
+
+    fun deleteHighlight(contentId: Long, highlightId: Long): RetrofitCall<Void> {
+        return getCourseService().deleteHighlight(contentId, highlightId)
     }
 }
