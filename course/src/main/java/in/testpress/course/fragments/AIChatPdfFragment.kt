@@ -5,7 +5,9 @@ import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.network.NetworkBookmark
+import `in`.testpress.course.network.NetworkHighlight
 import `in`.testpress.course.repository.BookmarkRepository
+import `in`.testpress.course.repository.HighlightRepository
 import `in`.testpress.course.util.AIPdfJsInterface
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
@@ -25,6 +27,7 @@ import androidx.fragment.app.Fragment
 import java.io.File
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.async
 import kotlinx.coroutines.suspendCancellableCoroutine
 import com.google.gson.FieldNamingPolicy
 import com.google.gson.GsonBuilder
@@ -48,6 +51,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     private lateinit var emptyViewFragment: EmptyViewFragment
     private lateinit var webChromeClient: BaseWebChromeClient
     private val bookmarkRepository by lazy { BookmarkRepository(requireContext()) }
+    private val highlightRepository by lazy { HighlightRepository(requireContext()) }
     private val gson = GsonBuilder()
         .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
         .create()
@@ -108,9 +112,12 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val bookmarks = getBookmarks(args, isNewWebView)
-            val updatedArgs = args.copy(bookmarks = bookmarks)
-            
+            val bookmarksDeferred = async { getBookmarks(args, isNewWebView) }
+            val highlightsDeferred = async { getHighlights(args, isNewWebView) }
+            val bookmarks = bookmarksDeferred.await()
+            val highlights = highlightsDeferred.await()
+            val updatedArgs = args.copy(bookmarks = bookmarks, highlights = highlights)
+
             showLoading()
             createWebView(updatedArgs, cacheKey)
             attachWebView()
@@ -151,6 +158,39 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         }
     }
 
+    private suspend fun getHighlights(args: PdfArguments, isNewWebView: Boolean): List<NetworkHighlight> {
+        val storedHighlights = getHighlightsFromDatabase(args.contentId)
+
+        return if (storedHighlights.isEmpty() && isNewWebView) {
+            fetchHighlights(args)
+        } else {
+            storedHighlights
+        }
+    }
+
+    private suspend fun getHighlightsFromDatabase(contentId: Long): List<NetworkHighlight> {
+        return highlightRepository.getStoredHighlights(contentId)
+    }
+
+    private suspend fun fetchHighlights(args: PdfArguments): List<NetworkHighlight> {
+        return suspendCancellableCoroutine { continuation ->
+            var isCompleted = false
+
+            fun complete(result: List<NetworkHighlight>) {
+                if (!isCompleted) {
+                    isCompleted = true
+                    continuation.resume(result) {}
+                }
+            }
+
+            highlightRepository.fetchHighlights(
+                contentId = args.contentId,
+                onSuccess = { highlights -> complete(highlights) },
+                onException = { complete(emptyList()) }
+            )
+        }
+    }
+
     private fun createWebView(args: PdfArguments, cacheKey: String) {
         webView = WebViewFactory.createCached(
             contentId = args.contentId,
@@ -181,7 +221,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
         val replacements = buildTemplateReplacements(
-            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks
+            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks, args.highlights
         )
         
         wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
@@ -234,7 +274,8 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         pdfId: String,
         authToken: String,
         pdfTitle: String,
-        bookmarks: List<NetworkBookmark>
+        bookmarks: List<NetworkBookmark>,
+        highlights: List<NetworkHighlight>
     ): Map<String, String> {
         val bookmarksForLearnLens = bookmarks.mapNotNull { bookmark ->
             bookmark.id?.let {
@@ -246,12 +287,19 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             }
         }
         val bookmarksJson = gson.toJson(bookmarksForLearnLens)
+
+        val highlightsForLearnLens = highlights.mapNotNull { highlight ->
+            highlight.id?.let { highlight.toJsMap() }
+        }
+        val highlightsJson = gson.toJson(highlightsForLearnLens)
+
         return mapOf(
             "PDF_URL" to pdfUrl,
             "PDF_ID" to pdfId,
             "AUTH_TOKEN" to authToken,
             "PDF_TITLE" to pdfTitle,
-            "INITIAL_BOOKMARKS_JSON" to bookmarksJson
+            "INITIAL_BOOKMARKS_JSON" to bookmarksJson,
+            "INITIAL_HIGHLIGHTS_JSON" to highlightsJson
         )
     }
     
@@ -262,6 +310,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val pdfTitle: String,
         val templateName: String,
         val learnlensAssetId: String?,
-        val bookmarks: List<NetworkBookmark> = emptyList()
+        val bookmarks: List<NetworkBookmark> = emptyList(),
+        val highlights: List<NetworkHighlight> = emptyList()
     )
 }
