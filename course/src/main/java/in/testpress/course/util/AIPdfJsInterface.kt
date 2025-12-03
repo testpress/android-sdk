@@ -93,7 +93,7 @@ class AIPdfJsInterface(
     @JavascriptInterface
     fun onBookmarkDelete(bookmarkId: String) {
         try {
-            val id = parseBookmarkId(bookmarkId)
+            val id = parseId(bookmarkId)
             
             if (id == null) {
                 val errorJson = gson.toJson(mapOf("error" to "Invalid bookmark ID"))
@@ -154,15 +154,7 @@ class AIPdfJsInterface(
                         return
                     }
                     
-                    val highlightId = response.id!!.toLong()
-                    val result = mapOf(
-                        "id" to highlightId,
-                        "page_number" to (response.pageNumber ?: 0),
-                        "selected_text" to (response.selectedText ?: ""),
-                        "notes" to (response.notes ?: ""),
-                        "color" to (response.color ?: "#FFEB3B"),
-                        "position" to (response.position ?: emptyList<Double>())
-                    )
+                    val result = response.toJsMap()
                     val resultJson = gson.toJson(result)
                     
                     evaluateJavascript("""
@@ -190,7 +182,7 @@ class AIPdfJsInterface(
     @JavascriptInterface
     fun onHighlightDelete(highlightId: String) {
         try {
-            val id = parseHighlightId(highlightId)
+            val id = parseId(highlightId)
             
             if (id == null) {
                 val errorJson = gson.toJson(mapOf("error" to "Invalid highlight ID"))
@@ -214,12 +206,8 @@ class AIPdfJsInterface(
         }
     }
 
-    private fun parseBookmarkId(bookmarkId: String): Long? {
-        return bookmarkId.trim().toLongOrNull()
-    }
-
-    private fun parseHighlightId(highlightId: String): Long? {
-        return highlightId.trim().toLongOrNull()
+    private fun parseId(id: String): Long? {
+        return id.trim().toLongOrNull()
     }
 
     private fun evaluateJavascript(script: String) {

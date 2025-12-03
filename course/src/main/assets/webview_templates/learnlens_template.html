@@ -51,6 +51,14 @@
             }
         }
         
+        function normalizeId(id) {
+            if (typeof id === 'object' && id !== null && id.id !== undefined) {
+                return String(id.id);
+            } else {
+                return String(id);
+            }
+        }
+
         function createBookmarkCallbacks() {
             return {
                 onBookmarkCreate: function(page, previewText) {
@@ -100,12 +108,7 @@
                 return Promise.reject(new Error('Android JavaScript interface not available'));
             }
 
-            let normalizedId;
-            if (typeof bookmarkId === 'object' && bookmarkId !== null && bookmarkId.id !== undefined) {
-                normalizedId = String(bookmarkId.id);
-            } else {
-                normalizedId = String(bookmarkId);
-            }
+            const normalizedId = normalizeId(bookmarkId);
 
             return new Promise(function(resolve, reject) {
                 window.LearnLens.onBookmarkDeleteSuccess = resolve;
@@ -176,12 +179,7 @@
                 return Promise.reject(new Error('Android JavaScript interface not available'));
             }
 
-            let normalizedId;
-            if (typeof highlightId === 'object' && highlightId !== null && highlightId.id !== undefined) {
-                normalizedId = String(highlightId.id);
-            } else {
-                normalizedId = String(highlightId);
-            }
+            const normalizedId = normalizeId(highlightId);
 
             return new Promise(function(resolve, reject) {
                 window.LearnLens.onHighlightDeleteSuccess = resolve;

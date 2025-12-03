@@ -112,8 +112,9 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
     
     private fun initializeWebView(args: PdfArguments, cacheKey: String, isNewWebView: Boolean) {
         viewLifecycleOwner.lifecycleScope.launch {
-            val bookmarks = getBookmarks(args, isNewWebView)
+            val bookmarksDeferred = async { getBookmarks(args, isNewWebView) }
             val highlightsDeferred = async { getHighlights(args, isNewWebView) }
+            val bookmarks = bookmarksDeferred.await()
             val highlights = highlightsDeferred.await()
             val updatedArgs = args.copy(bookmarks = bookmarks, highlights = highlights)
 
@@ -288,16 +289,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val bookmarksJson = gson.toJson(bookmarksForLearnLens)
 
         val highlightsForLearnLens = highlights.mapNotNull { highlight ->
-            highlight.id?.let {
-                mapOf(
-                    "id" to it,
-                    "page_number" to (highlight.pageNumber ?: 0),
-                    "selected_text" to (highlight.selectedText ?: ""),
-                    "notes" to (highlight.notes ?: ""),
-                    "color" to (highlight.color ?: "#FFEB3B"),
-                    "position" to (highlight.position ?: emptyList<Double>())
-                )
-            }
+            highlight.id?.let { highlight.toJsMap() }
         }
         val highlightsJson = gson.toJson(highlightsForLearnLens)
 

@@ -46,5 +46,16 @@ data class NetworkHighlight(
     val position: List<Double>? = null,
     val created: String? = null,
     val modified: String? = null
-)
+) {
+    fun toJsMap(): Map<String, Any> {
+        return mapOf(
+            "id" to (id ?: 0L),
+            "page_number" to (pageNumber ?: 0),
+            "selected_text" to (selectedText ?: ""),
+            "notes" to (notes ?: ""),
+            "color" to (color ?: "#FFEB3B"),
+            "position" to (position ?: emptyList<Double>())
+        )
+    }
+}
 
