@@ -72,14 +72,7 @@ class AIPdfJsInterface(
                     )
                     val resultJson = gson.toJson(result)
                     
-                    evaluateJavascript("""
-                        (function() {
-                            var bookmark = $resultJson;
-                            if (window.LearnLens && window.LearnLens.onBookmarkCreateSuccess) {
-                                window.LearnLens.onBookmarkCreateSuccess(bookmark);
-                            }
-                        })();
-                    """.trimIndent())
+                    evaluateJavascript("window.LearnLens?.onBookmarkCreateSuccess?.($resultJson);")
                 }
 
                 override fun onException(exception: TestpressException?) {

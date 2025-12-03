@@ -115,24 +115,6 @@ class BookmarkRepository(private val context: Context) {
         val bookmarkType = "annotate"
         val queryParams = createBookmarkQueryParams(contentId)
         
-        scope.launch {
-            try {
-                val storedBookmarks = bookmarkDao.getBookmarksByContent(contentId, bookmarkType)
-                if (storedBookmarks.isNotEmpty()) {
-                    val networkBookmarks = storedBookmarks.map { it.toNetworkBookmark() }
-                    withContext(Dispatchers.Main) {
-                        onSuccess(networkBookmarks)
-                    }
-                }
-            } catch (e: Exception) {
-                Log.e(
-                    "BookmarkRepository",
-                    "Failed to load cached bookmarks for contentId=$contentId, type=$bookmarkType",
-                    e
-                )
-            }
-        }
-        
         courseNetwork.getBookmarks(queryParams).enqueue(object : TestpressCallback<ApiResponse<BookmarksListApiResponse>>() {
             override fun onSuccess(response: ApiResponse<BookmarksListApiResponse>) {
                 scope.launch {
