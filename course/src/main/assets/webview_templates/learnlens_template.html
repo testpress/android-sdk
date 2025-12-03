@@ -18,17 +18,18 @@
         let pollAttempts = 0;
         const MAX_POLL_ATTEMPTS = 50;
         const POLL_INTERVAL = 100;
-        let pendingAnnotations = null;
         
         const initialBookmarks = {{INITIAL_BOOKMARKS_JSON}} || [];
-        
+        const initialHighlights = {{INITIAL_HIGHLIGHTS_JSON}} || [];
+
         function initLearnLens() {
             if (isInitialized) return;
             
             if (window.LearnLens && window.LearnLens.mountPdfChat) {
                 isInitialized = true;
                 
-                const callbacks = createBookmarkCallbacks();
+                const bookmarkCallbacks = createBookmarkCallbacks();
+                const highlightCallbacks = createHighlightCallbacks();
                 
                 window.LearnLens.mountPdfChat("learnlens-pdf-chat", {
                     pdfUrl: "{{PDF_URL}}",
@@ -36,8 +37,11 @@
                     authToken: "{{AUTH_TOKEN}}",
                     pdfTitle: "{{PDF_TITLE}}",
                     initialBookmarks: initialBookmarks,
-                    onBookmarkCreate: callbacks.onBookmarkCreate,
-                    onBookmarkDelete: callbacks.onBookmarkDelete
+                    initialHighlights: initialHighlights,
+                    onBookmarkCreate: bookmarkCallbacks.onBookmarkCreate,
+                    onBookmarkDelete: bookmarkCallbacks.onBookmarkDelete,
+                    onHighlightCreate: highlightCallbacks.onHighlightCreate,
+                    onHighlightDelete: highlightCallbacks.onHighlightDelete
                 });
             } else if (pollAttempts < MAX_POLL_ATTEMPTS) {
                 pollAttempts++;
@@ -115,9 +119,84 @@
                 delete window.LearnLens.onBookmarkDeleteError;
             });
         }
+
+        function createHighlightCallbacks() {
+            return {
+                onHighlightCreate: function(highlight) {
+                    return createHighlightViaInterface(highlight);
+                },
+                onHighlightDelete: function(highlightId) {
+                    return deleteHighlightViaInterface(highlightId);
+                }
+            };
+        }
+
+        function createHighlightViaInterface(highlight) {
+            if (!window.AndroidJsInterface || !window.AndroidJsInterface.onHighlightCreate) {
+                return Promise.reject(new Error('Android JavaScript interface not available'));
+            }
+
+            if (!highlight.position) {
+                return Promise.reject(new Error('Position is required for highlight'));
+            }
+
+            const highlightToSend = {
+                page_number: highlight.page_number,
+                position: highlight.position,
+                selected_text: highlight.selected_text || '',
+                notes: highlight.notes || '',
+                color: highlight.color || '#FFEB3B'
+            };
+
+            return new Promise(function(resolve, reject) {
+                const successHandler = function(createdHighlight) {
+                    if (createdHighlight && createdHighlight.id) {
+                        resolve(createdHighlight);
+                    } else {
+                        reject(new Error('Highlight created but ID is missing'));
+                    }
+                };
+
+                const errorHandler = function(error) {
+                    reject(new Error(error.error || 'Failed to create highlight'));
+                };
+
+                window.LearnLens.onHighlightCreateSuccess = successHandler;
+                window.LearnLens.onHighlightCreateError = errorHandler;
+
+                window.AndroidJsInterface.onHighlightCreate(JSON.stringify(highlightToSend));
+            }).finally(function() {
+                delete window.LearnLens.onHighlightCreateSuccess;
+                delete window.LearnLens.onHighlightCreateError;
+            });
+        }
+
+        function deleteHighlightViaInterface(highlightId) {
+            if (!window.AndroidJsInterface || !window.AndroidJsInterface.onHighlightDelete) {
+                return Promise.reject(new Error('Android JavaScript interface not available'));
+            }
+
+            let normalizedId;
+            if (typeof highlightId === 'object' && highlightId !== null && highlightId.id !== undefined) {
+                normalizedId = String(highlightId.id);
+            } else {
+                normalizedId = String(highlightId);
+            }
+
+            return new Promise(function(resolve, reject) {
+                window.LearnLens.onHighlightDeleteSuccess = resolve;
+                window.LearnLens.onHighlightDeleteError = function(error) {
+                    reject(new Error(error.error || 'Failed to delete highlight'));
+                };
+
+                window.AndroidJsInterface.onHighlightDelete(normalizedId);
+            }).finally(function() {
+                delete window.LearnLens.onHighlightDeleteSuccess;
+                delete window.LearnLens.onHighlightDeleteError;
+            });
+        }
         
         initLearnLens();
     </script>
 </body>
 </html>
-
