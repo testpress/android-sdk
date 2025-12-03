@@ -73,7 +73,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         webChromeClient = BaseWebChromeClient(this)
         loadPdfInWebView(args)
     }
-
+    
     private fun extractArguments(): PdfArguments {
         val contentId = requireArguments().getLong(ARG_CONTENT_ID, -1L)
         val courseId = requireArguments().getLong(ARG_COURSE_ID, -1L)
@@ -223,7 +223,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val replacements = buildTemplateReplacements(
             args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks, args.highlights
         )
-
+        
         wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
         wv.loadTemplateAndCacheResources(args.templateName, replacements, "file://${cacheDir.absolutePath}/")
     }
@@ -256,7 +256,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         emptyViewContainer?.isVisible = true
         emptyViewFragment.displayError(exception)
     }
-
+    
     override fun onRetryClick() {
         emptyViewContainer?.isVisible = false
         container?.isVisible = true
@@ -311,7 +311,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             "INITIAL_HIGHLIGHTS_JSON" to highlightsJson
         )
     }
-
+    
     private data class PdfArguments(
         val contentId: Long,
         val courseId: Long,
