@@ -809,7 +809,7 @@ public class TestActivity extends BaseToolBarActivity  {
     public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
         super.onMultiWindowModeChanged(isInMultiWindowMode);
         TestFragment testFragment = getCurrentFragment();
-        if (testFragment != null && exam != null && exam.isWindowMonitoringEnabled()) {
+        if (testFragment != null) {
             testFragment.showBlockingOverlay(isInMultiWindowMode);
         }
     }

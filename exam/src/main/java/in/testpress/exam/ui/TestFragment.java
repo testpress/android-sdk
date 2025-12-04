@@ -549,7 +549,6 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-        showBlockingOverlay(isInMultiWindowMode());
         startCountDownTimer();
     }
 
