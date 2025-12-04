@@ -202,7 +202,7 @@ public class TestFragment extends BaseFragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         bindViews();
-        showBlockingOverlay(isInMultiWindowMode());
+        showBlockingOverlay(requireActivity().isInMultiWindowMode());
         initializeProgressDialog();
         initializeListeners();
         initializeQuestionsListAdapter();
@@ -1658,7 +1658,7 @@ public class TestFragment extends BaseFragment implements
             return;
         }
 
-        showBlockingOverlay(isInMultiWindowMode());
+        showBlockingOverlay(requireActivity().isInMultiWindowMode());
 
         if (currentViolationCount > MAX_VIOLATION_COUNT) {
             showViolationAlertDialog(true);
@@ -1772,13 +1772,6 @@ public class TestFragment extends BaseFragment implements
 
     private boolean isOfflineExam() {
         return exam != null && Boolean.TRUE.equals(exam.getIsOfflineExam());
-    }
-
-    private boolean isInMultiWindowMode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            return requireActivity().isInMultiWindowMode();
-        }
-        return false;
     }
 
     void showBlockingOverlay(boolean isInMultiWindowMode) {
