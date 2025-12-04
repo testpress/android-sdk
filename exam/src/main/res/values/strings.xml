@@ -255,6 +255,7 @@
     <string name="window_switch_detected_title">Window Switch Detected</string>
     <string name="window_violation_warning">You switched apps %1$d time(s). Switching apps more than %2$d times will end the exam.</string>
     <string name="exam_final_violation_message"><b>Violation Detected:</b> You have exceeded the maximum allowed interruptions during the assessment.\n\nThe system has recorded multiple interruptions, which may be caused by one or more of the following:\n1) Minimizing the app or switching to another app.\n2) Pressing restricted keys or attempting to access system features.\n3) Trying to leave the assessment screen.\n\n<b>Your exam will now be ended permanently.</b>\n\nYou will not be able to resume this attempt. Please contact your administrator if you believe this was a mistake.</string>
+    <string name="multi_window_blocking_message">Multiple windows detected. Please close other windows to continue.</string>
     <string name="testpress_retake_with">Retake with?</string>
     <string-array name="testpress_retake_options">
         <item>All Questions</item>
