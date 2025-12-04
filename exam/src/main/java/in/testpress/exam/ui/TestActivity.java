@@ -4,6 +4,7 @@ import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
@@ -802,6 +803,15 @@ public class TestActivity extends BaseToolBarActivity  {
 
     boolean isOfflineExam() {
         return Boolean.TRUE.equals(exam.getIsOfflineExam());
+    }
+
+    @Override
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
+        super.onMultiWindowModeChanged(isInMultiWindowMode);
+        TestFragment testFragment = getCurrentFragment();
+        if (testFragment != null && exam != null && exam.isWindowMonitoringEnabled()) {
+            testFragment.showBlockingOverlay(isInMultiWindowMode);
+        }
     }
 
 }

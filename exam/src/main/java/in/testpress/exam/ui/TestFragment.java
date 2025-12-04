@@ -114,6 +114,7 @@ public class TestFragment extends BaseFragment implements
     private AlertDialog windowViolationDialog;
 
     private View questionsListProgressBar;
+    private View blockingOverlay;
 
     Attempt attempt;
     private Exam exam;
@@ -201,6 +202,7 @@ public class TestFragment extends BaseFragment implements
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         bindViews();
+        showBlockingOverlay(isInMultiWindowMode());
         initializeProgressDialog();
         initializeListeners();
         initializeQuestionsListAdapter();
@@ -394,6 +396,7 @@ public class TestFragment extends BaseFragment implements
         viewPager.setSwipeEnabled(true);
         slidingPaneLayout = view.findViewById(R.id.sliding_layout);
         questionsListProgressBar = (View) LayoutInflater.from(getActivity()).inflate(R.layout.progress_bar, null);
+        blockingOverlay = view.findViewById(R.id.blocking_overlay);
         questionsListView.addFooterView(questionsListProgressBar);
         if (instituteSettings.isGrowthHackEnabled()) {
             customiseToolbar();
@@ -546,6 +549,7 @@ public class TestFragment extends BaseFragment implements
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        showBlockingOverlay(isInMultiWindowMode());
         startCountDownTimer();
     }
 
@@ -1651,8 +1655,11 @@ public class TestFragment extends BaseFragment implements
 
         if (exam != null && !exam.isWindowMonitoringEnabled()) {
             removeAppBackgroundHandler();
+            showBlockingOverlay(false);
             return;
         }
+
+        showBlockingOverlay(isInMultiWindowMode());
 
         if (currentViolationCount > MAX_VIOLATION_COUNT) {
             showViolationAlertDialog(true);
@@ -1767,4 +1774,27 @@ public class TestFragment extends BaseFragment implements
     private boolean isOfflineExam() {
         return exam != null && Boolean.TRUE.equals(exam.getIsOfflineExam());
     }
+
+    private boolean isInMultiWindowMode() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            return requireActivity().isInMultiWindowMode();
+        }
+        return false;
+    }
+
+    void showBlockingOverlay(boolean isInMultiWindowMode) {
+        if (blockingOverlay == null || !isAdded() || exam == null) {
+            return;
+        }
+        
+        boolean shouldShowOverlay = isInMultiWindowMode && exam.isWindowMonitoringEnabled();
+        
+        if (shouldShowOverlay) {
+            blockingOverlay.bringToFront();
+            blockingOverlay.setVisibility(View.VISIBLE);
+        } else {
+            blockingOverlay.setVisibility(View.GONE);
+        }
+    }
+
 }
