@@ -10,7 +10,6 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.exam.api.TestpressExamApiClient;
@@ -41,7 +40,6 @@ import static in.testpress.network.TestpressApiClient.FOLDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {
-
 
     private Context context;
     private TestpressExamApiClient apiClient;
