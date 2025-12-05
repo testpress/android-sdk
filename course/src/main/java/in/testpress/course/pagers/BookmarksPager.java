@@ -184,11 +184,11 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
         }
 
         return resultResponse.getBookmarks().stream()
-                .filter(bookmark -> !hasPageNumber(bookmark))
+                .filter(bookmark -> !isPdfTextBookmark(bookmark))
                 .collect(Collectors.toList());
     }
 
-    private boolean hasPageNumber(Bookmark bookmark) {
+    private boolean isPdfTextBookmark(Bookmark bookmark) {
         Integer pageNumber = bookmark.getPageNumber();
         return pageNumber != null && pageNumber > 0;
     }
