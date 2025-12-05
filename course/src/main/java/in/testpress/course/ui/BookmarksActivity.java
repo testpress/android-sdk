@@ -522,7 +522,7 @@ public class BookmarksActivity extends BaseToolBarActivity
         if (pager == null) {
             return;
         }
-        if (!pager.hasNext()) {
+        if (!pager.hasMore()) {
             if (listAdapter.getFootersCount() != 0) {
                 // if pager reached last page, remove footer if footer exists
                 listAdapter.removeFooter(loadingLayout);
