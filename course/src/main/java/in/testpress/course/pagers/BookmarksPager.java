@@ -41,7 +41,6 @@ import static in.testpress.network.TestpressApiClient.FOLDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {
-    private static final String CHAPTER_CONTENT_MODEL = "chaptercontent";
 
     private Context context;
     private TestpressExamApiClient apiClient;
