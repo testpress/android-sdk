@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.exam.api.TestpressExamApiClient;
@@ -40,6 +41,7 @@ import static in.testpress.network.TestpressApiClient.FOLDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {
+    private static final String CHAPTER_CONTENT_MODEL = "chaptercontent";
 
     private Context context;
     private TestpressExamApiClient apiClient;
@@ -182,7 +184,17 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
             attachments.put(attachment.getId(), attachment);
         }
 
-        return resultResponse.getBookmarks();
+        return resultResponse.getBookmarks().stream()
+                .filter(bookmark -> !isPdfBookmark(bookmark))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isPdfBookmark(Bookmark bookmark) {
+        if (bookmark.getPageNumber() == null) return false;
+        Long contentTypeId = bookmark.getContentTypeId();
+        if (contentTypeId == null) return false;
+        ContentType contentType = contentTypes.get(contentTypeId);
+        return contentType != null && CHAPTER_CONTENT_MODEL.equals(contentType.getModel());
     }
 
     public ArrayList<BookmarkFolder> getFolders() {
