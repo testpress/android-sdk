@@ -41,7 +41,7 @@ import static in.testpress.network.TestpressApiClient.FOLDER;
 import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {
-    private static final String CHAPTER_CONTENT_MODEL = "chaptercontent";
+
 
     private Context context;
     private TestpressExamApiClient apiClient;
@@ -185,15 +185,13 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
         }
 
         return resultResponse.getBookmarks().stream()
-                .filter(bookmark -> !isPdfBookmark(bookmark))
+                .filter(bookmark -> !hasPageNumber(bookmark))
                 .collect(Collectors.toList());
     }
 
-    private boolean isPdfBookmark(Bookmark bookmark) {
-        if (bookmark.getPageNumber() == null) return false;
-        Long contentTypeId = bookmark.getContentTypeId();
-        ContentType contentType = contentTypes.get(contentTypeId);
-        return contentType != null && CHAPTER_CONTENT_MODEL.equals(contentType.getModel());
+    private boolean hasPageNumber(Bookmark bookmark) {
+        Integer pageNumber = bookmark.getPageNumber();
+        return pageNumber != null && pageNumber > 0;
     }
 
     public ArrayList<BookmarkFolder> getFolders() {
