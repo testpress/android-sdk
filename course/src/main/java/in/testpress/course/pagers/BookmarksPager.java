@@ -182,7 +182,22 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
             attachments.put(attachment.getId(), attachment);
         }
 
-        return resultResponse.getBookmarks();
+        List<Bookmark> allBookmarks = resultResponse.getBookmarks();
+        List<Bookmark> filteredBookmarks = new ArrayList<>();
+        
+        for (Bookmark bookmark : allBookmarks) {
+            if (isPdfBookmark(bookmark)) continue;
+            filteredBookmarks.add(bookmark);
+        }
+        return filteredBookmarks;
+    }
+
+    private boolean isPdfBookmark(Bookmark bookmark) {
+        Long contentTypeId = bookmark.getContentTypeId();
+        ContentType contentType = contentTypes.get(contentTypeId);
+        if (bookmark.getPageNumber() == null) return false;
+        if (contentTypeId == null) return false;
+        return contentType != null && "chaptercontent".equals(contentType.getModel());
     }
 
     public ArrayList<BookmarkFolder> getFolders() {
