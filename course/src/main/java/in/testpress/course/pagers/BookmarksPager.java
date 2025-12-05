@@ -192,7 +192,6 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
     private boolean isPdfBookmark(Bookmark bookmark) {
         if (bookmark.getPageNumber() == null) return false;
         Long contentTypeId = bookmark.getContentTypeId();
-        if (contentTypeId == null) return false;
         ContentType contentType = contentTypes.get(contentTypeId);
         return contentType != null && CHAPTER_CONTENT_MODEL.equals(contentType.getModel());
     }
