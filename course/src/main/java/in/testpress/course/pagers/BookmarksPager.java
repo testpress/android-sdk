@@ -42,7 +42,6 @@ import static in.testpress.network.TestpressApiClient.UNFILTERED;
 
 public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Bookmark> {
 
-
     private Context context;
     private TestpressExamApiClient apiClient;
     private SimpleDateFormat simpleDateFormat;
