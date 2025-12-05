@@ -522,14 +522,12 @@ public class BookmarksActivity extends BaseToolBarActivity
         if (pager == null) {
             return;
         }
-
         if (!pager.hasMore()) {
             if (listAdapter.getFootersCount() != 0) listAdapter.removeFooter(loadingLayout);
             if (!isLoadingNewBookmarks) viewPagerSwipeRefreshLayout.setRefreshing(false);
             viewPager.setVisibility(View.VISIBLE);
             return;
         }
-        
         if (!pager.getResources().isEmpty()) {
             saveItems(pager);
         }
