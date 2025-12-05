@@ -16,6 +16,8 @@ import in.testpress.core.TestpressSDKDatabase;
 
 import org.greenrobot.greendao.query.QueryBuilder;
 
+import com.google.gson.annotations.SerializedName;
+
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 // KEEP INCLUDES END
 
@@ -54,6 +56,9 @@ public class Bookmark {
     private transient Long contentType__resolvedKey;
 
     // KEEP FIELDS - put your custom fields here
+    @SerializedName("page_number")
+    private Integer pageNumber;
+
     // KEEP FIELDS END
 
     @Generated
@@ -246,6 +251,14 @@ public class Bookmark {
     }
 
     // KEEP METHODS - put your custom methods here
+    public Integer getPageNumber() {
+        return pageNumber;
+    }
+    
+    public void setPageNumber(Integer pageNumber) {
+        this.pageNumber = pageNumber;
+    }
+    
     public static void save(Context context, List<Bookmark> bookmarks, boolean allFolders) {
         BookmarkDao bookmarkDao = TestpressSDKDatabase.getBookmarkDao(context);
         for (int i = 0; i < bookmarks.size(); i++) {
