@@ -523,10 +523,10 @@ public class BookmarksActivity extends BaseToolBarActivity
             return;
         }
         if (!pager.hasMore()) {
-            if (listAdapter.getFootersCount() != 0) listAdapter.removeFooter(loadingLayout);
-            if (!isLoadingNewBookmarks) viewPagerSwipeRefreshLayout.setRefreshing(false);
-            viewPager.setVisibility(View.VISIBLE);
-            return;
+            if (listAdapter.getFootersCount() != 0) {
+                // if pager reached last page, remove footer if footer exists
+                listAdapter.removeFooter(loadingLayout);
+            }
         }
         if (!pager.getResources().isEmpty()) {
             saveItems(pager);
