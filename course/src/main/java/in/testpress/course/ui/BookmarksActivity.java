@@ -423,7 +423,7 @@ public class BookmarksActivity extends BaseToolBarActivity
         @Override
         public List<Bookmark> loadData() throws TestpressException {
             pager.next();
-            return pager.getListResponse().getBookmarks();
+            return pager.getResources();
         }
     }
 

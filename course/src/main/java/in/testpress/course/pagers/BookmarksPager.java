@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.exam.api.TestpressExamApiClient;
@@ -182,7 +183,14 @@ public class BookmarksPager extends BaseResourcePager<BookmarksListResponse, Boo
             attachments.put(attachment.getId(), attachment);
         }
 
-        return resultResponse.getBookmarks();
+        return resultResponse.getBookmarks().stream()
+                .filter(bookmark -> !isPdfTextBookmark(bookmark))
+                .collect(Collectors.toList());
+    }
+
+    private boolean isPdfTextBookmark(Bookmark bookmark) {
+        Integer pageNumber = bookmark.getPageNumber();
+        return pageNumber != null && pageNumber > 0;
     }
 
     public ArrayList<BookmarkFolder> getFolders() {
