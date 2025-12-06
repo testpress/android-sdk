@@ -15,9 +15,13 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.util.List;
 
@@ -97,12 +101,22 @@ public class WebViewUtils {
                     hasError = true;
                 }
             }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                WebResourceResponse response = WebViewUtils.this.shouldInterceptRequest(url);
+                if (response != null) {
+                    return response;
+                }
+                return super.shouldInterceptRequest(view, url);
+            }
+
         });
         loadHtml(htmlContent);
     }
 
     public void loadHtml(String htmlContent) {
-        webView.loadDataWithBaseURL("file:///android_asset/", getHeader() + htmlContent,
+        webView.loadDataWithBaseURL("https://www.testpress.in/android_asset/", getHeader() + htmlContent,
                 "text/html", "utf-8", null);
     }
 
@@ -164,6 +178,28 @@ public class WebViewUtils {
     }
 
     protected void onNetworkError() {
+    }
+
+    protected WebResourceResponse shouldInterceptRequest(String url) {
+        if (url != null && url.startsWith("https://www.testpress.in/android_asset/")) {
+            String assetPath = url.substring("https://www.testpress.in/android_asset/".length());
+            try {
+                if (assetPath.contains("?")) {
+                    assetPath = assetPath.substring(0, assetPath.indexOf("?"));
+                }
+                InputStream stream = webView.getContext().getAssets().open(assetPath);
+                String mimeType = "text/plain";
+                if (assetPath.endsWith(".css")) mimeType = "text/css";
+                else if (assetPath.endsWith(".js")) mimeType = "text/javascript";
+                else if (assetPath.endsWith(".png")) mimeType = "image/png";
+                else if (assetPath.endsWith(".svg")) mimeType = "image/svg+xml";
+                
+                return new WebResourceResponse(mimeType, "UTF-8", stream);
+            } catch (IOException e) {
+                // Asset not found, let WebView handle it normally
+            }
+        }
+        return null;
     }
 
     private void evaluateJavascript(String javascript) {
