@@ -15,9 +15,14 @@ import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebViewClient;
+
+import java.io.IOException;
+import java.io.InputStream;
 
 import java.util.List;
 
@@ -30,6 +35,18 @@ public class WebViewUtils {
 
     private WebView webView;
     private boolean hasError;
+
+    private String getAssetUrlBase() {
+        TestpressSession session = TestpressSdk.getTestpressSession(webView.getContext());
+        if (session != null && session.getInstituteSettings() != null) {
+            String domainUrl = session.getInstituteSettings().getDomainUrl();
+            if (domainUrl != null) {
+                return domainUrl + "/android_asset/";
+            }
+        }
+        // Fallback to default if session is not available
+        return "https://www.testpress.in/android_asset/";
+    }
 
     public WebViewUtils(WebView webView) {
         this.webView = webView;
@@ -97,12 +114,22 @@ public class WebViewUtils {
                     hasError = true;
                 }
             }
+
+            @Override
+            public WebResourceResponse shouldInterceptRequest(WebView view, String url) {
+                WebResourceResponse response = WebViewUtils.this.shouldInterceptRequest(url);
+                if (response != null) {
+                    return response;
+                }
+                return super.shouldInterceptRequest(view, url);
+            }
+
         });
         loadHtml(htmlContent);
     }
 
     public void loadHtml(String htmlContent) {
-        webView.loadDataWithBaseURL("file:///android_asset/", getHeader() + htmlContent,
+        webView.loadDataWithBaseURL(getAssetUrlBase(), getHeader() + htmlContent,
                 "text/html", "utf-8", null);
     }
 
@@ -164,6 +191,28 @@ public class WebViewUtils {
     }
 
     protected void onNetworkError() {
+    }
+
+    protected WebResourceResponse shouldInterceptRequest(String url) {
+        String assetUrlBase = getAssetUrlBase();
+        if (url != null && url.startsWith(assetUrlBase)) {
+            String assetPath = url.substring(assetUrlBase.length());
+            try {
+                if (assetPath.contains("?")) {
+                    assetPath = assetPath.substring(0, assetPath.indexOf("?"));
+                }
+                InputStream stream = webView.getContext().getAssets().open(assetPath);
+                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(assetPath);
+                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+                if (mimeType == null) {
+                    mimeType = "text/plain";
+                }
+                return new WebResourceResponse(mimeType, "UTF-8", stream);
+            } catch (IOException e) {
+                Log.e("WebViewUtils", "Error loading asset: " + assetPath, e);
+            }
+        }
+        return null;
     }
 
     private void evaluateJavascript(String javascript) {
