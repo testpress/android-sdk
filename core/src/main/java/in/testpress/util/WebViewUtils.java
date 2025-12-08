@@ -33,10 +33,20 @@ import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
 
-    private static final String ASSET_URL_BASE = "https://www.testpress.in/android_asset/";
-
     private WebView webView;
     private boolean hasError;
+
+    private String getAssetUrlBase() {
+        TestpressSession session = TestpressSdk.getTestpressSession(webView.getContext());
+        if (session != null && session.getInstituteSettings() != null) {
+            String domainUrl = session.getInstituteSettings().getDomainUrl();
+            if (domainUrl != null) {
+                return domainUrl + "/android_asset/";
+            }
+        }
+        // Fallback to default if session is not available
+        return "https://www.testpress.in/android_asset/";
+    }
 
     public WebViewUtils(WebView webView) {
         this.webView = webView;
@@ -119,7 +129,7 @@ public class WebViewUtils {
     }
 
     public void loadHtml(String htmlContent) {
-        webView.loadDataWithBaseURL(ASSET_URL_BASE, getHeader() + htmlContent,
+        webView.loadDataWithBaseURL(getAssetUrlBase(), getHeader() + htmlContent,
                 "text/html", "utf-8", null);
     }
 
@@ -184,8 +194,9 @@ public class WebViewUtils {
     }
 
     protected WebResourceResponse shouldInterceptRequest(String url) {
-        if (url != null && url.startsWith(ASSET_URL_BASE)) {
-            String assetPath = url.substring(ASSET_URL_BASE.length());
+        String assetUrlBase = getAssetUrlBase();
+        if (url != null && url.startsWith(assetUrlBase)) {
+            String assetPath = url.substring(assetUrlBase.length());
             try {
                 if (assetPath.contains("?")) {
                     assetPath = assetPath.substring(0, assetPath.indexOf("?"));
