@@ -18,6 +18,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.webkit.MimeTypeMap;
 import android.webkit.WebViewClient;
 
 import java.io.IOException;
@@ -31,6 +32,8 @@ import in.testpress.models.InstituteSettings;
 import in.testpress.ui.ZoomableImageActivity;
 
 public class WebViewUtils {
+
+    private static final String ASSET_URL_BASE = "https://www.testpress.in/android_asset/";
 
     private WebView webView;
     private boolean hasError;
@@ -116,7 +119,7 @@ public class WebViewUtils {
     }
 
     public void loadHtml(String htmlContent) {
-        webView.loadDataWithBaseURL("https://www.testpress.in/android_asset/", getHeader() + htmlContent,
+        webView.loadDataWithBaseURL(ASSET_URL_BASE, getHeader() + htmlContent,
                 "text/html", "utf-8", null);
     }
 
@@ -181,22 +184,21 @@ public class WebViewUtils {
     }
 
     protected WebResourceResponse shouldInterceptRequest(String url) {
-        if (url != null && url.startsWith("https://www.testpress.in/android_asset/")) {
-            String assetPath = url.substring("https://www.testpress.in/android_asset/".length());
+        if (url != null && url.startsWith(ASSET_URL_BASE)) {
+            String assetPath = url.substring(ASSET_URL_BASE.length());
             try {
                 if (assetPath.contains("?")) {
                     assetPath = assetPath.substring(0, assetPath.indexOf("?"));
                 }
                 InputStream stream = webView.getContext().getAssets().open(assetPath);
-                String mimeType = "text/plain";
-                if (assetPath.endsWith(".css")) mimeType = "text/css";
-                else if (assetPath.endsWith(".js")) mimeType = "text/javascript";
-                else if (assetPath.endsWith(".png")) mimeType = "image/png";
-                else if (assetPath.endsWith(".svg")) mimeType = "image/svg+xml";
-                
+                String fileExtension = MimeTypeMap.getFileExtensionFromUrl(assetPath);
+                String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(fileExtension);
+                if (mimeType == null) {
+                    mimeType = "text/plain";
+                }
                 return new WebResourceResponse(mimeType, "UTF-8", stream);
             } catch (IOException e) {
-                // Asset not found, let WebView handle it normally
+                Log.e("WebViewUtils", "Error loading asset: " + assetPath, e);
             }
         }
         return null;
