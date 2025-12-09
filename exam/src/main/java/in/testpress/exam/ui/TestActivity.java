@@ -790,6 +790,11 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     @Override
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
+        super.onMultiWindowModeChanged(isInMultiWindowMode);
+    }
+
+    @Override
     public RetrofitCall[] getRetrofitCalls() {
         return new RetrofitCall[] {
                 examApiRequest, languagesApiRequest, attemptsApiRequest, permissionsApiRequest
