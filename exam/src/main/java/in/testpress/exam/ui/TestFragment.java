@@ -89,6 +89,7 @@ public class TestFragment extends BaseFragment implements
 
     static final String PARAM_EXAM = "exam";
     static final String PARAM_ATTEMPT = "attempt";
+    static final String PARAM_VIOLATION_COUNT = "violationCount";
     SlidingPaneLayout slidingPaneLayout;
     private TestpressExamApiClient apiClient;
     private TextView previous;
@@ -152,12 +153,17 @@ public class TestFragment extends BaseFragment implements
     private AttemptViewModel attemptViewModel;
     private static final long MAX_VIOLATION_COUNT = 2;
     private long currentViolationCount = 0;
+    private boolean isViolationRecorded = false;
+    private boolean isInitialMultiWindowChecked = false;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         attemptViewModel = AttemptViewModel.Companion.initializeViewModel(requireActivity());
         initializeAttemptAndExamVariables(savedInstanceState);
+        if (savedInstanceState != null) {
+            currentViolationCount = savedInstanceState.getLong(PARAM_VIOLATION_COUNT, 0);
+        }
         instituteSettings = TestpressSdk.getTestpressSession(getContext()).getInstituteSettings();
         eventsTrackerFacade = new EventsTrackerFacade(getContext());
         logEvent(EventsTrackerFacade.STARTED_EXAM);
@@ -1642,6 +1648,7 @@ public class TestFragment extends BaseFragment implements
     public void onSaveInstanceState(@NonNull Bundle outState) {
         attempt.setSections(sections);
         outState.putParcelable(PARAM_ATTEMPT, attempt);
+        outState.putLong(PARAM_VIOLATION_COUNT, currentViolationCount);
         super.onSaveInstanceState(outState);
     }
 
@@ -1654,9 +1661,14 @@ public class TestFragment extends BaseFragment implements
             return;
         }
 
+        if (!isInitialMultiWindowChecked && requireActivity().isInMultiWindowMode() && currentViolationCount == 0) {
+            currentViolationCount++;
+        }
+        isInitialMultiWindowChecked = true;
+
         if (currentViolationCount > MAX_VIOLATION_COUNT) {
             showViolationAlertDialog(true);
-        } else if (currentViolationCount > 0) {
+        } else if (currentViolationCount > 0 || requireActivity().isInMultiWindowMode()) {
             showViolationAlertDialog(false);
         }
         disableScreenTimeOut();
@@ -1690,6 +1702,30 @@ public class TestFragment extends BaseFragment implements
         builder.setCancelable(false);
         windowViolationDialog = builder.create();
         windowViolationDialog.show();
+        if (requireActivity().isInMultiWindowMode()) {
+            windowViolationDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(false);
+        }
+    }
+
+    public void onMultiWindowModeChanged(boolean isInMultiWindowMode) {
+        if (isInMultiWindowMode) {
+            if (exam != null && exam.isWindowMonitoringEnabled()) {
+                if (!isViolationRecorded) {
+                    currentViolationCount++;
+                }
+                isViolationRecorded = false;
+                
+                if (currentViolationCount > MAX_VIOLATION_COUNT) {
+                    showViolationAlertDialog(true);
+                } else {
+                    showViolationAlertDialog(false);
+                }
+            }
+        } else {
+            if (windowViolationDialog != null && windowViolationDialog.isShowing()) {
+                windowViolationDialog.getButton(AlertDialog.BUTTON_POSITIVE).setEnabled(true);
+            }
+        }
     }
 
     private void disableScreenTimeOut() {
@@ -1723,7 +1759,10 @@ public class TestFragment extends BaseFragment implements
         super.onStop();
         saveResult(currentQuestionIndex, Action.UPDATE_ANSWER);
         if (exam != null && exam.isWindowMonitoringEnabled()) {
-            currentViolationCount++;
+            if (!requireActivity().isInMultiWindowMode()) {
+                currentViolationCount++;
+                isViolationRecorded = true;
+            }
             return;
         }
         appBackgroundStateHandler = new Handler();
