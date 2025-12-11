@@ -26,6 +26,8 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import kotlin.math.roundToInt
+import org.jsoup.Jsoup
+import org.jsoup.safety.Whitelist
 
 class QuizReviewFragment: Fragment() {
     private lateinit var questionsView: WebView
@@ -223,8 +225,16 @@ class QuizReviewFragment: Fragment() {
                     correctAnswerHtml += WebViewUtils.getCorrectAnswerIndexWithTags(index)
                 }
 
+                val wl = Whitelist.relaxed()
+                        .addTags("font")
+                        .addAttributes("span", "style", "class")
+                        .addAttributes("div", "style", "class")
+                        .addAttributes("p", "style", "class")
+                        .addAttributes("font", "face")
+                val doc = Jsoup.clean(answer.textHtml ?: "", wl)
+
                 htmlContent += WebViewUtils.getOptionWithTags(
-                    answer.textHtml ?: "", index, optionColor, context, isCorrect
+                    doc, index, optionColor, context, isCorrect
                 )
             } else if (question.isNumericalType) {
                 correctAnswerHtml = answer.textHtml ?: ""
