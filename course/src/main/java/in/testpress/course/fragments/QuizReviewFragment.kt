@@ -207,6 +207,12 @@ class QuizReviewFragment: Fragment() {
 
         var htmlContent = ""
         var correctAnswerHtml = ""
+        val wl = Whitelist.relaxed()
+                        .addTags("font")
+                        .addAttributes("span", "style", "class")
+                        .addAttributes("div", "style", "class")
+                        .addAttributes("p", "style", "class")
+                        .addAttributes("font", "face")
         question.answers?.forEachIndexed { index, answer ->
             var isCorrect = false
             if(question.isSingleMCQType || question.isMultipleMCQType) {
@@ -225,7 +231,6 @@ class QuizReviewFragment: Fragment() {
                     correctAnswerHtml += WebViewUtils.getCorrectAnswerIndexWithTags(index)
                 }
 
-                val wl = Whitelist.relaxed()
                 val doc = Jsoup.clean(answer.textHtml, wl)
 
                 htmlContent += "\n" + WebViewUtils.getOptionWithTags(
