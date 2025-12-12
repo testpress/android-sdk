@@ -7,8 +7,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Handler;
-import android.os.Looper;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
@@ -169,24 +167,15 @@ public class TestActivity extends BaseToolBarActivity  {
     @Override
     protected void onResume() {
         super.onResume();
-        ensureKioskModeActive();
+        if (isKioskModeRequired()) activateKioskMode();
     }
 
-    private void ensureKioskModeActive() {
-        // delayed check to catch the "Decline" action without flickering
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                startLockTaskIfInactive();
-            }
-        }, 500);
+    private boolean isKioskModeRequired() {
+        return exam != null && exam.isWindowMonitoringEnabled() && exam.hasStarted() && !exam.isEnded();
     }
 
-    private void startLockTaskIfInactive() {
-        if (exam != null && exam.isWindowMonitoringEnabled() 
-            && exam.hasStarted() && !exam.isEnded()) {
-            if (!isScreenPinned(this)) startLockTask();
-        }
+    private void activateKioskMode() {
+        if (!isScreenPinned(this)) startLockTask();
     }
 
     @Override
@@ -200,7 +189,7 @@ public class TestActivity extends BaseToolBarActivity  {
         if ((ev.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0
                 || (ev.getFlags() & MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED) != 0) {
             if (ev.getAction() == MotionEvent.ACTION_UP) {
-                Toast.makeText(this, "Floating window detected. Please close it.", Toast.LENGTH_LONG).show();
+                Toast.makeText(this, R.string.testpress_floating_window_detected, Toast.LENGTH_LONG).show();
             }
             return true;
         }
@@ -208,8 +197,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private boolean blockInputIfUnpinned(MotionEvent ev) {
-        if (exam != null && exam.isWindowMonitoringEnabled() 
-            && exam.hasStarted() && !exam.isEnded()) {
+        if (isKioskModeRequired()) {
             if (!isScreenPinned(this)) {
                 if (ev.getAction() == MotionEvent.ACTION_DOWN) startLockTask(); 
                 return true;
@@ -221,17 +209,7 @@ public class TestActivity extends BaseToolBarActivity  {
     public boolean isScreenPinned(Context context) {
         ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
         if (am == null) return false;
-
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
-            // API 23+ (Android 6+)
-            return am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_PINNED;
-        } else {
-            // API 21+ (Android 5+)
-             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
-                return am.isInLockTaskMode();
-             }
-        }
-        return false;
+        return am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_PINNED;
     }
 
     @Override
