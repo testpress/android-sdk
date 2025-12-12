@@ -2,14 +2,19 @@ package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import androidx.annotation.Nullable;
 import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -159,6 +164,80 @@ public class TestActivity extends BaseToolBarActivity  {
         observeLanguageResources();
         observeContentAttemptResources();
         observeAttemptResources();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        ensureKioskModeActive();
+    }
+
+    private void ensureKioskModeActive() {
+        // delayed check to catch the "Decline" action without flickering
+        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                startLockTaskIfInactive();
+            }
+        }, 500);
+    }
+
+    private void startLockTaskIfInactive() {
+        if (exam != null && exam.isWindowMonitoringEnabled() 
+            && exam.hasStarted() && !exam.isEnded()) {
+            if (!isScreenPinned(this)) startLockTask();
+        }
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (isOverlayDetected(ev)) return true;
+        if (blockInputIfUnpinned(ev)) return true;
+        return super.dispatchTouchEvent(ev);
+    }
+
+    private boolean isOverlayDetected(MotionEvent ev) {
+        if ((ev.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0
+                || (ev.getFlags() & MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED) != 0) {
+            if (ev.getAction() == MotionEvent.ACTION_UP) {
+                Toast.makeText(this, "Floating window detected. Please close it.", Toast.LENGTH_LONG).show();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean blockInputIfUnpinned(MotionEvent ev) {
+        if (exam != null && exam.isWindowMonitoringEnabled() 
+            && exam.hasStarted() && !exam.isEnded()) {
+            if (!isScreenPinned(this)) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) startLockTask(); 
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isScreenPinned(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) return false;
+
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+            // API 23+ (Android 6+)
+            return am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_PINNED;
+        } else {
+            // API 21+ (Android 5+)
+             if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+                return am.isInLockTaskMode();
+             }
+        }
+        return false;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (isScreenPinned(this)) stopLockTask();
+        super.onDestroy();
     }
 
     private void retrieveDataFromSavedInstanceState(@Nullable Bundle savedInstanceState) {
@@ -328,6 +407,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void handleSuccessAttempt(Attempt attempt) {
+        this.attempt = attempt;
         if (isOfflineExamComplete(attempt)){
             this.finish();
             Toast.makeText(this,"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
@@ -626,6 +706,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void endExam(boolean isExamWindowViolated) {
+        stopLockTask();
         progressBar.setVisibility(View.VISIBLE);
         if (courseContent != null){
             examViewModel.endContentAttempt(attempt.getId(), courseAttempt.getEndAttemptUrl(), isExamWindowViolated);
@@ -696,6 +777,11 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void startExam(boolean resumeExam) {
+        if (exam.isWindowMonitoringEnabled() && !isScreenPinned(this)) {
+            startLockTask();
+            return;
+        }
+        startLockTask();
         if (resumeExam){
             examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
