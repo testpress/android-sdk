@@ -385,7 +385,6 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void handleSuccessAttempt(Attempt attempt) {
-        this.attempt = attempt;
         if (isOfflineExamComplete(attempt)){
             this.finish();
             Toast.makeText(this,"Please connect to the internet to view your results.",Toast.LENGTH_SHORT).show();
@@ -759,7 +758,6 @@ public class TestActivity extends BaseToolBarActivity  {
             startLockTask();
             return;
         }
-        startLockTask();
         if (resumeExam){
             examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
