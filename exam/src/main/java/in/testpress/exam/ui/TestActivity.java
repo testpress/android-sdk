@@ -2,6 +2,8 @@ package in.testpress.exam.ui;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.app.ActivityManager;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,6 +12,7 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -159,6 +162,60 @@ public class TestActivity extends BaseToolBarActivity  {
         observeLanguageResources();
         observeContentAttemptResources();
         observeAttemptResources();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (isKioskModeRequired()) activateKioskMode();
+    }
+
+    private boolean isKioskModeRequired() {
+        return exam != null && exam.isWindowMonitoringEnabled() && exam.hasStarted() && !exam.isEnded();
+    }
+
+    private void activateKioskMode() {
+        if (!isScreenPinned(this)) startLockTask();
+    }
+
+    @Override
+    public boolean dispatchTouchEvent(MotionEvent ev) {
+        if (isOverlayDetected(ev)) return true;
+        if (blockInputIfUnpinned(ev)) return true;
+        return super.dispatchTouchEvent(ev);
+    }
+
+    private boolean isOverlayDetected(MotionEvent ev) {
+        if ((ev.getFlags() & MotionEvent.FLAG_WINDOW_IS_OBSCURED) != 0
+                || (ev.getFlags() & MotionEvent.FLAG_WINDOW_IS_PARTIALLY_OBSCURED) != 0) {
+            if (ev.getAction() == MotionEvent.ACTION_UP) {
+                Toast.makeText(this, R.string.testpress_floating_window_detected, Toast.LENGTH_LONG).show();
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private boolean blockInputIfUnpinned(MotionEvent ev) {
+        if (isKioskModeRequired()) {
+            if (!isScreenPinned(this)) {
+                if (ev.getAction() == MotionEvent.ACTION_DOWN) startLockTask(); 
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isScreenPinned(Context context) {
+        ActivityManager am = (ActivityManager) context.getSystemService(Context.ACTIVITY_SERVICE);
+        if (am == null) return false;
+        return am.getLockTaskModeState() == ActivityManager.LOCK_TASK_MODE_PINNED;
+    }
+
+    @Override
+    public void onDestroy() {
+        if (isScreenPinned(this)) stopLockTask();
+        super.onDestroy();
     }
 
     private void retrieveDataFromSavedInstanceState(@Nullable Bundle savedInstanceState) {
@@ -626,6 +683,7 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void endExam(boolean isExamWindowViolated) {
+        stopLockTask();
         progressBar.setVisibility(View.VISIBLE);
         if (courseContent != null){
             examViewModel.endContentAttempt(attempt.getId(), courseAttempt.getEndAttemptUrl(), isExamWindowViolated);
@@ -696,6 +754,10 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void startExam(boolean resumeExam) {
+        if (exam.isWindowMonitoringEnabled() && !isScreenPinned(this)) {
+            startLockTask();
+            return;
+        }
         if (resumeExam){
             examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
