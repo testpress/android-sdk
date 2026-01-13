@@ -47,7 +47,16 @@ public class TestpressStore {
         Assert.assertNotNull("containerViewId must not be null.", containerViewId);
 
         init(activity.getApplicationContext(), testpressSession);
-        ProductListFragment.show(activity, containerViewId);
+
+        String baseUrl = testpressSession.getInstituteSettings().getBaseUrl();
+        if (baseUrl != null && baseUrl.contains("pratibha")) {
+            Intent intent = new Intent(activity, in.testpress.ui.WebViewActivity.class);
+            intent.putExtra(in.testpress.ui.WebViewActivity.URL_TO_OPEN, "https://www.epratibha.net/courses/");
+            intent.putExtra(in.testpress.ui.WebViewActivity.ACTIVITY_TITLE, "Store");
+            activity.startActivity(intent);
+        } else {
+            ProductListFragment.show(activity, containerViewId);
+        }
     }
 
     /**
@@ -70,9 +79,18 @@ public class TestpressStore {
         Assert.assertNotNull("Activity must not be null.", activity);
 
         init(activity.getApplicationContext(), testpressSession);
-        Intent intent = new Intent(activity, ProductsListActivity.class);
-        intent = populateIntent(intent, activity);
-        activity.startActivityForResult(intent, STORE_REQUEST_CODE);
+
+        String baseUrl = testpressSession.getInstituteSettings().getBaseUrl();
+        if (baseUrl != null && baseUrl.contains("pratibha")) {
+            Intent intent = new Intent(activity, in.testpress.ui.WebViewActivity.class);
+            intent.putExtra(in.testpress.ui.WebViewActivity.URL_TO_OPEN, "https://www.epratibha.net/courses/");
+            intent.putExtra(in.testpress.ui.WebViewActivity.ACTIVITY_TITLE, "Store");
+            activity.startActivity(intent);
+        } else {
+            Intent intent = new Intent(activity, ProductsListActivity.class);
+            intent = populateIntent(intent, activity);
+            activity.startActivityForResult(intent, STORE_REQUEST_CODE);
+        }
     }
 
     /**
