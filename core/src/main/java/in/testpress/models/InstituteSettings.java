@@ -53,6 +53,7 @@ public class InstituteSettings {
     private String videoWatermarkType;
     private String videoWatermarkPosition;
     private Boolean useNewDiscountFeat;
+    private String customStoreUrl;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -482,6 +483,15 @@ public class InstituteSettings {
 
     public InstituteSettings setUseNewDiscountFeat(Boolean useNewDiscountFeat) {
         this.useNewDiscountFeat = useNewDiscountFeat;
+        return this;
+    }
+
+    public String getCustomStoreUrl() {
+        return customStoreUrl;
+    }
+
+    public InstituteSettings setCustomStoreUrl(String customStoreUrl) {
+        this.customStoreUrl = customStoreUrl;
         return this;
     }
 }

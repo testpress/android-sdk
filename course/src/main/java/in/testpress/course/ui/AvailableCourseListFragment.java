@@ -20,6 +20,7 @@ import java.util.Objects;
 
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSDKDatabase;
+import in.testpress.core.TestpressSdk;
 import in.testpress.course.AvailableCourseListAdapter;
 import in.testpress.course.R;
 import in.testpress.course.adapter.CategorySelectionListener;
@@ -39,6 +40,18 @@ import in.testpress.store.network.StoreApiClient;
 import in.testpress.ui.BaseListViewFragment;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.ThrowableLoader;
+
+import static in.testpress.fragments.WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW;
+import static in.testpress.fragments.WebViewFragment.ENABLE_SWIPE_REFRESH;
+import static in.testpress.fragments.WebViewFragment.IS_AUTHENTICATION_REQUIRED;
+import static in.testpress.fragments.WebViewFragment.SHOW_LOADING_BETWEEN_PAGES;
+import static in.testpress.fragments.WebViewFragment.URL_TO_OPEN;
+
+import android.widget.FrameLayout;
+
+import in.testpress.fragments.WebViewFragment;
+import in.testpress.models.InstituteSettings;
+import in.testpress.util.CommonUtils;
 
 public class AvailableCourseListFragment extends BaseListViewFragment<Product> implements CategorySelectionListener {
 
@@ -75,11 +88,46 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        String customUrl = getCustomStoreUrl();
+        if (customUrl != null && !customUrl.isEmpty()) {
+            return createWebView(customUrl);
+        }
         return inflater.inflate(R.layout.available_course_fragment, container, false);
+    }
+
+    private String getCustomStoreUrl() {
+        InstituteSettings settings = TestpressSdk.getTestpressSession(requireContext()).getInstituteSettings();
+        String url = settings.getCustomStoreUrl();
+        if (url == null && settings.getBaseUrl().contains("pratibha")) {
+            return "https://www.epratibha.net/courses/";
+        }
+        return url;
+    }
+
+    private View createWebView(String url) {
+        FrameLayout frameLayout = new FrameLayout(requireContext());
+        frameLayout.setId(View.generateViewId());
+
+        WebViewFragment webViewFragment = new WebViewFragment();
+        Bundle bundle = new Bundle();
+        bundle.putString(URL_TO_OPEN, url);
+        bundle.putBoolean(SHOW_LOADING_BETWEEN_PAGES, true);
+        bundle.putBoolean(IS_AUTHENTICATION_REQUIRED, false);
+        bundle.putBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, true);
+        bundle.putBoolean(ENABLE_SWIPE_REFRESH, true);
+        webViewFragment.setArguments(bundle);
+
+        getChildFragmentManager().beginTransaction()
+                .replace(frameLayout.getId(), webViewFragment)
+                .commit();
+        
+        return frameLayout;
     }
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
+        if (getCustomStoreUrl() != null) return;
+        
         super.onViewCreated(view, savedInstanceState);
         bind(view);
         initProductCategoriesView();
@@ -117,6 +165,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     public void refreshWithProgress() {
+        if (getCustomStoreUrl() != null) return;
         pager.reset();
         super.refreshWithProgress();
         refreshProductCategory();
@@ -130,6 +179,9 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     public Loader<List<Product>> onCreateLoader(int id, Bundle args) {
+        if (getCustomStoreUrl() != null) {
+            return new Loader<>(requireContext()); // Dummy loader
+        }
         return new ProductsLoader(getContext(), pager, courseDao);
     }
 
@@ -175,6 +227,8 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     public void onLoadFinished(Loader<List<Product>> loader, List<Product> products) {
+        if (getCustomStoreUrl() != null) return;
+        
         final TestpressException exception = getException(loader);
         this.exception = exception;
         swipeRefreshLayout.setRefreshing(false);
@@ -208,6 +262,7 @@ public class AvailableCourseListFragment extends BaseListViewFragment<Product> i
 
     @Override
     protected boolean isItemsEmpty() {
+        if (getCustomStoreUrl() != null) return false;
         return productDao.queryBuilder().listLazy().isEmpty();
     }
 

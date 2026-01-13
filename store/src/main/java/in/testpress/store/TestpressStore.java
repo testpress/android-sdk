@@ -9,6 +9,7 @@ import androidx.fragment.app.FragmentActivity;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
+import in.testpress.models.InstituteSettings;
 import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.store.ui.ProductListFragment;
 import in.testpress.store.ui.ProductsListActivity;
@@ -48,10 +49,15 @@ public class TestpressStore {
 
         init(activity.getApplicationContext(), testpressSession);
 
-        String baseUrl = testpressSession.getInstituteSettings().getBaseUrl();
-        if (baseUrl != null && baseUrl.contains("pratibha")) {
+        InstituteSettings settings = testpressSession.getInstituteSettings();
+        String customUrl = settings.getCustomStoreUrl();
+        if (customUrl == null && settings.getBaseUrl().contains("pratibha")) {
+            customUrl = "https://www.epratibha.net/courses/";
+        }
+
+        if (customUrl != null) {
             Intent intent = new Intent(activity, in.testpress.ui.WebViewActivity.class);
-            intent.putExtra(in.testpress.ui.WebViewActivity.URL_TO_OPEN, "https://www.epratibha.net/courses/");
+            intent.putExtra(in.testpress.ui.WebViewActivity.URL_TO_OPEN, customUrl);
             intent.putExtra(in.testpress.ui.WebViewActivity.ACTIVITY_TITLE, "Store");
             activity.startActivity(intent);
         } else {
@@ -80,10 +86,15 @@ public class TestpressStore {
 
         init(activity.getApplicationContext(), testpressSession);
 
-        String baseUrl = testpressSession.getInstituteSettings().getBaseUrl();
-        if (baseUrl != null && baseUrl.contains("pratibha")) {
+        InstituteSettings settings = testpressSession.getInstituteSettings();
+        String customUrl = settings.getCustomStoreUrl();
+        if (customUrl == null && settings.getBaseUrl().contains("pratibha")) {
+            customUrl = "https://www.epratibha.net/courses/";
+        }
+
+        if (customUrl != null) {
             Intent intent = new Intent(activity, in.testpress.ui.WebViewActivity.class);
-            intent.putExtra(in.testpress.ui.WebViewActivity.URL_TO_OPEN, "https://www.epratibha.net/courses/");
+            intent.putExtra(in.testpress.ui.WebViewActivity.URL_TO_OPEN, customUrl);
             intent.putExtra(in.testpress.ui.WebViewActivity.ACTIVITY_TITLE, "Store");
             activity.startActivity(intent);
         } else {

@@ -1,11 +1,5 @@
 package in.testpress.course.ui;
 
-import static in.testpress.fragments.WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW;
-import static in.testpress.fragments.WebViewFragment.ENABLE_SWIPE_REFRESH;
-import static in.testpress.fragments.WebViewFragment.IS_AUTHENTICATION_REQUIRED;
-import static in.testpress.fragments.WebViewFragment.SHOW_LOADING_BETWEEN_PAGES;
-import static in.testpress.fragments.WebViewFragment.URL_TO_OPEN;
-
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -26,15 +20,12 @@ import java.util.List;
 import in.testpress.core.TestpressSdk;
 import in.testpress.core.TestpressSession;
 import in.testpress.course.R;
-import in.testpress.fragments.WebViewFragment;
 import in.testpress.store.TestpressStore;
 import in.testpress.ui.BaseFragment;
-import in.testpress.util.CommonUtils;
 
 public class CourseListFragment extends BaseFragment {
     private TabLayout tabs;
     private Adapter adapter;
-    private WebViewFragment webViewFragment;
     private boolean isWebViewVisibleToUser = false;
     private TestpressSession session;
 
@@ -90,25 +81,7 @@ public class CourseListFragment extends BaseFragment {
         if (isStoreDisabled()) {
             return;
         }
-        // Here we are adding Custom store WebView for EPratibha App
-        if (isEPratibhaApp()) {
-            addEPratibhaWebViewFragment(storeLabel);
-        } else {
-            adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
-        }
-    }
-
-    private void addEPratibhaWebViewFragment(String storeLabel) {
-        String[] credentials = CommonUtils.getUserCredentials(requireContext());
-        WebViewFragment webViewFragment = new WebViewFragment();
-        Bundle bundle = new Bundle();
-        bundle.putString(URL_TO_OPEN, "https://www.epratibha.net/mobile-login/?email=" + credentials[0] + "&pass=" + credentials[1]);
-        bundle.putBoolean(SHOW_LOADING_BETWEEN_PAGES, true);
-        bundle.putBoolean(IS_AUTHENTICATION_REQUIRED, false);
-        bundle.putBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, true);
-        bundle.putBoolean(ENABLE_SWIPE_REFRESH, true);
-        webViewFragment.setArguments(bundle);
-        adapter.addFragment(webViewFragment, storeLabel);
+        adapter.addFragment(new AvailableCourseListFragment(), storeLabel);
     }
 
     private boolean isStoreDisabled() {
@@ -117,17 +90,8 @@ public class CourseListFragment extends BaseFragment {
                 || session.getInstituteSettings().getDisableStoreInApp());
     }
 
-    private boolean isEPratibhaApp() {
-        return requireContext().getPackageName().equals("net.epratibha.www");
-    }
-
     public Boolean onBackPress(){
-        if (webViewFragment != null && isWebViewVisibleToUser && webViewFragment.canGoBack()){
-            webViewFragment.goBack();
-            return false;
-        } else {
-            return true;
-        }
+        return true;
     }
 
     static class Adapter extends FragmentPagerAdapter {
