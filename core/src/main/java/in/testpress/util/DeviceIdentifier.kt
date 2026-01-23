@@ -5,11 +5,14 @@ import android.content.SharedPreferences
 import java.io.File
 import java.util.UUID
 import androidx.security.crypto.EncryptedSharedPreferences
-import androidx.security.crypto.MasterKey
+import androidx.security.crypto.MasterKeys
 
 object DeviceIdentifier {
     private const val PREFS_FILE = "testpress_device_prefs"
     private const val KEY_DEVICE_UID = "device_uid"
+    const val HEADER_DEVICE_UID = "X-Device-UID"
+    const val HEADER_DEVICE_TYPE = "X-Device-Type"
+    const val DEVICE_TYPE_MOBILE = "mobile_app"
     
     @Volatile
     private var deviceUid: String? = null
@@ -27,36 +30,33 @@ object DeviceIdentifier {
             }
 
             val prefs = getEncryptedPrefs(context)
-            var uid = prefs.getString(KEY_DEVICE_UID, null)
-
-            if (uid == null) {
-                uid = UUID.randomUUID().toString()
-                prefs.edit().putString(KEY_DEVICE_UID, uid).apply()
+            val uid = prefs.getString(KEY_DEVICE_UID, null) ?: UUID.randomUUID().toString().also { newUid ->
+                prefs.edit().putString(KEY_DEVICE_UID, newUid).apply()
             }
-
             deviceUid = uid
-            return uid!!
+            return uid
         }
     }
 
     private fun getEncryptedPrefs(context: Context): SharedPreferences {
-        val masterKey = MasterKey.Builder(context)
-            .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
-            .build()
+        val masterKeyAlias = MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC)
 
         return try {
-            createEncryptedPrefs(context, masterKey)
-        } catch (e: Exception) {
+            createEncryptedPrefs(context, masterKeyAlias)
+        } catch (e: java.security.GeneralSecurityException) {
             deleteSharedPreferences(context, PREFS_FILE)
-            createEncryptedPrefs(context, masterKey)
+            createEncryptedPrefs(context, masterKeyAlias)
+        } catch (e: java.io.IOException) {
+            deleteSharedPreferences(context, PREFS_FILE)
+            createEncryptedPrefs(context, masterKeyAlias)
         }
     }
 
-    private fun createEncryptedPrefs(context: Context, masterKey: MasterKey): SharedPreferences {
+    private fun createEncryptedPrefs(context: Context, masterKeyAlias: String): SharedPreferences {
         return EncryptedSharedPreferences.create(
-            context,
             PREFS_FILE,
-            masterKey,
+            masterKeyAlias,
+            context,
             EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
             EncryptedSharedPreferences.PrefValueEncryptionScheme.AES256_GCM
         )
@@ -68,13 +68,13 @@ object DeviceIdentifier {
                 context.deleteSharedPreferences(name)
             } else {
                 context.getSharedPreferences(name, Context.MODE_PRIVATE).edit().clear().commit()
-                val prefsFile = File(context.filesDir.parent + "/shared_prefs/" + name + ".xml")
+                val prefsFile = File(File(context.applicationInfo.dataDir, "shared_prefs"), "$name.xml")
                 if (prefsFile.exists()) {
                     prefsFile.delete()
                 }
             }
         } catch (e: Exception) {
-            e.printStackTrace()
+            android.util.Log.e("DeviceIdentifier", "Failed to delete shared preferences", e)
         }
     }
 }

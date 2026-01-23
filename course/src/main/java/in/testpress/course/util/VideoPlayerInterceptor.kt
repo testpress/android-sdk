@@ -18,8 +18,8 @@ class VideoPlayerInterceptor(val context: Context) : Interceptor {
             val updatedUrl = request.url.newBuilder().host(hostUrl).build()
             request = request.newBuilder()
                 .addHeader("Authorization", "JWT " + session?.token)
-                .addHeader("X-Device-UID", DeviceIdentifier.get(context))
-                .addHeader("X-Device-Type", "mobile_app")
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_UID, DeviceIdentifier.get(context))
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_TYPE, DeviceIdentifier.DEVICE_TYPE_MOBILE)
                 .url(updatedUrl)
                 .build()
         }

@@ -78,8 +78,8 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
             Request.Builder()
                 .url(url)
                 .addHeader("Authorization", authKey)
-                .addHeader("X-Device-UID", DeviceIdentifier.get(activity))
-                .addHeader("X-Device-Type", "mobile_app")
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_UID, DeviceIdentifier.get(activity))
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_TYPE, DeviceIdentifier.DEVICE_TYPE_MOBILE)
                 .build()
         ).execute()
 

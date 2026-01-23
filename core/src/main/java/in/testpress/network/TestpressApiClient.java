@@ -117,11 +117,11 @@ public class TestpressApiClient {
             @Override
             public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
                 Request.Builder header = chain.request().newBuilder()
-                        .addHeader("User-Agent", UserAgentProvider.get(context))
-                        .addHeader("X-Device-UID", DeviceIdentifier.INSTANCE.get(context))
-                        .addHeader("X-Device-Type", "mobile_app");
+                        .addHeader("User-Agent", UserAgentProvider.get(context));
                 if (testpressSession != null) {
-                    header.addHeader("Authorization", "JWT " + testpressSession.getToken());
+                    header.addHeader("Authorization", "JWT " + testpressSession.getToken())
+                            .addHeader(DeviceIdentifier.HEADER_DEVICE_UID, DeviceIdentifier.INSTANCE.get(context))
+                            .addHeader(DeviceIdentifier.HEADER_DEVICE_TYPE, DeviceIdentifier.DEVICE_TYPE_MOBILE);
                 }
                 return chain.proceed(header.build());
             }
