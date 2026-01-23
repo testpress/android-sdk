@@ -30,6 +30,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.Misc;
 import in.testpress.util.UIUtils;
+import in.testpress.util.DeviceIdentifier;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -116,7 +117,9 @@ public class TestpressApiClient {
             @Override
             public okhttp3.Response intercept(Interceptor.Chain chain) throws IOException {
                 Request.Builder header = chain.request().newBuilder()
-                        .addHeader("User-Agent", UserAgentProvider.get(context));
+                        .addHeader("User-Agent", UserAgentProvider.get(context))
+                        .addHeader("X-Device-UID", DeviceIdentifier.INSTANCE.get(context))
+                        .addHeader("X-Device-Type", "mobile_app");
                 if (testpressSession != null) {
                     header.addHeader("Authorization", "JWT " + testpressSession.getToken());
                 }
