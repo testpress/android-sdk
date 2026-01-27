@@ -57,6 +57,7 @@ ext {
     roomPaging = "androidx.room:room-paging:2.4.3"
     roomCompiler = "androidx.room:room-compiler:2.4.3"
     viewPager2 = "androidx.viewpager2:viewpager2:1.0.0"
+    securityCrypto = "androidx.security:security-crypto:1.0.0"
 
     // Media/Player/PDF/Image Dependencies
     exoPlayerCore = "com.google.android.exoplayer:exoplayer-core:2.17.1"

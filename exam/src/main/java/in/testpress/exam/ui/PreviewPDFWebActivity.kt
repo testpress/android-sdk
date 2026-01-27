@@ -9,6 +9,7 @@ import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import `in`.testpress.ui.AbstractWebViewActivity
 import `in`.testpress.util.BaseJavaScriptInterface
+import `in`.testpress.util.DeviceIdentifier
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -77,6 +78,8 @@ class JavaScriptInterface(private val activity: PreviewPDFWebActivity) :
             Request.Builder()
                 .url(url)
                 .addHeader("Authorization", authKey)
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_UID, DeviceIdentifier.get(activity))
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_TYPE, DeviceIdentifier.DEVICE_TYPE_MOBILE)
                 .build()
         ).execute()
 

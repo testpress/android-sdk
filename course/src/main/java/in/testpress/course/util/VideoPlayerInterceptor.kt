@@ -1,6 +1,7 @@
 package `in`.testpress.course.util
 
 import `in`.testpress.core.TestpressSdk
+import `in`.testpress.util.DeviceIdentifier
 import android.content.Context
 import okhttp3.Interceptor
 import okhttp3.Response
@@ -17,6 +18,8 @@ class VideoPlayerInterceptor(val context: Context) : Interceptor {
             val updatedUrl = request.url.newBuilder().host(hostUrl).build()
             request = request.newBuilder()
                 .addHeader("Authorization", "JWT " + session?.token)
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_UID, DeviceIdentifier.get(context))
+                .addHeader(DeviceIdentifier.HEADER_DEVICE_TYPE, DeviceIdentifier.DEVICE_TYPE_MOBILE)
                 .url(updatedUrl)
                 .build()
         }

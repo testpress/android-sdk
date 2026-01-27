@@ -30,6 +30,7 @@ import in.testpress.models.TestpressApiResponse;
 import in.testpress.ui.UserDevicesActivity;
 import in.testpress.util.Misc;
 import in.testpress.util.UIUtils;
+import in.testpress.util.DeviceIdentifier;
 import in.testpress.util.UserAgentProvider;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -118,7 +119,9 @@ public class TestpressApiClient {
                 Request.Builder header = chain.request().newBuilder()
                         .addHeader("User-Agent", UserAgentProvider.get(context));
                 if (testpressSession != null) {
-                    header.addHeader("Authorization", "JWT " + testpressSession.getToken());
+                    header.addHeader("Authorization", "JWT " + testpressSession.getToken())
+                            .addHeader(DeviceIdentifier.HEADER_DEVICE_UID, DeviceIdentifier.INSTANCE.get(context))
+                            .addHeader(DeviceIdentifier.HEADER_DEVICE_TYPE, DeviceIdentifier.DEVICE_TYPE_MOBILE);
                 }
                 return chain.proceed(header.build());
             }

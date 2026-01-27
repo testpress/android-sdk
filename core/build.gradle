@@ -90,6 +90,7 @@ dependencies {
     kapt rootProject.roomCompiler
     api rootProject.kotlinxCoroutinesCore
     api rootProject.kotlinxCoroutinesAndroid
+    api rootProject.securityCrypto
 
     testImplementation rootProject.junit
     testImplementation rootProject.mockito
