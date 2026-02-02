@@ -3,7 +3,7 @@
     tools:ignore="UnusedResources">
 
     <!-- Base application theme. -->
-    <style name="TestpressTheme" parent="Theme.MaterialComponents.Light.DarkActionBar.Bridge">
+    <style name="TestpressTheme" parent="Theme.MaterialComponents.DayNight.DarkActionBar.Bridge">
         <item name="colorPrimary">@color/testpress_actionbar_background</item>
         <item name="colorAccent">@color/testpress_color_primary</item>
         <item name="windowActionBar">false</item>
@@ -79,7 +79,7 @@
         <item name="android:textColor">@color/testpress_button_text_color</item>
     </style>
 
-    <style name="TestpressTextInputLayoutTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="TestpressTextInputLayoutTheme" parent="Theme.AppCompat.DayNight.DarkActionBar">
         <item name="android:textSize">14sp</item>
         <!--Bar Color in False State-->
         <item name="colorControlNormal">#c5c5c5</item>
