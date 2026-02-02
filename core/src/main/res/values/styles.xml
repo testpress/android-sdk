@@ -33,9 +33,9 @@
     </style>
 
     <style name="TestpressAppCompatAlertDialogStyle" parent="Theme.AppCompat.Light.Dialog.Alert">
-        <item name="colorAccent">#08AE9E</item>
-        <item name="android:textColorPrimary">#333333</item>
-        <item name="android:background">#FFFFFF</item>
+        <item name="colorAccent">@color/testpress_dialog_accent</item>
+        <item name="android:textColorPrimary">@color/testpress_black</item>
+        <item name="android:background">@color/testpress_white</item>
     </style>
 
     <style name="Widget.Testpress.HeaderBar.Spinner.Base" parent="Widget.AppCompat.Light.Spinner.DropDown.ActionBar">

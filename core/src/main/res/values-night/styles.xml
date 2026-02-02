@@ -4,13 +4,13 @@
 
     <!-- Dark mode style overrides -->
     <style name="TestpressTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" >
-        <item name="android:background">#1F1F1F</item>
+        <item name="android:background">@color/testpress_white</item>
     </style>
 
     <style name="TestpressAppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
-        <item name="colorAccent">#08AE9E</item>
-        <item name="android:textColorPrimary">#E0E0E0</item>
-        <item name="android:background">#1F1F1F</item>
+        <item name="colorAccent">@color/testpress_dialog_accent</item>
+        <item name="android:textColorPrimary">@color/testpress_black</item>
+        <item name="android:background">@color/testpress_white</item>
     </style>
 
 </resources>
