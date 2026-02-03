@@ -234,15 +234,23 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         TestpressUserDetails.getInstance().profileDetails?.id?.toString()?.let { return it }
         
         return suspendCancellableCoroutine { continuation ->
-            TestpressUserDetails.getInstance().load(requireContext(), object : TestpressCallback<ProfileDetails>() {
+            val call = TestpressUserDetails.getInstance().load(requireContext(), object : TestpressCallback<ProfileDetails>() {
                 override fun onSuccess(userDetails: ProfileDetails) {
-                    continuation.resume(userDetails.id?.toString() ?: "") {}
+                    if (continuation.isActive) {
+                        continuation.resume(userDetails.id?.toString() ?: "") {}
+                    }
                 }
                 
                 override fun onException(exception: TestpressException) {
-                    continuation.resume("") {}
+                    if (continuation.isActive) {
+                        continuation.resume("") {}
+                    }
                 }
             })
+            
+            continuation.invokeOnCancellation {
+                call?.cancel()
+            }
         }
     }
     
