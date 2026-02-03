@@ -4,6 +4,8 @@ import `in`.testpress.course.util.WebViewFactory
 import `in`.testpress.course.R
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.TestpressUserDetails
+import `in`.testpress.core.TestpressCallback
 import `in`.testpress.course.network.NetworkBookmark
 import `in`.testpress.course.network.NetworkHighlight
 import `in`.testpress.course.repository.BookmarkRepository
@@ -11,6 +13,7 @@ import `in`.testpress.course.repository.HighlightRepository
 import `in`.testpress.course.util.AIPdfJsInterface
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
+import `in`.testpress.models.ProfileDetails
 import `in`.testpress.util.webview.WebViewEventListener
 import `in`.testpress.util.webview.BaseWebViewClient
 import `in`.testpress.util.webview.BaseWebChromeClient
@@ -220,10 +223,40 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
         val cacheDir = File(requireContext().filesDir, "web_assets")
         val pdfId = args.learnlensAssetId ?: args.contentId.toString()
-        val replacements = buildTemplateReplacements(
-            args.pdfUrl, pdfId, authToken, args.pdfTitle, args.bookmarks, args.highlights
-        )
         
+        viewLifecycleOwner.lifecycleScope.launch {
+            val userId = getUserId()
+            loadWebViewWithUserId(wv, args, authToken, pdfId, cacheDir, userId)
+        }
+    }
+    
+    private suspend fun getUserId(): String {
+        TestpressUserDetails.getInstance().profileDetails?.id?.toString()?.let { return it }
+        
+        return suspendCancellableCoroutine { continuation ->
+            TestpressUserDetails.getInstance().load(requireContext(), object : TestpressCallback<ProfileDetails>() {
+                override fun onSuccess(userDetails: ProfileDetails) {
+                    continuation.resume(userDetails.id?.toString() ?: "") {}
+                }
+                
+                override fun onException(exception: TestpressException) {
+                    continuation.resume("") {}
+                }
+            })
+        }
+    }
+    
+    private fun loadWebViewWithUserId(
+        wv: WebView,
+        args: PdfArguments,
+        authToken: String,
+        pdfId: String,
+        cacheDir: File,
+        userId: String
+    ) {
+        val replacements = buildTemplateReplacements(
+            args.pdfUrl, pdfId, authToken, args.pdfTitle, userId, args.bookmarks, args.highlights
+        )
         wv.addJavascriptInterface(AIPdfJsInterface(requireActivity(), wv, args.contentId), "AndroidJsInterface")
         wv.loadTemplateAndCacheResources(args.templateName, replacements, "file://${cacheDir.absolutePath}/")
     }
@@ -274,6 +307,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
         pdfId: String,
         authToken: String,
         pdfTitle: String,
+        userId: String,
         bookmarks: List<NetworkBookmark>,
         highlights: List<NetworkHighlight>
     ): Map<String, String> {
@@ -298,6 +332,7 @@ class AIChatPdfFragment : Fragment(), EmptyViewListener, WebViewEventListener {
             "PDF_ID" to pdfId,
             "AUTH_TOKEN" to authToken,
             "PDF_TITLE" to pdfTitle,
+            "USER_ID" to userId,
             "INITIAL_BOOKMARKS_JSON" to bookmarksJson,
             "INITIAL_HIGHLIGHTS_JSON" to highlightsJson
         )
