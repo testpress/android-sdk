@@ -6,6 +6,7 @@ import `in`.testpress.databinding.WebviewFragmentBinding
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.BaseJavaScriptInterface
 import `in`.testpress.util.UserAgentProvider
+import `in`.testpress.util.DeviceIdentifier
 import `in`.testpress.util.webview.CustomWebViewClient
 import `in`.testpress.util.webview.CustomWebChromeClient
 import android.annotation.SuppressLint
@@ -155,6 +156,8 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         if (isAuthenticationRequired){
             headersMap["Authorization"] = "JWT ${session?.token}"
             headersMap["User-Agent"] = UserAgentProvider.get(requireContext())
+            headersMap[DeviceIdentifier.HEADER_DEVICE_UID] = DeviceIdentifier.get(requireContext())
+            headersMap[DeviceIdentifier.HEADER_DEVICE_TYPE] = DeviceIdentifier.DEVICE_TYPE_MOBILE
         }
         return headersMap
     }
