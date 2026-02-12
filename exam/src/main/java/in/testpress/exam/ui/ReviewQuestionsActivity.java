@@ -126,6 +126,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     private Menu optionsMenu;
     String reviewUrl;
     int totalQuestions = 0;
+    boolean languagesFetched = false;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
@@ -542,8 +543,6 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
         setUpLanguageOptionsMenu();
         onSpinnerItemSelected(0);
     }
-
-    boolean languagesFetched = false;
 
     void fetchLanguages() {
         if (exam == null) return;
