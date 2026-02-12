@@ -525,22 +525,29 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                     .where(LanguageDao.Properties.Code.eq(languageCode))
                     .list();
 
-            if (languagesFromDB.isEmpty()) {
-                fetchLanguages();
-            } else {
+            if (!languagesFromDB.isEmpty()) {
                 Language language = languagesFromDB.get(0);
                 uniqueLanguages.put(language.getCode(), language);
             }
         }
-        if (exam != null){
+        if (uniqueLanguages.size() < languageCodes.size()) {
+            if (!languagesFetched) {
+                fetchLanguages();
+                return;
+            }
+        }
+        if (exam != null) {
             exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
         }
         setUpLanguageOptionsMenu();
         onSpinnerItemSelected(0);
     }
 
+    boolean languagesFetched = false;
+
     void fetchLanguages() {
         if (exam == null) return;
+        languagesFetched = true;
         progressBar.setVisibility(View.VISIBLE);
         languageApiRequest = apiClient.getLanguages(exam.getSlug())
                 .enqueue(new TestpressCallback<ApiResponse<List<Language>>>() {
