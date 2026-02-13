@@ -126,6 +126,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
     private Menu optionsMenu;
     String reviewUrl;
     int totalQuestions = 0;
+    boolean languagesFetched = false;
 
     public static Intent createIntent(Activity activity, Exam exam, Attempt attempt) {
         Intent intent = new Intent(activity, ReviewQuestionsActivity.class);
@@ -525,14 +526,18 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
                     .where(LanguageDao.Properties.Code.eq(languageCode))
                     .list();
 
-            if (languagesFromDB.isEmpty()) {
-                fetchLanguages();
-            } else {
+            if (!languagesFromDB.isEmpty()) {
                 Language language = languagesFromDB.get(0);
                 uniqueLanguages.put(language.getCode(), language);
             }
         }
-        if (exam != null){
+        if (uniqueLanguages.size() < languageCodes.size()) {
+            if (!languagesFetched) {
+                fetchLanguages();
+                return;
+            }
+        }
+        if (exam != null) {
             exam.setLanguages(new ArrayList<>(uniqueLanguages.values()));
         }
         setUpLanguageOptionsMenu();
@@ -541,6 +546,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
 
     void fetchLanguages() {
         if (exam == null) return;
+        languagesFetched = true;
         progressBar.setVisibility(View.VISIBLE);
         languageApiRequest = apiClient.getLanguages(exam.getSlug())
                 .enqueue(new TestpressCallback<ApiResponse<List<Language>>>() {
