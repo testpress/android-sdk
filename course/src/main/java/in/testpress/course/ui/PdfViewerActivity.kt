@@ -8,10 +8,10 @@ import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import android.os.Bundle
 import android.view.View
+import `in`.testpress.ui.BaseToolBarActivity
 import android.view.WindowManager
-import androidx.appcompat.app.AppCompatActivity
 
-class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
+class PdfViewerActivity : BaseToolBarActivity(), PdfDownloadListener, DisplayPDFListener {
     private lateinit var binding: LayoutPdfViewerBinding
     private lateinit var pdfDownloadManager: PDFDownloadManager
 
@@ -25,7 +25,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        disableScreenShot()
         binding = LayoutPdfViewerBinding.inflate(layoutInflater)
         setContentView(binding.root)
         hideStatusBar()
@@ -36,13 +35,6 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         } else {
             pdfDownloadManager.download(url)
         }
-    }
-
-    private fun disableScreenShot() {
-        window.setFlags(
-                WindowManager.LayoutParams.FLAG_SECURE,
-                WindowManager.LayoutParams.FLAG_SECURE
-        )
     }
 
     private fun hideStatusBar() {
