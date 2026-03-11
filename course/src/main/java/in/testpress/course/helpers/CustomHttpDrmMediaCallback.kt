@@ -9,8 +9,11 @@ import com.google.android.exoplayer2.drm.MediaDrmCallback
 import java.util.*
 
 
-internal class CustomHttpDrmMediaCallback(val context: Context, val contentId: Long) :
-    MediaDrmCallback {
+internal class CustomHttpDrmMediaCallback @JvmOverloads constructor(
+    val context: Context, 
+    val contentId: Long, 
+    val isDownload: Boolean = false
+) : MediaDrmCallback {
 
     private val httpMediaDrmCallback = HttpMediaDrmCallback(
         "",
@@ -20,7 +23,7 @@ internal class CustomHttpDrmMediaCallback(val context: Context, val contentId: L
     val courseNetwork = CourseNetwork(context)
 
     private fun fetchDrmLicenseURL(): String {
-        val response = courseNetwork.getDRMLicenseURL(contentId).execute()
+        val response = courseNetwork.getDRMLicenseURL(contentId, isDownload).execute()
         return if (response.isSuccessful) {
             val drmLicense = response.body()!!
             drmLicense.licenseUrl ?: ""

@@ -57,8 +57,12 @@ interface CourseService {
         @Body arguments: HashMap<String, Any>
     ): RetrofitCall<Void>
 
-    @POST("/api/v2.5/chapter_contents/{content_id}/drm_license/?download=true")
-    fun getDRMLicenseURL(@Path(value = "content_id", encoded = true) contentId: Long, @Body arguments: HashMap<String, Any>): RetrofitCall<NetworkDRMLicenseAPIResult>
+    @POST("/api/v2.5/chapter_contents/{content_id}/drm_license/")
+    fun getDRMLicenseURL(
+        @Path(value = "content_id", encoded = true) contentId: Long, 
+        @Query("download") download: Boolean?,
+        @Body arguments: HashMap<String, Any>
+    ): RetrofitCall<NetworkDRMLicenseAPIResult>
 
     @GET(V5_PRODUCTS_LIST_PATH + PRODUCTS_CATEGORIES_PATH)
     fun getProductsCategories(
@@ -185,9 +189,12 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
         return getCourseService().syncVideoWatchData(arguments)
     }
 
-    fun getDRMLicenseURL(contentId: Long): RetrofitCall<NetworkDRMLicenseAPIResult> {
-        val args = hashMapOf<String, Any>("download" to true)
-        return getCourseService().getDRMLicenseURL(contentId, args)
+    fun getDRMLicenseURL(contentId: Long, isDownload: Boolean = false): RetrofitCall<NetworkDRMLicenseAPIResult> {
+        return getCourseService().getDRMLicenseURL(
+            contentId = contentId,
+            download = if (isDownload) true else null,
+            arguments = hashMapOf("download" to isDownload)
+        )
     }
 
     fun getProductsCategories(arguments: HashMap<String, Any>): RetrofitCall<ApiResponse<List<ProductCategoryEntity>>> {
