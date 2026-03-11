@@ -51,7 +51,7 @@ class VideoDownloadRequestCreationHandler(
 
     private fun getDownloadHelper(): DownloadHelper {
         val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(CustomHttpDrmMediaCallback(context, content.id))
+            .build(CustomHttpDrmMediaCallback(context, content.id, true))
         sessionManager.setMode(DefaultDrmSessionManager.MODE_DOWNLOAD, null)
         val dataSourceFactory = ExoPlayerDataSourceFactory(context).build()
         val renderersFactory = DefaultRenderersFactory(context)

@@ -27,7 +27,7 @@ object OfflineDRMLicenseHelper {
             val dataSource = DefaultHttpDataSource.Factory().createDataSource()
             val dashManifest = DashUtil.loadManifest(dataSource, Uri.parse(url))
             val sessionManager = DefaultDrmSessionManager.Builder()
-                .build(CustomHttpDrmMediaCallback(context, contentId))
+                .build(CustomHttpDrmMediaCallback(context, contentId, true))
             val drmInitData = DashUtil.loadFormatWithDrmInitData(dataSource, dashManifest.getPeriod(0))
             val keySetId = OfflineLicenseHelper(
                 sessionManager,
@@ -84,7 +84,7 @@ object OfflineDRMLicenseHelper {
 
     fun fetchLicense(context: Context, contentId: Long, downloadHelper: DownloadHelper, callback: DRMLicenseFetchCallback) {
         val sessionManager = DefaultDrmSessionManager.Builder()
-            .build(CustomHttpDrmMediaCallback(context, contentId))
+            .build(CustomHttpDrmMediaCallback(context, contentId, true))
         val offlineLicenseHelper = OfflineLicenseHelper(
             sessionManager, DrmSessionEventListener.EventDispatcher()
         )
