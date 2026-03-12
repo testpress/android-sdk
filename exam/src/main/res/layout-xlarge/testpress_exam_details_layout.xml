@@ -39,7 +39,7 @@
                     android:id="@+id/number_of_questions"
                     style="@style/TestpressExamInfoValue.Tab"
                     android:textStyle="bold"
-                    android:text="200"/>
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -62,7 +62,7 @@
                     android:id="@+id/exam_duration"
                     style="@style/TestpressExamInfoValue.Tab"
                     android:textStyle="bold"
-                    android:text="02:00:00"/>
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -85,7 +85,7 @@
                     android:id="@+id/mark_per_question"
                     style="@style/TestpressExamInfoValue.Tab"
                     android:textStyle="bold"
-                    android:text="200"/>
+                    />
             </LinearLayout>
 
             <LinearLayout
@@ -108,7 +108,7 @@
                     android:id="@+id/negative_marks"
                     style="@style/TestpressExamInfoValue.Tab"
                     android:textStyle="bold"
-                    android:text="200"/>
+                    />
             </LinearLayout>
 
             <LinearLayout

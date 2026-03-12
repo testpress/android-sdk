@@ -303,7 +303,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     fun loadAttemptsAndUpdateStartButton() {
         val observer = Observer<Resource<List<DomainLanguage>>> { resource ->
-            examRefreshListener.showOrHideRefresh(false)
+            hideDefaultLoading()
             when(resource.status) {
                 Status.SUCCESS -> {
                     var exam = content.exam!!
@@ -320,16 +320,16 @@ open class BaseExamWidgetFragment : Fragment() {
             }
         }
 
-        examRefreshListener.showOrHideRefresh(true)
+        showDefaultLoading()
         var url = content.attemptsUrl ?: "/api/v2.3/contents/${content.id}/attempts/"
         viewModel.loadContentAttempts(url, contentId)
             .observe(viewLifecycleOwner, Observer { resource ->
-                examRefreshListener.showOrHideRefresh(false)
+                hideDefaultLoading()
                 when (resource.status) {
                     Status.SUCCESS -> {
                         contentAttempts = resource.data!!
                         val exam = content.exam!!
-                        examRefreshListener.showOrHideRefresh(true)
+                        showDefaultLoading()
                         viewModel.getLanguages(exam.slug!!, exam.id)
                             .observe(viewLifecycleOwner, observer)
                     }
@@ -541,6 +541,14 @@ open class BaseExamWidgetFragment : Fragment() {
     }
 
     open fun display() {}
+
+    open fun showDefaultLoading() {
+        examRefreshListener.showOrHideRefresh(true)
+    }
+
+    open fun hideDefaultLoading() {
+        examRefreshListener.showOrHideRefresh(false)
+    }
 
     override fun onResume() {
         super.onResume()
