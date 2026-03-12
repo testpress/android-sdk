@@ -34,7 +34,7 @@
                 style="@style/TestpressExamInfoValue"
                 android:layout_weight="0.4"
                 android:textStyle="bold"
-                android:text="200"/>
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -58,7 +58,7 @@
                 style="@style/TestpressExamInfoValue"
                 android:layout_weight="0.4"
                 android:textStyle="bold"
-                android:text="02:00:00"/>
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -82,7 +82,7 @@
                 style="@style/TestpressExamInfoValue"
                 android:layout_weight="0.4"
                 android:textStyle="bold"
-                android:text="200"/>
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -106,7 +106,7 @@
                 style="@style/TestpressExamInfoValue"
                 android:layout_weight="0.4"
                 android:textStyle="bold"
-                android:text="200"/>
+                />
         </LinearLayout>
 
         <LinearLayout
@@ -132,7 +132,7 @@
                 style="@style/TestpressExamInfoValue"
                 android:layout_weight="0.4"
                 android:textStyle="bold"
-                android:text="Nov 12, 2017 - forever"/>
+                />
         </LinearLayout>
 
         <LinearLayout

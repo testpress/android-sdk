@@ -34,6 +34,8 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
     private lateinit var webOnlyLabel: TextView
     private lateinit var examStatusMessage: TextView
     private lateinit var examStatusImage: ImageView
+    private lateinit var shimmerContainer: com.facebook.shimmer.ShimmerFrameLayout
+    private lateinit var examDetailsLayout: LinearLayout
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -67,6 +69,8 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
         webOnlyLabel = view.findViewById(R.id.web_only_label)
         examStatusMessage = view.findViewById(R.id.exam_status_message)
         examStatusImage = view.findViewById(R.id.exam_status_image)
+        shimmerContainer = view.findViewById(R.id.shimmer_view_container)
+        examDetailsLayout = view.findViewById(R.id.exam_details_layout)
 
 
         ViewUtils.setTypeface(
@@ -91,6 +95,22 @@ class ExamStartScreenFragment : BaseExamWidgetFragment() {
             ),
             TestpressSdk.getRubikRegularFont(requireActivity())
         )
+    }
+
+    override fun showDefaultLoading() {
+        if (::shimmerContainer.isInitialized) {
+            shimmerContainer.startShimmer()
+            shimmerContainer.visibility = View.VISIBLE
+            examDetailsLayout.visibility = View.GONE
+        }
+    }
+
+    override fun hideDefaultLoading() {
+        if (::shimmerContainer.isInitialized) {
+            shimmerContainer.stopShimmer()
+            shimmerContainer.visibility = View.GONE
+            examDetailsLayout.visibility = View.VISIBLE
+        }
     }
 
     override fun display() {
