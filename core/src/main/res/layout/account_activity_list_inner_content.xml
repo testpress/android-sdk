@@ -6,7 +6,7 @@
     android:orientation="horizontal"
     android:paddingBottom="6dp"
     android:paddingLeft="20dp"
-    android:background="#ffffff"
+    android:background="@color/testpress_white"
     android:paddingRight="5dp">
 
     <ImageView
@@ -23,7 +23,7 @@
             android:id="@+id/ipAddress"
             android:text="@string/ip_address"
             android:textSize="15sp"
-            android:textColor="#333"
+            android:textColor="@color/testpress_black"
             android:textStyle="bold"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -31,7 +31,7 @@
         <TextView
             android:id="@+id/lastUsed"
             android:textSize="13sp"
-            android:textColor="#333"
+            android:textColor="@color/testpress_black"
             android:text="@string/last_used"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
@@ -40,7 +40,7 @@
             android:id="@+id/deviceName"
             android:text="@string/ip_address"
             android:textSize="13sp"
-            android:textColor="#333"
+            android:textColor="@color/testpress_black"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"/>
     </LinearLayout>
