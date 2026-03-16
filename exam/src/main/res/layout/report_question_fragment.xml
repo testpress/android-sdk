@@ -196,7 +196,7 @@
             android:layout_marginTop="16dp"
             android:background="@drawable/rounded_border_edittext"
             android:gravity="top"
-            android:hint="Describe your concern (minimum 100 characters required)"
+            android:hint="Describe your concern"
             android:imeOptions="actionDone"
             android:inputType="textMultiLine"
             android:lines="4"
@@ -209,7 +209,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="8dp"
-            android:text="Please enter at least 100 characters to describe your concern."
+            android:text="Please enter the minimum required characters."
             android:textColor="#d9534f"
             android:visibility="gone" />
 

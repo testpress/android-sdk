@@ -125,6 +125,8 @@ public class TestpressCoreSampleActivity extends BaseToolBarActivity {
         instituteSettings.setEnableOfflineExam(true);
         instituteSettings.setUseNewDiscountFeat(false);
         instituteSettings.setShowOfflineExamEndingAlert(true);
+        instituteSettings.setRequireQuestionReportDescription(false);
+        instituteSettings.setQuestionReportDescriptionMinLength(0);
         TestpressSdk.initialize(this, instituteSettings, userId, accessToken, provider,
                 new TestpressCallback<TestpressSession>() {
                     @Override
