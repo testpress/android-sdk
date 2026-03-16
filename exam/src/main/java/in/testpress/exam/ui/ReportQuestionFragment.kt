@@ -8,6 +8,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.RadioButton
 import androidx.core.view.isVisible
+import androidx.core.widget.doAfterTextChanged
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
@@ -93,7 +94,7 @@ class ReportQuestionFragment : Fragment() {
         val reasonTitle = "Why are you reporting this question? *"
         val spannableReasonTitle = SpannableString(reasonTitle)
         spannableReasonTitle.setSpan(
-            ForegroundColorSpan(Color.RED), 
+            ForegroundColorSpan(Color.parseColor("#d9534f")), 
             reasonTitle.length - 1, 
             reasonTitle.length, 
             Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
@@ -101,7 +102,6 @@ class ReportQuestionFragment : Fragment() {
         binding.reportQuestionTitle2.text = spannableReasonTitle
 
         binding.discriptionInput.hint = hintText
-        binding.descriptionError.text = "Please enter at least $minLength characters."
         validateButtonState()
     }
 
@@ -115,13 +115,9 @@ class ReportQuestionFragment : Fragment() {
         binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
             onChange(checkedId)
         }
-        binding.discriptionInput.addTextChangedListener(object : TextWatcher {
-            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
-            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
-            override fun afterTextChanged(s: Editable?) {
-                validateButtonState()
-            }
-        })
+        binding.discriptionInput.doAfterTextChanged {
+            validateButtonState()
+        }
         binding.discriptionInput.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
                 validateButtonState()
