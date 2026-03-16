@@ -53,6 +53,8 @@ public class InstituteSettings {
     private String videoWatermarkType;
     private String videoWatermarkPosition;
     private Boolean useNewDiscountFeat;
+    private Boolean requireQuestionReportDescription;
+    private Integer questionReportDescriptionMinLength;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -482,6 +484,24 @@ public class InstituteSettings {
 
     public InstituteSettings setUseNewDiscountFeat(Boolean useNewDiscountFeat) {
         this.useNewDiscountFeat = useNewDiscountFeat;
+        return this;
+    }
+
+    public Boolean getRequireQuestionReportDescription() {
+        return requireQuestionReportDescription != null && requireQuestionReportDescription;
+    }
+
+    public InstituteSettings setRequireQuestionReportDescription(Boolean requireQuestionReportDescription) {
+        this.requireQuestionReportDescription = requireQuestionReportDescription;
+        return this;
+    }
+
+    public Integer getQuestionReportDescriptionMinLength() {
+        return questionReportDescriptionMinLength != null ? questionReportDescriptionMinLength : 0;
+    }
+
+    public InstituteSettings setQuestionReportDescriptionMinLength(Integer questionReportDescriptionMinLength) {
+        this.questionReportDescriptionMinLength = questionReportDescriptionMinLength;
         return this;
     }
 }

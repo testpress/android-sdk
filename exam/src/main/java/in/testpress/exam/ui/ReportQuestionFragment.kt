@@ -1,6 +1,8 @@
 package `in`.testpress.exam.ui
 
 import android.os.Bundle
+import android.text.Editable
+import android.text.TextWatcher
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,6 +12,10 @@ import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import android.graphics.Color
+import android.text.Spannable
+import android.text.SpannableString
+import android.text.style.ForegroundColorSpan
 import `in`.testpress.core.TestpressSdk
 import `in`.testpress.enums.Status
 import `in`.testpress.exam.R
@@ -28,6 +34,8 @@ class ReportQuestionFragment : Fragment() {
     private lateinit var binding: ReportQuestionFragmentBinding
     private lateinit var viewModel: ReportQuestionViewModel
     private var position = -1
+    private var minLength = 0
+    private var isDescriptionRequired = false
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -67,7 +75,34 @@ class ReportQuestionFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         initializeClickListener()
         initializeViewModelObserves()
+        updateUIBasedOnSettings()
         changeCustomFont()
+    }
+
+    private fun updateUIBasedOnSettings() {
+        val settings = TestpressSdk.getTestpressSession(requireContext())?.instituteSettings
+        isDescriptionRequired = settings?.requireQuestionReportDescription ?: false
+        minLength = settings?.questionReportDescriptionMinLength ?: 0
+
+        val hintText = if (isDescriptionRequired) {
+            "Describe your concern (minimum $minLength characters required) *"
+        } else {
+            "Describe your concern (Optional)"
+        }
+
+        val reasonTitle = "Why are you reporting this question? *"
+        val spannableReasonTitle = SpannableString(reasonTitle)
+        spannableReasonTitle.setSpan(
+            ForegroundColorSpan(Color.RED), 
+            reasonTitle.length - 1, 
+            reasonTitle.length, 
+            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        )
+        binding.reportQuestionTitle2.text = spannableReasonTitle
+
+        binding.discriptionInput.hint = hintText
+        binding.descriptionError.text = "Please enter at least $minLength characters."
+        validateButtonState()
     }
 
     private fun initializeClickListener() {
@@ -80,34 +115,39 @@ class ReportQuestionFragment : Fragment() {
         binding.radioGroup.setOnCheckedChangeListener { group, checkedId ->
             onChange(checkedId)
         }
+        binding.discriptionInput.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {}
+            override fun afterTextChanged(s: Editable?) {
+                validateButtonState()
+            }
+        })
         binding.discriptionInput.setOnFocusChangeListener { view, hasFocus ->
             if (hasFocus) {
-                binding.descriptionError.isVisible = false
+                validateButtonState()
             }
         }
     }
 
-    private fun submit() {
-        var hasError = false
-        
-        if (position == -1) {
-            binding.radioButtonError.isVisible = true
-            hasError = true
-        } else {
-            binding.radioButtonError.isVisible = false
-        }
-        
+    private fun validateButtonState() {
         val description = binding.discriptionInput.text.toString().trim()
-        if (description.length < 100) {
+        val isReasonSelected = position != -1
+        val isDescriptionValid = !isDescriptionRequired || (description.length >= minLength)
+        
+        binding.radioButtonError.isVisible = !isReasonSelected
+        if (isDescriptionRequired && description.isNotEmpty() && !isDescriptionValid) {
             binding.descriptionError.isVisible = true
-            hasError = true
+            binding.descriptionError.text = "Minimum $minLength characters required. (Currently: ${description.length})"
         } else {
             binding.descriptionError.isVisible = false
         }
-        
-        if (hasError) {
-            return
-        }
+
+        binding.submitButton.isEnabled = isReasonSelected && isDescriptionValid
+        binding.submitButton.alpha = if (binding.submitButton.isEnabled) 1.0f else 0.5f
+    }
+
+    private fun submit() {
+        val description = binding.discriptionInput.text.toString().trim()
         viewModel.submitReportQuestion(
             description,
             examId,
@@ -125,6 +165,7 @@ class ReportQuestionFragment : Fragment() {
     private fun onChange(checkedId: Int) {
         position = binding.radioGroup.indexOfChild(view?.findViewById<RadioButton>(checkedId))
         binding.radioButtonError.isVisible = false
+        validateButtonState()
     }
 
     private fun initializeViewModelObserves() {
