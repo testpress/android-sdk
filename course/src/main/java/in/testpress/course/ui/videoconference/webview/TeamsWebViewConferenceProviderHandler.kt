@@ -33,6 +33,7 @@ class TeamsWebViewConferenceProviderHandler(
 
     @SuppressLint("JavascriptInterface")
     private fun autoJoinTeamsMeetingWeb() {
+        // Best-effort: depends on Teams DOM selectors/text and may break if Teams UI changes.
         val javascript = """
             (function() {
                 var maxRetries = 20;

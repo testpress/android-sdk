@@ -108,9 +108,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             showLoadingAndDisableStartButton()
             when (videoConference?.providerType() ?: VideoConferenceProviderType.ZOOM) {
                 VideoConferenceProviderType.ZOOM -> joinMeeting()
-                VideoConferenceProviderType.MICROSOFT_TEAMS -> {
-                    videoConference?.let { joinWebViewMeeting(it) } ?: hideLoadingAndEnableStartButton()
-                }
+                VideoConferenceProviderType.MICROSOFT_TEAMS -> joinWebViewMeeting(requireNotNull(videoConference))
                 VideoConferenceProviderType.UNKNOWN -> {
                     Toast.makeText(context, "Provider not supported", Toast.LENGTH_LONG).show()
                     hideLoadingAndEnableStartButton()
