@@ -4,6 +4,7 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainVideoConferenceContent
+import `in`.testpress.course.domain.VideoConferenceProviderType
 import `in`.testpress.course.util.VideoConferenceHandler
 import `in`.testpress.course.util.VideoConferenceInitializeListener
 import `in`.testpress.models.ProfileDetails
@@ -22,6 +23,7 @@ import com.auth0.android.jwt.JWT
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import io.sentry.Sentry
+import `in`.testpress.course.ui.WebViewVideoConferenceActivity
 
 class VideoConferenceFragment : BaseContentDetailFragment() {
     private lateinit var titleView: TextView
@@ -84,25 +86,36 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             return
         }
 
-        videoConference?.accessToken?.let { token ->
-            try {
-                if (JWT(token).isExpired(10) && reloadContent < maxReloadContent) {
-                    reloadContent++
-                    forceReloadContent()
+        if (videoConference == null || videoConference.isZoom()) {
+            videoConference?.accessToken?.let { token ->
+                try {
+                    if (JWT(token).isExpired(10) && reloadContent < maxReloadContent) {
+                        reloadContent++
+                        forceReloadContent()
+                        return
+                    }
+                } catch (e: Exception) {
+                    Sentry.captureException(e)
                     return
                 }
-            } catch (e: Exception) {
-                Sentry.captureException(e)
-                return
             }
-        }
 
-        initializeVideoConferenceHandler(videoConference)
+            initializeVideoConferenceHandler(videoConference)
+        }
 
         startButton.visibility = View.VISIBLE
         startButton.setOnClickListener {
             showLoadingAndDisableStartButton()
-            joinMeeting()
+            when (videoConference?.providerType() ?: VideoConferenceProviderType.ZOOM) {
+                VideoConferenceProviderType.ZOOM -> joinMeeting()
+                VideoConferenceProviderType.MICROSOFT_TEAMS -> {
+                    videoConference?.let { joinWebViewMeeting(it) } ?: hideLoadingAndEnableStartButton()
+                }
+                VideoConferenceProviderType.UNKNOWN -> {
+                    Toast.makeText(context, "Provider not supported", Toast.LENGTH_LONG).show()
+                    hideLoadingAndEnableStartButton()
+                }
+            }
         }
     }
 
@@ -308,5 +321,17 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         isRetryingAfterFailure = false
         hideLoadingAndEnableStartButton()
         Toast.makeText(context, "Could not join meeting. Please refresh the page and try again.", Toast.LENGTH_LONG).show()
+    }
+
+    private fun joinWebViewMeeting(videoConference: DomainVideoConferenceContent) {
+        val joinUrl = videoConference.joinUrl
+        if (!joinUrl.isNullOrEmpty()) {
+            val intent = WebViewVideoConferenceActivity.createIntent(requireContext(), joinUrl, content.title, videoConference.provider)
+            startActivity(intent)
+            viewModel.createContentAttempt(contentId)
+        } else {
+            Toast.makeText(context, "Ready to start, but meeting link is missing", Toast.LENGTH_LONG).show()
+        }
+        hideLoadingAndEnableStartButton()
     }
 }

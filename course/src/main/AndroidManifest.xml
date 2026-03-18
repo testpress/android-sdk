@@ -100,6 +100,11 @@
             android:theme="@style/TestpressTheme" />
 
         <activity
+            android:name=".ui.WebViewVideoConferenceActivity"
+            android:configChanges="orientation|keyboardHidden|screenSize"
+            android:theme="@style/TestpressTheme" />
+
+        <activity
             android:name=".ui.CustomTestGenerationActivity"
             android:configChanges="orientation|keyboardHidden|screenSize"
             android:theme="@style/TestpressTheme" />

@@ -7,6 +7,22 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.TimeZone
 
+enum class VideoConferenceProviderType {
+    ZOOM,
+    MICROSOFT_TEAMS,
+    UNKNOWN;
+
+    companion object {
+        fun fromProviderName(provider: String?): VideoConferenceProviderType {
+            return when {
+                provider == null || provider.equals("Zoom", ignoreCase = true) -> ZOOM
+                provider.equals("Microsoft Teams", ignoreCase = true) -> MICROSOFT_TEAMS
+                else -> UNKNOWN
+            }
+        }
+    }
+}
+
 data class DomainVideoConferenceContent(
     val id: Long? = null,
     val conferenceId: String? = null,
@@ -39,6 +55,12 @@ data class DomainVideoConferenceContent(
     fun formattedStartDate() = formattedDate(start ?: "")
 
     fun isEnded() = state?.equals("ended", ignoreCase = true) == true
+
+    fun providerType() = VideoConferenceProviderType.fromProviderName(provider)
+
+    fun isZoom() = providerType() == VideoConferenceProviderType.ZOOM
+
+    fun isWebViewProvider() = providerType() == VideoConferenceProviderType.MICROSOFT_TEAMS
 }
 
 fun createDomainVideoConferenceContent(video: VideoConference): DomainVideoConferenceContent {
