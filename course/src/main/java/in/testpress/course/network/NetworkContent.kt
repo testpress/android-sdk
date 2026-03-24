@@ -4,6 +4,8 @@ import `in`.testpress.database.ContentEntity
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.models.greendao.Content
+import com.google.gson.annotations.SerializedName
+
 
 data class NetworkContent(
     val id: Long,
@@ -54,8 +56,16 @@ data class NetworkContent(
     val nextContentId: Long? = null,
     val hasEnded: Boolean? = null,
     val examStartUrl: String? = null,
+    @SerializedName("is_ai_enabled")
     val isAIEnabled: Boolean? = null,
-    val learnlensAssetId: String? = null
+    @SerializedName("learnlens_asset_id")
+    val learnlensAssetId: String? = null,
+    @SerializedName("can_enable_learnlens_ai")
+    val canEnableLearnLensAI: Boolean? = null,
+    @SerializedName("ai_notes_url")
+    val aiNotesUrl: String? = null,
+    @SerializedName("learnlens_asset_status")
+    val learnlensAssetStatus: String? = null
 )
 
 fun NetworkContent.asDatabaseModel(): ContentEntity {
@@ -87,7 +97,10 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         hasEnded = this.hasEnded,
         examStartUrl = this.examStartUrl,
         isAIEnabled = this.isAIEnabled,
-        learnlensAssetId = this.learnlensAssetId
+        learnlensAssetId = this.learnlensAssetId,
+        canEnableLearnLensAI = this.canEnableLearnLensAI,
+        aiNotesUrl = this.aiNotesUrl,
+        learnlensAssetStatus = this.learnlensAssetStatus
     )
     contentEntity.title = this.title
     contentEntity.order = this.order
@@ -138,6 +151,9 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.examStartUrl,
         this.isAIEnabled,
         this.learnlensAssetId,
+        this.canEnableLearnLensAI,
+        this.aiNotesUrl,
+        this.learnlensAssetStatus,
         this.courseId,
         this.chapterId,
         this.videoConferenceId,

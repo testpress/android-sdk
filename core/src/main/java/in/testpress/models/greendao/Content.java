@@ -64,7 +64,14 @@ public class Content implements android.os.Parcelable {
     @SerializedName("is_ai_enabled")
     @Property(nameInDb = "IS_AI_ENABLED")
     private Boolean isAIEnabled;
+    @SerializedName(value="learnlensAssetId", alternate={"learnlens_asset_id"})
     private String learnlensAssetId;
+    @SerializedName("can_enable_learnlens_ai")
+    private Boolean canEnableLearnLensAI;
+    @SerializedName("ai_notes_url")
+    private String aiNotesUrl;
+    @SerializedName("learnlens_asset_status")
+    private String learnlensAssetStatus;
     private Long courseId;
     private Long chapterId;
     private Long videoConferenceId;
@@ -142,7 +149,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -176,6 +183,9 @@ public class Content implements android.os.Parcelable {
         this.examStartUrl = examStartUrl;
         this.isAIEnabled = isAIEnabled;
         this.learnlensAssetId = learnlensAssetId;
+        this.canEnableLearnLensAI = canEnableLearnLensAI;
+        this.aiNotesUrl = aiNotesUrl;
+        this.learnlensAssetStatus = learnlensAssetStatus;
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.videoConferenceId = videoConferenceId;
@@ -455,6 +465,30 @@ public class Content implements android.os.Parcelable {
 
     public void setLearnlensAssetId(String learnlensAssetId) {
         this.learnlensAssetId = learnlensAssetId;
+    }
+
+    public Boolean getCanEnableLearnLensAI() {
+        return canEnableLearnLensAI;
+    }
+
+    public void setCanEnableLearnLensAI(Boolean canEnableLearnLensAI) {
+        this.canEnableLearnLensAI = canEnableLearnLensAI;
+    }
+
+    public String getAiNotesUrl() {
+        return aiNotesUrl;
+    }
+
+    public void setAiNotesUrl(String aiNotesUrl) {
+        this.aiNotesUrl = aiNotesUrl;
+    }
+
+    public String getLearnlensAssetStatus() {
+        return learnlensAssetStatus;
+    }
+
+    public void setLearnlensAssetStatus(String learnlensAssetStatus) {
+        this.learnlensAssetStatus = learnlensAssetStatus;
     }
 
     public Long getCourseId() {
