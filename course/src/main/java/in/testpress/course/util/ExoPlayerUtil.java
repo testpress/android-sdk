@@ -118,12 +118,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private Dialog fullscreenDialog;
     private View fullscreenRootView;
     private FrameLayout fullscreenPlayerContainer;
-    private FrameLayout fullscreenAiContainer;
-    private OnAiContainerReadyListener onAiContainerReadyListener;
-    private boolean aiContainerReadyNotified = false;
+    private FrameLayout fullscreenSidePanelContainer;
+    private OnSidePanelReadyListener onSidePanelReadyListener;
+    private boolean sidePanelReadyNotified = false;
 
-    public interface OnAiContainerReadyListener {
-        void onAiContainerReady();
+    public interface OnSidePanelReadyListener {
+        void onSidePanelReady();
     }
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
@@ -397,43 +397,43 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
     }
 
-    public void showAiContainer(View view) {
-        if (fullscreenAiContainer != null) {
-            fullscreenAiContainer.removeAllViews();
+    public void showSidePanel(View view) {
+        if (fullscreenSidePanelContainer != null) {
+            fullscreenSidePanelContainer.removeAllViews();
             if (view != null) {
                 if (view.getParent() != null) {
                     ((ViewGroup) view.getParent()).removeView(view);
                 }
-                fullscreenAiContainer.addView(view);
-                fullscreenAiContainer.setVisibility(View.VISIBLE);
+                fullscreenSidePanelContainer.addView(view);
+                fullscreenSidePanelContainer.setVisibility(View.VISIBLE);
             }
         }
     }
 
-    public void hideAiContainer() {
-        if (fullscreenAiContainer != null) {
-            fullscreenAiContainer.setVisibility(View.GONE);
+    public void hideSidePanel() {
+        if (fullscreenSidePanelContainer != null) {
+            fullscreenSidePanelContainer.setVisibility(View.GONE);
         }
     }
 
-    public boolean isAiContainerAvailable() {
-        return fullscreenAiContainer != null;
+    public boolean isSidePanelAvailable() {
+        return fullscreenSidePanelContainer != null;
     }
 
-    public boolean isAiContainerVisible() {
-        return fullscreenAiContainer != null && fullscreenAiContainer.getVisibility() == View.VISIBLE;
+    public boolean isSidePanelVisible() {
+        return fullscreenSidePanelContainer != null && fullscreenSidePanelContainer.getVisibility() == View.VISIBLE;
     }
 
-    public void setOnAiContainerReadyListener(OnAiContainerReadyListener listener) {
-        this.onAiContainerReadyListener = listener;
-        notifyAiContainerReadyIfNeeded();
+    public void setOnSidePanelReadyListener(OnSidePanelReadyListener listener) {
+        this.onSidePanelReadyListener = listener;
+        notifySidePanelReadyIfNeeded();
     }
 
-    private void notifyAiContainerReadyIfNeeded() {
-        if (fullscreenAiContainer == null || onAiContainerReadyListener == null) return;
-        if (aiContainerReadyNotified) return;
-        aiContainerReadyNotified = true;
-        onAiContainerReadyListener.onAiContainerReady();
+    private void notifySidePanelReadyIfNeeded() {
+        if (fullscreenSidePanelContainer == null || onSidePanelReadyListener == null) return;
+        if (sidePanelReadyNotified) return;
+        sidePanelReadyNotified = true;
+        onSidePanelReadyListener.onSidePanelReady();
     }
 
     private void initResolutionSelector() {
@@ -727,8 +727,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         exoPlayerMainFrame.removeView(exoPlayerLayout);
         fullscreenRootView = activity.getLayoutInflater().inflate(R.layout.exo_fullscreen_with_side_panel, null);
         fullscreenPlayerContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_player_container);
-        fullscreenAiContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_ai_container);
-        aiContainerReadyNotified = false;
+        fullscreenSidePanelContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_side_panel_container);
+        sidePanelReadyNotified = false;
         fullscreenPlayerContainer.addView(exoPlayerLayout, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -736,7 +736,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
         fullscreenDialog.show();
-        notifyAiContainerReadyIfNeeded();
+        notifySidePanelReadyIfNeeded();
     }
 
     private void changeOrientation(int orientation) {
@@ -756,7 +756,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (!iscloseFullscreenDialogCalled) {
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled = true;
-            hideAiContainer();
+            hideSidePanel();
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
@@ -778,19 +778,19 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
         fullscreenRootView = null;
         fullscreenPlayerContainer = null;
-        fullscreenAiContainer = null;
-        aiContainerReadyNotified = false;
+        fullscreenSidePanelContainer = null;
+        sidePanelReadyNotified = false;
         exoPlayerMainFrame.addView(exoPlayerLayout);
         fullscreenDialog.dismiss();
     }
 
-    public FrameLayout getFullscreenAiContainer() {
-        return fullscreenAiContainer;
+    public FrameLayout getFullscreenSidePanelContainer() {
+        return fullscreenSidePanelContainer;
     }
 
-    public void setFullscreenAiContainerVisible(boolean visible) {
-        if (fullscreenAiContainer == null) return;
-        fullscreenAiContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
+    public void setFullscreenSidePanelVisible(boolean visible) {
+        if (fullscreenSidePanelContainer == null) return;
+        fullscreenSidePanelContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void setFullscreenIcon(@DrawableRes int imageResId) {

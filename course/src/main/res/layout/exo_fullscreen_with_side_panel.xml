@@ -13,7 +13,7 @@
         android:layout_weight="1" />
 
     <FrameLayout
-        android:id="@+id/exo_fullscreen_ai_container"
+        android:id="@+id/exo_fullscreen_side_panel_container"
         android:layout_width="360dp"
         android:layout_height="match_parent"
         android:visibility="gone" />

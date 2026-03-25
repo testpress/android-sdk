@@ -136,7 +136,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
                 }
             })
 
-        exoPlayerUtil?.setOnAiContainerReadyListener {
+        exoPlayerUtil?.setOnSidePanelReadyListener {
             if (isAiPanelRequested) {
                 aiAssetId?.let { assetId ->
                     attachAiToSidePanel(assetId, aiNotesUrl)
@@ -189,9 +189,9 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
         val util = exoPlayerUtil ?: return
         val act = activity ?: return
 
-        if (util.isAiContainerAvailable) {
+        if (util.isSidePanelAvailable) {
             val content = getOrCreateAiSidePanelContent(act, util)
-            util.showAiContainer(content.createView(act))
+            util.showSidePanel(content.createView(act))
             content.mount(assetId, notesUrl)
         }
     }
@@ -202,7 +202,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
             onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
             onCloseRequested = { 
                 isAiPanelRequested = false
-                util.hideAiContainer()
+                util.hideSidePanel()
                 getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
             }
         ).also { aiSidePanelContent = it }
@@ -211,9 +211,9 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
     private fun toggleAiSidePanel() {
         val util = exoPlayerUtil ?: return
         
-        if (util.isAiContainerVisible) {
+        if (util.isSidePanelVisible) {
             isAiPanelRequested = false
-            util.hideAiContainer()
+            util.hideSidePanel()
             getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         } else {
             aiAssetId?.let { showVideoAISidePanel(it, aiNotesUrl) }
@@ -222,7 +222,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
 
     override fun hideVideoAISidePanel(notifyHost: Boolean) {
         isAiPanelRequested = false
-        exoPlayerUtil?.hideAiContainer()
+        exoPlayerUtil?.hideSidePanel()
         if (notifyHost) {
             getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         }
