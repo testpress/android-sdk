@@ -119,6 +119,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private View fullscreenRootView;
     private FrameLayout fullscreenPlayerContainer;
     private FrameLayout fullscreenAiContainer;
+    private OnAiContainerReadyListener onAiContainerReadyListener;
+
+    public interface OnAiContainerReadyListener {
+        void onAiContainerReady();
+    }
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
     private LinearLayout noticeScreen;
@@ -407,6 +412,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     public boolean isAiContainerVisible() {
         return fullscreenAiContainer != null && fullscreenAiContainer.getVisibility() == View.VISIBLE;
+    }
+
+    public void setOnAiContainerReadyListener(OnAiContainerReadyListener listener) {
+        this.onAiContainerReadyListener = listener;
+        if (isAiContainerAvailable() && listener != null) {
+            listener.onAiContainerReady();
+        }
     }
 
     private void initResolutionSelector() {
@@ -708,6 +720,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
         fullscreenDialog.show();
+        if (onAiContainerReadyListener != null) {
+            onAiContainerReadyListener.onAiContainerReady();
+        }
     }
 
     private void changeOrientation(int orientation) {
