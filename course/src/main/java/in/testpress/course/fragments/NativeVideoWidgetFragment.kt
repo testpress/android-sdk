@@ -1,6 +1,5 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
@@ -43,6 +42,10 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     interface VideoAIButtonHost {
         fun onVideoAIButtonClicked(isFullscreen: Boolean)
+    }
+
+    interface VideoAIPanelStateHost {
+        fun onVideoAIPanelStateChanged(isOpen: Boolean)
     }
 
     override fun onCreateView(
@@ -172,12 +175,17 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         return (parentFragment as? VideoAIButtonHost) ?: (activity as? VideoAIButtonHost)
     }
 
+    private fun getVideoAIPanelStateHost(): VideoAIPanelStateHost? {
+        return (parentFragment as? VideoAIPanelStateHost) ?: (activity as? VideoAIPanelStateHost)
+    }
+
     fun setAiPanelRequested(requested: Boolean) {
         this.isAiPanelRequested = requested
     }
 
     fun showAiSidePanel(assetId: String, notesUrl: String?) {
         isAiPanelRequested = true
+        getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(true)
         attachAiToSidePanel(assetId, notesUrl)
     }
 
@@ -198,7 +206,8 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
             onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
             onCloseRequested = { 
                 isAiPanelRequested = false
-                util.hideAiContainer() 
+                util.hideAiContainer()
+                getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
             }
         ).also { aiPlayerController = it }
     }
@@ -209,15 +218,17 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         if (util.isAiContainerVisible) {
             isAiPanelRequested = false
             util.hideAiContainer()
+            getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         } else {
             aiAssetId?.let { showAiSidePanel(it, aiNotesUrl) }
         }
     }
 
-    override fun onConfigurationChanged(newConfig: Configuration) {
-        super.onConfigurationChanged(newConfig)
-        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
-            isAiPanelRequested = false
+    fun hideAiSidePanel(notifyHost: Boolean = true) {
+        isAiPanelRequested = false
+        exoPlayerUtil?.hideAiContainer()
+        if (notifyHost) {
+            getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         }
     }
 

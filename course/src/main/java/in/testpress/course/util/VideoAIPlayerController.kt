@@ -46,8 +46,8 @@ class VideoAIPlayerController(
     }
 
     fun mount(assetId: String, notesUrl: String?) {
-        val root = rootView ?: return
-        
+        if (rootView == null) return
+
         if (webView == null) {
             val wv = WebView(activity)
             webView = wv

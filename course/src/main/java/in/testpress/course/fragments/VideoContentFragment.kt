@@ -47,6 +47,7 @@ import java.util.regex.Pattern
 open class VideoContentFragment : BaseContentDetailFragment(),
     VideoQuestionSheetFragment.OnQuestionCompleteListener,
     NativeVideoWidgetFragment.VideoAIButtonHost,
+    NativeVideoWidgetFragment.VideoAIPanelStateHost,
     VideoAIFragment.Host {
     protected lateinit var titleView: TextView
     protected lateinit var description: TextView
@@ -61,6 +62,11 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private lateinit var contentRepository: ContentRepository
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
     private var askAiFab: View? = null
+    private var isVideoAIOpen: Boolean = false
+
+    companion object {
+        private const val STATE_VIDEO_AI_OPEN = "state_video_ai_open"
+    }
 
     private val questionCallbackHandler = Handler(Looper.getMainLooper()) { message ->
         val positionInSeconds = message.what.toLong()
@@ -74,6 +80,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        isVideoAIOpen = savedInstanceState?.getBoolean(STATE_VIDEO_AI_OPEN) ?: false
         VideoDownloadService.start(requireContext())
         offlineVideoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -83,6 +90,11 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
         videoQuestionViewModel = ViewModelProvider(this).get(VideoQuestionViewModel::class.java)
         contentRepository = ContentRepository(requireContext())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putBoolean(STATE_VIDEO_AI_OPEN, isVideoAIOpen)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateView(
@@ -240,6 +252,9 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         }
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
+        transaction.runOnCommit {
+            syncVideoAIForOrientation()
+        }
         transaction.commit()
         if (videoWidgetFragment.enabledVideoQuestion) {
             fetchVideoQuestions()
@@ -252,6 +267,13 @@ open class VideoContentFragment : BaseContentDetailFragment(),
             showDownloadStatus()
         }
         updateVideoAIUIState()
+        syncVideoAIForOrientation()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateVideoAIUIState()
+        syncVideoAIForOrientation()
     }
 
     override fun onDestroyView() {
@@ -276,14 +298,50 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun toggleVideoAIPanel() {
         if (!canUseVideoAI()) return
+        if (isVideoAIOpen) {
+            closeVideoAIPanel()
+        } else {
+            openVideoAIPanel()
+        }
+    }
+
+    private fun openVideoAIPanel() {
+        isVideoAIOpen = true
+        syncVideoAIForOrientation()
+    }
+
+    private fun closeVideoAIPanel() {
+        isVideoAIOpen = false
+        val nativePlayer = (videoWidgetFragment as? NativeVideoWidgetFragment)
+        nativePlayer?.setAiPanelRequested(false)
+        nativePlayer?.hideAiSidePanel()
+        VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+        updateVideoAIUIState()
+    }
+
+    private fun syncVideoAIForOrientation() {
+        if (!canUseVideoAI()) {
+            if (isVideoAIOpen) closeVideoAIPanel()
+            return
+        }
+
+        val nativePlayer = (videoWidgetFragment as? NativeVideoWidgetFragment) ?: return
         val assetId = content.learnlensAssetId ?: return
         val notesUrl = content.aiNotesUrl
-        val nativePlayer = (videoWidgetFragment as? NativeVideoWidgetFragment)
 
+        if (!isVideoAIOpen) {
+            nativePlayer.setAiPanelRequested(false)
+            nativePlayer.hideAiSidePanel(notifyHost = false)
+            VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+            return
+        }
+
+        nativePlayer.setAiPanelRequested(true)
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            nativePlayer?.showAiSidePanel(assetId, notesUrl)
+            VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+            nativePlayer.showAiSidePanel(assetId, notesUrl)
         } else {
-            nativePlayer?.setAiPanelRequested(true)
+            nativePlayer.hideAiSidePanel(notifyHost = false)
             VideoAIBottomPanelDialogFragment.showOrReuse(this, assetId, notesUrl)
         }
     }
@@ -297,7 +355,12 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     override fun onVideoAICloseRequested() {
-        VideoAIBottomPanelDialogFragment.dismissIfPresent(this)
+        closeVideoAIPanel()
+    }
+
+    override fun onVideoAIPanelStateChanged(isOpen: Boolean) {
+        isVideoAIOpen = isOpen
+        updateVideoAIUIState()
     }
 
 

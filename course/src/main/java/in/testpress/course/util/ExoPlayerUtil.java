@@ -379,12 +379,18 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public void setAiButtonVisible(boolean visible) {
+        if (aiButton == null && playerView != null) {
+            aiButton = playerView.findViewById(R.id.exo_ai_button);
+        }
         if (aiButton != null) {
             aiButton.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
 
     public void setAiButtonOnClickListener(View.OnClickListener listener) {
+        if (aiButton == null && playerView != null) {
+            aiButton = playerView.findViewById(R.id.exo_ai_button);
+        }
         if (aiButton != null) {
             aiButton.setOnClickListener(listener);
         }

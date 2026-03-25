@@ -53,6 +53,13 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
             (fm.findFragmentByTag(DEFAULT_TAG) as? VideoAIBottomPanelDialogFragment)
                 ?.dismissAllowingStateLoss()
         }
+
+        fun hideIfPresent(host: androidx.fragment.app.Fragment) {
+            val fm = host.childFragmentManager
+            (fm.findFragmentByTag(DEFAULT_TAG) as? VideoAIBottomPanelDialogFragment)
+                ?.dialog
+                ?.hide()
+        }
     }
 
     private var assetId: String = ""
@@ -100,7 +107,7 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
-            dismissAllowingStateLoss()
+            dialog?.hide()
             return
         }
         refreshPanelAppearance()
@@ -115,7 +122,7 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
         if (newConfig.orientation != Configuration.ORIENTATION_PORTRAIT) {
-            dismissAllowingStateLoss()
+            dialog?.hide()
         }
     }
 
@@ -192,5 +199,6 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
 
     override fun onVideoAICloseRequested() {
         dialog?.hide()
+        resolveHost()?.onVideoAICloseRequested()
     }
 }
