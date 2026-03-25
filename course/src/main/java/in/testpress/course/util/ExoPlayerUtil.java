@@ -394,6 +394,9 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (fullscreenAiContainer != null) {
             fullscreenAiContainer.removeAllViews();
             if (view != null) {
+                if (view.getParent() != null) {
+                    ((ViewGroup) view.getParent()).removeView(view);
+                }
                 fullscreenAiContainer.addView(view);
                 fullscreenAiContainer.setVisibility(View.VISIBLE);
             }
@@ -742,6 +745,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (!iscloseFullscreenDialogCalled) {
             isopenFullscreenDialogCalled = false;
             iscloseFullscreenDialogCalled = true;
+            hideAiContainer();
             changeOrientation(ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT);
             removePlayerViewFromDialog();
             setFullscreenIcon(R.drawable.testpress_fullscreen);
