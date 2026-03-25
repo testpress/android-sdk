@@ -109,12 +109,16 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
     private DoubleTapPlayerView playerView;
+    private FrameLayout aiButton;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public ExoPlayer player;
     private ImageView fullscreenIcon;
     private Dialog fullscreenDialog;
+    private View fullscreenRootView;
+    private FrameLayout fullscreenPlayerContainer;
+    private FrameLayout fullscreenAiContainer;
     private TrackSelectionDialog trackSelectionDialog;
     private YouTubeOverlay youtubeOverlay;
     private LinearLayout noticeScreen;
@@ -182,6 +186,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
         speedRateSpinner = exoPlayerMainFrame.findViewById(R.id.exo_speed_rate_spinner);
+        aiButton = playerView.findViewById(R.id.exo_ai_button);
         String[] speedValues = activity.getResources().getStringArray(R.array.exo_speed_values);
         speedSpinnerAdapter =
                 new ExploreSpinnerAdapter(activity.getLayoutInflater(), activity.getResources(), false);
@@ -362,6 +367,46 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (player != null){
             player.seekTo(milliSeconds);
         }
+    }
+
+    public boolean isFullscreen() {
+        return fullscreen;
+    }
+
+    public void setAiButtonVisible(boolean visible) {
+        if (aiButton != null) {
+            aiButton.setVisibility(visible ? View.VISIBLE : View.GONE);
+        }
+    }
+
+    public void setAiButtonOnClickListener(View.OnClickListener listener) {
+        if (aiButton != null) {
+            aiButton.setOnClickListener(listener);
+        }
+    }
+
+    public void showAiContainer(View view) {
+        if (fullscreenAiContainer != null) {
+            fullscreenAiContainer.removeAllViews();
+            if (view != null) {
+                fullscreenAiContainer.addView(view);
+                fullscreenAiContainer.setVisibility(View.VISIBLE);
+            }
+        }
+    }
+
+    public void hideAiContainer() {
+        if (fullscreenAiContainer != null) {
+            fullscreenAiContainer.setVisibility(View.GONE);
+        }
+    }
+
+    public boolean isAiContainerAvailable() {
+        return fullscreenAiContainer != null;
+    }
+
+    public boolean isAiContainerVisible() {
+        return fullscreenAiContainer != null && fullscreenAiContainer.getVisibility() == View.VISIBLE;
     }
 
     private void initResolutionSelector() {
@@ -653,7 +698,13 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     private void addPlayerLayoutToDialog() {
         exoPlayerMainFrame.removeView(exoPlayerLayout);
-        fullscreenDialog.addContentView(exoPlayerLayout, new ViewGroup.LayoutParams(
+        fullscreenRootView = activity.getLayoutInflater().inflate(R.layout.exo_fullscreen_with_side_panel, null);
+        fullscreenPlayerContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_player_container);
+        fullscreenAiContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_ai_container);
+        fullscreenPlayerContainer.addView(exoPlayerLayout, new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+
+        fullscreenDialog.setContentView(fullscreenRootView, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
         fullscreenDialog.show();
@@ -691,9 +742,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void removePlayerViewFromDialog() {
-        ((ViewGroup) exoPlayerLayout.getParent()).removeView(exoPlayerLayout);
+        ViewGroup parent = (ViewGroup) exoPlayerLayout.getParent();
+        if (parent != null) {
+            parent.removeView(exoPlayerLayout);
+        }
+        fullscreenRootView = null;
+        fullscreenPlayerContainer = null;
+        fullscreenAiContainer = null;
         exoPlayerMainFrame.addView(exoPlayerLayout);
         fullscreenDialog.dismiss();
+    }
+
+    public FrameLayout getFullscreenAiContainer() {
+        return fullscreenAiContainer;
+    }
+
+    public void setFullscreenAiContainerVisible(boolean visible) {
+        if (fullscreenAiContainer == null) return;
+        fullscreenAiContainer.setVisibility(visible ? View.VISIBLE : View.GONE);
     }
 
     private void setFullscreenIcon(@DrawableRes int imageResId) {

@@ -40,10 +40,14 @@ import `in`.testpress.course.network.NetworkVideoQuestion
 import `in`.testpress.enums.Status
 import `in`.testpress.core.TestpressException
 import android.widget.Toast
-
+import android.content.res.Configuration
+import androidx.core.view.isVisible
 import java.util.regex.Pattern
 
-open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionSheetFragment.OnQuestionCompleteListener {
+open class VideoContentFragment : BaseContentDetailFragment(),
+    VideoQuestionSheetFragment.OnQuestionCompleteListener,
+    NativeVideoWidgetFragment.VideoAIButtonHost,
+    VideoAIFragment.Host {
     protected lateinit var titleView: TextView
     protected lateinit var description: TextView
     protected lateinit var titleLayout: LinearLayout
@@ -56,6 +60,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
 
     private lateinit var contentRepository: ContentRepository
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
+    private var askAiFab: View? = null
 
     private val questionCallbackHandler = Handler(Looper.getMainLooper()) { message ->
         val positionInSeconds = message.what.toLong()
@@ -93,6 +98,8 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         titleView = view.findViewById(R.id.title)
         description = view.findViewById(R.id.description)
         titleLayout = view.findViewById(R.id.title_layout)
+        askAiFab = view.findViewById(R.id.ask_ai_fab)
+        askAiFab?.setOnClickListener { toggleVideoAIPanel() }
         initializeListeners()
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
         initializeRemainingDownloadsCount()
@@ -225,6 +232,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
+        updateVideoAIUIState()
         if (content.video!!.isDownloadable() && instituteSettings.isVideoDownloadEnabled) {
             showDownloadStatus()
         } else if (::menu.isInitialized) {
@@ -243,7 +251,53 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         if(isContentInitialized() && instituteSettings.isVideoDownloadEnabled && content.video!!.isDownloadable()) {
             showDownloadStatus()
         }
+        updateVideoAIUIState()
     }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val act = activity ?: return
+        if (!act.isChangingConfigurations && (isRemoving || act.isFinishing)) {
+            VideoAIBottomPanelDialogFragment.dismissIfPresent(this)
+        }
+    }
+
+    private fun canUseVideoAI(): Boolean {
+        if (!::videoWidgetFragment.isInitialized) return false
+        return videoWidgetFragment is NativeVideoWidgetFragment && 
+               content.canEnableLearnLensAI == true && 
+               !content.learnlensAssetId.isNullOrBlank()
+    }
+
+    private fun updateVideoAIUIState() {
+        val showFab = canUseVideoAI() && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        askAiFab?.isVisible = showFab
+    }
+
+    private fun toggleVideoAIPanel() {
+        if (!canUseVideoAI()) return
+        val assetId = content.learnlensAssetId ?: return
+        val notesUrl = content.aiNotesUrl
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            (videoWidgetFragment as? NativeVideoWidgetFragment)?.showAiSidePanel(assetId, notesUrl)
+        } else {
+            VideoAIBottomPanelDialogFragment.showOrReuse(this, assetId, notesUrl)
+        }
+    }
+
+    override fun onVideoAIButtonClicked(isFullscreen: Boolean) {
+        toggleVideoAIPanel()
+    }
+
+    override fun onVideoAISeek(seconds: Double) {
+        videoWidgetFragment.seekTo((seconds * 1000).toLong())
+    }
+
+    override fun onVideoAICloseRequested() {
+        VideoAIBottomPanelDialogFragment.dismissIfPresent(this)
+    }
+
 
     private fun showDownloadStatus() {
         offlineVideoViewModel.get(content.video!!.getPlaybackURL()!!).observe(viewLifecycleOwner, Observer {
