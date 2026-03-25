@@ -62,13 +62,17 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private lateinit var contentRepository: ContentRepository
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
     private var askAiFab: View? = null
-    private var isVideoAIOpen: Boolean = false
+    private var openPanel: OpenPanel? = null
     
     private val nativeVideoWidgetFragment: NativeVideoWidgetFragment?
         get() = if (::videoWidgetFragment.isInitialized) videoWidgetFragment as? NativeVideoWidgetFragment else null
 
     companion object {
-        private const val STATE_VIDEO_AI_OPEN = "state_video_ai_open"
+        private const val STATE_OPEN_PANEL = "state_open_panel"
+    }
+
+    private enum class OpenPanel {
+        AI,
     }
 
     private val questionCallbackHandler = Handler(Looper.getMainLooper()) { message ->
@@ -83,7 +87,15 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        isVideoAIOpen = savedInstanceState?.getBoolean(STATE_VIDEO_AI_OPEN) ?: false
+        openPanel = savedInstanceState
+            ?.getString(STATE_OPEN_PANEL)
+            ?.let { name ->
+                try {
+                    OpenPanel.valueOf(name)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            }
         VideoDownloadService.start(requireContext())
         offlineVideoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -96,7 +108,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
-        outState.putBoolean(STATE_VIDEO_AI_OPEN, isVideoAIOpen)
+        outState.putString(STATE_OPEN_PANEL, openPanel?.name)
         super.onSaveInstanceState(outState)
     }
 
@@ -301,7 +313,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun toggleVideoAIPanel() {
         val config = getVideoAIConfigOrNull() ?: return
-        if (isVideoAIOpen) closeVideoAIPanel() else openVideoAIPanel(config)
+        if (openPanel == OpenPanel.AI) closeVideoAIPanel() else openVideoAIPanel(config)
     }
 
     private data class VideoAIConfig(
@@ -321,12 +333,12 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     private fun openVideoAIPanel(config: VideoAIConfig) {
-        isVideoAIOpen = true
+        openPanel = OpenPanel.AI
         showVideoAIPanelForCurrentOrientation(config)
     }
 
     private fun closeVideoAIPanel() {
-        isVideoAIOpen = false
+        openPanel = null
         hideVideoAIPanel()
         updateVideoAIUIState()
     }
@@ -340,11 +352,11 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         val config = getVideoAIConfigOrNull()
 
         if (config == null) {
-            if (isVideoAIOpen) closeVideoAIPanel()
+            if (openPanel != null) closeVideoAIPanel()
             return
         }
 
-        if (!isVideoAIOpen) {
+        if (openPanel != OpenPanel.AI) {
             hideVideoAIPanel(notifySidePanel = false)
             return
         }
@@ -379,7 +391,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     override fun onVideoAIPanelStateChanged(isOpen: Boolean) {
-        isVideoAIOpen = isOpen
+        openPanel = if (isOpen) OpenPanel.AI else null
         updateVideoAIUIState()
     }
 

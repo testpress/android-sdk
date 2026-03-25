@@ -109,7 +109,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private FrameLayout exoPlayerMainFrame;
     private View exoPlayerLayout;
     private DoubleTapPlayerView playerView;
-    private FrameLayout aiButton;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
@@ -192,7 +191,6 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
         speedRateSpinner = exoPlayerMainFrame.findViewById(R.id.exo_speed_rate_spinner);
-        aiButton = playerView.findViewById(R.id.exo_ai_button);
         String[] speedValues = activity.getResources().getStringArray(R.array.exo_speed_values);
         speedSpinnerAdapter =
                 new ExploreSpinnerAdapter(activity.getLayoutInflater(), activity.getResources(), false);
@@ -379,22 +377,28 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         return fullscreen;
     }
 
-    public void setAiButtonVisible(boolean visible) {
-        if (aiButton == null && playerView != null) {
-            aiButton = playerView.findViewById(R.id.exo_ai_button);
-        }
-        if (aiButton != null) {
-            aiButton.setVisibility(visible ? View.VISIBLE : View.GONE);
+    public void setPlayerActionButtonVisible(int viewId, boolean visible) {
+        if (playerView == null) return;
+        View view = playerView.findViewById(viewId);
+        if (view != null) {
+            view.setVisibility(visible ? View.VISIBLE : View.GONE);
         }
     }
 
+    public void setPlayerActionButtonOnClickListener(int viewId, View.OnClickListener listener) {
+        if (playerView == null) return;
+        View view = playerView.findViewById(viewId);
+        if (view != null) {
+            view.setOnClickListener(listener);
+        }
+    }
+
+    public void setAiButtonVisible(boolean visible) {
+        setPlayerActionButtonVisible(R.id.exo_ai_button, visible);
+    }
+
     public void setAiButtonOnClickListener(View.OnClickListener listener) {
-        if (aiButton == null && playerView != null) {
-            aiButton = playerView.findViewById(R.id.exo_ai_button);
-        }
-        if (aiButton != null) {
-            aiButton.setOnClickListener(listener);
-        }
+        setPlayerActionButtonOnClickListener(R.id.exo_ai_button, listener);
     }
 
     public void showSidePanel(View view) {
