@@ -71,11 +71,12 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
 
     private fun handleReuse(newAssetId: String, newNotesUrl: String?) {
         updateArguments(newAssetId, newNotesUrl)
-        if (dialog?.isShowing == true) {
+        if (dialog != null) {
+            dialog?.show()
             refreshPanelAppearance()
             mountVideoAIContent()
         } else {
-            // Re-show logic if fragmented was hidden or state-lost
+            // Re-show logic if fragment was restored without an active dialog
             dismissAllowingStateLoss()
             createNewInstance(parentFragmentManager, newAssetId, newNotesUrl)
         }
@@ -118,7 +119,11 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
         }
 
         val fm = childFragmentManager
-        if (fm.findFragmentByTag(INNER_FRAGMENT_TAG) != null) return
+        val existing = fm.findFragmentByTag(INNER_FRAGMENT_TAG) as? VideoAIFragment
+
+        if (existing != null && existing.arguments?.getString(VideoAIFragment.ARG_ASSET_ID) == assetId) {
+            return
+        }
 
         val fragment = VideoAIFragment.newInstance(assetId, notesUrl)
         fm.beginTransaction()

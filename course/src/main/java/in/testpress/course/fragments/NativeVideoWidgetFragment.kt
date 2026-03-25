@@ -25,11 +25,6 @@ import `in`.testpress.network.Resource
 import android.content.res.Configuration
 
 class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
-    companion object {
-        private const val AI_RETRY_MAX_ATTEMPTS = 10
-        private const val AI_RETRY_DELAY_MS = 120L
-    }
-
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
@@ -173,19 +168,11 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         val util = exoPlayerUtil ?: return
         val act = activity ?: return
 
-        fun attachAndShow(tryIndex: Int) {
-            if (util.isAiContainerAvailable) {
-                val controller = getOrCreateAiController(act, util)
-                util.showAiContainer(controller.createView(act))
-                controller.mount(assetId, notesUrl)
-                return
-            }
-            if (tryIndex < AI_RETRY_MAX_ATTEMPTS) {
-                exoPlayerMainFrame.postDelayed({ attachAndShow(tryIndex + 1) }, AI_RETRY_DELAY_MS)
-            }
+        util.setOnAiContainerReadyListener {
+            val controller = getOrCreateAiController(act, util)
+            util.showAiContainer(controller.createView(act))
+            controller.mount(assetId, notesUrl)
         }
-
-        attachAndShow(0)
     }
 
     private fun getOrCreateAiController(act: android.app.Activity, util: ExoPlayerUtil): VideoAIPlayerController {

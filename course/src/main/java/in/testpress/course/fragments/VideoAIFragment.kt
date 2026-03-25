@@ -106,7 +106,8 @@ class VideoAIFragment : Fragment(), WebViewEventListener, VideoAIJsInterface.Hos
         val cacheDir = File(requireContext().filesDir, "web_assets")
 
         viewLifecycleOwner.lifecycleScope.launch {
-            val userId = VideoAIUserIdProvider.getUserId(requireContext())
+            val context = context ?: return@launch
+            val userId = VideoAIUserIdProvider.getUserId(context)
             val replacements = mapOf(
                 "ASSET_ID" to assetId,
                 "AUTH_TOKEN" to authToken,
