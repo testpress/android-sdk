@@ -63,6 +63,9 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
     private var askAiFab: View? = null
     private var isVideoAIOpen: Boolean = false
+    
+    private val nativeVideoWidgetFragment: NativeVideoWidgetFragment?
+        get() = if (::videoWidgetFragment.isInitialized) videoWidgetFragment as? NativeVideoWidgetFragment else null
 
     companion object {
         private const val STATE_VIDEO_AI_OPEN = "state_video_ai_open"
@@ -314,7 +317,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     private fun getVideoAISidePanelContractOrNull(): VideoAISidePanelContract? {
-        return videoWidgetFragment as? VideoAISidePanelContract
+        return nativeVideoWidgetFragment
     }
 
     private fun openVideoAIPanel(config: VideoAIConfig) {
@@ -366,7 +369,9 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     override fun onVideoAISeek(seconds: Double) {
-        videoWidgetFragment.seekTo((seconds * 1000).toLong())
+        if (::videoWidgetFragment.isInitialized) {
+            videoWidgetFragment.seekTo((seconds * 1000).toLong())
+        }
     }
 
     override fun onVideoAICloseRequested() {
@@ -494,7 +499,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         videoQuestionViewModel.setQuestions(validQuestions)
         val positions = videoQuestionViewModel.getUniquePositions()
 
-        (videoWidgetFragment as? NativeVideoWidgetFragment)?.let {
+        nativeVideoWidgetFragment?.let {
             it.registerPositionCallbacks(
                 positions,
                 questionCallbackHandler
@@ -510,7 +515,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
             return
         }
 
-        (videoWidgetFragment as? NativeVideoWidgetFragment)?.pauseVideo()
+        nativeVideoWidgetFragment?.pauseVideo()
         VideoQuestionSheetFragment.newInstance(question)
             .show(childFragmentManager, "VideoQuestionSheetFragment")
     }
@@ -523,7 +528,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
             VideoQuestionSheetFragment.newInstance(nextQuestion)
                 .show(childFragmentManager, "VideoQuestionSheetFragment")
         } else {
-            (videoWidgetFragment as? NativeVideoWidgetFragment)?.playVideo()
+            nativeVideoWidgetFragment?.playVideo()
         }
     }
 }
