@@ -1,15 +1,9 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.core.TestpressException
-import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
-import `in`.testpress.course.util.VideoAIUserIdProvider
 import `in`.testpress.course.util.VideoAIJsInterface
+import `in`.testpress.course.util.VideoAIWebViewRenderer
 import `in`.testpress.util.webview.BaseWebChromeClient
-import `in`.testpress.util.webview.BaseWebViewClient
-import `in`.testpress.util.webview.WebView
-import `in`.testpress.util.webview.WebViewEventListener
-import android.annotation.SuppressLint
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -19,15 +13,12 @@ import android.widget.ProgressBar
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import kotlinx.coroutines.launch
-import java.io.File
 
-class VideoAIFragment : Fragment(), WebViewEventListener, VideoAIJsInterface.Host {
+class VideoAIFragment : Fragment(), VideoAIJsInterface.Host {
 
     companion object {
         const val ARG_ASSET_ID = "assetId"
         const val ARG_NOTES_URL = "notesUrl"
-        private const val TEMPLATE_NAME = "video_ai_template.html"
 
         fun newInstance(assetId: String, notesUrl: String?): VideoAIFragment {
             return VideoAIFragment().apply {
@@ -44,10 +35,10 @@ class VideoAIFragment : Fragment(), WebViewEventListener, VideoAIJsInterface.Hos
         fun onVideoAICloseRequested()
     }
 
-    private var webView: WebView? = null
     private var progressBar: ProgressBar? = null
     private var container: FrameLayout? = null
     private lateinit var webChromeClient: BaseWebChromeClient
+    private var webViewRenderer: VideoAIWebViewRenderer? = null
     private var assetId: String = ""
     private var notesUrl: String = ""
 
@@ -82,40 +73,20 @@ class VideoAIFragment : Fragment(), WebViewEventListener, VideoAIJsInterface.Hos
     }
 
     private fun setupAndLoadWebView() {
-        val wv = WebView(requireContext())
-        webView = wv
-        container?.addView(wv)
-        
-        configureWebView()
-        loadTemplate()
-    }
+        val targetContainer = container ?: return
+        val act = activity ?: return
 
-    @SuppressLint("JavascriptInterface", "AddJavascriptInterface")
-    private fun configureWebView() {
-        webView?.let { wv ->
-            wv.enableFileAccess()
-            wv.webViewClient = BaseWebViewClient(this)
-            wv.webChromeClient = webChromeClient
-            wv.addJavascriptInterface(VideoAIJsInterface(requireActivity(), this), "AndroidVideoAI")
-        }
-    }
+        val renderer = webViewRenderer ?: VideoAIWebViewRenderer(
+            activity = act,
+            scope = viewLifecycleOwner.lifecycleScope,
+            jsHost = this,
+            isViewActive = { isAdded },
+            onLoadingChanged = { isLoading -> toggleLoadingState(isLoading) },
+            webChromeClient = webChromeClient,
+        ).also { webViewRenderer = it }
 
-    private fun loadTemplate() {
-        toggleLoadingState(true)
-        val authToken = TestpressSdk.getTestpressSession(requireContext())?.token ?: ""
-        val cacheDir = File(requireContext().filesDir, "web_assets")
-
-        viewLifecycleOwner.lifecycleScope.launch {
-            val context = context ?: return@launch
-            val userId = VideoAIUserIdProvider.getUserId(context)
-            val replacements = mapOf(
-                "ASSET_ID" to assetId,
-                "AUTH_TOKEN" to authToken,
-                "USER_ID" to userId,
-                "NOTES_URL" to notesUrl
-            )
-            webView?.loadTemplateAndCacheResources(TEMPLATE_NAME, replacements, "file://${cacheDir.absolutePath}/")
-        }
+        renderer.attach(targetContainer)
+        renderer.mount(assetId, notesUrl)
     }
 
     private fun toggleLoadingState(isLoading: Boolean) {
@@ -130,24 +101,11 @@ class VideoAIFragment : Fragment(), WebViewEventListener, VideoAIJsInterface.Hos
     override fun onDestroyView() {
         super.onDestroyView()
         webChromeClient.cleanup()
-        cleanupWebView()
-    }
-
-    private fun cleanupWebView() {
-        webView?.let { wv ->
-            wv.stopLoading()
-            container?.removeView(wv)
-            wv.destroy()
-        }
-        webView = null
+        webViewRenderer?.destroy()
+        webViewRenderer = null
         progressBar = null
         container = null
     }
-
-    override fun onLoadingStarted() = toggleLoadingState(true)
-    override fun onLoadingFinished() = toggleLoadingState(false)
-    override fun onError(exception: TestpressException) = toggleLoadingState(false)
-    override fun isViewActive(): Boolean = isAdded
 
     override fun onSeek(seconds: Double) {
         findHost()?.onVideoAISeek(seconds)

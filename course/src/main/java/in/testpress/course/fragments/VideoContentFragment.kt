@@ -286,7 +286,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun canUseVideoAI(): Boolean {
         if (!::videoWidgetFragment.isInitialized) return false
-        return videoWidgetFragment is NativeVideoWidgetFragment && 
+        return videoWidgetFragment is VideoAISidePanelContract &&
                content.canEnableLearnLensAI == true && 
                !content.learnlensAssetId.isNullOrBlank()
     }
@@ -297,52 +297,67 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     private fun toggleVideoAIPanel() {
-        if (!canUseVideoAI()) return
-        if (isVideoAIOpen) {
-            closeVideoAIPanel()
-        } else {
-            openVideoAIPanel()
-        }
+        val config = getVideoAIConfigOrNull() ?: return
+        if (isVideoAIOpen) closeVideoAIPanel() else openVideoAIPanel(config)
     }
 
-    private fun openVideoAIPanel() {
+    private data class VideoAIConfig(
+        val assetId: String,
+        val notesUrl: String?,
+    )
+
+    private fun getVideoAIConfigOrNull(): VideoAIConfig? {
+        if (!canUseVideoAI()) return null
+        val assetId = content.learnlensAssetId ?: return null
+        if (assetId.isBlank()) return null
+        return VideoAIConfig(assetId = assetId, notesUrl = content.aiNotesUrl)
+    }
+
+    private fun getVideoAISidePanelContractOrNull(): VideoAISidePanelContract? {
+        return videoWidgetFragment as? VideoAISidePanelContract
+    }
+
+    private fun openVideoAIPanel(config: VideoAIConfig) {
         isVideoAIOpen = true
-        syncVideoAIForOrientation()
+        showVideoAIPanelForCurrentOrientation(config)
     }
 
     private fun closeVideoAIPanel() {
         isVideoAIOpen = false
-        val nativePlayer = (videoWidgetFragment as? NativeVideoWidgetFragment)
-        nativePlayer?.setAiPanelRequested(false)
-        nativePlayer?.hideAiSidePanel()
-        VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+        hideVideoAIPanel()
         updateVideoAIUIState()
     }
 
+    private fun hideVideoAIPanel(notifySidePanel: Boolean = true) {
+        getVideoAISidePanelContractOrNull()?.hideVideoAISidePanel(notifyHost = notifySidePanel)
+        VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+    }
+
     private fun syncVideoAIForOrientation() {
-        if (!canUseVideoAI()) {
+        val config = getVideoAIConfigOrNull()
+
+        if (config == null) {
             if (isVideoAIOpen) closeVideoAIPanel()
             return
         }
 
-        val nativePlayer = (videoWidgetFragment as? NativeVideoWidgetFragment) ?: return
-        val assetId = content.learnlensAssetId ?: return
-        val notesUrl = content.aiNotesUrl
-
         if (!isVideoAIOpen) {
-            nativePlayer.setAiPanelRequested(false)
-            nativePlayer.hideAiSidePanel(notifyHost = false)
-            VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+            hideVideoAIPanel(notifySidePanel = false)
             return
         }
 
-        nativePlayer.setAiPanelRequested(true)
+        showVideoAIPanelForCurrentOrientation(config)
+    }
+
+    private fun showVideoAIPanelForCurrentOrientation(config: VideoAIConfig) {
+        val sidePanel = getVideoAISidePanelContractOrNull() ?: return
+
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
             VideoAIBottomPanelDialogFragment.hideIfPresent(this)
-            nativePlayer.showAiSidePanel(assetId, notesUrl)
+            sidePanel.showVideoAISidePanel(config.assetId, config.notesUrl)
         } else {
-            nativePlayer.hideAiSidePanel(notifyHost = false)
-            VideoAIBottomPanelDialogFragment.showOrReuse(this, assetId, notesUrl)
+            sidePanel.hideVideoAISidePanel(notifyHost = false)
+            VideoAIBottomPanelDialogFragment.showOrReuse(this, config.assetId, config.notesUrl)
         }
     }
 

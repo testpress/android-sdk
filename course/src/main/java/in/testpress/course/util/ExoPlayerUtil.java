@@ -120,6 +120,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private FrameLayout fullscreenPlayerContainer;
     private FrameLayout fullscreenAiContainer;
     private OnAiContainerReadyListener onAiContainerReadyListener;
+    private boolean aiContainerReadyNotified = false;
 
     public interface OnAiContainerReadyListener {
         void onAiContainerReady();
@@ -425,9 +426,14 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     public void setOnAiContainerReadyListener(OnAiContainerReadyListener listener) {
         this.onAiContainerReadyListener = listener;
-        if (isAiContainerAvailable() && listener != null) {
-            listener.onAiContainerReady();
-        }
+        notifyAiContainerReadyIfNeeded();
+    }
+
+    private void notifyAiContainerReadyIfNeeded() {
+        if (fullscreenAiContainer == null || onAiContainerReadyListener == null) return;
+        if (aiContainerReadyNotified) return;
+        aiContainerReadyNotified = true;
+        onAiContainerReadyListener.onAiContainerReady();
     }
 
     private void initResolutionSelector() {
@@ -722,6 +728,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenRootView = activity.getLayoutInflater().inflate(R.layout.exo_fullscreen_with_side_panel, null);
         fullscreenPlayerContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_player_container);
         fullscreenAiContainer = fullscreenRootView.findViewById(R.id.exo_fullscreen_ai_container);
+        aiContainerReadyNotified = false;
         fullscreenPlayerContainer.addView(exoPlayerLayout, new ViewGroup.LayoutParams(
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
 
@@ -729,9 +736,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
         fullscreenDialog.getWindow().addFlags(FLAG_SECURE);
         fullscreenDialog.show();
-        if (onAiContainerReadyListener != null) {
-            onAiContainerReadyListener.onAiContainerReady();
-        }
+        notifyAiContainerReadyIfNeeded();
     }
 
     private void changeOrientation(int orientation) {
@@ -774,6 +779,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenRootView = null;
         fullscreenPlayerContainer = null;
         fullscreenAiContainer = null;
+        aiContainerReadyNotified = false;
         exoPlayerMainFrame.addView(exoPlayerLayout);
         fullscreenDialog.dismiss();
     }

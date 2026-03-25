@@ -7,7 +7,7 @@ import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
-import `in`.testpress.course.util.VideoAIPlayerController
+import `in`.testpress.course.util.VideoAISidePanelContent
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -23,7 +23,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import `in`.testpress.network.Resource
 import android.content.res.Configuration
 
-class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
+class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelContract {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
@@ -35,7 +35,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         ExoplayerFullscreenHelper(activity)
     }
 
-    private var aiPlayerController: VideoAIPlayerController? = null
+    private var aiSidePanelContent: VideoAISidePanelContent? = null
     private var aiAssetId: String? = null
     private var aiNotesUrl: String? = null
     private var isAiPanelRequested: Boolean = false
@@ -179,11 +179,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         return (parentFragment as? VideoAIPanelStateHost) ?: (activity as? VideoAIPanelStateHost)
     }
 
-    fun setAiPanelRequested(requested: Boolean) {
-        this.isAiPanelRequested = requested
-    }
-
-    fun showAiSidePanel(assetId: String, notesUrl: String?) {
+    override fun showVideoAISidePanel(assetId: String, notesUrl: String?) {
         isAiPanelRequested = true
         getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(true)
         attachAiToSidePanel(assetId, notesUrl)
@@ -194,14 +190,14 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         val act = activity ?: return
 
         if (util.isAiContainerAvailable) {
-            val controller = getOrCreateAiController(act, util)
-            util.showAiContainer(controller.createView(act))
-            controller.mount(assetId, notesUrl)
+            val content = getOrCreateAiSidePanelContent(act, util)
+            util.showAiContainer(content.createView(act))
+            content.mount(assetId, notesUrl)
         }
     }
 
-    private fun getOrCreateAiController(act: android.app.Activity, util: ExoPlayerUtil): VideoAIPlayerController {
-        return aiPlayerController ?: VideoAIPlayerController(
+    private fun getOrCreateAiSidePanelContent(act: android.app.Activity, util: ExoPlayerUtil): VideoAISidePanelContent {
+        return aiSidePanelContent ?: VideoAISidePanelContent(
             activity = act,
             onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
             onCloseRequested = { 
@@ -209,7 +205,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                 util.hideAiContainer()
                 getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
             }
-        ).also { aiPlayerController = it }
+        ).also { aiSidePanelContent = it }
     }
 
     private fun toggleAiSidePanel() {
@@ -220,11 +216,11 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
             util.hideAiContainer()
             getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         } else {
-            aiAssetId?.let { showAiSidePanel(it, aiNotesUrl) }
+            aiAssetId?.let { showVideoAISidePanel(it, aiNotesUrl) }
         }
     }
 
-    fun hideAiSidePanel(notifyHost: Boolean = true) {
+    override fun hideVideoAISidePanel(notifyHost: Boolean) {
         isAiPanelRequested = false
         exoPlayerUtil?.hideAiContainer()
         if (notifyHost) {
@@ -258,8 +254,8 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
-        aiPlayerController?.destroy()
-        aiPlayerController = null
+        aiSidePanelContent?.destroy()
+        aiSidePanelContent = null
         exoplayerFullscreenHelper?.disableOrientationListener()
     }
 
