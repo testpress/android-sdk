@@ -278,10 +278,12 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         if (!canUseVideoAI()) return
         val assetId = content.learnlensAssetId ?: return
         val notesUrl = content.aiNotesUrl
+        val nativePlayer = (videoWidgetFragment as? NativeVideoWidgetFragment)
 
         if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
-            (videoWidgetFragment as? NativeVideoWidgetFragment)?.showAiSidePanel(assetId, notesUrl)
+            nativePlayer?.showAiSidePanel(assetId, notesUrl)
         } else {
+            nativePlayer?.setAiPanelRequested(true)
             VideoAIBottomPanelDialogFragment.showOrReuse(this, assetId, notesUrl)
         }
     }

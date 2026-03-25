@@ -39,6 +39,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     private var aiPlayerController: VideoAIPlayerController? = null
     private var aiAssetId: String? = null
     private var aiNotesUrl: String? = null
+    private var isAiPanelRequested: Boolean = false
 
     interface VideoAIButtonHost {
         fun onVideoAIButtonClicked(isFullscreen: Boolean)
@@ -130,8 +131,15 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                         exoPlayerUtil?.initializePlayer()
                     }
                 }
-
             })
+
+        exoPlayerUtil?.setOnAiContainerReadyListener {
+            if (isAiPanelRequested) {
+                aiAssetId?.let { assetId ->
+                    attachAiToSidePanel(assetId, aiNotesUrl)
+                }
+            }
+        }
     }
 
     private fun isVideoAIEnabled(content: DomainContent): Boolean {
@@ -164,11 +172,20 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         return (parentFragment as? VideoAIButtonHost) ?: (activity as? VideoAIButtonHost)
     }
 
+    fun setAiPanelRequested(requested: Boolean) {
+        this.isAiPanelRequested = requested
+    }
+
     fun showAiSidePanel(assetId: String, notesUrl: String?) {
+        isAiPanelRequested = true
+        attachAiToSidePanel(assetId, notesUrl)
+    }
+
+    private fun attachAiToSidePanel(assetId: String, notesUrl: String?) {
         val util = exoPlayerUtil ?: return
         val act = activity ?: return
 
-        util.setOnAiContainerReadyListener {
+        if (util.isAiContainerAvailable) {
             val controller = getOrCreateAiController(act, util)
             util.showAiContainer(controller.createView(act))
             controller.mount(assetId, notesUrl)
@@ -179,7 +196,10 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         return aiPlayerController ?: VideoAIPlayerController(
             activity = act,
             onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
-            onCloseRequested = { util.hideAiContainer() }
+            onCloseRequested = { 
+                isAiPanelRequested = false
+                util.hideAiContainer() 
+            }
         ).also { aiPlayerController = it }
     }
 
@@ -187,9 +207,17 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         val util = exoPlayerUtil ?: return
         
         if (util.isAiContainerVisible) {
+            isAiPanelRequested = false
             util.hideAiContainer()
         } else {
             aiAssetId?.let { showAiSidePanel(it, aiNotesUrl) }
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            isAiPanelRequested = false
         }
     }
 

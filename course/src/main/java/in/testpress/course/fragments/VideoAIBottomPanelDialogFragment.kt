@@ -100,7 +100,7 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
     override fun onStart() {
         super.onStart()
         if (resources.configuration.orientation != Configuration.ORIENTATION_PORTRAIT) {
-            dialog?.hide()
+            dismissAllowingStateLoss()
             return
         }
         refreshPanelAppearance()
@@ -110,6 +110,13 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
     override fun onResume() {
         super.onResume()
         refreshPanelAppearance()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation != Configuration.ORIENTATION_PORTRAIT) {
+            dismissAllowingStateLoss()
+        }
     }
 
     private fun mountVideoAIContent() {
