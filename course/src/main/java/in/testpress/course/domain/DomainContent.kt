@@ -149,6 +149,34 @@ fun DomainVideoSubtitle.jobStatusEnum(): VideoSubtitleJobStatus {
     }
 }
 
+private fun toDomainVideoSubtitle(
+    url: String?,
+    language: String?,
+    jobStatus: String?,
+): DomainVideoSubtitle? {
+    return DomainVideoSubtitle(
+        url = url,
+        language = language,
+        jobStatus = jobStatus
+    ).takeIf { it.url != null || it.language != null || it.jobStatus != null }
+}
+
+private fun ContentEntity.toDomainVideoSubtitle(): DomainVideoSubtitle? {
+    return toDomainVideoSubtitle(
+        url = videoSubtitleUrl,
+        language = videoSubtitleLanguage,
+        jobStatus = videoSubtitleJobStatus,
+    )
+}
+
+private fun Content.toDomainVideoSubtitle(): DomainVideoSubtitle? {
+    return toDomainVideoSubtitle(
+        url = videoSubtitleUrl,
+        language = videoSubtitleLanguage,
+        jobStatus = videoSubtitleJobStatus,
+    )
+}
+
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
     return DomainContent(
         id = contentEntity.id,
@@ -193,11 +221,7 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         aiNotesUrl = contentEntity.aiNotesUrl,
         learnlensAssetStatus = contentEntity.learnlensAssetStatus,
         enableTranscript = contentEntity.enableTranscript,
-        videoSubtitle = DomainVideoSubtitle(
-            url = contentEntity.videoSubtitleUrl,
-            language = contentEntity.videoSubtitleLanguage,
-            jobStatus = contentEntity.videoSubtitleJobStatus
-        ).takeIf { it.url != null || it.language != null || it.jobStatus != null }
+        videoSubtitle = contentEntity.toDomainVideoSubtitle()
     )
 }
 
@@ -255,11 +279,7 @@ fun createDomainContent(content: Content): DomainContent {
         aiNotesUrl = content.aiNotesUrl,
         learnlensAssetStatus = content.learnlensAssetStatus,
         enableTranscript = content.enableTranscript,
-        videoSubtitle = DomainVideoSubtitle(
-            url = content.videoSubtitleUrl,
-            language = content.videoSubtitleLanguage,
-            jobStatus = content.videoSubtitleJobStatus
-        ).takeIf { it.url != null || it.language != null || it.jobStatus != null }
+        videoSubtitle = content.toDomainVideoSubtitle()
     )
 }
 
