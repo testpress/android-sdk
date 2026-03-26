@@ -154,10 +154,18 @@ class VideoAIBottomPanelDialogFragment : DialogFragment(), VideoAIFragment.Host 
 
     private fun applyPanelConstraints(window: android.view.Window) {
         val screenHeight = getScreenHeight()
-        val minHeight = dpToPx(320)
-        val maxHeight = screenHeight - dpToPx(120)
-        
-        val targetHeight = max((screenHeight * 0.6f).toInt(), minHeight).coerceAtMost(maxHeight)
+        val isTablet = resources.configuration.smallestScreenWidthDp >= 600
+
+        val targetHeight = if (isTablet) {
+            val minHeight = dpToPx(280)
+            val preferredHeight = (screenHeight * 0.48f).toInt()
+            val maxHeight = (screenHeight * 0.55f).toInt().coerceAtLeast(minHeight)
+            preferredHeight.coerceIn(minHeight, maxHeight)
+        } else {
+            val minHeight = dpToPx(320)
+            val maxHeight = screenHeight - dpToPx(120)
+            max((screenHeight * 0.6f).toInt(), minHeight).coerceAtMost(maxHeight)
+        }
         
         window.setLayout(ViewGroup.LayoutParams.MATCH_PARENT, targetHeight)
         window.setGravity(Gravity.BOTTOM)
