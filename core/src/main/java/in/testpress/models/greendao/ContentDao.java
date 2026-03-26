@@ -60,14 +60,17 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property ExamStartUrl = new Property(30, String.class, "examStartUrl", false, "EXAM_START_URL");
         public final static Property IsAIEnabled = new Property(31, Boolean.class, "isAIEnabled", false, "IS_AI_ENABLED");
         public final static Property LearnlensAssetId = new Property(32, String.class, "learnlensAssetId", false, "LEARNLENS_ASSET_ID");
-        public final static Property CourseId = new Property(33, Long.class, "courseId", false, "COURSE_ID");
-        public final static Property ChapterId = new Property(34, Long.class, "chapterId", false, "CHAPTER_ID");
-        public final static Property VideoConferenceId = new Property(35, Long.class, "videoConferenceId", false, "VIDEO_CONFERENCE_ID");
-        public final static Property LiveStreamId = new Property(36, Long.class, "liveStreamId", false, "LIVE_STREAM_ID");
-        public final static Property HtmlId = new Property(37, Long.class, "htmlId", false, "HTML_ID");
-        public final static Property VideoId = new Property(38, Long.class, "videoId", false, "VIDEO_ID");
-        public final static Property AttachmentId = new Property(39, Long.class, "attachmentId", false, "ATTACHMENT_ID");
-        public final static Property ExamId = new Property(40, Long.class, "examId", false, "EXAM_ID");
+        public final static Property CanEnableLearnLensAI = new Property(33, Boolean.class, "canEnableLearnLensAI", false, "CAN_ENABLE_LEARN_LENS_AI");
+        public final static Property AiNotesUrl = new Property(34, String.class, "aiNotesUrl", false, "AI_NOTES_URL");
+        public final static Property LearnlensAssetStatus = new Property(35, String.class, "learnlensAssetStatus", false, "LEARNLENS_ASSET_STATUS");
+        public final static Property CourseId = new Property(36, Long.class, "courseId", false, "COURSE_ID");
+        public final static Property ChapterId = new Property(37, Long.class, "chapterId", false, "CHAPTER_ID");
+        public final static Property VideoConferenceId = new Property(38, Long.class, "videoConferenceId", false, "VIDEO_CONFERENCE_ID");
+        public final static Property LiveStreamId = new Property(39, Long.class, "liveStreamId", false, "LIVE_STREAM_ID");
+        public final static Property HtmlId = new Property(40, Long.class, "htmlId", false, "HTML_ID");
+        public final static Property VideoId = new Property(41, Long.class, "videoId", false, "VIDEO_ID");
+        public final static Property AttachmentId = new Property(42, Long.class, "attachmentId", false, "ATTACHMENT_ID");
+        public final static Property ExamId = new Property(43, Long.class, "examId", false, "EXAM_ID");
     }
 
     private DaoSession daoSession;
@@ -121,14 +124,17 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"EXAM_START_URL\" TEXT," + // 30: examStartUrl
                 "\"IS_AI_ENABLED\" INTEGER," + // 31: isAIEnabled
                 "\"LEARNLENS_ASSET_ID\" TEXT," + // 32: learnlensAssetId
-                "\"COURSE_ID\" INTEGER," + // 33: courseId
-                "\"CHAPTER_ID\" INTEGER," + // 34: chapterId
-                "\"VIDEO_CONFERENCE_ID\" INTEGER," + // 35: videoConferenceId
-                "\"LIVE_STREAM_ID\" INTEGER," + // 36: liveStreamId
-                "\"HTML_ID\" INTEGER," + // 37: htmlId
-                "\"VIDEO_ID\" INTEGER," + // 38: videoId
-                "\"ATTACHMENT_ID\" INTEGER," + // 39: attachmentId
-                "\"EXAM_ID\" INTEGER);"); // 40: examId
+                "\"CAN_ENABLE_LEARN_LENS_AI\" INTEGER," + // 33: canEnableLearnLensAI
+                "\"AI_NOTES_URL\" TEXT," + // 34: aiNotesUrl
+                "\"LEARNLENS_ASSET_STATUS\" TEXT," + // 35: learnlensAssetStatus
+                "\"COURSE_ID\" INTEGER," + // 36: courseId
+                "\"CHAPTER_ID\" INTEGER," + // 37: chapterId
+                "\"VIDEO_CONFERENCE_ID\" INTEGER," + // 38: videoConferenceId
+                "\"LIVE_STREAM_ID\" INTEGER," + // 39: liveStreamId
+                "\"HTML_ID\" INTEGER," + // 40: htmlId
+                "\"VIDEO_ID\" INTEGER," + // 41: videoId
+                "\"ATTACHMENT_ID\" INTEGER," + // 42: attachmentId
+                "\"EXAM_ID\" INTEGER);"); // 43: examId
     }
 
     /** Drops the underlying database table. */
@@ -298,44 +304,59 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindString(33, learnlensAssetId);
         }
  
+        Boolean canEnableLearnLensAI = entity.getCanEnableLearnLensAI();
+        if (canEnableLearnLensAI != null) {
+            stmt.bindLong(34, canEnableLearnLensAI ? 1L: 0L);
+        }
+ 
+        String aiNotesUrl = entity.getAiNotesUrl();
+        if (aiNotesUrl != null) {
+            stmt.bindString(35, aiNotesUrl);
+        }
+ 
+        String learnlensAssetStatus = entity.getLearnlensAssetStatus();
+        if (learnlensAssetStatus != null) {
+            stmt.bindString(36, learnlensAssetStatus);
+        }
+ 
         Long courseId = entity.getCourseId();
         if (courseId != null) {
-            stmt.bindLong(34, courseId);
+            stmt.bindLong(37, courseId);
         }
  
         Long chapterId = entity.getChapterId();
         if (chapterId != null) {
-            stmt.bindLong(35, chapterId);
+            stmt.bindLong(38, chapterId);
         }
  
         Long videoConferenceId = entity.getVideoConferenceId();
         if (videoConferenceId != null) {
-            stmt.bindLong(36, videoConferenceId);
+            stmt.bindLong(39, videoConferenceId);
         }
  
         Long liveStreamId = entity.getLiveStreamId();
         if (liveStreamId != null) {
-            stmt.bindLong(37, liveStreamId);
+            stmt.bindLong(40, liveStreamId);
         }
  
         Long htmlId = entity.getHtmlId();
         if (htmlId != null) {
-            stmt.bindLong(38, htmlId);
+            stmt.bindLong(41, htmlId);
         }
  
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(39, videoId);
+            stmt.bindLong(42, videoId);
         }
  
         Long attachmentId = entity.getAttachmentId();
         if (attachmentId != null) {
-            stmt.bindLong(40, attachmentId);
+            stmt.bindLong(43, attachmentId);
         }
  
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(41, examId);
+            stmt.bindLong(44, examId);
         }
     }
 
@@ -500,44 +521,59 @@ public class ContentDao extends AbstractDao<Content, Long> {
             stmt.bindString(33, learnlensAssetId);
         }
  
+        Boolean canEnableLearnLensAI = entity.getCanEnableLearnLensAI();
+        if (canEnableLearnLensAI != null) {
+            stmt.bindLong(34, canEnableLearnLensAI ? 1L: 0L);
+        }
+ 
+        String aiNotesUrl = entity.getAiNotesUrl();
+        if (aiNotesUrl != null) {
+            stmt.bindString(35, aiNotesUrl);
+        }
+ 
+        String learnlensAssetStatus = entity.getLearnlensAssetStatus();
+        if (learnlensAssetStatus != null) {
+            stmt.bindString(36, learnlensAssetStatus);
+        }
+ 
         Long courseId = entity.getCourseId();
         if (courseId != null) {
-            stmt.bindLong(34, courseId);
+            stmt.bindLong(37, courseId);
         }
  
         Long chapterId = entity.getChapterId();
         if (chapterId != null) {
-            stmt.bindLong(35, chapterId);
+            stmt.bindLong(38, chapterId);
         }
  
         Long videoConferenceId = entity.getVideoConferenceId();
         if (videoConferenceId != null) {
-            stmt.bindLong(36, videoConferenceId);
+            stmt.bindLong(39, videoConferenceId);
         }
  
         Long liveStreamId = entity.getLiveStreamId();
         if (liveStreamId != null) {
-            stmt.bindLong(37, liveStreamId);
+            stmt.bindLong(40, liveStreamId);
         }
  
         Long htmlId = entity.getHtmlId();
         if (htmlId != null) {
-            stmt.bindLong(38, htmlId);
+            stmt.bindLong(41, htmlId);
         }
  
         Long videoId = entity.getVideoId();
         if (videoId != null) {
-            stmt.bindLong(39, videoId);
+            stmt.bindLong(42, videoId);
         }
  
         Long attachmentId = entity.getAttachmentId();
         if (attachmentId != null) {
-            stmt.bindLong(40, attachmentId);
+            stmt.bindLong(43, attachmentId);
         }
  
         Long examId = entity.getExamId();
         if (examId != null) {
-            stmt.bindLong(41, examId);
+            stmt.bindLong(44, examId);
         }
     }
 
@@ -588,14 +624,17 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30), // examStartUrl
             cursor.isNull(offset + 31) ? null : cursor.getShort(offset + 31) != 0, // isAIEnabled
             cursor.isNull(offset + 32) ? null : cursor.getString(offset + 32), // learnlensAssetId
-            cursor.isNull(offset + 33) ? null : cursor.getLong(offset + 33), // courseId
-            cursor.isNull(offset + 34) ? null : cursor.getLong(offset + 34), // chapterId
-            cursor.isNull(offset + 35) ? null : cursor.getLong(offset + 35), // videoConferenceId
-            cursor.isNull(offset + 36) ? null : cursor.getLong(offset + 36), // liveStreamId
-            cursor.isNull(offset + 37) ? null : cursor.getLong(offset + 37), // htmlId
-            cursor.isNull(offset + 38) ? null : cursor.getLong(offset + 38), // videoId
-            cursor.isNull(offset + 39) ? null : cursor.getLong(offset + 39), // attachmentId
-            cursor.isNull(offset + 40) ? null : cursor.getLong(offset + 40) // examId
+            cursor.isNull(offset + 33) ? null : cursor.getShort(offset + 33) != 0, // canEnableLearnLensAI
+            cursor.isNull(offset + 34) ? null : cursor.getString(offset + 34), // aiNotesUrl
+            cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35), // learnlensAssetStatus
+            cursor.isNull(offset + 36) ? null : cursor.getLong(offset + 36), // courseId
+            cursor.isNull(offset + 37) ? null : cursor.getLong(offset + 37), // chapterId
+            cursor.isNull(offset + 38) ? null : cursor.getLong(offset + 38), // videoConferenceId
+            cursor.isNull(offset + 39) ? null : cursor.getLong(offset + 39), // liveStreamId
+            cursor.isNull(offset + 40) ? null : cursor.getLong(offset + 40), // htmlId
+            cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41), // videoId
+            cursor.isNull(offset + 42) ? null : cursor.getLong(offset + 42), // attachmentId
+            cursor.isNull(offset + 43) ? null : cursor.getLong(offset + 43) // examId
         );
         return entity;
     }
@@ -635,14 +674,17 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setExamStartUrl(cursor.isNull(offset + 30) ? null : cursor.getString(offset + 30));
         entity.setIsAIEnabled(cursor.isNull(offset + 31) ? null : cursor.getShort(offset + 31) != 0);
         entity.setLearnlensAssetId(cursor.isNull(offset + 32) ? null : cursor.getString(offset + 32));
-        entity.setCourseId(cursor.isNull(offset + 33) ? null : cursor.getLong(offset + 33));
-        entity.setChapterId(cursor.isNull(offset + 34) ? null : cursor.getLong(offset + 34));
-        entity.setVideoConferenceId(cursor.isNull(offset + 35) ? null : cursor.getLong(offset + 35));
-        entity.setLiveStreamId(cursor.isNull(offset + 36) ? null : cursor.getLong(offset + 36));
-        entity.setHtmlId(cursor.isNull(offset + 37) ? null : cursor.getLong(offset + 37));
-        entity.setVideoId(cursor.isNull(offset + 38) ? null : cursor.getLong(offset + 38));
-        entity.setAttachmentId(cursor.isNull(offset + 39) ? null : cursor.getLong(offset + 39));
-        entity.setExamId(cursor.isNull(offset + 40) ? null : cursor.getLong(offset + 40));
+        entity.setCanEnableLearnLensAI(cursor.isNull(offset + 33) ? null : cursor.getShort(offset + 33) != 0);
+        entity.setAiNotesUrl(cursor.isNull(offset + 34) ? null : cursor.getString(offset + 34));
+        entity.setLearnlensAssetStatus(cursor.isNull(offset + 35) ? null : cursor.getString(offset + 35));
+        entity.setCourseId(cursor.isNull(offset + 36) ? null : cursor.getLong(offset + 36));
+        entity.setChapterId(cursor.isNull(offset + 37) ? null : cursor.getLong(offset + 37));
+        entity.setVideoConferenceId(cursor.isNull(offset + 38) ? null : cursor.getLong(offset + 38));
+        entity.setLiveStreamId(cursor.isNull(offset + 39) ? null : cursor.getLong(offset + 39));
+        entity.setHtmlId(cursor.isNull(offset + 40) ? null : cursor.getLong(offset + 40));
+        entity.setVideoId(cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41));
+        entity.setAttachmentId(cursor.isNull(offset + 42) ? null : cursor.getLong(offset + 42));
+        entity.setExamId(cursor.isNull(offset + 43) ? null : cursor.getLong(offset + 43));
      }
     
     @Override

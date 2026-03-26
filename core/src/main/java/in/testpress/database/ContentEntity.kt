@@ -33,5 +33,8 @@ data class ContentEntity(
     var hasEnded: Boolean? = null,
     var examStartUrl: String? = null,
     var isAIEnabled: Boolean? = null,
-    var learnlensAssetId: String? = null
+    var learnlensAssetId: String? = null,
+    var canEnableLearnLensAI: Boolean? = null,
+    var aiNotesUrl: String? = null,
+    var learnlensAssetStatus: String? = null
 ): BaseContentEntity()
