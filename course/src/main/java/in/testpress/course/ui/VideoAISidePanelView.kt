@@ -1,8 +1,7 @@
-package `in`.testpress.course.view
+package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
 import `in`.testpress.course.util.VideoAIJsInterface
-import `in`.testpress.course.ui.videocontent.webview.VideoAIWebView
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View

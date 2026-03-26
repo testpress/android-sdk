@@ -11,7 +11,7 @@ import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
-import `in`.testpress.course.view.VideoAISidePanelInterface
+import `in`.testpress.course.ui.VideoAISidePanelInterface
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
 import android.app.Activity.RESULT_OK

@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.util.VideoAIJsInterface
-import `in`.testpress.course.ui.videocontent.webview.VideoAIWebView
+import `in`.testpress.course.ui.VideoAIWebView
 import `in`.testpress.util.webview.BaseWebChromeClient
 import android.os.Bundle
 import android.view.LayoutInflater

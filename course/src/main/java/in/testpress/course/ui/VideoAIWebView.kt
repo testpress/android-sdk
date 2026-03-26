@@ -1,4 +1,4 @@
-package `in`.testpress.course.ui.videocontent.webview
+package `in`.testpress.course.ui
 
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk

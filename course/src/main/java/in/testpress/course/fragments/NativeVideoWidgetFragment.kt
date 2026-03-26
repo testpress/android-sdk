@@ -7,8 +7,8 @@ import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
-import `in`.testpress.course.view.VideoAISidePanelInterface
-import `in`.testpress.course.view.VideoAISidePanelView
+import `in`.testpress.course.ui.VideoAISidePanelInterface
+import `in`.testpress.course.ui.VideoAISidePanelView
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
