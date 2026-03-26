@@ -7,7 +7,8 @@ import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
-import `in`.testpress.course.util.VideoAISidePanelContent
+import `in`.testpress.course.view.VideoAISidePanelInterface
+import `in`.testpress.course.view.VideoAISidePanelView
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -23,7 +24,7 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import `in`.testpress.network.Resource
 import android.content.res.Configuration
 
-class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelContract {
+class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInterface {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
@@ -35,7 +36,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
         ExoplayerFullscreenHelper(activity)
     }
 
-    private var aiSidePanelContent: VideoAISidePanelContent? = null
+    private var aiSidePanelView: VideoAISidePanelView? = null
     private var aiAssetId: String? = null
     private var aiNotesUrl: String? = null
     private var isAiPanelRequested: Boolean = false
@@ -154,9 +155,9 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
         aiAssetId = content.learnlensAssetId
         aiNotesUrl = content.aiNotesUrl
 
-        exoPlayerUtil?.setAiButtonVisible(enabled)
+        exoPlayerUtil?.setPlayerActionButtonVisible(R.id.exo_ai_button, enabled)
         if (enabled) {
-            exoPlayerUtil?.setAiButtonOnClickListener { handleAiButtonClick() }
+            exoPlayerUtil?.setPlayerActionButtonOnClickListener(R.id.exo_ai_button) { handleAiButtonClick() }
         }
     }
 
@@ -190,14 +191,14 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
         val act = activity ?: return
 
         if (util.isSidePanelAvailable) {
-            val content = getOrCreateAiSidePanelContent(act, util)
-            util.showSidePanel(content.createView(act))
-            content.mount(assetId, notesUrl)
+            val view = getOrCreateAiSidePanelView(act, util)
+            util.showSidePanel(view.createView(act))
+            view.mount(assetId, notesUrl)
         }
     }
 
-    private fun getOrCreateAiSidePanelContent(act: android.app.Activity, util: ExoPlayerUtil): VideoAISidePanelContent {
-        return aiSidePanelContent ?: VideoAISidePanelContent(
+    private fun getOrCreateAiSidePanelView(act: android.app.Activity, util: ExoPlayerUtil): VideoAISidePanelView {
+        return aiSidePanelView ?: VideoAISidePanelView(
             activity = act,
             onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
             onCloseRequested = { 
@@ -205,7 +206,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
                 util.hideSidePanel()
                 getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
             }
-        ).also { aiSidePanelContent = it }
+        ).also { aiSidePanelView = it }
     }
 
     private fun toggleAiSidePanel() {
@@ -254,8 +255,8 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelCon
 
     override fun onDestroy() {
         super.onDestroy()
-        aiSidePanelContent?.destroy()
-        aiSidePanelContent = null
+        aiSidePanelView?.destroy()
+        aiSidePanelView = null
         exoplayerFullscreenHelper?.disableOrientationListener()
     }
 

@@ -1,4 +1,4 @@
-package `in`.testpress.course.util
+package `in`.testpress.core
 
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
@@ -7,7 +7,7 @@ import `in`.testpress.models.ProfileDetails
 import android.content.Context
 import kotlinx.coroutines.suspendCancellableCoroutine
 
-object VideoAIUserIdProvider {
+object TestpressUserIdProvider {
     suspend fun getUserId(context: Context): String {
         TestpressUserDetails.getInstance().profileDetails?.id?.toString()?.let { return it }
 
@@ -32,4 +32,3 @@ object VideoAIUserIdProvider {
         }
     }
 }
-

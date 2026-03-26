@@ -11,6 +11,7 @@ import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
+import `in`.testpress.course.view.VideoAISidePanelInterface
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
 import android.app.Activity.RESULT_OK
@@ -301,7 +302,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun canUseVideoAI(): Boolean {
         if (!::videoWidgetFragment.isInitialized) return false
-        return videoWidgetFragment is VideoAISidePanelContract &&
+        return videoWidgetFragment is VideoAISidePanelInterface &&
                content.canEnableLearnLensAI == true && 
                !content.learnlensAssetId.isNullOrBlank()
     }
@@ -328,7 +329,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         return VideoAIConfig(assetId = assetId, notesUrl = content.aiNotesUrl)
     }
 
-    private fun getVideoAISidePanelContractOrNull(): VideoAISidePanelContract? {
+    private fun getVideoAISidePanelContractOrNull(): VideoAISidePanelInterface? {
         return nativeVideoWidgetFragment
     }
 

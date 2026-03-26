@@ -2,7 +2,7 @@ package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
 import `in`.testpress.course.util.VideoAIJsInterface
-import `in`.testpress.course.util.VideoAIWebViewRenderer
+import `in`.testpress.course.ui.videocontent.webview.VideoAIWebView
 import `in`.testpress.util.webview.BaseWebChromeClient
 import android.os.Bundle
 import android.view.LayoutInflater
@@ -38,7 +38,7 @@ class VideoAIFragment : Fragment(), VideoAIJsInterface.Host {
     private var progressBar: ProgressBar? = null
     private var container: FrameLayout? = null
     private lateinit var webChromeClient: BaseWebChromeClient
-    private var webViewRenderer: VideoAIWebViewRenderer? = null
+    private var videoAIWebView: VideoAIWebView? = null
     private var assetId: String = ""
     private var notesUrl: String = ""
 
@@ -76,17 +76,17 @@ class VideoAIFragment : Fragment(), VideoAIJsInterface.Host {
         val targetContainer = container ?: return
         val act = activity ?: return
 
-        val renderer = webViewRenderer ?: VideoAIWebViewRenderer(
+        val webView = videoAIWebView ?: VideoAIWebView(
             activity = act,
             scope = viewLifecycleOwner.lifecycleScope,
             jsHost = this,
             isViewActive = { isAdded },
             onLoadingChanged = { isLoading -> toggleLoadingState(isLoading) },
             webChromeClient = webChromeClient,
-        ).also { webViewRenderer = it }
+        ).also { videoAIWebView = it }
 
-        renderer.attach(targetContainer)
-        renderer.mount(assetId, notesUrl)
+        webView.attach(targetContainer)
+        webView.mount(assetId, notesUrl)
     }
 
     private fun toggleLoadingState(isLoading: Boolean) {
@@ -101,8 +101,8 @@ class VideoAIFragment : Fragment(), VideoAIJsInterface.Host {
     override fun onDestroyView() {
         super.onDestroyView()
         webChromeClient.cleanup()
-        webViewRenderer?.destroy()
-        webViewRenderer = null
+        videoAIWebView?.destroy()
+        videoAIWebView = null
         progressBar = null
         container = null
     }

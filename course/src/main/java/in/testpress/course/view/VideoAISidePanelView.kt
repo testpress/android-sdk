@@ -1,6 +1,8 @@
-package `in`.testpress.course.util
+package `in`.testpress.course.view
 
 import `in`.testpress.course.R
+import `in`.testpress.course.util.VideoAIJsInterface
+import `in`.testpress.course.ui.videocontent.webview.VideoAIWebView
 import android.app.Activity
 import android.view.LayoutInflater
 import android.view.View
@@ -12,7 +14,12 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 
-class VideoAISidePanelContent(
+interface VideoAISidePanelInterface {
+    fun showVideoAISidePanel(assetId: String, notesUrl: String?)
+    fun hideVideoAISidePanel(notifyHost: Boolean = true)
+}
+
+class VideoAISidePanelView(
     private val activity: Activity,
     private val onSeek: (seconds: Double) -> Unit,
     private val onCloseRequested: () -> Unit,
@@ -23,7 +30,7 @@ class VideoAISidePanelContent(
     private var rootView: View? = null
     private var progressBar: ProgressBar? = null
     private var webViewContainer: FrameLayout? = null
-    private var webViewRenderer: VideoAIWebViewRenderer? = null
+    private var webView: VideoAIWebView? = null
 
     private var mountedAssetId: String? = null
     private var mountedNotesUrl: String? = null
@@ -36,7 +43,7 @@ class VideoAISidePanelContent(
 
             val container = webViewContainer
             if (container != null) {
-                webViewRenderer = VideoAIWebViewRenderer(
+                webView = VideoAIWebView(
                     activity = activity,
                     scope = scope,
                     jsHost = this,
@@ -52,7 +59,7 @@ class VideoAISidePanelContent(
     fun mount(assetId: String, notesUrl: String?) {
         if (rootView == null) return
 
-        webViewRenderer?.let { renderer ->
+        webView?.let { renderer ->
             val container = webViewContainer
             if (container != null) renderer.attach(container)
         }
@@ -60,14 +67,14 @@ class VideoAISidePanelContent(
         if (mountedAssetId != assetId || mountedNotesUrl != notesUrl) {
             mountedAssetId = assetId
             mountedNotesUrl = notesUrl
-            webViewRenderer?.mount(assetId, notesUrl)
+            webView?.mount(assetId, notesUrl)
         }
     }
 
     fun destroy() {
         scope.cancel()
-        webViewRenderer?.destroy()
-        webViewRenderer = null
+        webView?.destroy()
+        webView = null
         webViewContainer = null
         progressBar = null
         (rootView?.parent as? FrameLayout)?.removeView(rootView)

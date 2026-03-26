@@ -1,7 +1,9 @@
-package `in`.testpress.course.util
+package `in`.testpress.course.ui.videocontent.webview
 
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSdk
+import `in`.testpress.core.TestpressUserIdProvider
+import `in`.testpress.course.util.VideoAIJsInterface
 import `in`.testpress.util.webview.BaseWebChromeClient
 import `in`.testpress.util.webview.BaseWebViewClient
 import `in`.testpress.util.webview.WebView
@@ -13,7 +15,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 import java.io.File
 
-class VideoAIWebViewRenderer(
+class VideoAIWebView(
     private val activity: Activity,
     private val scope: CoroutineScope,
     private val jsHost: VideoAIJsInterface.Host,
@@ -87,7 +89,7 @@ class VideoAIWebViewRenderer(
         scope.launch {
             if (!isViewActive()) return@launch
 
-            val userId = VideoAIUserIdProvider.getUserId(activity)
+            val userId = TestpressUserIdProvider.getUserId(activity)
             val replacements = mapOf(
                 "ASSET_ID" to assetId,
                 "AUTH_TOKEN" to authToken,
