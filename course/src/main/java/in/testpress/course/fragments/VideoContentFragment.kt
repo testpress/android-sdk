@@ -12,6 +12,9 @@ import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
 import `in`.testpress.course.ui.VideoAISidePanelInterface
+import `in`.testpress.course.ui.VideoTranscriptSidePanelInterface
+import `in`.testpress.course.domain.VideoSubtitleJobStatus
+import `in`.testpress.course.domain.jobStatusEnum
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
 import android.app.Activity.RESULT_OK
@@ -49,6 +52,9 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     VideoQuestionSheetFragment.OnQuestionCompleteListener,
     NativeVideoWidgetFragment.VideoAIButtonHost,
     NativeVideoWidgetFragment.VideoAIPanelStateHost,
+    NativeVideoWidgetFragment.VideoTranscriptButtonHost,
+    NativeVideoWidgetFragment.VideoTranscriptPanelStateHost,
+    VideoTranscriptBottomPanelDialogFragment.Host,
     VideoAIFragment.Host {
     protected lateinit var titleView: TextView
     protected lateinit var description: TextView
@@ -63,6 +69,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private lateinit var contentRepository: ContentRepository
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
     private var askAiFab: View? = null
+    private var transcriptFab: View? = null
     private var openPanel: OpenPanel? = null
     
     private val nativeVideoWidgetFragment: NativeVideoWidgetFragment?
@@ -74,6 +81,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private enum class OpenPanel {
         AI,
+        TRANSCRIPT,
     }
 
     private val questionCallbackHandler = Handler(Looper.getMainLooper()) { message ->
@@ -128,6 +136,8 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         titleLayout = view.findViewById(R.id.title_layout)
         askAiFab = view.findViewById(R.id.ask_ai_fab)
         askAiFab?.setOnClickListener { toggleVideoAIPanel() }
+        transcriptFab = view.findViewById(R.id.transcript_fab)
+        transcriptFab?.setOnClickListener { toggleVideoTranscriptPanel() }
         initializeListeners()
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
         initializeRemainingDownloadsCount()
@@ -260,7 +270,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
-        updateVideoAIUIState()
+        updateVideoToolsUIState()
         if (content.video!!.isDownloadable() && instituteSettings.isVideoDownloadEnabled) {
             showDownloadStatus()
         } else if (::menu.isInitialized) {
@@ -269,7 +279,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
         transaction.runOnCommit {
-            syncVideoAIForOrientation()
+            syncOpenPanelForOrientation()
         }
         transaction.commit()
         if (videoWidgetFragment.enabledVideoQuestion) {
@@ -282,14 +292,14 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         if(isContentInitialized() && instituteSettings.isVideoDownloadEnabled && content.video!!.isDownloadable()) {
             showDownloadStatus()
         }
-        updateVideoAIUIState()
-        syncVideoAIForOrientation()
+        updateVideoToolsUIState()
+        syncOpenPanelForOrientation()
     }
 
     override fun onConfigurationChanged(newConfig: Configuration) {
         super.onConfigurationChanged(newConfig)
-        updateVideoAIUIState()
-        syncVideoAIForOrientation()
+        updateVideoToolsUIState()
+        syncOpenPanelForOrientation()
     }
 
     override fun onDestroyView() {
@@ -297,6 +307,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         val act = activity ?: return
         if (!act.isChangingConfigurations && (isRemoving || act.isFinishing)) {
             VideoAIBottomPanelDialogFragment.dismissIfPresent(this)
+            VideoTranscriptBottomPanelDialogFragment.dismissIfPresent(this)
         }
     }
 
@@ -307,14 +318,31 @@ open class VideoContentFragment : BaseContentDetailFragment(),
                !content.learnlensAssetId.isNullOrBlank()
     }
 
-    private fun updateVideoAIUIState() {
-        val showFab = canUseVideoAI() && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
-        askAiFab?.isVisible = showFab
+    private fun canUseVideoTranscript(): Boolean {
+        if (!::videoWidgetFragment.isInitialized) return false
+        val subtitle = content.videoSubtitle
+        val url = subtitle?.url
+        val isReady = subtitle?.jobStatusEnum() == VideoSubtitleJobStatus.COMPLETED
+        return nativeVideoWidgetFragment != null &&
+                content.enableTranscript == true &&
+                isReady &&
+                !url.isNullOrBlank()
+    }
+
+    private fun updateVideoToolsUIState() {
+        val isPortrait = resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        askAiFab?.isVisible = canUseVideoAI() && isPortrait
+        transcriptFab?.isVisible = canUseVideoTranscript() && isPortrait
     }
 
     private fun toggleVideoAIPanel() {
         val config = getVideoAIConfigOrNull() ?: return
-        if (openPanel == OpenPanel.AI) closeVideoAIPanel() else openVideoAIPanel(config)
+        if (openPanel == OpenPanel.AI) {
+            closeVideoAIPanel()
+        } else {
+            if (openPanel == OpenPanel.TRANSCRIPT) closeVideoTranscriptPanel()
+            openVideoAIPanel(config)
+        }
     }
 
     private data class VideoAIConfig(
@@ -341,7 +369,7 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private fun closeVideoAIPanel() {
         openPanel = null
         hideVideoAIPanel()
-        updateVideoAIUIState()
+        updateVideoToolsUIState()
     }
 
     private fun hideVideoAIPanel(notifySidePanel: Boolean = true) {
@@ -349,20 +377,73 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         VideoAIBottomPanelDialogFragment.hideIfPresent(this)
     }
 
-    private fun syncVideoAIForOrientation() {
-        val config = getVideoAIConfigOrNull()
+    private data class VideoTranscriptConfig(
+        val subtitleUrl: String,
+    )
 
-        if (config == null) {
-            if (openPanel != null) closeVideoAIPanel()
-            return
+    private fun getVideoTranscriptConfigOrNull(): VideoTranscriptConfig? {
+        if (!canUseVideoTranscript()) return null
+        val url = content.videoSubtitle?.url?.trim().orEmpty()
+        if (url.isBlank()) return null
+        return VideoTranscriptConfig(subtitleUrl = url)
+    }
+
+    private fun getVideoTranscriptSidePanelContractOrNull(): VideoTranscriptSidePanelInterface? {
+        return nativeVideoWidgetFragment
+    }
+
+    private fun toggleVideoTranscriptPanel() {
+        val config = getVideoTranscriptConfigOrNull() ?: return
+        if (openPanel == OpenPanel.TRANSCRIPT) {
+            closeVideoTranscriptPanel()
+        } else {
+            if (openPanel == OpenPanel.AI) closeVideoAIPanel()
+            openVideoTranscriptPanel(config)
         }
+    }
 
-        if (openPanel != OpenPanel.AI) {
-            hideVideoAIPanel(notifySidePanel = false)
-            return
+    private fun openVideoTranscriptPanel(config: VideoTranscriptConfig) {
+        openPanel = OpenPanel.TRANSCRIPT
+        showVideoTranscriptPanelForCurrentOrientation(config)
+    }
+
+    private fun closeVideoTranscriptPanel() {
+        openPanel = null
+        hideVideoTranscriptPanel()
+        updateVideoToolsUIState()
+    }
+
+    private fun hideVideoTranscriptPanel(notifySidePanel: Boolean = true) {
+        getVideoTranscriptSidePanelContractOrNull()?.hideVideoTranscriptSidePanel(notifyHost = notifySidePanel)
+        VideoTranscriptBottomPanelDialogFragment.hideIfPresent(this)
+    }
+
+    private fun syncOpenPanelForOrientation() {
+        val aiConfig = getVideoAIConfigOrNull()
+        val transcriptConfig = getVideoTranscriptConfigOrNull()
+
+        when (openPanel) {
+            OpenPanel.AI -> {
+                if (aiConfig == null) {
+                    closeVideoAIPanel()
+                    return
+                }
+                hideVideoTranscriptPanel(notifySidePanel = false)
+                showVideoAIPanelForCurrentOrientation(aiConfig)
+            }
+            OpenPanel.TRANSCRIPT -> {
+                if (transcriptConfig == null) {
+                    closeVideoTranscriptPanel()
+                    return
+                }
+                hideVideoAIPanel(notifySidePanel = false)
+                showVideoTranscriptPanelForCurrentOrientation(transcriptConfig)
+            }
+            null -> {
+                hideVideoAIPanel(notifySidePanel = false)
+                hideVideoTranscriptPanel(notifySidePanel = false)
+            }
         }
-
-        showVideoAIPanelForCurrentOrientation(config)
     }
 
     private fun showVideoAIPanelForCurrentOrientation(config: VideoAIConfig) {
@@ -374,6 +455,18 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         } else {
             sidePanel.hideVideoAISidePanel(notifyHost = false)
             VideoAIBottomPanelDialogFragment.showOrReuse(this, config.assetId, config.notesUrl)
+        }
+    }
+
+    private fun showVideoTranscriptPanelForCurrentOrientation(config: VideoTranscriptConfig) {
+        val sidePanel = getVideoTranscriptSidePanelContractOrNull() ?: return
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            VideoTranscriptBottomPanelDialogFragment.hideIfPresent(this)
+            sidePanel.showVideoTranscriptSidePanel(config.subtitleUrl)
+        } else {
+            sidePanel.hideVideoTranscriptSidePanel(notifyHost = false)
+            VideoTranscriptBottomPanelDialogFragment.showOrReuse(this, config.subtitleUrl)
         }
     }
 
@@ -393,7 +486,30 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     override fun onVideoAIPanelStateChanged(isOpen: Boolean) {
         openPanel = if (isOpen) OpenPanel.AI else null
-        updateVideoAIUIState()
+        updateVideoToolsUIState()
+    }
+
+    override fun onVideoTranscriptButtonClicked(isFullscreen: Boolean) {
+        toggleVideoTranscriptPanel()
+    }
+
+    override fun onVideoTranscriptPanelStateChanged(isOpen: Boolean) {
+        openPanel = if (isOpen) OpenPanel.TRANSCRIPT else null
+        updateVideoToolsUIState()
+    }
+
+    override fun onVideoTranscriptSeek(seconds: Double) {
+        if (::videoWidgetFragment.isInitialized) {
+            videoWidgetFragment.seekTo((seconds * 1000).toLong())
+        }
+    }
+
+    override fun onVideoTranscriptCloseRequested() {
+        closeVideoTranscriptPanel()
+    }
+
+    override fun getVideoTranscriptCurrentPositionSeconds(): Float {
+        return nativeVideoWidgetFragment?.getCurrentPositionSeconds() ?: 0f
     }
 
 
