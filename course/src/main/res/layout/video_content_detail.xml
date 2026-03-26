@@ -10,7 +10,7 @@
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/button_layout"
+        android:layout_above="@id/bottom_navigation_fragment"
         android:layout_below="@+id/appbar">
 
         <LinearLayout
@@ -90,4 +90,42 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
+
+    <!-- Custom Floating Action Button for Ask AI (native player only) -->
+    <LinearLayout
+        android:id="@+id/ask_ai_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="80dp"
+        android:orientation="horizontal"
+        android:background="@drawable/ask_ai_fab_background"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:elevation="6dp"
+        android:visibility="gone"
+        android:minWidth="100dp">
+
+        <ImageView
+            android:id="@+id/ai_icon_fab"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_ai"
+            android:contentDescription="@string/AI"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/ai_text_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/ask_to_ai"
+            android:textColor="@color/testpress_white"
+            android:textSize="14sp" />
+
+    </LinearLayout>
 </RelativeLayout>

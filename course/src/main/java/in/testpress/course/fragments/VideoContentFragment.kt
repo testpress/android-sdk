@@ -11,6 +11,7 @@ import `in`.testpress.course.ui.DownloadsActivity
 import `in`.testpress.course.ui.VideoDownloadQualityChooserDialog
 import `in`.testpress.util.DateUtils.convertDurationStringToSeconds
 import `in`.testpress.course.util.PatternEditableBuilder
+import `in`.testpress.course.ui.VideoAISidePanelInterface
 import `in`.testpress.course.viewmodels.OfflineVideoViewModel
 import `in`.testpress.models.InstituteSettings
 import android.app.Activity.RESULT_OK
@@ -40,10 +41,15 @@ import `in`.testpress.course.network.NetworkVideoQuestion
 import `in`.testpress.enums.Status
 import `in`.testpress.core.TestpressException
 import android.widget.Toast
-
+import android.content.res.Configuration
+import androidx.core.view.isVisible
 import java.util.regex.Pattern
 
-open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionSheetFragment.OnQuestionCompleteListener {
+open class VideoContentFragment : BaseContentDetailFragment(),
+    VideoQuestionSheetFragment.OnQuestionCompleteListener,
+    NativeVideoWidgetFragment.VideoAIButtonHost,
+    NativeVideoWidgetFragment.VideoAIPanelStateHost,
+    VideoAIFragment.Host {
     protected lateinit var titleView: TextView
     protected lateinit var description: TextView
     protected lateinit var titleLayout: LinearLayout
@@ -56,6 +62,19 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
 
     private lateinit var contentRepository: ContentRepository
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
+    private var askAiFab: View? = null
+    private var openPanel: OpenPanel? = null
+    
+    private val nativeVideoWidgetFragment: NativeVideoWidgetFragment?
+        get() = if (::videoWidgetFragment.isInitialized) videoWidgetFragment as? NativeVideoWidgetFragment else null
+
+    companion object {
+        private const val STATE_OPEN_PANEL = "state_open_panel"
+    }
+
+    private enum class OpenPanel {
+        AI,
+    }
 
     private val questionCallbackHandler = Handler(Looper.getMainLooper()) { message ->
         val positionInSeconds = message.what.toLong()
@@ -69,6 +88,15 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        openPanel = savedInstanceState
+            ?.getString(STATE_OPEN_PANEL)
+            ?.let { name ->
+                try {
+                    OpenPanel.valueOf(name)
+                } catch (_: IllegalArgumentException) {
+                    null
+                }
+            }
         VideoDownloadService.start(requireContext())
         offlineVideoViewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
@@ -78,6 +106,11 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
 
         videoQuestionViewModel = ViewModelProvider(this).get(VideoQuestionViewModel::class.java)
         contentRepository = ContentRepository(requireContext())
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        outState.putString(STATE_OPEN_PANEL, openPanel?.name)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onCreateView(
@@ -93,6 +126,8 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         titleView = view.findViewById(R.id.title)
         description = view.findViewById(R.id.description)
         titleLayout = view.findViewById(R.id.title_layout)
+        askAiFab = view.findViewById(R.id.ask_ai_fab)
+        askAiFab?.setOnClickListener { toggleVideoAIPanel() }
         initializeListeners()
         instituteSettings = TestpressSdk.getTestpressSession(requireContext())!!.instituteSettings;
         initializeRemainingDownloadsCount()
@@ -225,6 +260,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         videoWidgetFragment = VideoWidgetFragmentFactory.getWidget(content.video!!)
         videoWidgetFragment.arguments = arguments
         parseVideoDescription()
+        updateVideoAIUIState()
         if (content.video!!.isDownloadable() && instituteSettings.isVideoDownloadEnabled) {
             showDownloadStatus()
         } else if (::menu.isInitialized) {
@@ -232,6 +268,9 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         }
         val transaction = childFragmentManager.beginTransaction()
         transaction.replace(R.id.video_widget_fragment, videoWidgetFragment)
+        transaction.runOnCommit {
+            syncVideoAIForOrientation()
+        }
         transaction.commit()
         if (videoWidgetFragment.enabledVideoQuestion) {
             fetchVideoQuestions()
@@ -243,7 +282,120 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         if(isContentInitialized() && instituteSettings.isVideoDownloadEnabled && content.video!!.isDownloadable()) {
             showDownloadStatus()
         }
+        updateVideoAIUIState()
+        syncVideoAIForOrientation()
     }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateVideoAIUIState()
+        syncVideoAIForOrientation()
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        val act = activity ?: return
+        if (!act.isChangingConfigurations && (isRemoving || act.isFinishing)) {
+            VideoAIBottomPanelDialogFragment.dismissIfPresent(this)
+        }
+    }
+
+    private fun canUseVideoAI(): Boolean {
+        if (!::videoWidgetFragment.isInitialized) return false
+        return videoWidgetFragment is VideoAISidePanelInterface &&
+               content.canEnableLearnLensAI == true && 
+               !content.learnlensAssetId.isNullOrBlank()
+    }
+
+    private fun updateVideoAIUIState() {
+        val showFab = canUseVideoAI() && resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT
+        askAiFab?.isVisible = showFab
+    }
+
+    private fun toggleVideoAIPanel() {
+        val config = getVideoAIConfigOrNull() ?: return
+        if (openPanel == OpenPanel.AI) closeVideoAIPanel() else openVideoAIPanel(config)
+    }
+
+    private data class VideoAIConfig(
+        val assetId: String,
+        val notesUrl: String?,
+    )
+
+    private fun getVideoAIConfigOrNull(): VideoAIConfig? {
+        if (!canUseVideoAI()) return null
+        val assetId = content.learnlensAssetId ?: return null
+        if (assetId.isBlank()) return null
+        return VideoAIConfig(assetId = assetId, notesUrl = content.aiNotesUrl)
+    }
+
+    private fun getVideoAISidePanelContractOrNull(): VideoAISidePanelInterface? {
+        return nativeVideoWidgetFragment
+    }
+
+    private fun openVideoAIPanel(config: VideoAIConfig) {
+        openPanel = OpenPanel.AI
+        showVideoAIPanelForCurrentOrientation(config)
+    }
+
+    private fun closeVideoAIPanel() {
+        openPanel = null
+        hideVideoAIPanel()
+        updateVideoAIUIState()
+    }
+
+    private fun hideVideoAIPanel(notifySidePanel: Boolean = true) {
+        getVideoAISidePanelContractOrNull()?.hideVideoAISidePanel(notifyHost = notifySidePanel)
+        VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+    }
+
+    private fun syncVideoAIForOrientation() {
+        val config = getVideoAIConfigOrNull()
+
+        if (config == null) {
+            if (openPanel != null) closeVideoAIPanel()
+            return
+        }
+
+        if (openPanel != OpenPanel.AI) {
+            hideVideoAIPanel(notifySidePanel = false)
+            return
+        }
+
+        showVideoAIPanelForCurrentOrientation(config)
+    }
+
+    private fun showVideoAIPanelForCurrentOrientation(config: VideoAIConfig) {
+        val sidePanel = getVideoAISidePanelContractOrNull() ?: return
+
+        if (resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            VideoAIBottomPanelDialogFragment.hideIfPresent(this)
+            sidePanel.showVideoAISidePanel(config.assetId, config.notesUrl)
+        } else {
+            sidePanel.hideVideoAISidePanel(notifyHost = false)
+            VideoAIBottomPanelDialogFragment.showOrReuse(this, config.assetId, config.notesUrl)
+        }
+    }
+
+    override fun onVideoAIButtonClicked(isFullscreen: Boolean) {
+        toggleVideoAIPanel()
+    }
+
+    override fun onVideoAISeek(seconds: Double) {
+        if (::videoWidgetFragment.isInitialized) {
+            videoWidgetFragment.seekTo((seconds * 1000).toLong())
+        }
+    }
+
+    override fun onVideoAICloseRequested() {
+        closeVideoAIPanel()
+    }
+
+    override fun onVideoAIPanelStateChanged(isOpen: Boolean) {
+        openPanel = if (isOpen) OpenPanel.AI else null
+        updateVideoAIUIState()
+    }
+
 
     private fun showDownloadStatus() {
         offlineVideoViewModel.get(content.video!!.getPlaybackURL()!!).observe(viewLifecycleOwner, Observer {
@@ -360,7 +512,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
         videoQuestionViewModel.setQuestions(validQuestions)
         val positions = videoQuestionViewModel.getUniquePositions()
 
-        (videoWidgetFragment as? NativeVideoWidgetFragment)?.let {
+        nativeVideoWidgetFragment?.let {
             it.registerPositionCallbacks(
                 positions,
                 questionCallbackHandler
@@ -376,7 +528,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
             return
         }
 
-        (videoWidgetFragment as? NativeVideoWidgetFragment)?.pauseVideo()
+        nativeVideoWidgetFragment?.pauseVideo()
         VideoQuestionSheetFragment.newInstance(question)
             .show(childFragmentManager, "VideoQuestionSheetFragment")
     }
@@ -389,7 +541,7 @@ open class VideoContentFragment : BaseContentDetailFragment(), VideoQuestionShee
             VideoQuestionSheetFragment.newInstance(nextQuestion)
                 .show(childFragmentManager, "VideoQuestionSheetFragment")
         } else {
-            (videoWidgetFragment as? NativeVideoWidgetFragment)?.playVideo()
+            nativeVideoWidgetFragment?.playVideo()
         }
     }
 }

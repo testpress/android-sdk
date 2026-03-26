@@ -1,6 +1,5 @@
 package `in`.testpress.course.fragments
 
-import `in`.testpress.core.TestpressSdk
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
@@ -8,12 +7,13 @@ import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
+import `in`.testpress.course.ui.VideoAISidePanelInterface
+import `in`.testpress.course.ui.VideoAISidePanelView
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.animation.AnimationUtils
 import android.widget.ImageButton
 import android.widget.LinearLayout
 import android.widget.TextView
@@ -22,8 +22,9 @@ import androidx.lifecycle.Observer
 import com.airbnb.lottie.LottieAnimationView
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import `in`.testpress.network.Resource
+import android.content.res.Configuration
 
-class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
+class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInterface {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
@@ -33,6 +34,19 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
     
     private val exoplayerFullscreenHelper: ExoplayerFullscreenHelper by lazy {
         ExoplayerFullscreenHelper(activity)
+    }
+
+    private var aiSidePanelView: VideoAISidePanelView? = null
+    private var aiAssetId: String? = null
+    private var aiNotesUrl: String? = null
+    private var isAiPanelRequested: Boolean = false
+
+    interface VideoAIButtonHost {
+        fun onVideoAIButtonClicked(isFullscreen: Boolean)
+    }
+
+    interface VideoAIPanelStateHost {
+        fun onVideoAIPanelStateChanged(isOpen: Boolean)
     }
 
     override fun onCreateView(
@@ -103,6 +117,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
         exoPlayerUtil = ExoPlayerUtil(activity, exoPlayerMainFrame, video?.getPlaybackURL(), 0F)
         exoPlayerUtil?.setContent(greenDaoContent!!)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
+        configureAiButton(content)
         registerPendingCallbacks()
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
@@ -120,8 +135,98 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
                         exoPlayerUtil?.initializePlayer()
                     }
                 }
-
             })
+
+        exoPlayerUtil?.setOnSidePanelReadyListener {
+            if (isAiPanelRequested) {
+                aiAssetId?.let { assetId ->
+                    attachAiToSidePanel(assetId, aiNotesUrl)
+                }
+            }
+        }
+    }
+
+    private fun isVideoAIEnabled(content: DomainContent): Boolean {
+        return content.canEnableLearnLensAI == true && !content.learnlensAssetId.isNullOrBlank()
+    }
+
+    private fun configureAiButton(content: DomainContent) {
+        val enabled = isVideoAIEnabled(content)
+        aiAssetId = content.learnlensAssetId
+        aiNotesUrl = content.aiNotesUrl
+
+        exoPlayerUtil?.setPlayerActionButtonVisible(R.id.exo_ai_button, enabled)
+        if (enabled) {
+            exoPlayerUtil?.setPlayerActionButtonOnClickListener(R.id.exo_ai_button) { handleAiButtonClick() }
+        }
+    }
+
+    private fun handleAiButtonClick() {
+        val util = exoPlayerUtil ?: return
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+        
+        if (util.isFullscreen || isLandscape) {
+            toggleAiSidePanel()
+        } else {
+            getVideoAIHost()?.onVideoAIButtonClicked(false)
+        }
+    }
+
+    private fun getVideoAIHost(): VideoAIButtonHost? {
+        return (parentFragment as? VideoAIButtonHost) ?: (activity as? VideoAIButtonHost)
+    }
+
+    private fun getVideoAIPanelStateHost(): VideoAIPanelStateHost? {
+        return (parentFragment as? VideoAIPanelStateHost) ?: (activity as? VideoAIPanelStateHost)
+    }
+
+    override fun showVideoAISidePanel(assetId: String, notesUrl: String?) {
+        isAiPanelRequested = true
+        getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(true)
+        attachAiToSidePanel(assetId, notesUrl)
+    }
+
+    private fun attachAiToSidePanel(assetId: String, notesUrl: String?) {
+        val util = exoPlayerUtil ?: return
+        val act = activity ?: return
+
+        if (util.isSidePanelAvailable) {
+            val view = getOrCreateAiSidePanelView(act, util)
+            util.showSidePanel(view.createView(act))
+            view.mount(assetId, notesUrl)
+        }
+    }
+
+    private fun getOrCreateAiSidePanelView(act: android.app.Activity, util: ExoPlayerUtil): VideoAISidePanelView {
+        return aiSidePanelView ?: VideoAISidePanelView(
+            activity = act,
+            onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
+            onCloseRequested = { 
+                isAiPanelRequested = false
+                util.hideSidePanel()
+                getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
+            }
+        ).also { aiSidePanelView = it }
+    }
+
+    private fun toggleAiSidePanel() {
+        val util = exoPlayerUtil ?: return
+        
+        if (util.isSidePanelVisible) {
+            isAiPanelRequested = false
+            util.hideSidePanel()
+            getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
+        } else {
+            aiAssetId?.let { showVideoAISidePanel(it, aiNotesUrl) }
+        }
+    }
+
+    override fun hideVideoAISidePanel(notifyHost: Boolean) {
+        isAiPanelRequested = false
+        exoPlayerUtil?.hideSidePanel()
+        if (notifyHost) {
+            getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
+        }
     }
 
     override fun seekTo(milliSeconds: Long?) {
@@ -150,6 +255,8 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment() {
 
     override fun onDestroy() {
         super.onDestroy()
+        aiSidePanelView?.destroy()
+        aiSidePanelView = null
         exoplayerFullscreenHelper?.disableOrientationListener()
     }
 

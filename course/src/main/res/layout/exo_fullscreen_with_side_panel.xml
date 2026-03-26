@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/exo_fullscreen_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="horizontal"
+    android:background="@android:color/black">
+
+    <FrameLayout
+        android:id="@+id/exo_fullscreen_player_container"
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1" />
+
+    <FrameLayout
+        android:id="@+id/exo_fullscreen_side_panel_container"
+        android:layout_width="360dp"
+        android:layout_height="match_parent"
+        android:visibility="gone" />
+
+</LinearLayout>
+
