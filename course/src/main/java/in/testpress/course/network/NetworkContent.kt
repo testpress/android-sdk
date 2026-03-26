@@ -65,7 +65,18 @@ data class NetworkContent(
     @SerializedName("ai_notes_url")
     val aiNotesUrl: String? = null,
     @SerializedName("learnlens_asset_status")
-    val learnlensAssetStatus: String? = null
+    val learnlensAssetStatus: String? = null,
+    @SerializedName("enable_transcript")
+    val enableTranscript: Boolean? = null,
+    @SerializedName("video_subtitle")
+    val videoSubtitle: NetworkVideoSubtitle? = null
+)
+
+data class NetworkVideoSubtitle(
+    val url: String? = null,
+    val language: String? = null,
+    @SerializedName("job_status")
+    val jobStatus: String? = null,
 )
 
 fun NetworkContent.asDatabaseModel(): ContentEntity {
@@ -100,7 +111,11 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         learnlensAssetId = this.learnlensAssetId,
         canEnableLearnLensAI = this.canEnableLearnLensAI,
         aiNotesUrl = this.aiNotesUrl,
-        learnlensAssetStatus = this.learnlensAssetStatus
+        learnlensAssetStatus = this.learnlensAssetStatus,
+        enableTranscript = this.enableTranscript,
+        videoSubtitleUrl = this.videoSubtitle?.url,
+        videoSubtitleLanguage = this.videoSubtitle?.language,
+        videoSubtitleJobStatus = this.videoSubtitle?.jobStatus
     )
     contentEntity.title = this.title
     contentEntity.order = this.order
@@ -154,6 +169,10 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.canEnableLearnLensAI,
         this.aiNotesUrl,
         this.learnlensAssetStatus,
+        this.enableTranscript,
+        this.videoSubtitle?.url,
+        this.videoSubtitle?.language,
+        this.videoSubtitle?.jobStatus,
         this.courseId,
         this.chapterId,
         this.videoConferenceId,

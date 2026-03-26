@@ -71,6 +71,8 @@ data class DomainContent(
     val canEnableLearnLensAI: Boolean? = null,
     val aiNotesUrl: String? = null,
     val learnlensAssetStatus: String? = null,
+    val enableTranscript: Boolean? = null,
+    val videoSubtitle: DomainVideoSubtitle? = null,
     val treePath: String? = null,
     val icon: String? = null,
     val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
@@ -123,6 +125,30 @@ data class DomainContent(
     }
 }
 
+data class DomainVideoSubtitle(
+    val url: String? = null,
+    val language: String? = null,
+    val jobStatus: String? = null,
+)
+
+enum class VideoSubtitleJobStatus {
+    PENDING,
+    RUNNING,
+    COMPLETED,
+    FAILED,
+    UNKNOWN
+}
+
+fun DomainVideoSubtitle.jobStatusEnum(): VideoSubtitleJobStatus {
+    return when (jobStatus?.trim()?.uppercase()) {
+        "PENDING" -> VideoSubtitleJobStatus.PENDING
+        "RUNNING" -> VideoSubtitleJobStatus.RUNNING
+        "COMPLETED" -> VideoSubtitleJobStatus.COMPLETED
+        "FAILED" -> VideoSubtitleJobStatus.FAILED
+        else -> VideoSubtitleJobStatus.UNKNOWN
+    }
+}
+
 fun createDomainContent(contentEntity: ContentEntity): DomainContent {
     return DomainContent(
         id = contentEntity.id,
@@ -165,7 +191,13 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         learnlensAssetId = contentEntity.learnlensAssetId,
         canEnableLearnLensAI = contentEntity.canEnableLearnLensAI,
         aiNotesUrl = contentEntity.aiNotesUrl,
-        learnlensAssetStatus = contentEntity.learnlensAssetStatus
+        learnlensAssetStatus = contentEntity.learnlensAssetStatus,
+        enableTranscript = contentEntity.enableTranscript,
+        videoSubtitle = DomainVideoSubtitle(
+            url = contentEntity.videoSubtitleUrl,
+            language = contentEntity.videoSubtitleLanguage,
+            jobStatus = contentEntity.videoSubtitleJobStatus
+        ).takeIf { it.url != null || it.language != null || it.jobStatus != null }
     )
 }
 
@@ -221,7 +253,13 @@ fun createDomainContent(content: Content): DomainContent {
         learnlensAssetId = content.learnlensAssetId,
         canEnableLearnLensAI = content.canEnableLearnLensAI,
         aiNotesUrl = content.aiNotesUrl,
-        learnlensAssetStatus = content.learnlensAssetStatus
+        learnlensAssetStatus = content.learnlensAssetStatus,
+        enableTranscript = content.enableTranscript,
+        videoSubtitle = DomainVideoSubtitle(
+            url = content.videoSubtitleUrl,
+            language = content.videoSubtitleLanguage,
+            jobStatus = content.videoSubtitleJobStatus
+        ).takeIf { it.url != null || it.language != null || it.jobStatus != null }
     )
 }
 
