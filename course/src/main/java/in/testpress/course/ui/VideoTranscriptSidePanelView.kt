@@ -12,34 +12,34 @@ class VideoTranscriptSidePanelView(
     private val onCloseRequested: () -> Unit,
     private val currentPositionSecondsProvider: () -> Float,
 ) {
-    private var panelView: VideoTranscriptPanelView? = null
+    private var transcriptView: VideoTranscriptView? = null
     private var rootView: View? = null
 
     fun createView(context: android.content.Context): View {
         if (rootView == null) {
-            panelView = VideoTranscriptPanelView(
+            transcriptView = VideoTranscriptView(
                 onSeek = onSeek,
                 onCloseRequested = onCloseRequested,
             )
-            rootView = panelView!!.createView(context)
+            rootView = transcriptView!!.createView(context)
         }
         return rootView!!
     }
 
     fun mount(subtitleUrl: String) {
-        val view = panelView ?: return
+        val view = transcriptView ?: return
         view.currentPositionSecondsProvider = currentPositionSecondsProvider
         view.mount(subtitleUrl)
         view.startSync()
     }
 
     fun onHidden() {
-        panelView?.stopSync()
+        transcriptView?.stopSync()
     }
 
     fun destroy() {
-        panelView?.destroy()
-        panelView = null
+        transcriptView?.destroy()
+        transcriptView = null
         rootView = null
     }
 }

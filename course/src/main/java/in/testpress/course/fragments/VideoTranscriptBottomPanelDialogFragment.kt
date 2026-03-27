@@ -1,7 +1,7 @@
 package `in`.testpress.course.fragments
 
 import `in`.testpress.course.R
-import `in`.testpress.course.ui.VideoTranscriptPanelView
+import `in`.testpress.course.ui.VideoTranscriptView
 import android.app.Dialog
 import android.content.res.Configuration
 import android.os.Build
@@ -69,7 +69,7 @@ class VideoTranscriptBottomPanelDialogFragment : DialogFragment() {
     }
 
     private var subtitleUrl: String = ""
-    private var panelView: VideoTranscriptPanelView? = null
+    private var transcriptView: VideoTranscriptView? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -107,11 +107,11 @@ class VideoTranscriptBottomPanelDialogFragment : DialogFragment() {
         }
         refreshPanelAppearance()
         mountTranscriptContent()
-        panelView?.startSync()
+        transcriptView?.startSync()
     }
 
     override fun onStop() {
-        panelView?.stopSync()
+        transcriptView?.stopSync()
         super.onStop()
     }
 
@@ -124,19 +124,19 @@ class VideoTranscriptBottomPanelDialogFragment : DialogFragment() {
 
     private fun mountTranscriptContent() {
         val container = view?.findViewById<ViewGroup>(R.id.content_container) ?: return
-        if (panelView == null) {
-            panelView = VideoTranscriptPanelView(
+        if (transcriptView == null) {
+            transcriptView = VideoTranscriptView(
                 onSeek = { seconds -> resolveHost()?.onVideoTranscriptSeek(seconds) },
                 onCloseRequested = {
                     dialog?.hide()
                     resolveHost()?.onVideoTranscriptCloseRequested()
                 },
             )
-            container.addView(panelView!!.createView(requireContext()))
+            container.addView(transcriptView!!.createView(requireContext()))
         }
 
-        panelView?.currentPositionSecondsProvider = { resolveHost()?.getVideoTranscriptCurrentPositionSeconds() ?: 0f }
-        panelView?.mount(subtitleUrl)
+        transcriptView?.currentPositionSecondsProvider = { resolveHost()?.getVideoTranscriptCurrentPositionSeconds() ?: 0f }
+        transcriptView?.mount(subtitleUrl)
     }
 
     private fun refreshPanelAppearance() {

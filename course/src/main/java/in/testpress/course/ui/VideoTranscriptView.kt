@@ -18,7 +18,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 
-class VideoTranscriptPanelView(
+class VideoTranscriptView(
     private val onSeek: (seconds: Double) -> Unit,
     private val onCloseRequested: () -> Unit,
     private val repository: TranscriptRepository = TranscriptRepository(),
