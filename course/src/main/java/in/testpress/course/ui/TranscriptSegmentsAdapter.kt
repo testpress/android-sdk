@@ -1,6 +1,6 @@
 package `in`.testpress.course.ui
 
-import `in`.testpress.course.domain.transcript.TranscriptSegment
+import `in`.testpress.course.domain.TranscriptSegment
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 

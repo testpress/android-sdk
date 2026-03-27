@@ -3,7 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.VideoTranscriptPanelBinding
 import `in`.testpress.course.repository.TranscriptRepository
-import `in`.testpress.course.domain.transcript.TranscriptSegment
+import `in`.testpress.course.domain.TranscriptSegment
 import android.content.Context
 import android.view.View
 import androidx.core.view.isVisible
@@ -45,8 +45,7 @@ class VideoTranscriptView(
             when (newState) {
                 RecyclerView.SCROLL_STATE_DRAGGING,
                 RecyclerView.SCROLL_STATE_SETTLING -> {
-                    resumeFollowJob?.cancel()
-                    resumeFollowJob = null
+                    cancelResumeFollowJob()
                     if (isFollowMode) {
                         isFollowMode = false
                     }
@@ -55,12 +54,11 @@ class VideoTranscriptView(
                 RecyclerView.SCROLL_STATE_IDLE -> {
                     if (!isFollowMode && activeIndex != -1) {
                         // Give the user a moment to browse; then return to "follow" mode automatically.
-                        resumeFollowJob?.cancel()
+                        cancelResumeFollowJob()
                         resumeFollowJob = scope.launch {
                             delay(FOLLOW_RESUME_DELAY_MS)
-                            isFollowMode = true
+                            setFollowModeEnabled()
                             scrollToIndexIfNeeded(activeIndex)
-                            binding.jumpToCurrentButton.isVisible = false
                         }
                     }
                 }
@@ -96,25 +94,18 @@ class VideoTranscriptView(
         val url = subtitleUrl?.trim().orEmpty()
         if (url.isBlank()) {
             mountedUrl = null
-            setLoading(false)
-            setMessage(R.string.transcript_not_available)
-            adapter.submitList(emptyList())
-            adapter.resetActiveIndex()
-            activeIndex = -1
-            isFollowMode = true
-            resumeFollowJob?.cancel()
-            resumeFollowJob = null
-            binding.jumpToCurrentButton.isVisible = false
+            showTranscriptNotAvailable()
+            resetFollowModeState()
+            cancelResumeFollowJob()
+            segments = emptyList()
             return
         }
 
         if (mountedUrl == url && segments.isNotEmpty()) return
 
         mountedUrl = url
-        isFollowMode = true
-        resumeFollowJob?.cancel()
-        resumeFollowJob = null
-        binding.jumpToCurrentButton.isVisible = false
+        resetFollowModeState()
+        cancelResumeFollowJob()
         loadTranscript(url)
     }
 
@@ -139,8 +130,7 @@ class VideoTranscriptView(
     fun destroy() {
         loadJob?.cancel()
         loadJob = null
-        resumeFollowJob?.cancel()
-        resumeFollowJob = null
+        cancelResumeFollowJob()
         stopSync()
         scope.cancel()
         if (::binding.isInitialized) {
@@ -151,10 +141,7 @@ class VideoTranscriptView(
     }
 
     private fun loadTranscript(url: String) {
-        setLoading(true)
-        setMessage(null)
-        adapter.submitList(emptyList())
-        adapter.resetActiveIndex()
+        prepareForTranscriptLoad()
 
         loadJob?.cancel()
         loadJob = scope.launch {
@@ -170,22 +157,53 @@ class VideoTranscriptView(
             setLoading(false)
 
             if (parsed.isEmpty()) {
-                setMessage(R.string.transcript_not_available)
-                adapter.submitList(emptyList())
-                adapter.resetActiveIndex()
-                activeIndex = -1
-                isFollowMode = true
-                binding.jumpToCurrentButton.isVisible = false
+                showTranscriptNotAvailable()
+                resetFollowModeState()
             } else {
-                setMessage(null)
-                adapter.submitList(parsed)
-                adapter.resetActiveIndex()
-                // Start in follow mode at the current position (if available).
-                activeIndex = -1
-                isFollowMode = true
-                binding.jumpToCurrentButton.isVisible = false
+                showTranscriptLoaded(parsed)
             }
         }
+    }
+
+    private fun prepareForTranscriptLoad() {
+        setLoading(true)
+        setMessage(null)
+        clearTranscriptList()
+    }
+
+    private fun showTranscriptNotAvailable() {
+        setLoading(false)
+        setMessage(R.string.transcript_not_available)
+        clearTranscriptList()
+    }
+
+    private fun showTranscriptLoaded(segments: List<TranscriptSegment>) {
+        setLoading(false)
+        setMessage(null)
+        adapter.submitList(segments)
+        adapter.resetActiveIndex()
+        // Start in follow mode at the current position (if available).
+        resetFollowModeState()
+    }
+
+    private fun cancelResumeFollowJob() {
+        resumeFollowJob?.cancel()
+        resumeFollowJob = null
+    }
+
+    private fun resetFollowModeState() {
+        activeIndex = -1
+        setFollowModeEnabled()
+    }
+
+    private fun clearTranscriptList() {
+        adapter.submitList(emptyList())
+        adapter.resetActiveIndex()
+    }
+
+    private fun setFollowModeEnabled() {
+        isFollowMode = true
+        binding.jumpToCurrentButton.isVisible = false
     }
 
     private fun setLoading(isLoading: Boolean) {
@@ -225,11 +243,9 @@ class VideoTranscriptView(
     private fun jumpToCurrent() {
         val index = activeIndex
         if (index == -1) return
-        resumeFollowJob?.cancel()
-        resumeFollowJob = null
-        isFollowMode = true
+        cancelResumeFollowJob()
+        setFollowModeEnabled()
         scrollToIndex(index)
-        binding.jumpToCurrentButton.isVisible = false
     }
 
     private fun updateJumpButtonVisibility() {
