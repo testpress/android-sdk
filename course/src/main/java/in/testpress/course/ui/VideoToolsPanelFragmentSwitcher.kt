@@ -51,8 +51,6 @@ class VideoToolsPanelFragmentSwitcher(
         fragment: Fragment,
         shouldReplace: (existing: Fragment, replacement: Fragment) -> Boolean,
     ) {
-        container.isVisible = true
-
         val existing = findPanel(panel)
         fragmentManager.beginTransaction().apply {
             setReorderingAllowed(true)
