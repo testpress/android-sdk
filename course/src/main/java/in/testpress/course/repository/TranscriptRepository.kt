@@ -1,8 +1,8 @@
 package `in`.testpress.course.repository
 
 import `in`.testpress.course.network.TranscriptTextDownloader
-import `in`.testpress.course.util.TranscriptSegment
-import `in`.testpress.course.util.WebVttTranscriptParser
+import `in`.testpress.course.domain.transcript.TranscriptSegment
+import `in`.testpress.course.domain.transcript.WebVttTranscriptParser
 
 class TranscriptRepository(
     private val downloader: TranscriptTextDownloader = TranscriptTextDownloader(),

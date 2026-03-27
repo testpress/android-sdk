@@ -1,4 +1,4 @@
-package `in`.testpress.course.util
+package `in`.testpress.course.domain.transcript
 
 data class TranscriptSegment(
     val startTimeSeconds: Double,

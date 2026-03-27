@@ -2,7 +2,7 @@ package `in`.testpress.course.ui
 
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.TranscriptSegmentItemBinding
-import `in`.testpress.course.util.TranscriptSegment
+import `in`.testpress.course.domain.transcript.TranscriptSegment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
@@ -45,4 +45,3 @@ class TranscriptSegmentViewHolder private constructor(
         }
     }
 }
-

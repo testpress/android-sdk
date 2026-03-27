@@ -3,7 +3,7 @@ package `in`.testpress.course.ui
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.VideoTranscriptPanelBinding
 import `in`.testpress.course.repository.TranscriptRepository
-import `in`.testpress.course.util.TranscriptSegment
+import `in`.testpress.course.domain.transcript.TranscriptSegment
 import android.content.Context
 import android.view.View
 import androidx.core.view.isVisible

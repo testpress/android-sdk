@@ -326,11 +326,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(),
         return transcriptSidePanelView ?: VideoTranscriptSidePanelView(
             onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
             onCloseRequested = {
-                isTranscriptPanelRequested = false
-                transcriptSidePanelView?.onHidden()
-                util.hideSidePanel()
-                activeSidePanel = null
-                getVideoTranscriptPanelStateHost()?.onVideoTranscriptPanelStateChanged(false)
+                closeTranscriptSidePanel(notifyHost = true, util = util)
             },
             currentPositionSecondsProvider = { util.getCurrentPosition() },
         ).also { transcriptSidePanelView = it }
@@ -340,11 +336,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(),
         val util = exoPlayerUtil ?: return
 
         if (util.isSidePanelVisible && activeSidePanel == ActiveSidePanel.TRANSCRIPT) {
-            isTranscriptPanelRequested = false
-            transcriptSidePanelView?.onHidden()
-            util.hideSidePanel()
-            activeSidePanel = null
-            getVideoTranscriptPanelStateHost()?.onVideoTranscriptPanelStateChanged(false)
+            closeTranscriptSidePanel(notifyHost = true, util = util)
         } else {
             activeSubtitleUrl?.let { showVideoTranscriptSidePanel(it) }
         }
@@ -365,11 +357,11 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(),
         }
     }
 
-    private fun closeTranscriptSidePanel(notifyHost: Boolean) {
+    private fun closeTranscriptSidePanel(notifyHost: Boolean, util: ExoPlayerUtil? = exoPlayerUtil) {
         isTranscriptPanelRequested = false
         if (activeSidePanel == ActiveSidePanel.TRANSCRIPT) {
             transcriptSidePanelView?.onHidden()
-            exoPlayerUtil?.hideSidePanel()
+            util?.hideSidePanel()
             activeSidePanel = null
         }
         if (notifyHost) {
