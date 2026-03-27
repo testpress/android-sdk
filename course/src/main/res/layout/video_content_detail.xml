@@ -91,6 +91,44 @@
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true" />
 
+    <!-- Custom Floating Action Button for Transcript (native player only) -->
+    <LinearLayout
+        android:id="@+id/transcript_fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentBottom="true"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="144dp"
+        android:orientation="horizontal"
+        android:background="@drawable/ask_ai_fab_background"
+        android:gravity="center_vertical"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="14dp"
+        android:paddingBottom="14dp"
+        android:elevation="6dp"
+        android:visibility="gone"
+        android:minWidth="140dp">
+
+        <ImageView
+            android:id="@+id/transcript_icon_fab"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:src="@drawable/ic_transcript"
+            android:contentDescription="@string/transcript"
+            android:layout_marginEnd="8dp" />
+
+        <TextView
+            android:id="@+id/transcript_text_fab"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/show_transcript"
+            android:textColor="@color/testpress_white"
+            android:textSize="14sp" />
+
+    </LinearLayout>
+
     <!-- Custom Floating Action Button for Ask AI (native player only) -->
     <LinearLayout
         android:id="@+id/ask_ai_fab"

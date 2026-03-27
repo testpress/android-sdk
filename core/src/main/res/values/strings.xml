@@ -56,6 +56,11 @@
     <string name="AI">AI</string>
     <string name="Switch_to_AI">Switch to AI</string>
     <string name="ask_to_ai">Ask to AI</string>
+    <string name="transcript">Transcript</string>
+    <string name="show_transcript">Show Transcript</string>
+    <string name="transcript_not_available">Transcript not available for this video.</string>
+    <string name="transcript_loading_failed">Failed to load transcript. Please try again later.</string>
+    <string name="jump_to_current">Jump to current</string>
 
     <string-array name="discussions_author_filter">
         <item>All</item>

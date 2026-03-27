@@ -3,12 +3,16 @@ package `in`.testpress.course.fragments
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.getGreenDaoContent
+import `in`.testpress.course.domain.VideoSubtitleJobStatus
+import `in`.testpress.course.domain.jobStatusEnum
 import `in`.testpress.enums.Status
 import `in`.testpress.course.ui.ContentActivity.CONTENT_ID
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import `in`.testpress.course.ui.VideoAISidePanelInterface
 import `in`.testpress.course.ui.VideoAISidePanelView
+import `in`.testpress.course.ui.VideoTranscriptSidePanelInterface
+import `in`.testpress.course.ui.VideoTranscriptSidePanelView
 import android.os.Bundle
 import android.os.Handler
 import android.view.LayoutInflater
@@ -24,7 +28,9 @@ import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import `in`.testpress.network.Resource
 import android.content.res.Configuration
 
-class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInterface {
+class NativeVideoWidgetFragment : BaseVideoWidgetFragment(),
+    VideoAISidePanelInterface,
+    VideoTranscriptSidePanelInterface {
     private lateinit var exoPlayerMainFrame: AspectRatioFrameLayout
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private var contentReloadObserver: Observer<Resource<DomainContent>>? = null
@@ -40,6 +46,16 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
     private var aiAssetId: String? = null
     private var aiNotesUrl: String? = null
     private var isAiPanelRequested: Boolean = false
+    private var activeSubtitleUrl: String? = null
+    private var isTranscriptPanelRequested: Boolean = false
+    private var transcriptSidePanelView: VideoTranscriptSidePanelView? = null
+
+    private enum class ActiveSidePanel {
+        AI,
+        TRANSCRIPT
+    }
+
+    private var activeSidePanel: ActiveSidePanel? = null
 
     interface VideoAIButtonHost {
         fun onVideoAIButtonClicked(isFullscreen: Boolean)
@@ -47,6 +63,14 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
 
     interface VideoAIPanelStateHost {
         fun onVideoAIPanelStateChanged(isOpen: Boolean)
+    }
+
+    interface VideoTranscriptButtonHost {
+        fun onVideoTranscriptButtonClicked(isFullscreen: Boolean)
+    }
+
+    interface VideoTranscriptPanelStateHost {
+        fun onVideoTranscriptPanelStateChanged(isOpen: Boolean)
     }
 
     override fun onCreateView(
@@ -118,6 +142,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
         exoPlayerUtil?.setContent(greenDaoContent!!)
         exoplayerFullscreenHelper.setExoplayerUtil(exoPlayerUtil)
         configureAiButton(content)
+        configureTranscriptButton(content)
         registerPendingCallbacks()
         viewModel.createContentAttempt(content.id)
             .observe(viewLifecycleOwner, Observer { resource ->
@@ -142,12 +167,23 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
                 aiAssetId?.let { assetId ->
                     attachAiToSidePanel(assetId, aiNotesUrl)
                 }
+            } else if (isTranscriptPanelRequested) {
+                activeSubtitleUrl?.let { subtitleUrl ->
+                    attachTranscriptToSidePanel(subtitleUrl)
+                }
             }
         }
     }
 
     private fun isVideoAIEnabled(content: DomainContent): Boolean {
         return content.canEnableLearnLensAI == true && !content.learnlensAssetId.isNullOrBlank()
+    }
+
+    private fun isVideoTranscriptEnabled(content: DomainContent): Boolean {
+        val subtitle = content.videoSubtitle
+        val url = subtitle?.url
+        val isReady = subtitle?.jobStatusEnum() == VideoSubtitleJobStatus.COMPLETED
+        return content.enableTranscript == true && isReady && !url.isNullOrBlank()
     }
 
     private fun configureAiButton(content: DomainContent) {
@@ -158,6 +194,16 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
         exoPlayerUtil?.setPlayerActionButtonVisible(R.id.exo_ai_button, enabled)
         if (enabled) {
             exoPlayerUtil?.setPlayerActionButtonOnClickListener(R.id.exo_ai_button) { handleAiButtonClick() }
+        }
+    }
+
+    private fun configureTranscriptButton(content: DomainContent) {
+        val enabled = isVideoTranscriptEnabled(content)
+        activeSubtitleUrl = content.videoSubtitle?.url
+
+        exoPlayerUtil?.setPlayerActionButtonVisible(R.id.exo_transcript_button, enabled)
+        if (enabled) {
+            exoPlayerUtil?.setPlayerActionButtonOnClickListener(R.id.exo_transcript_button) { handleTranscriptButtonClick() }
         }
     }
 
@@ -172,6 +218,17 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
         }
     }
 
+    private fun handleTranscriptButtonClick() {
+        val util = exoPlayerUtil ?: return
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+        if (util.isFullscreen || isLandscape) {
+            toggleTranscriptSidePanel()
+        } else {
+            getVideoTranscriptHost()?.onVideoTranscriptButtonClicked(false)
+        }
+    }
+
     private fun getVideoAIHost(): VideoAIButtonHost? {
         return (parentFragment as? VideoAIButtonHost) ?: (activity as? VideoAIButtonHost)
     }
@@ -180,8 +237,18 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
         return (parentFragment as? VideoAIPanelStateHost) ?: (activity as? VideoAIPanelStateHost)
     }
 
+    private fun getVideoTranscriptHost(): VideoTranscriptButtonHost? {
+        return (parentFragment as? VideoTranscriptButtonHost) ?: (activity as? VideoTranscriptButtonHost)
+    }
+
+    private fun getVideoTranscriptPanelStateHost(): VideoTranscriptPanelStateHost? {
+        return (parentFragment as? VideoTranscriptPanelStateHost) ?: (activity as? VideoTranscriptPanelStateHost)
+    }
+
     override fun showVideoAISidePanel(assetId: String, notesUrl: String?) {
+        closeTranscriptSidePanel(notifyHost = true)
         isAiPanelRequested = true
+        activeSidePanel = ActiveSidePanel.AI
         getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(true)
         attachAiToSidePanel(assetId, notesUrl)
     }
@@ -194,6 +261,7 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
             val view = getOrCreateAiSidePanelView(act, util)
             util.showSidePanel(view.createView(act))
             view.mount(assetId, notesUrl)
+            activeSidePanel = ActiveSidePanel.AI
         }
     }
 
@@ -212,9 +280,10 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
     private fun toggleAiSidePanel() {
         val util = exoPlayerUtil ?: return
         
-        if (util.isSidePanelVisible) {
+        if (util.isSidePanelVisible && activeSidePanel == ActiveSidePanel.AI) {
             isAiPanelRequested = false
             util.hideSidePanel()
+            activeSidePanel = null
             getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         } else {
             aiAssetId?.let { showVideoAISidePanel(it, aiNotesUrl) }
@@ -223,14 +292,89 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
 
     override fun hideVideoAISidePanel(notifyHost: Boolean) {
         isAiPanelRequested = false
-        exoPlayerUtil?.hideSidePanel()
+        if (activeSidePanel == ActiveSidePanel.AI) {
+            exoPlayerUtil?.hideSidePanel()
+            activeSidePanel = null
+        }
         if (notifyHost) {
             getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
         }
     }
 
+    override fun showVideoTranscriptSidePanel(subtitleUrl: String) {
+        closeAiSidePanel(notifyHost = true)
+        isTranscriptPanelRequested = true
+        activeSubtitleUrl = subtitleUrl
+        activeSidePanel = ActiveSidePanel.TRANSCRIPT
+        getVideoTranscriptPanelStateHost()?.onVideoTranscriptPanelStateChanged(true)
+        attachTranscriptToSidePanel(subtitleUrl)
+    }
+
+    private fun attachTranscriptToSidePanel(subtitleUrl: String) {
+        val util = exoPlayerUtil ?: return
+        val act = activity ?: return
+
+        if (util.isSidePanelAvailable) {
+            val view = getOrCreateTranscriptSidePanelView(util)
+            util.showSidePanel(view.createView(act))
+            view.mount(subtitleUrl)
+            activeSidePanel = ActiveSidePanel.TRANSCRIPT
+        }
+    }
+
+    private fun getOrCreateTranscriptSidePanelView(util: ExoPlayerUtil): VideoTranscriptSidePanelView {
+        return transcriptSidePanelView ?: VideoTranscriptSidePanelView(
+            onSeek = { seconds -> util.seekTo((seconds * 1000).toLong()) },
+            onCloseRequested = {
+                closeTranscriptSidePanel(notifyHost = true, util = util)
+            },
+            currentPositionSecondsProvider = { util.getCurrentPosition() },
+        ).also { transcriptSidePanelView = it }
+    }
+
+    private fun toggleTranscriptSidePanel() {
+        val util = exoPlayerUtil ?: return
+
+        if (util.isSidePanelVisible && activeSidePanel == ActiveSidePanel.TRANSCRIPT) {
+            closeTranscriptSidePanel(notifyHost = true, util = util)
+        } else {
+            activeSubtitleUrl?.let { showVideoTranscriptSidePanel(it) }
+        }
+    }
+
+    override fun hideVideoTranscriptSidePanel(notifyHost: Boolean) {
+        closeTranscriptSidePanel(notifyHost = notifyHost)
+    }
+
+    private fun closeAiSidePanel(notifyHost: Boolean) {
+        isAiPanelRequested = false
+        if (activeSidePanel == ActiveSidePanel.AI) {
+            exoPlayerUtil?.hideSidePanel()
+            activeSidePanel = null
+        }
+        if (notifyHost) {
+            getVideoAIPanelStateHost()?.onVideoAIPanelStateChanged(false)
+        }
+    }
+
+    private fun closeTranscriptSidePanel(notifyHost: Boolean, util: ExoPlayerUtil? = exoPlayerUtil) {
+        isTranscriptPanelRequested = false
+        if (activeSidePanel == ActiveSidePanel.TRANSCRIPT) {
+            transcriptSidePanelView?.onHidden()
+            util?.hideSidePanel()
+            activeSidePanel = null
+        }
+        if (notifyHost) {
+            getVideoTranscriptPanelStateHost()?.onVideoTranscriptPanelStateChanged(false)
+        }
+    }
+
     override fun seekTo(milliSeconds: Long?) {
         exoPlayerUtil?.seekTo(milliSeconds)
+    }
+
+    fun getCurrentPositionSeconds(): Float {
+        return exoPlayerUtil?.getCurrentPosition() ?: 0f
     }
 
     override fun onPause() {
@@ -257,6 +401,8 @@ class NativeVideoWidgetFragment : BaseVideoWidgetFragment(), VideoAISidePanelInt
         super.onDestroy()
         aiSidePanelView?.destroy()
         aiSidePanelView = null
+        transcriptSidePanelView?.destroy()
+        transcriptSidePanelView = null
         exoplayerFullscreenHelper?.disableOrientationListener()
     }
 
