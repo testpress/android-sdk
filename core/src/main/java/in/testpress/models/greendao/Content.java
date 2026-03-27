@@ -72,6 +72,11 @@ public class Content implements android.os.Parcelable {
     private String aiNotesUrl;
     @SerializedName("learnlens_asset_status")
     private String learnlensAssetStatus;
+    @SerializedName("enable_transcript")
+    private Boolean enableTranscript;
+    private String videoSubtitleUrl;
+    private String videoSubtitleLanguage;
+    private String videoSubtitleJobStatus;
     private Long courseId;
     private Long chapterId;
     private Long videoConferenceId;
@@ -149,7 +154,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Boolean enableTranscript, String videoSubtitleUrl, String videoSubtitleLanguage, String videoSubtitleJobStatus, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -186,6 +191,10 @@ public class Content implements android.os.Parcelable {
         this.canEnableLearnLensAI = canEnableLearnLensAI;
         this.aiNotesUrl = aiNotesUrl;
         this.learnlensAssetStatus = learnlensAssetStatus;
+        this.enableTranscript = enableTranscript;
+        this.videoSubtitleUrl = videoSubtitleUrl;
+        this.videoSubtitleLanguage = videoSubtitleLanguage;
+        this.videoSubtitleJobStatus = videoSubtitleJobStatus;
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.videoConferenceId = videoConferenceId;
@@ -489,6 +498,38 @@ public class Content implements android.os.Parcelable {
 
     public void setLearnlensAssetStatus(String learnlensAssetStatus) {
         this.learnlensAssetStatus = learnlensAssetStatus;
+    }
+
+    public Boolean getEnableTranscript() {
+        return enableTranscript;
+    }
+
+    public void setEnableTranscript(Boolean enableTranscript) {
+        this.enableTranscript = enableTranscript;
+    }
+
+    public String getVideoSubtitleUrl() {
+        return videoSubtitleUrl;
+    }
+
+    public void setVideoSubtitleUrl(String videoSubtitleUrl) {
+        this.videoSubtitleUrl = videoSubtitleUrl;
+    }
+
+    public String getVideoSubtitleLanguage() {
+        return videoSubtitleLanguage;
+    }
+
+    public void setVideoSubtitleLanguage(String videoSubtitleLanguage) {
+        this.videoSubtitleLanguage = videoSubtitleLanguage;
+    }
+
+    public String getVideoSubtitleJobStatus() {
+        return videoSubtitleJobStatus;
+    }
+
+    public void setVideoSubtitleJobStatus(String videoSubtitleJobStatus) {
+        this.videoSubtitleJobStatus = videoSubtitleJobStatus;
     }
 
     public Long getCourseId() {

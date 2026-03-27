@@ -36,5 +36,9 @@ data class ContentEntity(
     var learnlensAssetId: String? = null,
     var canEnableLearnLensAI: Boolean? = null,
     var aiNotesUrl: String? = null,
-    var learnlensAssetStatus: String? = null
+    var learnlensAssetStatus: String? = null,
+    var enableTranscript: Boolean? = null,
+    var videoSubtitleUrl: String? = null,
+    var videoSubtitleLanguage: String? = null,
+    var videoSubtitleJobStatus: String? = null
 ): BaseContentEntity()
