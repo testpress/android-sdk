@@ -6,24 +6,24 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
+    <FrameLayout
+        android:id="@+id/video_widget_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/appbar" />
+
     <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
         android:id="@+id/swipe_container"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@id/bottom_navigation_fragment"
-        android:layout_below="@+id/appbar">
+        android:layout_below="@id/video_widget_fragment">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
             tools:ignore="ScrollViewSize">
-
-            <FrameLayout
-                android:id="@+id/video_widget_fragment"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content" />
-
 
             <LinearLayout
                 android:id="@+id/header_layout"
@@ -79,6 +79,18 @@
 
         </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+
+    <!-- Inline panel for Transcript / AI in portrait; anchored below the video player -->
+    <FrameLayout
+        android:id="@+id/video_tools_panel_container"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/video_widget_fragment"
+        android:layout_above="@id/bottom_navigation_fragment"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:background="@android:color/transparent" />
 
     <FrameLayout
         android:id="@+id/empty_view_fragment"
