@@ -48,6 +48,7 @@ import android.widget.Toast
 import android.content.res.Configuration
 import androidx.core.view.isVisible
 import java.util.regex.Pattern
+import android.text.SpannableStringBuilder
 
 open class VideoContentFragment : BaseContentDetailFragment(),
     VideoQuestionSheetFragment.OnQuestionCompleteListener,
@@ -269,26 +270,29 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun initializeListeners() {
         titleLayout.setOnClickListener {
-            val isDescriptionVisible = description.visibility == View.VISIBLE
-            toggleDescription(!isDescriptionVisible)
+            if (!isContentInitialized() || content.description.isNullOrBlank()) return@setOnClickListener
+            val isExpanded = description.isVisible
+            toggleDescription(!isExpanded)
         }
     }
 
     private fun toggleDescription(show: Boolean) {
-        if (show) {
-            description.visibility = View.VISIBLE
-            titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up_chevron, 0)
-            content.description?.let { swipeRefresh.isEnabled = false }
-        } else {
-            description.visibility = View.INVISIBLE
-            swipeRefresh.isEnabled = true
-            titleView.setCompoundDrawablesWithIntrinsicBounds(
-                0,
-                0,
-                R.drawable.ic_down_chevron,
-                0
-            )
+        val hasDescription = isContentInitialized() && !content.description.isNullOrBlank()
+        if (!hasDescription) {
+            description.visibility = View.GONE
+            titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            updateVideoToolsUIState()
+            return
         }
+
+        description.visibility = if (show) View.VISIBLE else View.GONE
+        titleView.setCompoundDrawablesWithIntrinsicBounds(
+            0,
+            0,
+            if (show) R.drawable.ic_up_chevron else R.drawable.ic_down_chevron,
+            0,
+        )
+        updateVideoToolsUIState()
     }
 
     override fun display() {
@@ -365,6 +369,13 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         val showFabs = isPortrait && openPanel == null
         askAiFab?.isVisible = canUseVideoAI() && showFabs
         transcriptFab?.isVisible = canUseVideoTranscript() && showFabs
+
+        // Avoid swipe-to-refresh gesture fighting with panel scrolling/interactions.
+        val isDescriptionExpanded = description.isVisible
+        val canSwipeRefresh = !isContentInitialized() ||
+            content.description.isNullOrBlank() ||
+            !isDescriptionExpanded
+        swipeRefresh.isEnabled = openPanel == null && canSwipeRefresh
     }
 
     private fun toggleVideoAIPanel() {
@@ -580,21 +591,37 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     private fun parseVideoDescription() {
-        content.description?.let {
-            description.text = HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
-            val durationRegex = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
-            val pattern: Pattern = Pattern.compile(durationRegex)
-            PatternEditableBuilder().addPattern(
-                pattern,
-                Color.parseColor("#2D9BE8"),
-                object : PatternEditableBuilder.SpannableClickedListener {
-                    override fun onSpanClicked(text: String) {
-                        val seconds = convertDurationStringToSeconds(text)
-                        videoWidgetFragment.seekTo(seconds * 1000L)
-                    }
-                }).into(description)
-            toggleDescription(true)
+        val raw = content.description?.trim().orEmpty()
+        if (raw.isBlank()) {
+            description.text = ""
+            description.visibility = View.GONE
+            titleLayout.isClickable = false
+            titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+            return
         }
+
+        titleLayout.isClickable = true
+        description.text = trimTrailingWhitespace(HtmlCompat.fromHtml(raw, HtmlCompat.FROM_HTML_MODE_LEGACY))
+        val durationRegex = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
+        val pattern: Pattern = Pattern.compile(durationRegex)
+        PatternEditableBuilder().addPattern(
+            pattern,
+            Color.parseColor("#2D9BE8"),
+            object : PatternEditableBuilder.SpannableClickedListener {
+                override fun onSpanClicked(text: String) {
+                    val seconds = convertDurationStringToSeconds(text)
+                    videoWidgetFragment.seekTo(seconds * 1000L)
+                }
+            }).into(description)
+        toggleDescription(true)
+    }
+
+    private fun trimTrailingWhitespace(text: CharSequence): CharSequence {
+        val builder = SpannableStringBuilder(text)
+        while (builder.isNotEmpty() && builder.last().isWhitespace()) {
+            builder.delete(builder.length - 1, builder.length)
+        }
+        return builder
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
