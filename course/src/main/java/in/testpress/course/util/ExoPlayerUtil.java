@@ -62,6 +62,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
@@ -1057,7 +1058,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
                     displayError(R.string.syncing_video);
                 } else {
+                    String drmDetailCode = getDetailedDrmErrorCode(exception);
                     String licenseRequestFailedMessage = activity.getString(R.string.license_request_failed, exception.errorCode, playBackId);
+                    if (drmDetailCode != null && !drmDetailCode.isEmpty()) {
+                        licenseRequestFailedMessage = licenseRequestFailedMessage + "\n\n(Detail: " + drmDetailCode + ")";
+                    }
                     displayError(licenseRequestFailedMessage, exception.errorCode);
                     logPlaybackException(licenseRequestFailedMessage, playBackId, exception);
                 }
@@ -1129,6 +1134,93 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     
     private boolean isDRMException(Throwable cause) {
         return cause instanceof DrmSession.DrmSessionException || cause instanceof MediaCodec.CryptoException || cause instanceof MediaDrmCallbackException;
+    }
+
+    private String getDetailedDrmErrorCode(PlaybackException exception) {
+        Throwable currentThrowable = exception.getCause();
+        int traversalDepth = 0;
+
+        while (currentThrowable != null && traversalDepth++ < 20) {
+            
+            if (currentThrowable instanceof MediaDrmCallbackException) {
+                return parseDrmCallbackException((MediaDrmCallbackException) currentThrowable);
+            }
+
+            // Phase 2: Failure during our custom License URL fetch (Testpress API phase)
+            String detailedErrorCode = parseLicenseUrlException(currentThrowable);
+            if (detailedErrorCode != null) {
+                return detailedErrorCode;
+            }
+
+            currentThrowable = currentThrowable.getCause();
+        }
+        return null;
+    }
+
+    private String parseDrmCallbackException(MediaDrmCallbackException drmException) {
+        Throwable nestedDrmThrowable = drmException.getCause();
+        int searchDepth = 0;
+
+        // Recursively search the internal DRM error chain for the root network/HTTP cause
+        while (nestedDrmThrowable != null && searchDepth++ < 15) {
+            
+            // Check for specific HTTP response failures (e.g., 403 Forbidden, 502 Bad Gateway)
+            if (nestedDrmThrowable instanceof HttpDataSource.InvalidResponseCodeException) {
+                int responseCode = ((HttpDataSource.InvalidResponseCodeException) nestedDrmThrowable).responseCode;
+                return "KEY_HTTP_" + responseCode;
+            }
+
+            // Check for common connectivity root causes
+            if (nestedDrmThrowable instanceof java.net.UnknownHostException) return "KEY_NO_INTERNET";
+            if (nestedDrmThrowable instanceof java.net.SocketTimeoutException) return "KEY_TIMEOUT";
+            if (nestedDrmThrowable instanceof java.net.ConnectException) return "KEY_CONNECT_FAIL";
+            
+            nestedDrmThrowable = nestedDrmThrowable.getCause();
+        }
+
+        // Fallback: If no specific match found, return the class name of the inner cause
+        Throwable rootCause = drmException.getCause();
+        if (rootCause != null) {
+            return "KEY_" + rootCause.getClass().getSimpleName();
+        }
+        return "KEY_MediaDrmCallbackException";
+    }
+
+    private String parseLicenseUrlException(Throwable throwable) {
+        String errorMessage = throwable.getMessage();
+        if (errorMessage != null && errorMessage.contains("DRM license URL")) {
+            
+            if (errorMessage.contains("missing in response")) {
+                return "LICENSE_URL_EMPTY";
+            }
+            
+            int httpCode = extractHttpCodeFromMessage(errorMessage);
+            if (httpCode != -1) {
+                return "LICENSE_URL_HTTP_" + httpCode;
+            }
+        }
+        return null;
+    }
+
+    private int extractHttpCodeFromMessage(String message) {
+        // Specifically parses for the pattern "HTTP XXX" within an error message string
+        int httpPatternStartIdx = message.indexOf("HTTP ");
+        if (httpPatternStartIdx == -1) return -1;
+
+        int numberStartIdx = httpPatternStartIdx + 5;
+        int numberEndIdx = numberStartIdx;
+
+        while (numberEndIdx < message.length() && Character.isDigit(message.charAt(numberEndIdx))) {
+            numberEndIdx++;
+        }
+
+        if (numberEndIdx == numberStartIdx) return -1;
+
+        try {
+            return Integer.parseInt(message.substring(numberStartIdx, numberEndIdx));
+        } catch (NumberFormatException ignored) {
+            return -1;
+        }
     }
 
     public static int getRendererIndex(int trackType, MappingTrackSelector.MappedTrackInfo mappedTrackInfo) {
