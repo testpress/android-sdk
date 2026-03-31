@@ -173,7 +173,7 @@
             android:id="@+id/ai_text_fab"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/ask_to_ai"
+            android:text="@string/ai_mode"
             android:textColor="@color/testpress_white"
             android:textSize="14sp" />
 
