@@ -295,35 +295,13 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun toggleDescription(show: Boolean) {
         if (!hasDescription()) {
-            description.text = ""
-            descriptionScroll?.isVisible = false
-            descriptionToggle?.isVisible = false
-            titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-            titleLayout.isClickable = false
-            isDescriptionExpanded = false
-            isDescriptionTruncatable = false
-            isDescriptionShowingFullText = false
+            resetDescriptionUiState()
             updateVideoToolsUIState()
             return
         }
 
         if (show) {
-            isDescriptionExpanded = true
-            descriptionScroll?.isVisible = true
-            titleLayout.isClickable = true
-
-            if (isDescriptionTruncatable) {
-                descriptionToggle?.isVisible = true
-                if (isDescriptionShowingFullText) {
-                    applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
-                } else {
-                    applyDescriptionTextMode(DescriptionTextMode.TRUNCATED)
-                }
-            } else {
-                descriptionToggle?.isVisible = false
-                applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
-            }
-
+            showDescriptionUiState()
             titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up_chevron, 0)
         } else {
             isDescriptionExpanded = false
@@ -335,6 +313,33 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         }
 
         updateVideoToolsUIState()
+    }
+
+    private fun resetDescriptionUiState() {
+        description.text = ""
+        descriptionScroll?.isVisible = false
+        descriptionToggle?.isVisible = false
+        titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+        titleLayout.isClickable = false
+        isDescriptionExpanded = false
+        isDescriptionTruncatable = false
+        isDescriptionShowingFullText = false
+    }
+
+    private fun showDescriptionUiState() {
+        isDescriptionExpanded = true
+        descriptionScroll?.isVisible = true
+        titleLayout.isClickable = true
+
+        if (isDescriptionTruncatable) {
+            descriptionToggle?.isVisible = true
+            applyDescriptionTextMode(
+                if (isDescriptionShowingFullText) DescriptionTextMode.FULL_TEXT else DescriptionTextMode.TRUNCATED,
+            )
+        } else {
+            descriptionToggle?.isVisible = false
+            applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
+        }
     }
 
     private fun setDescriptionExpanded(showFullText: Boolean) {
