@@ -25,6 +25,7 @@ import android.graphics.Color
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.text.TextUtils
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.Menu
@@ -48,6 +49,8 @@ import android.widget.Toast
 import android.content.res.Configuration
 import androidx.core.view.isVisible
 import java.util.regex.Pattern
+import android.text.SpannableStringBuilder
+import androidx.core.view.doOnPreDraw
 
 open class VideoContentFragment : BaseContentDetailFragment(),
     VideoQuestionSheetFragment.OnQuestionCompleteListener,
@@ -71,15 +74,23 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private lateinit var videoQuestionViewModel: VideoQuestionViewModel
     private var askAiFab: View? = null
     private var transcriptFab: View? = null
+    private var descriptionScroll: View? = null
+    private var descriptionToggle: TextView? = null
     private var videoToolsPanelContainer: ViewGroup? = null
     private var videoToolsPanelSwitcher: VideoToolsPanelFragmentSwitcher? = null
     private var openPanel: OpenPanel? = null
+    private var isDescriptionExpanded: Boolean = false
+    private var isDescriptionTruncatable: Boolean = false
+    private var isDescriptionShowingFullText: Boolean = false
     
     private val nativeVideoWidgetFragment: NativeVideoWidgetFragment?
         get() = if (::videoWidgetFragment.isInitialized) videoWidgetFragment as? NativeVideoWidgetFragment else null
 
     companion object {
         private const val STATE_OPEN_PANEL = "state_open_panel"
+        private const val DESCRIPTION_COLLAPSED_MAX_LINES = 5
+        private const val TIMESTAMP_REGEX = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
+        private val TIMESTAMP_PATTERN: Pattern = Pattern.compile(TIMESTAMP_REGEX)
     }
 
     private enum class OpenPanel {
@@ -156,6 +167,8 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         super.onViewCreated(view, savedInstanceState)
         titleView = view.findViewById(R.id.title)
         description = view.findViewById(R.id.description)
+        descriptionScroll = view.findViewById(R.id.description_scroll)
+        descriptionToggle = view.findViewById(R.id.description_toggle)
         titleLayout = view.findViewById(R.id.title_layout)
         askAiFab = view.findViewById(R.id.ask_ai_fab)
         askAiFab?.setOnClickListener { toggleVideoAIPanel() }
@@ -269,25 +282,112 @@ open class VideoContentFragment : BaseContentDetailFragment(),
 
     private fun initializeListeners() {
         titleLayout.setOnClickListener {
-            val isDescriptionVisible = description.visibility == View.VISIBLE
-            toggleDescription(!isDescriptionVisible)
+            if (!isContentInitialized() || content.description.isNullOrBlank()) return@setOnClickListener
+            toggleDescription(show = !isDescriptionExpanded)
+        }
+
+        descriptionToggle?.setOnClickListener {
+            if (!isContentInitialized() || content.description.isNullOrBlank()) return@setOnClickListener
+            if (!isDescriptionTruncatable) return@setOnClickListener
+            setDescriptionExpanded(showFullText = !isDescriptionShowingFullText)
         }
     }
 
     private fun toggleDescription(show: Boolean) {
+        if (!hasDescription()) {
+            resetDescriptionUiState()
+            updateVideoToolsUIState()
+            return
+        }
+
         if (show) {
-            description.visibility = View.VISIBLE
+            showDescriptionUiState()
             titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up_chevron, 0)
-            content.description?.let { swipeRefresh.isEnabled = false }
         } else {
-            description.visibility = View.INVISIBLE
-            swipeRefresh.isEnabled = true
-            titleView.setCompoundDrawablesWithIntrinsicBounds(
-                0,
-                0,
-                R.drawable.ic_down_chevron,
-                0
+            isDescriptionExpanded = false
+            isDescriptionShowingFullText = false
+            descriptionScroll?.isVisible = false
+            descriptionToggle?.isVisible = false
+            titleLayout.isClickable = true
+            titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_down_chevron, 0)
+        }
+
+        updateVideoToolsUIState()
+    }
+
+    private fun resetDescriptionUiState() {
+        description.text = ""
+        descriptionScroll?.isVisible = false
+        descriptionToggle?.isVisible = false
+        titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
+        titleLayout.isClickable = false
+        isDescriptionExpanded = false
+        isDescriptionTruncatable = false
+        isDescriptionShowingFullText = false
+    }
+
+    private fun showDescriptionUiState() {
+        isDescriptionExpanded = true
+        descriptionScroll?.isVisible = true
+        titleLayout.isClickable = true
+
+        if (isDescriptionTruncatable) {
+            descriptionToggle?.isVisible = true
+            applyDescriptionTextMode(
+                if (isDescriptionShowingFullText) DescriptionTextMode.FULL_TEXT else DescriptionTextMode.TRUNCATED,
             )
+        } else {
+            descriptionToggle?.isVisible = false
+            applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
+        }
+    }
+
+    private fun setDescriptionExpanded(showFullText: Boolean) {
+        if (!hasDescription()) return
+        if (!isDescriptionTruncatable) return
+        if (!isDescriptionExpanded) return
+
+        if (showFullText) {
+            closeOpenPanelIfAny()
+            isDescriptionShowingFullText = true
+            applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
+        } else {
+            isDescriptionShowingFullText = false
+            applyDescriptionTextMode(DescriptionTextMode.TRUNCATED)
+        }
+        updateVideoToolsUIState()
+    }
+
+    private fun hasDescription(): Boolean {
+        return isContentInitialized() && !content.description.isNullOrBlank()
+    }
+
+    private fun closeOpenPanelIfAny() {
+        val panelToClose = openPanel ?: return
+        when (panelToClose) {
+            OpenPanel.AI -> closeVideoAIPanel()
+            OpenPanel.TRANSCRIPT -> closeVideoTranscriptPanel()
+        }
+    }
+
+    private enum class DescriptionTextMode {
+        TRUNCATED,
+        FULL_TEXT,
+    }
+
+    private fun applyDescriptionTextMode(mode: DescriptionTextMode) {
+        when (mode) {
+            DescriptionTextMode.TRUNCATED -> {
+                description.maxLines = DESCRIPTION_COLLAPSED_MAX_LINES
+                description.ellipsize = TextUtils.TruncateAt.END
+                descriptionToggle?.setText(R.string.show_more)
+                descriptionScroll?.scrollTo(0, 0)
+            }
+            DescriptionTextMode.FULL_TEXT -> {
+                description.maxLines = Int.MAX_VALUE
+                description.ellipsize = null
+                descriptionToggle?.setText(R.string.show_less)
+            }
         }
     }
 
@@ -365,6 +465,12 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         val showFabs = isPortrait && openPanel == null
         askAiFab?.isVisible = canUseVideoAI() && showFabs
         transcriptFab?.isVisible = canUseVideoTranscript() && showFabs
+
+        // Avoid swipe-to-refresh gesture fighting with panel scrolling/interactions.
+        val canSwipeRefresh = !isContentInitialized() ||
+            content.description.isNullOrBlank() ||
+            !isDescriptionExpanded
+        swipeRefresh.isEnabled = openPanel == null && canSwipeRefresh
     }
 
     private fun toggleVideoAIPanel() {
@@ -580,21 +686,83 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     }
 
     private fun parseVideoDescription() {
-        content.description?.let {
-            description.text = HtmlCompat.fromHtml(it, HtmlCompat.FROM_HTML_MODE_LEGACY)
-            val durationRegex = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
-            val pattern: Pattern = Pattern.compile(durationRegex)
-            PatternEditableBuilder().addPattern(
-                pattern,
+        val raw = content.description?.trim().orEmpty()
+        if (raw.isBlank()) {
+            resetDescriptionUiState()
+            return
+        }
+
+        initializeDescriptionUiForContent()
+        setDescriptionHtml(raw)
+        enableTimestampSeekSpans()
+
+        applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
+        updateDescriptionDisplayState()
+    }
+
+    private fun initializeDescriptionUiForContent() {
+        isDescriptionExpanded = true
+        isDescriptionShowingFullText = false
+        descriptionScroll?.isVisible = true
+        titleLayout.isClickable = true
+        descriptionToggle?.isVisible = false
+        titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up_chevron, 0)
+    }
+
+    private fun setDescriptionHtml(rawHtml: String) {
+        description.text = trimTrailingWhitespace(
+            HtmlCompat.fromHtml(rawHtml, HtmlCompat.FROM_HTML_MODE_LEGACY),
+        )
+    }
+
+    private fun enableTimestampSeekSpans() {
+        PatternEditableBuilder()
+            .addPattern(
+                TIMESTAMP_PATTERN,
                 Color.parseColor("#2D9BE8"),
                 object : PatternEditableBuilder.SpannableClickedListener {
                     override fun onSpanClicked(text: String) {
-                        val seconds = convertDurationStringToSeconds(text)
-                        videoWidgetFragment.seekTo(seconds * 1000L)
+                        seekVideoToTimestamp(text)
                     }
-                }).into(description)
-            toggleDescription(true)
+                },
+            )
+            .into(description)
+    }
+
+    private fun seekVideoToTimestamp(durationText: String) {
+        val seconds = convertDurationStringToSeconds(durationText)
+        videoWidgetFragment.seekTo(seconds * 1000L)
+    }
+
+    private fun updateDescriptionDisplayState() {
+        getDescriptionLineCount { lineCount ->
+            isDescriptionTruncatable = lineCount > DESCRIPTION_COLLAPSED_MAX_LINES
+            isDescriptionShowingFullText = false
+
+            if (isDescriptionTruncatable) {
+                descriptionToggle?.isVisible = true
+                applyDescriptionTextMode(DescriptionTextMode.TRUNCATED)
+            } else {
+                descriptionToggle?.isVisible = false
+                applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
+            }
+            updateVideoToolsUIState()
         }
+    }
+
+    private fun getDescriptionLineCount(onResult: (Int) -> Unit) {
+        description.doOnPreDraw {
+            val lineCount = description.lineCount
+            if (lineCount > 0) onResult(lineCount)
+        }
+    }
+
+    private fun trimTrailingWhitespace(text: CharSequence): CharSequence {
+        val builder = SpannableStringBuilder(text)
+        while (builder.isNotEmpty() && builder.last().isWhitespace()) {
+            builder.delete(builder.length - 1, builder.length)
+        }
+        return builder
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {

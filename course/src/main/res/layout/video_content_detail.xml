@@ -32,7 +32,7 @@
                 android:orientation="vertical"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:paddingBottom="20dp">
+                android:paddingBottom="0dp">
 
                 <LinearLayout
                     android:id="@id/title_layout"
@@ -56,41 +56,48 @@
                 </LinearLayout>
 
                 <androidx.core.widget.NestedScrollView
+                    android:id="@+id/description_scroll"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:fillViewport="true">
+                    android:layout_marginTop="6dp"
+                    android:maxHeight="160dp"
+                    android:overScrollMode="ifContentScrolls"
+                    android:visibility="gone">
 
-                    <LinearLayout
+                    <TextView
+                        android:id="@+id/description"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:paddingBottom="20dp">
-
-                        <TextView
-                            android:id="@+id/description"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginTop="10dp"
-                            android:scrollbars="vertical"
-                            android:textColor="@color/testpress_text_gray"
-                            android:textColorHighlight="#00FFFFFF" />
-                    </LinearLayout>
+                        android:scrollbars="vertical"
+                        android:textColor="@color/testpress_text_gray"
+                        android:textColorHighlight="#00FFFFFF" />
                 </androidx.core.widget.NestedScrollView>
+
+                <TextView
+                    android:id="@+id/description_toggle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="start"
+                    android:paddingTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:textColor="@color/testpress_color_primary"
+                    android:textSize="14sp"
+                    android:visibility="gone" />
             </LinearLayout>
+
+            <!-- Video tools panel (AI / Transcript) in portrait; shown below title & description -->
+            <FrameLayout
+                android:id="@+id/video_tools_panel_container"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone"
+                android:clickable="true"
+                android:focusable="true"
+                android:background="@android:color/transparent" />
 
         </LinearLayout>
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
-
-    <!-- Inline panel for Transcript / AI in portrait; anchored below the video player -->
-    <FrameLayout
-        android:id="@+id/video_tools_panel_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/video_widget_fragment"
-        android:layout_above="@id/bottom_navigation_fragment"
-        android:visibility="gone"
-        android:clickable="true"
-        android:focusable="true"
-        android:background="@android:color/transparent" />
 
     <FrameLayout
         android:id="@+id/empty_view_fragment"
