@@ -89,6 +89,8 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     companion object {
         private const val STATE_OPEN_PANEL = "state_open_panel"
         private const val DESCRIPTION_COLLAPSED_MAX_LINES = 5
+        private const val TIMESTAMP_REGEX = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
+        private val TIMESTAMP_PATTERN: Pattern = Pattern.compile(TIMESTAMP_REGEX)
     }
 
     private enum class OpenPanel {
@@ -699,21 +701,36 @@ open class VideoContentFragment : BaseContentDetailFragment(),
         titleLayout.isClickable = true
         descriptionToggle?.isVisible = false
         titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up_chevron, 0)
-        description.text = trimTrailingWhitespace(HtmlCompat.fromHtml(raw, HtmlCompat.FROM_HTML_MODE_LEGACY))
-        val durationRegex = "([0-2]?[0-9]?:?[0-5]?[0-9]:[0-5][0-9])"
-        val pattern: Pattern = Pattern.compile(durationRegex)
-        PatternEditableBuilder().addPattern(
-            pattern,
-            Color.parseColor("#2D9BE8"),
-            object : PatternEditableBuilder.SpannableClickedListener {
-                override fun onSpanClicked(text: String) {
-                    val seconds = convertDurationStringToSeconds(text)
-                    videoWidgetFragment.seekTo(seconds * 1000L)
-                }
-            }).into(description)
+        setDescriptionHtml(raw)
+        enableTimestampSeekSpans()
 
         applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
         updateDescriptionDisplayState()
+    }
+
+    private fun setDescriptionHtml(rawHtml: String) {
+        description.text = trimTrailingWhitespace(
+            HtmlCompat.fromHtml(rawHtml, HtmlCompat.FROM_HTML_MODE_LEGACY),
+        )
+    }
+
+    private fun enableTimestampSeekSpans() {
+        PatternEditableBuilder()
+            .addPattern(
+                TIMESTAMP_PATTERN,
+                Color.parseColor("#2D9BE8"),
+                object : PatternEditableBuilder.SpannableClickedListener {
+                    override fun onSpanClicked(text: String) {
+                        seekVideoToTimestamp(text)
+                    }
+                },
+            )
+            .into(description)
+    }
+
+    private fun seekVideoToTimestamp(durationText: String) {
+        val seconds = convertDurationStringToSeconds(durationText)
+        videoWidgetFragment.seekTo(seconds * 1000L)
     }
 
     private fun updateDescriptionDisplayState() {
