@@ -688,29 +688,25 @@ open class VideoContentFragment : BaseContentDetailFragment(),
     private fun parseVideoDescription() {
         val raw = content.description?.trim().orEmpty()
         if (raw.isBlank()) {
-            description.text = ""
-            descriptionScroll?.isVisible = false
-            descriptionToggle?.isVisible = false
-            titleLayout.isClickable = false
-            titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, 0, 0)
-            isDescriptionExpanded = false
-            isDescriptionTruncatable = false
-            isDescriptionShowingFullText = false
+            resetDescriptionUiState()
             return
         }
 
-        // Show the description section by default; allow users to collapse it via the title row.
+        initializeDescriptionUiForContent()
+        setDescriptionHtml(raw)
+        enableTimestampSeekSpans()
+
+        applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
+        updateDescriptionDisplayState()
+    }
+
+    private fun initializeDescriptionUiForContent() {
         isDescriptionExpanded = true
         isDescriptionShowingFullText = false
         descriptionScroll?.isVisible = true
         titleLayout.isClickable = true
         descriptionToggle?.isVisible = false
         titleView.setCompoundDrawablesWithIntrinsicBounds(0, 0, R.drawable.ic_up_chevron, 0)
-        setDescriptionHtml(raw)
-        enableTimestampSeekSpans()
-
-        applyDescriptionTextMode(DescriptionTextMode.FULL_TEXT)
-        updateDescriptionDisplayState()
     }
 
     private fun setDescriptionHtml(rawHtml: String) {
