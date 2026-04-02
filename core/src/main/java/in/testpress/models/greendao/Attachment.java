@@ -21,6 +21,7 @@ public class Attachment implements android.os.Parcelable {
     @Id
     private Long id;
     private Boolean isRenderable;
+    private Boolean allowDownload;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -34,12 +35,13 @@ public class Attachment implements android.os.Parcelable {
     }
 
     @Generated
-    public Attachment(String title, String attachmentUrl, String description, Long id, Boolean isRenderable) {
+    public Attachment(String title, String attachmentUrl, String description, Long id, Boolean isRenderable, Boolean allowDownload) {
         this.title = title;
         this.attachmentUrl = attachmentUrl;
         this.description = description;
         this.id = id;
         this.isRenderable = isRenderable;
+        this.allowDownload = allowDownload;
     }
 
     public String getTitle() {
@@ -82,12 +84,22 @@ public class Attachment implements android.os.Parcelable {
         this.isRenderable = isRenderable;
     }
 
+    public Boolean getAllowDownload() {
+        return allowDownload;
+    }
+
+    public void setAllowDownload(Boolean allowDownload) {
+        this.allowDownload = allowDownload;
+    }
+
     // KEEP METHODS - put your custom methods here
     protected Attachment(Parcel in) {
         title = in.readString();
         attachmentUrl = in.readString();
         description = in.readString();
         id = in.readByte() == 0x00 ? null : in.readLong();
+        isRenderable = in.readByte() == 0x00 ? null : in.readByte() != 0x00;
+        allowDownload = in.readByte() == 0x00 ? null : in.readByte() != 0x00;
     }
 
     @Override
@@ -105,6 +117,18 @@ public class Attachment implements android.os.Parcelable {
         } else {
             dest.writeByte((byte) (0x01));
             dest.writeLong(id);
+        }
+        if (isRenderable == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) (isRenderable ? 0x01 : 0x00));
+        }
+        if (allowDownload == null) {
+            dest.writeByte((byte) (0x00));
+        } else {
+            dest.writeByte((byte) (0x01));
+            dest.writeByte((byte) (allowDownload ? 0x01 : 0x00));
         }
     }
 

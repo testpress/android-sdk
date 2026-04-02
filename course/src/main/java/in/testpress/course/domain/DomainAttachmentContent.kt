@@ -8,7 +8,8 @@ data class DomainAttachmentContent(
     val title: String? = null,
     val attachmentUrl: String? = null,
     val description: String? = null,
-    val isRenderable: Boolean? = null
+    val isRenderable: Boolean? = null,
+    val allowDownload: Boolean? = null
 ) {
 
     fun isAttachmentUrlExpired(): Boolean {
@@ -27,7 +28,8 @@ fun createDomainAttachmentContent(attachment: Attachment): DomainAttachmentConte
         title = attachment.title,
         attachmentUrl = attachment.attachmentUrl,
         description = attachment.description,
-        isRenderable = attachment.isRenderable
+        isRenderable = attachment.isRenderable,
+        allowDownload = attachment.allowDownload
     )
 }
 

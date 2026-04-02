@@ -7,11 +7,12 @@ data class NetworkAttachmentContent(
     val title: String? = null,
     val description: String? = null,
     val attachmentUrl: String = "",
-    val isRenderable: Boolean? = null
+    val isRenderable: Boolean? = null,
+    val allowDownload: Boolean? = null
 )
 
 fun NetworkAttachmentContent.asGreenDaoModel(): Attachment {
     return Attachment(
-         this.title, this.attachmentUrl, this.description, this.id, this.isRenderable
+         this.title, this.attachmentUrl, this.description, this.id, this.isRenderable, this.allowDownload
     )
 }
