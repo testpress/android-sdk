@@ -128,13 +128,13 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun onDownloadPdfClick() {
+        val attachment = content.attachment
+        if (attachment?.allowDownload != true) return
+
         if (!permissionsUtils.isStoragePermissionGranted) {
             permissionsUtils.requestStoragePermissionWithSnackbar()
             return
         }
-
-        val attachment = content.attachment
-        if (attachment?.allowDownload != true) return
 
         if (attachment.isAttachmentUrlExpired()) {
             forceReloadContent {
@@ -149,11 +149,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     private fun startPdfPublicDownload() {
         val url = content.attachment?.attachmentUrl
         if (url.isNullOrBlank()) {
-            ViewUtils.toast(requireContext(), "Download URL not available")
+            ViewUtils.toast(requireContext(), getString(R.string.download_url_not_available))
             return
         }
 
-        val title = content.attachment?.title ?: "Attachment-$contentId"
+        val title = content.attachment?.title?.takeIf { it.isNotBlank() } ?: "Attachment-$contentId"
         val fileName = "$title${getFileExtensionFromUrl(url)}".sanitizeFileName()
         FileDownloader(requireContext()).downloadFile(url, fileName)
     }
