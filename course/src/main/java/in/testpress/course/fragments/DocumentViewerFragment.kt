@@ -10,6 +10,11 @@ import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import `in`.testpress.course.util.SHA256Generator.generateSha256
+import `in`.testpress.util.FileDownloader
+import `in`.testpress.util.PermissionsUtils
+import `in`.testpress.util.ViewUtils
+import `in`.testpress.util.getFileExtensionFromUrl
+import `in`.testpress.util.sanitizeFileName
 import android.content.Intent
 import android.os.Bundle
 import android.view.*
@@ -30,6 +35,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     lateinit var fullScreenMenu: MenuItem
+
+    @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
+    lateinit var downloadMenu: MenuItem
+
+    private lateinit var permissionsUtils: PermissionsUtils
     private val completeProgress = 100
     private var isAIView = false
     private var aiChatFragment: AIChatPdfFragment? = null
@@ -45,6 +55,8 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             savedInstanceState: Bundle?
     ): View {
         _binding = LayoutDocumentViewerBinding.inflate(inflater, container, false)
+
+        permissionsUtils = PermissionsUtils(requireActivity(), binding.root)
         
         binding.askAiFab.setOnClickListener {
             showAIView()
@@ -78,6 +90,14 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         inflater.inflate(R.menu.full_screen_menu, menu)
         fullScreenMenu = menu.findItem(R.id.fullScreen)
         fullScreenMenu.isVisible = !isAIView
+
+        downloadMenu = menu.findItem(R.id.downloadPdf)
+        updateDownloadMenuVisibility()
+    }
+
+    private fun updateDownloadMenuVisibility() {
+        if (!::downloadMenu.isInitialized) return
+        downloadMenu.isVisible = !isAIView && isContentInitialized() && content.attachment?.allowDownload == true
     }
 
     private fun updateAskAIFABVisibility() {
@@ -95,12 +115,47 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
+            R.id.downloadPdf -> {
+                onDownloadPdfClick()
+                true
+            }
             R.id.fullScreen -> {
                 navigateToPdfViewerActivity()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
+    }
+
+    private fun onDownloadPdfClick() {
+        val attachment = content.attachment
+        if (attachment?.allowDownload != true) return
+
+        if (!permissionsUtils.isStoragePermissionGranted) {
+            permissionsUtils.requestStoragePermissionWithSnackbar()
+            return
+        }
+
+        if (attachment.isAttachmentUrlExpired()) {
+            forceReloadContent {
+                startPdfPublicDownload()
+                updateDownloadMenuVisibility()
+            }
+        } else {
+            startPdfPublicDownload()
+        }
+    }
+
+    private fun startPdfPublicDownload() {
+        val url = content.attachment?.attachmentUrl
+        if (url.isNullOrBlank()) {
+            ViewUtils.toast(requireContext(), getString(R.string.download_url_not_available))
+            return
+        }
+
+        val title = content.attachment?.title?.takeIf { it.isNotBlank() } ?: "Attachment-$contentId"
+        val fileName = "$title${getFileExtensionFromUrl(url)}".sanitizeFileName()
+        FileDownloader(requireContext()).downloadFile(url, fileName)
     }
 
     private fun navigateToPdfViewerActivity() {
@@ -157,6 +212,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         binding.aiPdfViewFragment.visibility = View.GONE
         isAIView = false
         activity?.invalidateOptionsMenu()
+        updateDownloadMenuVisibility()
     }
 
     override fun display() {
@@ -165,6 +221,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         pdfDownloadManager = PDFDownloadManager(this,requireContext(),fileName)
 
         updateAskAIFABVisibility()
+        activity?.invalidateOptionsMenu()
 
         if (pdfDownloadManager.isDownloaded()) {
             displayPDF()
@@ -230,6 +287,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         if (::fullScreenMenu.isInitialized) {
             fullScreenMenu.isVisible = true
         }
+        updateDownloadMenuVisibility()
     }
 
     override fun onError() {

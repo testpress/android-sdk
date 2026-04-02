@@ -2,6 +2,11 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
+        android:id="@+id/downloadPdf"
+        android:icon="@drawable/ic_download_outline"
+        android:title="@string/download"
+        app:showAsAction="always" />
+    <item
         android:id="@+id/fullScreen"
         android:icon="@drawable/ic_full_screen"
         android:title="fullScreen"
