@@ -915,6 +915,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             errorMessage = activity.getString(R.string.exoplayer_audio_track_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (6000 <= exception.errorCode && exception.errorCode <= 7000) { // DRM errors
             errorMessage = activity.getString(R.string.exoplayer_drm_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
+            String drmFailureReasonCode = DrmErrorIdentifier.getFailureReason(exception);
+            if (drmFailureReasonCode != null && !drmFailureReasonCode.isEmpty()) {
+                errorMessage = errorMessage + "\n\n(Detail: " + drmFailureReasonCode + ")";
+            }
         }
         displayError(errorMessage, exception.errorCode);
         logPlaybackException(errorMessage, playbackId, exception);
@@ -1058,13 +1062,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
                     displayError(R.string.syncing_video);
                 } else {
-                    String drmFailureReasonCode = DrmErrorIdentifier.getFailureReason(exception);
-                    String licenseRequestFailedMessage = activity.getString(R.string.license_request_failed, exception.errorCode, playBackId);
-                    if (drmFailureReasonCode != null && !drmFailureReasonCode.isEmpty()) {
-                        licenseRequestFailedMessage = licenseRequestFailedMessage + "\n\n(Detail: " + drmFailureReasonCode + ")";
-                    }
-                    displayError(licenseRequestFailedMessage, exception.errorCode);
-                    logPlaybackException(licenseRequestFailedMessage, playBackId, exception);
+                    handleError(exception, playBackId);
                 }
             } else {
                 handleError(exception,playBackId);
