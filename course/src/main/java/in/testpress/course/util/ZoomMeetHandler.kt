@@ -13,6 +13,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.widget.Toast
+import io.sentry.Sentry
+import io.sentry.SentryLevel
 import us.zoom.sdk.*
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_MEETING_ID
 import us.zoom.sdk.MeetingViewsOptions.NO_TEXT_PASSWORD
@@ -26,6 +28,9 @@ class ZoomMeetHandler(
     private lateinit var zoomSDK: ZoomSDK
     private lateinit var activity: Activity
     private var onInitializeCallback: VideoConferenceInitializeListener? = null
+    private var useCustomMeetingUi: Boolean = false
+    private var customUiShown: Boolean = false
+    private var activityUsableErrorLogged: Boolean = false
 
     fun init(callback: VideoConferenceInitializeListener) {
         zoomSDK = ZoomSDK.getInstance()
@@ -36,13 +41,21 @@ class ZoomMeetHandler(
         if (zoomSDK.isInitialized) {
             registerMeetingServiceListener()
             setIsCustomizedMeetingUIEnabled()
+            configureMeetingUi()
         }
     }
 
     private fun setIsCustomizedMeetingUIEnabled(){
         val instituteSettings: InstituteSettings =
             TestpressSdk.getTestpressSession(context)!!.instituteSettings
-        zoomSDK.meetingSettingsHelper.isCustomizedMeetingUIEnabled = instituteSettings.isCustomMeetingUIEnabled
+        useCustomMeetingUi = instituteSettings.isCustomMeetingUIEnabled
+        zoomSDK.meetingSettingsHelper.isCustomizedMeetingUIEnabled = useCustomMeetingUi
+    }
+
+    private fun configureMeetingUi() {
+        if (!useCustomMeetingUi) {
+            zoomSDK.zoomUIService?.setNewMeetingUI(ZoomMeetActivity::class.java)
+        }
     }
 
     fun getInitializationParams(): ZoomSDKInitParams {
@@ -84,7 +97,7 @@ class ZoomMeetHandler(
     }
 
     private fun returnToMeeting(){
-        if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
+        if (useCustomMeetingUi) {
             showCustomMeetingUI(true)
         }else{
             zoomSDK.meetingService.returnToMeeting(context)
@@ -114,11 +127,36 @@ class ZoomMeetHandler(
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
             MeetingStatus.MEETING_STATUS_CONNECTING -> {
-                if (ZoomSDK.getInstance().meetingSettingsHelper.isCustomizedMeetingUIEnabled) {
+                if (useCustomMeetingUi && !customUiShown && isActivityUsable()) {
+                    customUiShown = true
                     showCustomMeetingUI(false)
                 }
             }
             else -> {}
+        }
+    }
+
+    private fun isActivityUsable(): Boolean {
+        return try {
+            !activity.isFinishing && !activity.isDestroyed
+        } catch (t: Throwable) {
+            if (!activityUsableErrorLogged) {
+                activityUsableErrorLogged = true
+                Sentry.captureException(t) { scope ->
+                    scope.level = SentryLevel.WARNING
+                    scope.setTag("component", "ZoomMeetHandler")
+                    scope.setTag("use_custom_meeting_ui", useCustomMeetingUi.toString())
+                    scope.setContexts(
+                        "Zoom UI Guard",
+                        mapOf(
+                            "Package Name" to context.packageName,
+                            "Conference Content ID" to videoConference.id,
+                            "Conference ID" to videoConference.conferenceId,
+                        )
+                    )
+                }
+            }
+            false
         }
     }
 
@@ -152,6 +190,7 @@ class ZoomMeetHandler(
         } else {
             registerMeetingServiceListener()
             setIsCustomizedMeetingUIEnabled()
+            configureMeetingUi()
             onInitializeCallback?.onSuccess()
         }
     }
@@ -173,6 +212,8 @@ class ZoomMeetHandler(
     }
 
     fun startMeeting() {
+        configureMeetingUi()
+
         val meetingService = zoomSDK.meetingService
         val ret = meetingService.joinMeetingWithParams(
             context,
@@ -180,7 +221,6 @@ class ZoomMeetHandler(
             getMeetingOptions()
         )
         zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
-        zoomSDK.zoomUIService?.setNewMeetingUI(ZoomMeetActivity::class.java)
     }
 
     private fun getMeetingOptions(): JoinMeetingOptions {
