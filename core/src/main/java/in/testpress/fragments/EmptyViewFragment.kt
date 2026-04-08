@@ -77,7 +77,7 @@ class EmptyViewFragment : Fragment() {
     }
 
     private fun handleForbidden(exception: TestpressException) {
-        val errorResponse = exception.response?.errorBody()?.string()?.let {
+        val errorResponse = exception.errorBodyString?.let {
             try {
                 JSONObject(it)
             } catch (e: JSONException) {
@@ -86,7 +86,12 @@ class EmptyViewFragment : Fragment() {
         }
 
         if (isScheduledContent(errorResponse)) {
-            showScheduledContentMessage(errorResponse?.getString("message")!!)
+            val message = errorResponse?.optString("message").orEmpty()
+            showScheduledContentMessage(
+                message.ifBlank { getString(R.string.testpress_some_thing_went_wrong_try_again) }
+            )
+        } else if (errorResponse?.has("message") == true) {
+            showCustomPermissionDeniedMessage(errorResponse.getString("message"))
         } else if (errorResponse?.has("detail") == true) {
             showCustomPermissionDeniedMessage(errorResponse.getString("detail"))
         } else {

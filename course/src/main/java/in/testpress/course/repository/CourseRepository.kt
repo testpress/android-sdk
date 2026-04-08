@@ -55,10 +55,11 @@ class CourseRepository(val context: Context) {
     }
 
     private fun addNewCoursesForUser(courses: List<Course>) {
-        for (course in courses) {
+        val mobileCourses = courses.filter { it.isAllowedOnMobile() }
+        for (course in mobileCourses) {
             course.isMyCourse = true
         }
-        courseDao.insertOrReplaceInTx(courses)
+        courseDao.insertOrReplaceInTx(mobileCourses)
     }
 
     private fun postToLiveData() {

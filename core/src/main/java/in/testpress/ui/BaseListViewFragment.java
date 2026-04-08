@@ -453,6 +453,27 @@ public abstract class BaseListViewFragment<E> extends Fragment
     }
 
     /**
+     * Set empty text on list fragment
+     *
+     * @param title
+     * @param description
+     * @return this fragment
+     */
+    protected BaseListViewFragment<E> setEmptyText(final int title, final String description, final int left) {
+        if (emptyView != null) {
+            if (isItemsEmpty()) {
+                swipeRefreshLayout.setEnabled(false);
+            }
+            emptyTitleView.setText(title);
+            emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
+            emptyDescView.setText(description);
+            emptyDescView.setVisibility(View.VISIBLE);
+            retryButton.setVisibility(View.VISIBLE);
+        }
+        return this;
+    }
+
+    /**
      * Callback when a list view item is clicked
      *
      * @param l

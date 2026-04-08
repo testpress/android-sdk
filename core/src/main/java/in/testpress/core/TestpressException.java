@@ -9,6 +9,7 @@ package in.testpress.core;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -60,6 +61,7 @@ public class TestpressException extends RuntimeException {
     private final Kind kind;
     private int statusCode;
     private String message;
+    private String errorBodyString;
 
     TestpressException(String message, Response response, Kind kind, Throwable exception) {
         super(message, exception);
@@ -103,12 +105,35 @@ public class TestpressException extends RuntimeException {
                 .setFieldNamingPolicy(FieldNamingPolicy.LOWER_CASE_WITH_UNDERSCORES)
                 .create();
         try {
-            String json = response.errorBody().string();
+            String json = getErrorBodyString();
+            if (json == null) {
+                return null;
+            }
             return gson.fromJson(json, type);
-        } catch (IOException | NullPointerException e) {
+        } catch (JsonParseException | IllegalStateException e) {
             e.printStackTrace();
         }
         return null;
+    }
+
+    /**
+     * Returns the raw error body as a String and caches it, since {@code errorBody().string()}
+     * can be consumed only once.
+     */
+    public String getErrorBodyString() {
+        if (errorBodyString != null) {
+            return errorBodyString;
+        }
+        if (response == null || response.errorBody() == null) {
+            return null;
+        }
+        try {
+            errorBodyString = response.errorBody().string();
+            return errorBodyString;
+        } catch (IOException | NullPointerException e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 
     public long getThrottleTime() {

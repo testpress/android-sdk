@@ -132,7 +132,9 @@ public abstract class BaseResourcePager<E> {
             resetPageCount();
         } catch (Exception e) {
             hasMore = false;
-            if (e instanceof IOException) {
+            if (e instanceof TestpressException) {
+                throw (TestpressException) e;
+            } else if (e instanceof IOException) {
                 throw TestpressException.networkError((IOException) e);
             } else {
                 throw TestpressException.unexpectedError(e);

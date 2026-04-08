@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.Toast;
 
 import org.greenrobot.greendao.AbstractDao;
+import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -150,6 +151,14 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
 
     @Override
     protected int getErrorMessage(TestpressException exception) {
+        if (exception.isForbidden()) {
+            String serverMessage = getErrorMessageFromResponse(exception);
+            if (serverMessage != null && !serverMessage.trim().isEmpty()) {
+                setEmptyText(R.string.permission_denied, serverMessage, R.drawable.ic_error_outline_black_18dp);
+                return R.string.permission_denied;
+            }
+        }
+
         if (exception.isUnauthenticated()) {
             setEmptyText(R.string.testpress_authentication_failed, R.string.testpress_please_login,
                     R.drawable.ic_error_outline_black_18dp);
@@ -164,6 +173,22 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                     R.drawable.ic_error_outline_black_18dp);
         }
         return R.string.testpress_some_thing_went_wrong_try_again;
+    }
+
+    private String getErrorMessageFromResponse(TestpressException exception) {
+        try {
+            String raw = exception.getErrorBodyString();
+            if (raw != null && !raw.trim().isEmpty()) {
+                JSONObject json = new JSONObject(raw);
+                if (json.has("message")) {
+                    return json.getString("message");
+                }
+                if (json.has("detail")) {
+                    return json.getString("detail");
+                }
+            }
+        } catch (Exception ignore) {}
+        return null;
     }
 
     @Override
@@ -206,11 +231,22 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private void deleteExistingChapters() {
+        Long parsedCourseId = parseCourseIdOrNull();
+        Long parsedParentId = parseParentIdOrNull();
+
+        if (parsedCourseId == null) {
+            return;
+        }
+
+        if (parentId != null && parsedParentId == null) {
+            return;
+        }
+
         getDao().queryBuilder()
-                .where(ChapterDao.Properties.CourseId.eq(courseId))
+                .where(ChapterDao.Properties.CourseId.eq(parsedCourseId))
                 .where(
                         parentId != null
-                                ? ChapterDao.Properties.ParentId.eq(parentId)
+                                ? ChapterDao.Properties.ParentId.eq(parsedParentId)
                                 : ChapterDao.Properties.ParentId.isNull()
                 )
                 .buildDelete()
@@ -218,17 +254,100 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         getDao().detachAll();
     }
 
+    private Long parseCourseIdOrNull() {
+        try {
+            return Long.valueOf(courseId);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    private Long parseParentIdOrNull() {
+        if (parentId == null) {
+            return null;
+        }
+        try {
+            return Long.valueOf(parentId);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    private void handleForbiddenError(TestpressException exception, Loader<List<Chapter>> loader) {
+        deleteExistingChapters();
+        showForbiddenMessage(exception);
+        markCourseNotAccessibleLocally();
+        clearDisplayedChapters();
+        retryButton.setVisibility(View.GONE);
+        finishLoadingWithError(loader);
+    }
+
+    private void showForbiddenMessage(TestpressException exception) {
+        String serverMessage = getErrorMessageFromResponse(exception);
+        if (serverMessage == null || serverMessage.trim().isEmpty()) {
+            setEmptyText(
+                    R.string.permission_denied,
+                    R.string.testpress_no_permission,
+                    R.drawable.ic_error_outline_black_18dp
+            );
+        } else {
+            setEmptyText(R.string.permission_denied, serverMessage, R.drawable.ic_error_outline_black_18dp);
+        }
+    }
+
+    private void markCourseNotAccessibleLocally() {
+        // If the course is not accessible on this device (disabled/web-only), stop showing it in "My Courses".
+        if (course != null) {
+            course.setIsMyCourse(false);
+            course.setActive(false);
+            courseDao.insertOrReplace(course);
+        }
+    }
+
+    private void clearDisplayedChapters() {
+        this.items = new ArrayList<>();
+        getListAdapter().getWrappedAdapter().setItems(this.items.toArray());
+    }
+
+    private void finishLoadingWithError(Loader<List<Chapter>> loader) {
+        hideLoadingPlaceholder();
+        swipeRefreshLayout.setEnabled(true);
+        showList();
+        getLoaderManager().destroyLoader(loader.getId());
+    }
+
     @Override
     public void onLoadFinished(Loader<List<Chapter>> loader,
                                List<Chapter> items) {
-        super.onLoadFinished(loader, items);
+        final TestpressException exception = getException(loader);
+        if (exception != null) {
+            this.exception = exception;
 
+            if (exception.isForbidden()) {
+                handleForbiddenError(exception, loader);
+                return;
+            }
+
+            int errorMessage = getErrorMessage(exception);
+            if (!isItemsEmpty()) {
+                showError(errorMessage);
+                displayDataFromDB();
+            }
+            finishLoadingWithError(loader);
+            return;
+        }
+
+        this.exception = null;
+        this.items = items;
         if (!items.isEmpty()) {
             deleteExistingChapters();
             getDao().insertOrReplaceInTx(items);
         }
+        displayDataFromDB();
         hideLoadingPlaceholder();
         swipeRefreshLayout.setEnabled(true);
+        showList();
+        getLoaderManager().destroyLoader(loader.getId());
     }
 
     @Override
