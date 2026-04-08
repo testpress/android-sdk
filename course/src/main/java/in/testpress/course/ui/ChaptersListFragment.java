@@ -231,16 +231,8 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
     }
 
     private void deleteExistingChapters() {
-        Long parsedCourseId = null;
-        Long parsedParentId = null;
-        try {
-            parsedCourseId = Long.valueOf(courseId);
-        } catch (Exception ignore) {}
-        try {
-            if (parentId != null) {
-                parsedParentId = Long.valueOf(parentId);
-            }
-        } catch (Exception ignore) {}
+        Long parsedCourseId = parseCourseIdOrNull();
+        Long parsedParentId = parseParentIdOrNull();
 
         if (parsedCourseId == null) {
             return;
@@ -260,6 +252,25 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
                 .buildDelete()
                 .executeDeleteWithoutDetachingEntities();
         getDao().detachAll();
+    }
+
+    private Long parseCourseIdOrNull() {
+        try {
+            return Long.valueOf(courseId);
+        } catch (Exception ignore) {
+            return null;
+        }
+    }
+
+    private Long parseParentIdOrNull() {
+        if (parentId == null) {
+            return null;
+        }
+        try {
+            return Long.valueOf(parentId);
+        } catch (Exception ignore) {
+            return null;
+        }
     }
 
     private void handleForbiddenError(TestpressException exception, Loader<List<Chapter>> loader) {
