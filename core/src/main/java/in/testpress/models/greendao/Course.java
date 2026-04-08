@@ -73,6 +73,8 @@ public class Course {
     private List<Content> contents;
 
     // KEEP FIELDS - put your custom fields here
+    @Transient
+    private String allowedDevices;
     // KEEP FIELDS END
 
     @Generated
@@ -480,6 +482,21 @@ public class Course {
             }
         }
         return filteredCourses;
+    }
+
+    public String getAllowedDevices() {
+        return allowedDevices;
+    }
+
+    public void setAllowedDevices(String allowedDevices) {
+        this.allowedDevices = allowedDevices;
+    }
+
+    public boolean isAllowedOnMobile() {
+        if (allowedDevices == null || allowedDevices.trim().isEmpty()) {
+            return true;
+        }
+        return allowedDevices.toLowerCase().contains("mobile");
     }
     // KEEP METHODS END
 
