@@ -9,6 +9,7 @@ package in.testpress.core;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonParseException;
 
 import java.io.IOException;
 import java.util.regex.Matcher;
@@ -109,7 +110,7 @@ public class TestpressException extends RuntimeException {
                 return null;
             }
             return gson.fromJson(json, type);
-        } catch (NullPointerException e) {
+        } catch (JsonParseException | IllegalStateException e) {
             e.printStackTrace();
         }
         return null;

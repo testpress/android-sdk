@@ -86,7 +86,10 @@ class EmptyViewFragment : Fragment() {
         }
 
         if (isScheduledContent(errorResponse)) {
-            showScheduledContentMessage(errorResponse?.getString("message")!!)
+            val message = errorResponse?.optString("message").orEmpty()
+            showScheduledContentMessage(
+                message.ifBlank { getString(R.string.testpress_some_thing_went_wrong_try_again) }
+            )
         } else if (errorResponse?.has("message") == true) {
             showCustomPermissionDeniedMessage(errorResponse.getString("message"))
         } else if (errorResponse?.has("detail") == true) {

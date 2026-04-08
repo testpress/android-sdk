@@ -242,11 +242,19 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             }
         } catch (Exception ignore) {}
 
+        if (parsedCourseId == null) {
+            return;
+        }
+
+        if (parentId != null && parsedParentId == null) {
+            return;
+        }
+
         getDao().queryBuilder()
-                .where(ChapterDao.Properties.CourseId.eq(parsedCourseId != null ? parsedCourseId : courseId))
+                .where(ChapterDao.Properties.CourseId.eq(parsedCourseId))
                 .where(
                         parentId != null
-                                ? ChapterDao.Properties.ParentId.eq(parsedParentId != null ? parsedParentId : parentId)
+                                ? ChapterDao.Properties.ParentId.eq(parsedParentId)
                                 : ChapterDao.Properties.ParentId.isNull()
                 )
                 .buildDelete()
@@ -312,6 +320,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             int errorMessage = getErrorMessage(exception);
             if (!isItemsEmpty()) {
                 showError(errorMessage);
+                displayDataFromDB();
             }
             finishLoadingWithError(loader);
             return;
@@ -327,6 +336,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         hideLoadingPlaceholder();
         swipeRefreshLayout.setEnabled(true);
         showList();
+        getLoaderManager().destroyLoader(loader.getId());
     }
 
     @Override
