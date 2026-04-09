@@ -155,6 +155,7 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             String serverMessage = getErrorMessageFromResponse(exception);
             if (serverMessage != null && !serverMessage.trim().isEmpty()) {
                 setEmptyText(R.string.permission_denied, serverMessage, R.drawable.ic_error_outline_black_18dp);
+                retryButton.setVisibility(View.GONE);
                 return R.string.permission_denied;
             }
         }
@@ -293,6 +294,8 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
         } else {
             setEmptyText(R.string.permission_denied, serverMessage, R.drawable.ic_error_outline_black_18dp);
         }
+        retryButton.setVisibility(View.GONE);
+        notifyCourseForbidden(serverMessage);
     }
 
     private void markCourseNotAccessibleLocally() {
@@ -343,11 +346,24 @@ public class ChaptersListFragment extends BaseDataBaseFragment<Chapter, Long> {
             deleteExistingChapters();
             getDao().insertOrReplaceInTx(items);
         }
+        notifyCourseAllowed();
         displayDataFromDB();
         hideLoadingPlaceholder();
         swipeRefreshLayout.setEnabled(true);
         showList();
         getLoaderManager().destroyLoader(loader.getId());
+    }
+
+    private void notifyCourseForbidden(String message) {
+        if (getActivity() instanceof ChapterDetailActivity) {
+            ((ChapterDetailActivity) getActivity()).showCourseAccessForbidden(message);
+        }
+    }
+
+    private void notifyCourseAllowed() {
+        if (getActivity() instanceof ChapterDetailActivity) {
+            ((ChapterDetailActivity) getActivity()).showCourseAccessAllowed();
+        }
     }
 
     @Override

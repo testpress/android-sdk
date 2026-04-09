@@ -103,14 +103,15 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         showBuyNowButton = getIntent().getBooleanExtra(SHOW_BUY_NOW_BUTTON,false);
         //noinspection ConstantConditions
         instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
+        emptyView = (LinearLayout) findViewById(R.id.empty_container);
+        emptyTitleView = (TextView) findViewById(R.id.empty_title);
+        emptyDescView = (TextView) findViewById(R.id.empty_description);
+        retryButton = (Button) findViewById(R.id.retry_button);
+        progressBar = (ProgressBar) findViewById(R.id.pb_loading);
+        UIUtils.setIndeterminateDrawable(this, progressBar, 4);
+
         final String chapterUrl = getIntent().getStringExtra(CHAPTER_URL);
         if (chapterUrl != null) {
-            emptyView = (LinearLayout) findViewById(R.id.empty_container);
-            emptyTitleView = (TextView) findViewById(R.id.empty_title);
-            emptyDescView = (TextView) findViewById(R.id.empty_description);
-            retryButton = (Button) findViewById(R.id.retry_button);
-            progressBar = (ProgressBar) findViewById(R.id.pb_loading);
-            UIUtils.setIndeterminateDrawable(this, progressBar, 4);
             retryButton.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
@@ -272,6 +273,7 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     void loadCourseTabLayout() {
         findViewById(R.id.fragment_carousel).setVisibility(View.VISIBLE);
         findViewById(R.id.fragment_container).setVisibility(View.GONE);
+        emptyView.setVisibility(View.GONE);
         CourseDetailsTabAdapter adapter =
                 new CourseDetailsTabAdapter(getSupportFragmentManager(), getFragmentList());
 
@@ -375,6 +377,22 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         emptyTitleView.setText(title);
         emptyDescView.setText(description);
         progressBar.setVisibility(View.GONE);
+    }
+
+    public void showCourseAccessForbidden(String message) {
+        findViewById(R.id.fragment_carousel).setVisibility(View.GONE);
+        findViewById(R.id.fragment_container).setVisibility(View.GONE);
+        emptyView.setVisibility(View.VISIBLE);
+        emptyTitleView.setText(R.string.permission_denied);
+        emptyDescView.setText(message == null || message.trim().isEmpty()
+                ? getString(R.string.testpress_no_permission)
+                : message);
+        retryButton.setVisibility(View.GONE);
+        progressBar.setVisibility(View.GONE);
+    }
+
+    public void showCourseAccessAllowed() {
+        emptyView.setVisibility(View.GONE);
     }
 
     @Override
