@@ -441,9 +441,6 @@ public abstract class BaseListViewFragment<E> extends Fragment
      */
     protected BaseListViewFragment<E> setEmptyText(final int title, final int description, final int left) {
         if (emptyView != null) {
-            if (isItemsEmpty()) {
-                swipeRefreshLayout.setEnabled(false);
-            }
             emptyTitleView.setText(title);
             emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
             emptyDescView.setText(description);
@@ -461,9 +458,6 @@ public abstract class BaseListViewFragment<E> extends Fragment
      */
     protected BaseListViewFragment<E> setEmptyText(final int title, final String description, final int left) {
         if (emptyView != null) {
-            if (isItemsEmpty()) {
-                swipeRefreshLayout.setEnabled(false);
-            }
             emptyTitleView.setText(title);
             emptyTitleView.setCompoundDrawablesWithIntrinsicBounds(left, 0, 0, 0);
             emptyDescView.setText(description);
