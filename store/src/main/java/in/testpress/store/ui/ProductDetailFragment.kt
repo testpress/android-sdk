@@ -27,12 +27,14 @@ import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
 import `in`.testpress.store.TestpressStore
+import `in`.testpress.store.data.model.NetworkProductOffersResponse
 import `in`.testpress.store.data.model.mapping.asProduct
 import `in`.testpress.store.databinding.DialogProgressBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.store.util.generateRandom10CharString
+import `in`.testpress.util.StringUtils
 import `in`.testpress.util.ImageUtils
 import `in`.testpress.util.UILImageGetter
 import `in`.testpress.util.ZoomableImageString
@@ -85,10 +87,12 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
             when (resource?.status) {
                 Status.LOADING ->{
                     this.domainProduct = resource.data
+                    productViewModel.getAppliedOffers(domainProduct?.product?.slug)
                     showLoadingState()
                 }
                 Status.SUCCESS ->{
                     this.domainProduct = resource.data
+                    productViewModel.getAppliedOffers(domainProduct?.product?.slug)
                     renderProductDetails()
                 }
                 Status.ERROR -> showErrorState(resource.exception)
@@ -125,6 +129,84 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 else -> Unit
             }
         }
+
+        productViewModel.offers.observe(viewLifecycleOwner) { resource ->
+            when (resource?.status) {
+                Status.SUCCESS -> updateOffersUi(resource.data)
+                Status.ERROR -> Unit
+                else -> Unit
+            }
+        }
+    }
+
+    private fun updateOffersUi(offers: NetworkProductOffersResponse?) {
+        if (!shouldRenderAppliedOffers(offers)) return
+
+        val product = domainProduct?.product ?: return
+        val originalPrice = product.price.orEmpty()
+        val finalPrice = StringUtils.trimWhitespace(offers?.finalPrice)
+
+        if (!hasDiscount(offers, finalPrice)) {
+            hideAppliedOfferName()
+            showOriginalPrice(originalPrice)
+            return
+        }
+
+        renderAppliedOfferName(StringUtils.trimWhitespace(offers?.appliedDiscountName))
+        renderDiscountedPrice(finalPrice, originalPrice)
+    }
+
+    private fun shouldRenderAppliedOffers(offers: NetworkProductOffersResponse?): Boolean {
+        return offers != null && order == null && !binding.couponAppliedText.isVisible
+    }
+
+    private fun hasDiscount(offers: NetworkProductOffersResponse?, finalPrice: String): Boolean {
+        return offers?.hasDiscount == true && finalPrice.isNotEmpty()
+    }
+
+    private fun showOriginalPrice(originalPrice: String) {
+        binding.detailLayout.price.text = originalPrice
+    }
+
+    private fun renderDiscountedPrice(finalPrice: String, originalPrice: String) {
+        if (originalPrice.isEmpty()) {
+            binding.detailLayout.price.text = finalPrice
+            return
+        }
+
+        val originalPriceStrikethrough = buildStrikethrough(originalPrice)
+        val finalText = SpannableStringBuilder()
+            .append(finalPrice)
+            .append("  ")
+            .append(originalPriceStrikethrough)
+        binding.detailLayout.price.text = finalText
+    }
+
+    private fun buildStrikethrough(text: String): SpannableString {
+        return SpannableString(text).apply {
+            setSpan(
+                StrikethroughSpan(),
+                0,
+                text.length,
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+            )
+        }
+    }
+
+    private fun renderAppliedOfferName(offerName: String) {
+        if (offerName.isEmpty()) {
+            hideAppliedOfferName()
+            return
+        }
+        binding.detailLayout.appliedDiscountName.text = getString(
+            `in`.testpress.store.R.string.testpress_offer_applied_name,
+            offerName
+        )
+        binding.detailLayout.appliedDiscountName.isVisible = true
+    }
+
+    private fun hideAppliedOfferName() {
+        binding.detailLayout.appliedDiscountName.isVisible = false
     }
 
     private fun showLoadingState() {
@@ -278,6 +360,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
     private fun updateApplyCouponUI(){
         updateCouponAppliedText(binding.couponInputEditText.text.toString(), order)
+        binding.detailLayout.appliedDiscountName.isVisible = false
         updatePriceDisplay()
         loadingDialog?.dismiss()
     }

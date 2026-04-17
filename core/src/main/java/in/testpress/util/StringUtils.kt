@@ -8,6 +8,11 @@ object StringUtils{
     fun isNullOrEmpty(str: String?): Boolean {
         return str.isNullOrBlank()
     }
+
+    @JvmStatic
+    fun trimWhitespace(value: String?): String {
+        return value?.trim().orEmpty()
+    }
 }
 
 fun String.isEmailValid(): Boolean {

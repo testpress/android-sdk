@@ -8,6 +8,7 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.store.data.model.NetworkProduct;
 import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
+import in.testpress.store.data.model.NetworkProductOffersResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
@@ -83,6 +84,11 @@ public interface ProductService {
     @GET(V3_PRODUCT_PATH + "{product_id}")
     RetrofitCall<NetworkProduct> getProductDetailV3(
             @Path(value = "product_id", encoded = true) int productId
+    );
+
+    @GET("api/v2.4/products/{product_slug}/offers/")
+    RetrofitCall<NetworkProductOffersResponse> getProductOffers(
+            @Path(value = "product_slug", encoded = true) String productSlug
     );
 }
 

@@ -13,6 +13,7 @@ import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
+import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
 import android.text.style.StrikethroughSpan;
 import android.view.View;
@@ -41,6 +42,7 @@ import in.testpress.core.TestpressSession;
 import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
+import in.testpress.store.data.model.NetworkProductOffersResponse;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
@@ -51,6 +53,7 @@ import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UILImageGetter;
 import in.testpress.util.UIUtils;
+import in.testpress.util.StringUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
 import io.sentry.Scope;
@@ -82,6 +85,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private LinearLayout discountContainer;
     private TextView discountPrompt;
     private TextView couponAppliedText;
+    private TextView appliedDiscountNameText;
     private EditText couponEditText;
     private Button applyCouponButton;
 
@@ -111,6 +115,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         emptyDescView = (TextView) findViewById(R.id.empty_description);
         retryButton = (Button) findViewById(R.id.retry_button);
         couponAppliedText = (TextView) findViewById(R.id.coupon_applied_text);
+        appliedDiscountNameText = (TextView) findViewById(R.id.applied_discount_name);
         couponEditText = (EditText) findViewById(R.id.coupon);
         applyCouponButton = (Button) findViewById(R.id.apply_coupon);
         discountPrompt = findViewById(R.id.discount_prompt);
@@ -273,6 +278,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
         // Price
         priceText.setText(product.getPrice());
+        if (appliedDiscountNameText != null) {
+            appliedDiscountNameText.setVisibility(View.GONE);
+        }
 
         // Update product description
         if(product.getDescription().isEmpty()) {
@@ -316,6 +324,88 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
         ProductDetailsActivity.this.product = product;
         logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
+        getAppliedOffers();
+    }
+
+    private void getAppliedOffers() {
+        if (!hasValidProductSlug()) return;
+
+        apiClient.getProductOffers(getProductSlug()).enqueue(new TestpressCallback<NetworkProductOffersResponse>() {
+            @Override
+            public void onSuccess(NetworkProductOffersResponse result) {
+                updateOffersUi(result);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                // Ignore silently; PDP will continue showing the original price.
+            }
+        });
+    }
+
+    private void updateOffersUi(NetworkProductOffersResponse offers) {
+        if (!shouldRenderAppliedOffers(offers)) return;
+
+        String finalPrice = StringUtils.trimWhitespace(offers.getFinalPrice());
+        if (!offers.getHasDiscount() || finalPrice.isEmpty()) {
+            hideAppliedOfferName();
+            return;
+        }
+
+        renderDiscountedPrice(finalPrice, getOriginalPrice());
+        renderAppliedOfferName(StringUtils.trimWhitespace(offers.getAppliedDiscountName()));
+    }
+
+    private boolean shouldRenderAppliedOffers(NetworkProductOffersResponse offers) {
+        return offers != null && order == null && couponAppliedText.getVisibility() != View.VISIBLE;
+    }
+
+    private void renderDiscountedPrice(String finalPrice, String originalPrice) {
+        TextView priceText = findViewById(R.id.price);
+        if (originalPrice.isEmpty()) {
+            priceText.setText(finalPrice);
+            return;
+        }
+
+        SpannableString originalPriceStrikethrough = new SpannableString(originalPrice);
+        originalPriceStrikethrough.setSpan(
+                new StrikethroughSpan(),
+                0,
+                originalPrice.length(),
+                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
+        );
+
+        SpannableStringBuilder finalText = new SpannableStringBuilder();
+        finalText.append(finalPrice).append("  ").append(originalPriceStrikethrough);
+        priceText.setText(finalText);
+    }
+
+    private void renderAppliedOfferName(String offerName) {
+        if (appliedDiscountNameText == null) return;
+        if (offerName.isEmpty()) {
+            hideAppliedOfferName();
+            return;
+        }
+        appliedDiscountNameText.setText(getString(R.string.testpress_offer_applied_name, offerName));
+        appliedDiscountNameText.setVisibility(View.VISIBLE);
+    }
+
+    private void hideAppliedOfferName() {
+        if (appliedDiscountNameText != null) {
+            appliedDiscountNameText.setVisibility(View.GONE);
+        }
+    }
+
+    private boolean hasValidProductSlug() {
+        return !TextUtils.isEmpty(getProductSlug());
+    }
+
+    private String getProductSlug() {
+        return product != null ? StringUtils.trimWhitespace(product.getSlug()) : "";
+    }
+
+    private String getOriginalPrice() {
+        return product != null ? StringUtils.trimWhitespace(product.getPrice()) : "";
     }
 
     void createOrder() {
@@ -412,6 +502,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void updatePriceDisplay(Order createdOrder) {
         TextView priceText = findViewById(R.id.price);
+        if (appliedDiscountNameText != null) {
+            appliedDiscountNameText.setVisibility(View.GONE);
+        }
         String newPrice = createdOrder.getOrderItems().get(0).getPrice();
         String oldPrice = product.getPrice();
 

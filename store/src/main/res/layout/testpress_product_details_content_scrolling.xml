@@ -57,6 +57,20 @@
                 android:textAppearance="@style/TextAppearance.AppCompat.Small"
                 android:textColor="#212121" />
 
+            <TextView
+                android:id="@+id/applied_discount_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/price"
+                android:layout_marginTop="4dp"
+                android:layout_marginStart="@dimen/testpress_horizontal_margin"
+                android:layout_marginLeft="@dimen/testpress_horizontal_margin"
+                android:layout_toEndOf="@id/price_icon"
+                android:layout_toRightOf="@id/price_icon"
+                android:textColor="@color/testpress_text_gray"
+                android:textSize="12sp"
+                android:visibility="gone" />
+
         </RelativeLayout>
 
         <RelativeLayout
