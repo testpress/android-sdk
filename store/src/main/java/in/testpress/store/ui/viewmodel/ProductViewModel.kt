@@ -14,6 +14,7 @@ class ProductViewModel(private val repository: ProductDetailRepository) : ViewMo
     val product = repository.resource
     val order = repository.orderStatus
     val coupon = repository.couponStatus
+    val offers = repository.appliedOffers
 
     fun refresh() {
         repository.loadFromDatabase()
@@ -33,6 +34,10 @@ class ProductViewModel(private val repository: ProductDetailRepository) : ViewMo
 
     fun applyCoupon(orderId: Long, couponString: String){
         repository.applyCoupon(orderId, couponString)
+    }
+
+    fun getAppliedOffers(productSlug: String?) {
+        repository.getAppliedOffers(productSlug)
     }
 
     private fun createOrderItem(product: DomainProduct): OrderItem {

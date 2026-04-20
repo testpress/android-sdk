@@ -11,6 +11,7 @@ import in.testpress.network.TestpressApiClient;
 import in.testpress.store.data.model.NetworkProduct;
 import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
+import in.testpress.store.data.model.NetworkProductOffersResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
@@ -119,5 +120,9 @@ public class StoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<NetworkProduct> getProductDetailV3(int productId) {
         return getProductService().getProductDetailV3(productId);
+    }
+
+    public RetrofitCall<NetworkProductOffersResponse> getProductOffers(String productSlug) {
+        return getProductService().getProductOffers(productSlug);
     }
 }

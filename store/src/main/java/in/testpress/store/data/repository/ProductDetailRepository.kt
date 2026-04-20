@@ -12,11 +12,13 @@ import `in`.testpress.database.entities.DomainProduct
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.network.Resource
 import `in`.testpress.store.data.model.NetworkProduct
+import `in`.testpress.store.data.model.NetworkProductOffersResponse
 import `in`.testpress.store.data.model.toPriceEntities
 import `in`.testpress.store.data.model.toProductEntity
 import `in`.testpress.store.models.Order
 import `in`.testpress.store.models.OrderItem
 import `in`.testpress.store.network.StoreApiClient
+import `in`.testpress.enums.Status
 
 class ProductDetailRepository(context: Context, private val productId: Int) :
     BaseDetailRepository<NetworkProduct, DomainProduct>(context) {
@@ -29,8 +31,13 @@ class ProductDetailRepository(context: Context, private val productId: Int) :
     private val _couponStatus = MutableLiveData<Resource<Order>>()
     val couponStatus: LiveData<Resource<Order>> = _couponStatus
 
+    private val _appliedOffers = MutableLiveData<Resource<NetworkProductOffersResponse>>()
+    val appliedOffers: LiveData<Resource<NetworkProductOffersResponse>> = _appliedOffers
+
     private var session: TestpressSession? = TestpressSdk.getTestpressSession(context)
     private var settings: InstituteSettings? = session?.instituteSettings
+
+    private var offersFetchedForSlug: String? = null
 
     init {
         loadFromDatabase()
@@ -79,6 +86,30 @@ class ProductDetailRepository(context: Context, private val productId: Int) :
 
             override fun onException(exception: TestpressException) {
                 _couponStatus.postValue(Resource.error(exception, null))
+            }
+        })
+    }
+
+    fun getAppliedOffers(productSlug: String?) {
+        val safeSlug = productSlug?.trim().orEmpty()
+        if (safeSlug.isEmpty()) return
+
+        val current = _appliedOffers.value
+        if (safeSlug == offersFetchedForSlug &&
+            (current?.status == Status.LOADING || current?.status == Status.SUCCESS)
+        ) {
+            return
+        }
+
+        offersFetchedForSlug = safeSlug
+        _appliedOffers.postValue(Resource.loading(current?.data))
+        apiClient.getProductOffers(safeSlug).enqueue(object : TestpressCallback<NetworkProductOffersResponse>() {
+            override fun onSuccess(result: NetworkProductOffersResponse?) {
+                _appliedOffers.postValue(Resource.success(result))
+            }
+
+            override fun onException(exception: TestpressException) {
+                _appliedOffers.postValue(Resource.error(exception, current?.data))
             }
         })
     }
