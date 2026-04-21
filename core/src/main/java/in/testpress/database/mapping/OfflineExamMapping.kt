@@ -47,6 +47,8 @@ fun OfflineExam.asGreenDaoModel(): Exam {
         this.examDataModifiedOn,
         true,
         this.graceDurationForOfflineSubmission,
-        false
+        false,
+        this.enableMindsetReflections,
+        this.preExamReflectionForm
     )
 }

@@ -41,7 +41,9 @@ class ExamContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
     }
 
     override fun display() {
-        titleView.text = content.title
+        val exam = content.exam
+        val debugInfo = "\n(Reflections: ${exam?.enableMindsetReflections}, FormId: ${exam?.preExamReflectionForm?.id}, Mandatory: ${exam?.preExamReflectionForm?.submissionMandatory})"
+        titleView.text = content.title + debugInfo
         titleLayout.visibility = View.VISIBLE
         initExamWidget(content)
     }

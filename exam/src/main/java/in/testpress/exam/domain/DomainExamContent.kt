@@ -1,6 +1,7 @@
 package `in`.testpress.exam.domain
 
 import `in`.testpress.models.greendao.Exam
+import `in`.testpress.util.ReflectionForm
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat
@@ -47,7 +48,9 @@ data class DomainExamContent(
     val examDataModifiedOn: String? = null,
     val isOfflineExam: Boolean = false,
     val graceDurationForOfflineSubmission: Long? = null,
-    val enableExamWindowMonitoring: Boolean? = null
+    val enableExamWindowMonitoring: Boolean? = null,
+    val enableMindsetReflections: Boolean? = null,
+    val preExamReflectionForm: DomainReflectionForm? = null
 ) {
     fun formattedDate(inputString: String): String {
         var date: Date? = null
@@ -96,6 +99,7 @@ data class DomainExamContent(
 }
 
 fun createDomainExamContent(exam: Exam): DomainExamContent {
+    val reflectionForm = exam.preExamReflectionForm
     return DomainExamContent(
         id = exam.id,
         title = exam.title,
@@ -132,7 +136,11 @@ fun createDomainExamContent(exam: Exam): DomainExamContent {
         enableQuizMode = exam.enableQuizMode,
         disableAttemptResume = exam.disableAttemptResume,
         allowPreemptiveSectionEnding = exam.allowPreemptiveSectionEnding,
-        enableExamWindowMonitoring = exam.enableExamWindowMonitoring
+        enableExamWindowMonitoring = exam.enableExamWindowMonitoring,
+        enableMindsetReflections = exam.enableMindsetReflections,
+        preExamReflectionForm = reflectionForm?.id?.let { id ->
+            DomainReflectionForm(id, reflectionForm.submissionMandatory == true)
+        }
     )
 }
 
@@ -184,7 +192,9 @@ fun createGreenDaoExamContent(exam: DomainExamContent): Exam {
         exam.examDataModifiedOn,
         exam.isOfflineExam,
         exam.graceDurationForOfflineSubmission,
-        exam.enableExamWindowMonitoring
+        exam.enableExamWindowMonitoring,
+        exam.enableMindsetReflections,
+        exam.preExamReflectionForm?.let { ReflectionForm(it.id, it.submissionMandatory) }
     )
     greenDaoexam.languages = exam.languages.toGreenDaoModels()
 
@@ -199,4 +209,11 @@ fun DomainExamContent.asGreenDaoModel(): Exam {
 object ExamTemplateType{
     val IELTS_TEMPLATE  = 12
     val CTET_TEMPLATE = 15
+}
+
+data class DomainReflectionForm(
+    val id: Long,
+    val submissionMandatory: Boolean
+) {
+    fun isMandatory() = submissionMandatory
 }

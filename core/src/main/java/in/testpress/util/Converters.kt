@@ -8,6 +8,20 @@ import `in`.testpress.database.entities.*
 object Converters {
     @TypeConverter
     @JvmStatic
+    fun fromReflectionForm(value: ReflectionForm?): String? {
+        return Gson().toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toReflectionForm(value: String?): ReflectionForm? {
+        if (value.isNullOrEmpty()) return null
+        val type = object : TypeToken<ReflectionForm>() {}.type
+        return Gson().fromJson(value, type)
+    }
+
+    @TypeConverter
+    @JvmStatic
     fun stringToList(value: String?): List<Array<String>>? {
         val listType = object : TypeToken<ArrayList<ArrayList<String>?>?>() {}.type
         return Gson().fromJson(value, listType)

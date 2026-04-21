@@ -9,6 +9,8 @@ import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
 
+import in.testpress.util.ReflectionForm;
+import in.testpress.util.ReflectionFormConverter;
 import in.testpress.util.StringList;
 import in.testpress.util.StringListConverter;
 
@@ -68,11 +70,14 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         public final static Property IsOfflineExam = new Property(40, Boolean.class, "isOfflineExam", false, "IS_OFFLINE_EXAM");
         public final static Property GraceDurationForOfflineSubmission = new Property(41, Long.class, "graceDurationForOfflineSubmission", false, "GRACE_DURATION_FOR_OFFLINE_SUBMISSION");
         public final static Property EnableExamWindowMonitoring = new Property(42, Boolean.class, "enableExamWindowMonitoring", false, "ENABLE_EXAM_WINDOW_MONITORING");
+        public final static Property EnableMindsetReflections = new Property(43, Boolean.class, "enableMindsetReflections", false, "ENABLE_MINDSET_REFLECTIONS");
+        public final static Property PreExamReflectionForm = new Property(44, String.class, "preExamReflectionForm", false, "PRE_EXAM_REFLECTION_FORM");
     }
 
     private DaoSession daoSession;
 
     private final StringListConverter categoriesConverter = new StringListConverter();
+    private final ReflectionFormConverter preExamReflectionFormConverter = new ReflectionFormConverter();
 
     public ExamDao(DaoConfig config) {
         super(config);
@@ -129,7 +134,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
                 "\"EXAM_DATA_MODIFIED_ON\" TEXT," + // 39: examDataModifiedOn
                 "\"IS_OFFLINE_EXAM\" INTEGER," + // 40: isOfflineExam
                 "\"GRACE_DURATION_FOR_OFFLINE_SUBMISSION\" INTEGER," + // 41: graceDurationForOfflineSubmission
-                "\"ENABLE_EXAM_WINDOW_MONITORING\" INTEGER);"); // 42: enableExamWindowMonitoring
+                "\"ENABLE_EXAM_WINDOW_MONITORING\" INTEGER," + // 42: enableExamWindowMonitoring
+                "\"ENABLE_MINDSET_REFLECTIONS\" INTEGER," + // 43: enableMindsetReflections
+                "\"PRE_EXAM_REFLECTION_FORM\" TEXT);"); // 44: preExamReflectionForm
     }
 
     /** Drops the underlying database table. */
@@ -356,6 +363,16 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (enableExamWindowMonitoring != null) {
             stmt.bindLong(43, enableExamWindowMonitoring ? 1L: 0L);
         }
+ 
+        Boolean enableMindsetReflections = entity.getEnableMindsetReflections();
+        if (enableMindsetReflections != null) {
+            stmt.bindLong(44, enableMindsetReflections ? 1L: 0L);
+        }
+ 
+        ReflectionForm preExamReflectionForm = entity.getPreExamReflectionForm();
+        if (preExamReflectionForm != null) {
+            stmt.bindString(45, preExamReflectionFormConverter.convertToDatabaseValue(preExamReflectionForm));
+        }
     }
 
     @Override
@@ -576,6 +593,16 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         if (enableExamWindowMonitoring != null) {
             stmt.bindLong(43, enableExamWindowMonitoring ? 1L: 0L);
         }
+ 
+        Boolean enableMindsetReflections = entity.getEnableMindsetReflections();
+        if (enableMindsetReflections != null) {
+            stmt.bindLong(44, enableMindsetReflections ? 1L: 0L);
+        }
+ 
+        ReflectionForm preExamReflectionForm = entity.getPreExamReflectionForm();
+        if (preExamReflectionForm != null) {
+            stmt.bindString(45, preExamReflectionFormConverter.convertToDatabaseValue(preExamReflectionForm));
+        }
     }
 
     @Override
@@ -634,7 +661,9 @@ public class ExamDao extends AbstractDao<Exam, Long> {
             cursor.isNull(offset + 39) ? null : cursor.getString(offset + 39), // examDataModifiedOn
             cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0, // isOfflineExam
             cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41), // graceDurationForOfflineSubmission
-            cursor.isNull(offset + 42) ? null : cursor.getShort(offset + 42) != 0 // enableExamWindowMonitoring
+            cursor.isNull(offset + 42) ? null : cursor.getShort(offset + 42) != 0, // enableExamWindowMonitoring
+            cursor.isNull(offset + 43) ? null : cursor.getShort(offset + 43) != 0, // enableMindsetReflections
+            cursor.isNull(offset + 44) ? null : preExamReflectionFormConverter.convertToEntityProperty(cursor.getString(offset + 44)) // preExamReflectionForm
         );
         return entity;
     }
@@ -684,6 +713,8 @@ public class ExamDao extends AbstractDao<Exam, Long> {
         entity.setIsOfflineExam(cursor.isNull(offset + 40) ? null : cursor.getShort(offset + 40) != 0);
         entity.setGraceDurationForOfflineSubmission(cursor.isNull(offset + 41) ? null : cursor.getLong(offset + 41));
         entity.setEnableExamWindowMonitoring(cursor.isNull(offset + 42) ? null : cursor.getShort(offset + 42) != 0);
+        entity.setEnableMindsetReflections(cursor.isNull(offset + 43) ? null : cursor.getShort(offset + 43) != 0);
+        entity.setPreExamReflectionForm(cursor.isNull(offset + 44) ? null : preExamReflectionFormConverter.convertToEntityProperty(cursor.getString(offset + 44)));
      }
     
     @Override
