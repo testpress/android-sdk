@@ -558,8 +558,8 @@ public class TestpressSDKDaoGenerator {
         exam.addBooleanProperty("enableExamWindowMonitoring");
         exam.addBooleanProperty("enableMindsetReflections");
         exam.addStringProperty("preExamReflectionForm").customType(
-                "in.testpress.util.ReflectionForm",
-                "in.testpress.util.ReflectionFormConverter"
+                "in.testpress.models.ReflectionForm",
+                "in.testpress.database.ReflectionFormConverter"
         );
         exam.implementsInterface("android.os.Parcelable");
         return exam;

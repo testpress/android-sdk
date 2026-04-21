@@ -1,7 +1,7 @@
 package `in`.testpress.exam.domain
 
 import `in`.testpress.models.greendao.Exam
-import `in`.testpress.util.ReflectionForm
+import `in`.testpress.models.ReflectionForm
 import java.text.DateFormat
 import java.text.ParseException
 import java.text.SimpleDateFormat

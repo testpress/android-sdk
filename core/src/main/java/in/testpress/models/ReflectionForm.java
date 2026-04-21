@@ -1,4 +1,4 @@
-package in.testpress.util;
+package in.testpress.models;
 
 public class ReflectionForm {
     private Long id;

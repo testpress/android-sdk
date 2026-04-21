@@ -9,8 +9,8 @@ import org.greenrobot.greendao.internal.DaoConfig;
 import org.greenrobot.greendao.database.Database;
 import org.greenrobot.greendao.database.DatabaseStatement;
 
-import in.testpress.util.ReflectionForm;
-import in.testpress.util.ReflectionFormConverter;
+import in.testpress.models.ReflectionForm;
+import in.testpress.database.ReflectionFormConverter;
 import in.testpress.util.StringList;
 import in.testpress.util.StringListConverter;
 

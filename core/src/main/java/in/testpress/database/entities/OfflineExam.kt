@@ -2,7 +2,7 @@ package `in`.testpress.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import `in`.testpress.util.ReflectionForm
+import `in`.testpress.models.ReflectionForm
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*

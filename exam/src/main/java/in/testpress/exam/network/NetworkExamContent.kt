@@ -2,7 +2,7 @@ package `in`.testpress.exam.network
 
 import `in`.testpress.exam.network.NetworkSection
 import `in`.testpress.models.greendao.Exam
-import `in`.testpress.util.ReflectionForm
+import `in`.testpress.models.ReflectionForm
 import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*

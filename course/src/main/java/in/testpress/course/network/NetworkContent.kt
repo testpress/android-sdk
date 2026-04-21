@@ -4,7 +4,7 @@ import `in`.testpress.database.ContentEntity
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.models.greendao.Content
-import `in`.testpress.util.ReflectionForm
+import `in`.testpress.models.ReflectionForm
 import com.google.gson.annotations.SerializedName
 
 
