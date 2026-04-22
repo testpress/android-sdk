@@ -26,9 +26,11 @@ import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.TestpressExam
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.domain.ExamTemplateType.CTET_TEMPLATE
+import `in`.testpress.exam.ui.PreExamReflectionActivity
 import `in`.testpress.exam.util.MultiLanguagesUtil
 import `in`.testpress.exam.util.RetakeExamUtil
 import `in`.testpress.models.greendao.Attempt
+import android.app.Activity
 import android.content.Context
 import android.content.DialogInterface
 import android.content.Intent
@@ -37,6 +39,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.TextView
 import android.widget.Toast
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AlertDialog
 import androidx.core.view.isVisible
 import androidx.fragment.app.Fragment
@@ -66,6 +69,16 @@ open class BaseExamWidgetFragment : Fragment() {
     var offlineAttemptSectionList: List<OfflineAttemptSection>? = null
     private var isOfflineExamSupportEnables = false
     var offlineAttemptUploaded = false
+    private var reflectionCompleted = false
+    private val preExamReflectionLauncher = registerForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        if (result.resultCode == Activity.RESULT_OK) {
+            reflectionCompleted = true
+            val exam = content.exam ?: return@registerForActivityResult
+            showExamModesOrStartExam(exam, shouldShowExamDetails(exam), isPartial = false)
+        }
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -400,7 +413,11 @@ open class BaseExamWidgetFragment : Fragment() {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
             MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
-                showExamModesOrStartExam(exam, shouldShowExamDetails(exam), isPartial = false)
+                if (shouldShowPreExamReflection(exam)) {
+                    openPreExamReflection(exam)
+                } else {
+                    showExamModesOrStartExam(exam, shouldShowExamDetails(exam), isPartial = false)
+                }
             }
         } else {
             startButton.setOnClickListener {
@@ -416,6 +433,22 @@ open class BaseExamWidgetFragment : Fragment() {
         // display the Exam Detail page. Otherwise, we return true to start the exam without
         // displaying the Exam Detail page.
         return !(exam.isAttemptResumeDisabled() || exam.isWindowMonitoringEnabled())
+    }
+
+    private fun shouldShowPreExamReflection(exam: DomainExamContent): Boolean {
+        if (reflectionCompleted) return false
+        if (exam.isOfflineExam) return false
+        return exam.enableMindsetReflections == true && exam.preExamReflectionForm != null
+    }
+
+    private fun openPreExamReflection(exam: DomainExamContent) {
+        val form = exam.preExamReflectionForm ?: return
+        val session = TestpressSdk.getTestpressSession(requireContext()) ?: return
+        val baseUrl = session.instituteSettings.baseUrl
+        val intent = PreExamReflectionActivity.createIntent(
+            requireContext(), baseUrl, exam.id, form.id, form.submissionMandatory ?: false
+        )
+        preExamReflectionLauncher.launch(intent)
     }
 
     private fun showExamModesOrStartExam(
