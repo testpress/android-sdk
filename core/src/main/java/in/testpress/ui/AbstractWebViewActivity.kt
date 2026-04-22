@@ -57,7 +57,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             this.putString(WebViewFragment.URL_TO_OPEN, urlPath)
             this.putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
             this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allowNonInstituteUrl)
-            this.putBoolean("allow_validation_errors", allowValidationErrors)
+            this.putBoolean(ALLOW_VALIDATION_ERRORS, allowValidationErrors)
         }
     }
 
@@ -68,7 +68,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         const val URL_TO_OPEN = "URL"
         const val IS_AUTHENTICATION_REQUIRED = "IS_AUTHENTICATION_REQUIRED"
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
-        const val ALLOW_VALIDATION_ERRORS = "allow_validation_errors"
+        const val ALLOW_VALIDATION_ERRORS = "ALLOW_VALIDATION_ERRORS"
 
         fun createIntent(
             currentContext: Context,

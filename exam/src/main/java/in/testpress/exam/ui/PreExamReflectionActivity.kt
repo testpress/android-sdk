@@ -52,7 +52,10 @@ class PreExamReflectionActivity : AbstractWebViewActivity() {
                     return
                 }
                 val nextUrl = Uri.encode(urlPath)
-                urlPath = "${session.instituteSettings.baseUrl}$ssoUrl&next=$nextUrl"
+                val separator = if (ssoUrl.contains("?")) "&" else "?"
+                val cleanBaseUrl = session.instituteSettings.baseUrl.trimEnd('/')
+                val cleanSsoUrl = if (ssoUrl.startsWith("/")) ssoUrl else "/$ssoUrl"
+                urlPath = "$cleanBaseUrl$cleanSsoUrl$separator&next=$nextUrl"
                 isSsoUrlFetched = true
                 initializeWebViewFragment()
             }
@@ -103,22 +106,12 @@ class PreExamReflectionActivity : AbstractWebViewActivity() {
             webViewFragment.goBack()
             return
         }
-        if (isMandatory) {
-            Toast.makeText(
-                this,
-                "Please complete the reflection before starting the exam.",
-                Toast.LENGTH_SHORT
-            ).show()
-        } else {
-            setResult(Activity.RESULT_CANCELED)
-            finish()
-        }
+        setResult(Activity.RESULT_CANCELED)
+        finish()
     }
 
     companion object {
         const val IS_MANDATORY = "IS_MANDATORY"
-        const val ALLOW_VALIDATION_ERRORS = "allow_validation_errors"
-        const val REQUEST_CODE = 1001
         const val RESULT_ACTION = "RESULT_ACTION"
         const val ACTION_SUBMITTED = "ACTION_SUBMITTED"
         const val ACTION_SKIPPED = "ACTION_SKIPPED"

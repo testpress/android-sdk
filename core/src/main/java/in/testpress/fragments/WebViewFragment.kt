@@ -84,7 +84,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
             arguments?.getBoolean(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW) ?: false
         allowZoomControl = arguments?.getBoolean(ALLOW_ZOOM_CONTROLS) ?: false
         enableSwipeRefresh = arguments?.getBoolean(ENABLE_SWIPE_REFRESH) ?: false
-        allowValidationErrors = arguments?.getBoolean("allow_validation_errors", false) ?: false
+        allowValidationErrors = arguments?.getBoolean(ALLOW_VALIDATION_ERRORS, false) ?: false
     }
 
     private var allowValidationErrors = false
@@ -233,6 +233,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
         const val ALLOW_ZOOM_CONTROLS = "ALLOW_ZOOM_CONTROLS"
         const val ENABLE_SWIPE_REFRESH = "ENABLE_SWIPE_REFRESH"
+        const val ALLOW_VALIDATION_ERRORS = "ALLOW_VALIDATION_ERRORS"
     }
 
 }
