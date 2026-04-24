@@ -274,4 +274,5 @@
     <string name="storage_permission_to_upload_file">The photos and videos permission is required to upload files.</string>
     <string name="testpress_pdf_preview">PDF Preview</string>
     <string name="testpress_floating_window_detected">Floating window detected. Please close it.</string>
+    <string name="testpress_mindset_insights">Mindset Insights</string>
 </resources>

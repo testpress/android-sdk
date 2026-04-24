@@ -85,9 +85,12 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         allowZoomControl = arguments?.getBoolean(ALLOW_ZOOM_CONTROLS) ?: false
         enableSwipeRefresh = arguments?.getBoolean(ENABLE_SWIPE_REFRESH) ?: false
         allowValidationErrors = arguments?.getBoolean(ALLOW_VALIDATION_ERRORS, false) ?: false
+        cacheMode = arguments?.getInt(CACHE_MODE, WebSettings.LOAD_CACHE_ELSE_NETWORK)
+            ?: WebSettings.LOAD_CACHE_ELSE_NETWORK
     }
 
     private var allowValidationErrors = false
+    private var cacheMode: Int = WebSettings.LOAD_CACHE_ELSE_NETWORK
 
     private fun initializedSwipeRefresh(){
         layout.swipeRefreshLayout.isEnabled = enableSwipeRefresh
@@ -115,7 +118,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         webView.settings.domStorageEnabled = true
         // Disable pinch to zoom without the zoom buttons
         webView.settings.builtInZoomControls = false
-        webView.settings.cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
+        webView.settings.cacheMode = cacheMode
         webView.settings.setSupportZoom(allowZoomControl)
         webView.webViewClient = CustomWebViewClient(this)
         webView.webChromeClient = CustomWebChromeClient(this)
@@ -234,6 +237,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         const val ALLOW_ZOOM_CONTROLS = "ALLOW_ZOOM_CONTROLS"
         const val ENABLE_SWIPE_REFRESH = "ENABLE_SWIPE_REFRESH"
         const val ALLOW_VALIDATION_ERRORS = "ALLOW_VALIDATION_ERRORS"
+        const val CACHE_MODE = "CACHE_MODE"
     }
 
 }

@@ -100,6 +100,8 @@ public class ReviewStatsFragment extends BaseFragment {
     private TextView analyticsButton;
     private TextView advancedAnalyticsButton;
     private LinearLayout advancedAnalyticsLayout;
+    private TextView mindsetInsightsButton;
+    private LinearLayout mindsetInsightsLayout;
     private TextView retakeButton;
     private LinearLayout retakeButtonLayout;
     private LinearLayout timeAnalyticsButtonLayout;
@@ -200,6 +202,8 @@ public class ReviewStatsFragment extends BaseFragment {
         analyticsButton = (TextView) view.findViewById(R.id.analytics);
         advancedAnalyticsButton = (TextView) view.findViewById(R.id.advanced_analytics);
         advancedAnalyticsLayout = (LinearLayout) view.findViewById(R.id.advanced_analytics_layout);
+        mindsetInsightsButton = (TextView) view.findViewById(R.id.mindset_insights);
+        mindsetInsightsLayout = (LinearLayout) view.findViewById(R.id.mindset_insights_layout);
         retakeButton = (TextView) view.findViewById(R.id.retake);
         emailPdfButton = (TextView) view.findViewById(R.id.email_mcqs);
         retakeButtonLayout = (LinearLayout) view.findViewById(R.id.retake_button_layout);
@@ -280,6 +284,7 @@ public class ReviewStatsFragment extends BaseFragment {
         showOrHideReviewQuestionButton();
         showOrHideAnalyticsButton();
         showOrHideAdvancedAnalyticsButton();
+        showOrHideMindsetInsightsButton();
         showOrHideEmailPDFButton();
         showOrHideRetakButton();
         setTotalMarks();
@@ -415,6 +420,25 @@ public class ReviewStatsFragment extends BaseFragment {
                 }
             });
         }
+    }
+
+    private void showOrHideMindsetInsightsButton() {
+        if (!isExamNotNull() || !Boolean.TRUE.equals(exam.getEnableMindsetReflections())) {
+            return;
+        }
+        mindsetInsightsLayout.setVisibility(View.VISIBLE);
+        mindsetInsightsButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                in.testpress.core.TestpressSession session =
+                        TestpressSdk.getTestpressSession(requireContext());
+                if (session == null) return;
+                String baseUrl = session.getInstituteSettings().getBaseUrl();
+                requireActivity().startActivity(
+                        MindsetInsightsActivity.createIntent(requireContext(), baseUrl, attempt.getId())
+                );
+            }
+        });
     }
 
     private void showOrHideEmailPDFButton() {
