@@ -56,7 +56,7 @@ class MindsetInsightsActivity : AbstractWebViewActivity() {
                 val separator = if (ssoUrl.contains("?")) "&" else "?"
                 val cleanBaseUrl = session.instituteSettings.baseUrl.trimEnd('/')
                 val cleanSsoUrl = if (ssoUrl.startsWith("/")) ssoUrl else "/$ssoUrl"
-                urlPath = "$cleanBaseUrl$cleanSsoUrl$separator&next=$nextUrl"
+                urlPath = "$cleanBaseUrl$cleanSsoUrl${separator}next=$nextUrl"
                 isSsoUrlFetched = true
                 initializeWebViewFragment()
             }
