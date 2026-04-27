@@ -2,6 +2,8 @@ package `in`.testpress.exam.network
 
 import `in`.testpress.exam.network.NetworkSection
 import `in`.testpress.models.greendao.Exam
+import `in`.testpress.models.ReflectionForm
+import com.google.gson.annotations.SerializedName
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -54,7 +56,17 @@ data class NetworkExamContent(
     val examDataModifiedOn: String? = null,
     val isOfflineExam: Boolean = false,
     val graceDurationForOfflineSubmission: Long? = null,
-    val enableExamWindowMonitoring: Boolean? = null
+    val enableExamWindowMonitoring: Boolean? = null,
+    @SerializedName("enable_mindset_reflections")
+    val enableMindsetReflections: Boolean? = null,
+    @SerializedName("pre_exam_reflection_form")
+    val preExamReflectionForm: NetworkReflectionForm? = null
+)
+
+data class NetworkReflectionForm(
+    val id: Long? = null,
+    @SerializedName("submission_mandatory")
+    val submissionMandatory: Boolean? = null
 )
 
 fun NetworkExamContent.asGreenDaoModel(): Exam {
@@ -101,7 +113,9 @@ fun NetworkExamContent.asGreenDaoModel(): Exam {
         this.examDataModifiedOn,
         this.isOfflineExam,
         this.graceDurationForOfflineSubmission,
-        this.enableExamWindowMonitoring
+        this.enableExamWindowMonitoring,
+        this.enableMindsetReflections,
+        this.preExamReflectionForm?.let { ReflectionForm(it.id, it.submissionMandatory) }
     )
 }
 

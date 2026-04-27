@@ -4,8 +4,23 @@ import androidx.room.TypeConverter
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import `in`.testpress.database.entities.*
+import `in`.testpress.models.ReflectionForm
 
 object Converters {
+    @TypeConverter
+    @JvmStatic
+    fun fromReflectionForm(value: ReflectionForm?): String? {
+        return Gson().toJson(value)
+    }
+
+    @TypeConverter
+    @JvmStatic
+    fun toReflectionForm(value: String?): ReflectionForm? {
+        if (value.isNullOrEmpty()) return null
+        val type = object : TypeToken<ReflectionForm>() {}.type
+        return Gson().fromJson(value, type)
+    }
+
     @TypeConverter
     @JvmStatic
     fun stringToList(value: String?): List<Array<String>>? {

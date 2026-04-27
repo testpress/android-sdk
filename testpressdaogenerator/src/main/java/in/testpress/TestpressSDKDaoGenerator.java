@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 81;
+    private static final int VERSION = 82;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -556,6 +556,11 @@ public class TestpressSDKDaoGenerator {
         exam.addBooleanProperty("isOfflineExam");
         exam.addLongProperty("graceDurationForOfflineSubmission");
         exam.addBooleanProperty("enableExamWindowMonitoring");
+        exam.addBooleanProperty("enableMindsetReflections");
+        exam.addStringProperty("preExamReflectionForm").customType(
+                "in.testpress.models.ReflectionForm",
+                "in.testpress.database.ReflectionFormConverter"
+        );
         exam.implementsInterface("android.os.Parcelable");
         return exam;
     }

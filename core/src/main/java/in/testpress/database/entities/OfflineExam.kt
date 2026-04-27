@@ -2,6 +2,7 @@ package `in`.testpress.database.entities
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import `in`.testpress.models.ReflectionForm
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.*
@@ -54,7 +55,9 @@ data class OfflineExam(
     val downloadedQuestionCount: Long = 0,
     val downloadComplete: Boolean = false,
     val offlinePausedAttemptsCount: Long = 0,
-    val graceDurationForOfflineSubmission: Long? = null
+    val graceDurationForOfflineSubmission: Long? = null,
+    val enableMindsetReflections: Boolean? = null,
+    val preExamReflectionForm: ReflectionForm? = null
 ) {
     fun getExamDataModifiedOnAsDate(): Date? {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSSSSSXXX")
