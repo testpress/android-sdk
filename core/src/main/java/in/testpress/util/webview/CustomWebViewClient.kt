@@ -30,13 +30,14 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
     private fun isPDFUrl(url: String?) = url?.contains(".pdf") ?: false
 
     private fun shouldLoadInWebView(url: String?):Boolean {
+        if (url == null) return true
         if (fragment.isInstituteUrl(url)) {
             return true
         }
         if (!fragment.allowNonInstituteUrlInWebView) {
             return false
         }
-        return url?.let { isHttpOrHttpsUrl(it) } ?: false
+        return isHttpOrHttpsUrl(url)
     }
 
     private fun isHttpOrHttpsUrl(url: String): Boolean {
