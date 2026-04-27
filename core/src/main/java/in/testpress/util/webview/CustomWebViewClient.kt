@@ -37,10 +37,10 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
         if (!fragment.allowNonInstituteUrlInWebView) {
             return false
         }
-        return isHttpOrHttpsUrl(url)
+        return hasHttpScheme(url)
     }
 
-    private fun isHttpOrHttpsUrl(url: String): Boolean {
+    private fun hasHttpScheme(url: String): Boolean {
         return url.startsWith("http://", ignoreCase = true) ||
                url.startsWith("https://", ignoreCase = true)
     }
