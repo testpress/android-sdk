@@ -30,11 +30,19 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
     private fun isPDFUrl(url: String?) = url?.contains(".pdf") ?: false
 
     private fun shouldLoadInWebView(url: String?):Boolean {
-        return if (fragment.isInstituteUrl(url)){
-            true
-        } else {
-            fragment.allowNonInstituteUrlInWebView
+        if (url == null) return true
+        if (fragment.isInstituteUrl(url)) {
+            return true
         }
+        if (!fragment.allowNonInstituteUrlInWebView) {
+            return false
+        }
+        return hasHttpScheme(url)
+    }
+
+    private fun hasHttpScheme(url: String): Boolean {
+        return url.startsWith("http://", ignoreCase = true) ||
+               url.startsWith("https://", ignoreCase = true)
     }
 
     override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
