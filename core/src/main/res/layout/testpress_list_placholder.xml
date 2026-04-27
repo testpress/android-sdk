@@ -3,7 +3,7 @@
     android:orientation="horizontal"
     android:paddingVertical="10dp"
     android:paddingHorizontal="20dp"
-    android:background="@android:color/white"
+    android:background="@color/testpress_white"
     android:id="@+id/chapter_item_layout"
     android:layout_width="match_parent"
     android:layout_height="wrap_content">

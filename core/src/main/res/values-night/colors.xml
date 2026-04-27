@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
+
+    <!-- Dark mode color overrides -->
+    <color name="testpress_white">#1F1F1F</color>
+    <color name="testpress_black">#E0E0E0</color>
+
+    <color name="testpress_table_text">#B8B8B8</color>
+    <color name="testpress_text_gray_dark">#999999</color>
+    <color name="testpress_text_gray">#888888</color>
+    <color name="testpress_text_gray_medium">#666666</color>
+
+    <color name="testpress_pager_background">#0B0B0B</color>
+    <color name="testpress_pager_background_alternate">#181818</color>
+
+    <color name="testpress_tab_text_color">#777777</color>
+    <color name="testpress_tab_background_color">#1F1F1F</color>
+
+    <color name="testpress_dropdown_list_divider_color">#5C5C5C</color>
+    <color name="testpress_body_text">#9FFFFFFF</color>
+
+    <color name="testpress_gray_light">#191919</color>
+    <color name="testpress_dotted_line">#222222</color>
+    <color name="testpress_text_gray_light">#404040</color>
+
+    <color name="testpress_difficulty_percentage_gray">#999999</color>
+
+</resources>
