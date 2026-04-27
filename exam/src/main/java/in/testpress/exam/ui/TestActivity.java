@@ -40,6 +40,7 @@ import in.testpress.exam.models.Permission;
 import in.testpress.exam.api.TestpressExamApiClient;
 import in.testpress.exam.ui.viewmodel.ExamViewModel;
 import in.testpress.exam.util.MultiLanguagesUtil;
+import in.testpress.models.ReflectionForm;
 import in.testpress.models.TestpressApiResponse;
 import in.testpress.models.greendao.Attempt;
 import in.testpress.models.greendao.Content;
@@ -103,6 +104,8 @@ public class TestActivity extends BaseToolBarActivity  {
     private RetrofitCall<TestpressApiResponse<Attempt>> attemptsApiRequest;
     private RetrofitCall<ApiResponse<List<Language>>> languagesApiRequest;
     private ExamViewModel examViewModel;
+    private boolean reflectionCompleted = false;
+    private static final int REFLECTION_REQUEST_CODE = 1001;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -652,6 +655,11 @@ public class TestActivity extends BaseToolBarActivity  {
     }
 
     private void showWarningAlertOrStartExam() {
+        if (shouldShowPreExamReflection()) {
+            openPreExamReflection();
+            return;
+        }
+
         boolean isResumeDisabled = exam.isAttemptResumeDisabled();
         boolean isWindowMonitoringEnabled = exam.isWindowMonitoringEnabled();
 
@@ -803,12 +811,40 @@ public class TestActivity extends BaseToolBarActivity  {
 
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (requestCode == REFLECTION_REQUEST_CODE) {
+            if (resultCode == Activity.RESULT_OK) {
+                reflectionCompleted = true;
+                showWarningAlertOrStartExam();
+            }
+            return;
+        }
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
             setResult(resultCode);
             finish();
         } else {
             super.onActivityResult(requestCode, resultCode, data);
         }
+    }
+
+    private boolean shouldShowPreExamReflection() {
+        if (reflectionCompleted) return false;
+        if (attempt != null) return false;
+        if (isOfflineExam()) return false;
+        if (exam.getPreExamReflectionForm() == null) return false;
+        return Boolean.TRUE.equals(exam.getEnableMindsetReflections());
+    }
+
+    private void openPreExamReflection() {
+        ReflectionForm form = exam.getPreExamReflectionForm();
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        if (session == null) {
+            Toast.makeText(this, "Session is null. Please login again.", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        String baseUrl = session.getInstituteSettings().getBaseUrl();
+        Intent intent = PreExamReflectionActivity.createIntent(
+                this, baseUrl, exam.getId(), form.getId(), form.getSubmissionMandatory() != null && form.getSubmissionMandatory());
+        startActivityForResult(intent, REFLECTION_REQUEST_CODE);
     }
 
     void handleError(TestpressException exception, @StringRes int errorMessage) {

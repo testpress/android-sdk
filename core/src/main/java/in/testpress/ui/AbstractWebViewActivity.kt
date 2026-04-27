@@ -11,11 +11,12 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
 
     private var _layout: BaseTestpressWebviewContainerLayoutBinding? = null
     private val layout: BaseTestpressWebviewContainerLayoutBinding get() = _layout!!
-    protected lateinit var webViewFragment: WebViewFragment
+    open lateinit var webViewFragment: WebViewFragment
     private lateinit var title: String
-    private lateinit var urlPath: String
+    open lateinit var urlPath: String
     private var isAuthenticationRequired: Boolean = true
     private var allowNonInstituteUrl: Boolean = false
+    private var allowValidationErrors: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,9 +40,10 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         urlPath = intent.getStringExtra(URL_TO_OPEN)!!
         isAuthenticationRequired = intent.getBooleanExtra(IS_AUTHENTICATION_REQUIRED,true)
         allowNonInstituteUrl = intent.getBooleanExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, false)
+        allowValidationErrors = intent.getBooleanExtra(ALLOW_VALIDATION_ERRORS, false)
     }
 
-    private fun initializeWebViewFragment() {
+    open fun initializeWebViewFragment() {
         webViewFragment = WebViewFragment()
         webViewFragment.arguments = getWebViewArguments()
         webViewFragment.setListener(this)
@@ -55,6 +57,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             this.putString(WebViewFragment.URL_TO_OPEN, urlPath)
             this.putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
             this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allowNonInstituteUrl)
+            this.putBoolean(ALLOW_VALIDATION_ERRORS, allowValidationErrors)
         }
     }
 
@@ -65,6 +68,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         const val URL_TO_OPEN = "URL"
         const val IS_AUTHENTICATION_REQUIRED = "IS_AUTHENTICATION_REQUIRED"
         const val ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW = "ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW"
+        const val ALLOW_VALIDATION_ERRORS = "ALLOW_VALIDATION_ERRORS"
 
         fun createIntent(
             currentContext: Context,

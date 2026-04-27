@@ -75,9 +75,11 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
             val currentWebViewUrl = fragment.webView.url.toString()
             if (requestUrl == currentWebViewUrl) {
                 val statusCode = error.value?.statusCode ?: -1
-                val reasonPhrase = error.value?.reasonPhrase ?: "Unknown Error"
-                val httpError = TestpressException.httpError(statusCode, reasonPhrase)
-                fragment.showErrorView(httpError)
+                if (fragment.shouldShowHttpError(statusCode)) {
+                    val reasonPhrase = error.value?.reasonPhrase ?: "Unknown Error"
+                    val httpError = TestpressException.httpError(statusCode, reasonPhrase)
+                    fragment.showErrorView(httpError)
+                }
                 errorList.clear()
             }
         }
