@@ -181,6 +181,10 @@ public class TestpressExamApiClient extends TestpressApiClient {
         return getExamService().getContentAttempts(url);
     }
 
+    public RetrofitCall<CourseAttempt> getCourseAttempt(String url) {
+        return getExamService().getCourseAttempt(url);
+    }
+
     public RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(
             String urlFrag, Map<String, Object> queryParams) {
         return getExamService().getReviewItems(urlFrag, queryParams);
