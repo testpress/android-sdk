@@ -1164,20 +1164,20 @@ public class TestFragment extends BaseFragment implements
         if (getActivity() == null) {
             return;
         }
-        if (!initialAttempt.getTrophies().equals("NA") || retryCount >= 5) {
+        if (!"NA".equals(initialAttempt.getTrophies()) || retryCount >= 5) {
             initialAttempt.saveInDB(getActivity(), courseContent);
             hideProgressBar();
             showReview(ReviewStatsActivity.createIntent(getActivity(), exam, initialAttempt));
             return;
         }
 
-        showProgress("Calculating results...");
+        showProgress(R.string.testpress_calculating_results);
 
         new Handler().postDelayed(new Runnable() {
             @Override
             public void run() {
                 if (getActivity() == null) return;
-                new TestpressExamApiClient(getActivity()).getCourseAttempt(initialAttempt.getAttemptUrl())
+                apiClient.getCourseAttempt(initialAttempt.getAttemptUrl())
                         .enqueue(new TestpressCallback<CourseAttempt>() {
                             @Override
                             public void onSuccess(CourseAttempt updatedAttempt) {
