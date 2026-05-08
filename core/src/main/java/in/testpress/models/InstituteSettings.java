@@ -506,6 +506,6 @@ public class InstituteSettings {
     }
 
     public boolean isBrilliantPalaELearn() {
-        return baseUrl != null && baseUrl.contains("brilliantpala");
+        return getDomainUrl().toLowerCase().contains("brilliantpala");
     }
 }

@@ -108,6 +108,7 @@ public class TestActivity extends BaseToolBarActivity  {
     private ExamViewModel examViewModel;
     private boolean reflectionCompleted = false;
     private static final int REFLECTION_REQUEST_CODE = 1001;
+    private boolean isBrilliantPala;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -136,6 +137,8 @@ public class TestActivity extends BaseToolBarActivity  {
                 TestpressSdk.getRubikMediumFont(this));
         UIUtils.setIndeterminateDrawable(this, findViewById(R.id.progress_bar), 4);
         apiClient = new TestpressExamApiClient(this);
+        TestpressSession session = TestpressSdk.getTestpressSession(this);
+        isBrilliantPala = session != null && session.getInstituteSettings().isBrilliantPalaELearn();
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
         assert data != null;
@@ -185,8 +188,7 @@ public class TestActivity extends BaseToolBarActivity  {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
-        if (isKioskModeRequired() || !instituteSettings.isBrilliantPalaELearn()) {
+        if (isKioskModeRequired() || !isBrilliantPala) {
             if (isOverlayDetected(ev)) return true;
         }
         if (blockInputIfUnpinned(ev)) return true;
