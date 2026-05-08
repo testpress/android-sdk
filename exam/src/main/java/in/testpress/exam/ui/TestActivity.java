@@ -12,6 +12,8 @@ import androidx.annotation.StringRes;
 import androidx.appcompat.app.AlertDialog;
 import androidx.lifecycle.Observer;
 
+import in.testpress.models.InstituteSettings;
+
 import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
@@ -183,7 +185,10 @@ public class TestActivity extends BaseToolBarActivity  {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (isOverlayDetected(ev)) return true;
+        InstituteSettings instituteSettings = TestpressSdk.getTestpressSession(this).getInstituteSettings();
+        if (isKioskModeRequired() || !instituteSettings.isBrilliantPalaELearn()) {
+            if (isOverlayDetected(ev)) return true;
+        }
         if (blockInputIfUnpinned(ev)) return true;
         return super.dispatchTouchEvent(ev);
     }

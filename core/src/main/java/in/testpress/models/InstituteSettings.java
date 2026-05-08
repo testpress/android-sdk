@@ -504,4 +504,8 @@ public class InstituteSettings {
         this.questionReportDescriptionMinLength = questionReportDescriptionMinLength;
         return this;
     }
+
+    public boolean isBrilliantPalaELearn() {
+        return baseUrl != null && baseUrl.contains("brilliantpala");
+    }
 }
