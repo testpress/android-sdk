@@ -1,11 +1,15 @@
 package `in`.testpress.course.fragments
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import `in`.testpress.course.R
 import `in`.testpress.course.domain.getGreenDaoContent
+import `in`.testpress.course.fragments.FermionLiveStreamFragment.Companion.ARG_STREAM_URL
+import `in`.testpress.course.fragments.FermionLiveStreamFragment.Companion.ARG_TITLE
 import `in`.testpress.course.util.ExoPlayerUtil
 import `in`.testpress.course.util.ExoplayerFullscreenHelper
 import `in`.testpress.fragments.WebViewFragment
@@ -16,6 +20,8 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.RelativeLayout
 import android.widget.TextView
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.core.content.ContextCompat
 import com.google.android.exoplayer2.ui.AspectRatioFrameLayout
 import kotlinx.coroutines.*
 import java.lang.Runnable
@@ -27,6 +33,16 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     private lateinit var exoplayerFullscreenHelper: ExoplayerFullscreenHelper
     private var exoPlayerUtil: ExoPlayerUtil? = null
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
+    private var pendingFermionLaunch = false
+
+    private val requestPermissionsLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions()
+    ) { results ->
+        if (pendingFermionLaunch && results.values.all { it }) {
+            pendingFermionLaunch = false
+            showFermionPlayer()
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,21 +66,73 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
         }
     }
 
+    private fun isFermionProvider(): Boolean {
+        return content.liveStream?.provider == FERMION_PROVIDER
+    }
+
     private fun initializeExoplayerFullscreenHelper() {
         exoplayerFullscreenHelper = ExoplayerFullscreenHelper(activity)
         exoplayerFullscreenHelper.initializeOrientationListener()
     }
 
     private fun displayPlayerViewWithChat(){
+        if (isFermionProvider()) {
+            requestCameraAndMicPermissions()
+        } else {
+            displayExoPlayerWithChat()
+        }
+    }
+
+    private fun displayExoPlayerWithChat() {
         initializePlayerView()
         initializeExoPlayer()
         setupChatWebView()
         viewModel.createContentAttempt(contentId)
-
-        // Disabling swipe to refresh because  it prevents users from scrolling the chat
-        // and temporarily hiding the bottom navigation as it hides the chat's send button..
         swipeRefresh.isEnabled = false
         hideBottomNavigationBar()
+    }
+
+    private fun requestCameraAndMicPermissions() {
+        val permissions = mutableListOf<String>()
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissions.add(Manifest.permission.CAMERA)
+        }
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO)
+            != PackageManager.PERMISSION_GRANTED
+        ) {
+            permissions.add(Manifest.permission.RECORD_AUDIO)
+        }
+        if (permissions.isEmpty()) {
+            showFermionPlayer()
+        } else {
+            pendingFermionLaunch = true
+            requestPermissionsLauncher.launch(permissions.toTypedArray())
+        }
+    }
+
+    private fun showFermionPlayer() {
+        setupFermionPlayer()
+        setupChatWebView()
+        viewModel.createContentAttempt(contentId)
+        swipeRefresh.isEnabled = false
+        hideBottomNavigationBar()
+    }
+
+    private fun setupFermionPlayer() {
+        val streamUrl = content.liveStream?.streamUrl ?: return
+        val container = view?.findViewById<ViewGroup>(R.id.fermion_player_container) ?: return
+        container.visibility = View.VISIBLE
+
+        val fermionFragment = FermionLiveStreamFragment()
+        fermionFragment.arguments = Bundle().apply {
+            putString(ARG_STREAM_URL, streamUrl)
+            putString(ARG_TITLE, content.title ?: "")
+        }
+        childFragmentManager.beginTransaction()
+            .replace(R.id.fermion_player_container, fermionFragment)
+            .commitAllowingStateLoss()
     }
 
     private fun displayNotStartedNotice(){
@@ -113,7 +181,7 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
             webViewFragment.arguments = bundle
             childFragmentManager.beginTransaction()
                 .replace(R.id.chat_view_fragment, webViewFragment)
-                .commit()
+                .commitAllowingStateLoss()
         }
     }
 
@@ -178,6 +246,10 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     override fun onDestroyView() {
         super.onDestroyView()
         coroutineScope.cancel()
+    }
+
+    companion object {
+        private const val FERMION_PROVIDER = "Fermion"
     }
 }
 
