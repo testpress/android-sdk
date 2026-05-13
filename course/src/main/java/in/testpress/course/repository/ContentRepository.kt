@@ -62,7 +62,9 @@ open class ContentRepository(
             }
 
             override fun shouldFetch(data: DomainContent?): Boolean {
-                return forceRefresh || getContentFromDB(contentId) == null
+                val dbContent = getContentFromDB(contentId)
+                val isLiveStream = dbContent?.liveStreamId != null
+                return forceRefresh || dbContent == null || isLiveStream
             }
 
             override fun loadFromDb(): LiveData<DomainContent> {
