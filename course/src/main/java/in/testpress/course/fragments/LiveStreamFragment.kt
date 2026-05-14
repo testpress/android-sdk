@@ -38,9 +38,13 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     private val requestPermissionsLauncher = registerForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { results ->
-        if (pendingFermionLaunch && results.values.all { it }) {
-            pendingFermionLaunch = false
-            showFermionPlayer()
+        if (pendingFermionLaunch) {
+            if (results.values.all { it }) {
+                pendingFermionLaunch = false
+                showFermionPlayer()
+            } else {
+                displayPermissionDeniedNotice()
+            }
         }
     }
 
@@ -118,6 +122,37 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
         }
     }
 
+    private fun hasCameraAndMicPermissions(): Boolean {
+        return ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED &&
+                ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+    }
+
+    private fun displayPermissionDeniedNotice() {
+        emptyViewFragment.setEmptyText(
+            R.string.testpress_permission_denied,
+            R.string.testpress_permission_denied_message,
+            null
+        )
+        emptyViewFragment.showOrHideButton(true)
+    }
+
+    private fun displayErrorNotice() {
+        emptyViewFragment.setEmptyText(
+            R.string.testpress_error_loading_contents,
+            R.string.testpress_some_thing_went_wrong_try_again,
+            null
+        )
+        emptyViewFragment.showOrHideButton(true)
+    }
+
+    override fun onRetryClick() {
+        if (isFermionProvider() && !hasCameraAndMicPermissions()) {
+            requestCameraAndMicPermissions()
+        } else {
+            super.onRetryClick()
+        }
+    }
+
     private fun showFermionPlayer() {
         setupFermionPlayer()
         setupChatWebView()
@@ -127,8 +162,13 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     }
 
     private fun setupFermionPlayer() {
-        val streamUrl = content.liveStream?.streamUrl ?: return
-        val container = view?.findViewById<ViewGroup>(R.id.fermion_player_container) ?: return
+        val streamUrl = content.liveStream?.streamUrl
+        val container = view?.findViewById<ViewGroup>(R.id.fermion_player_container)
+
+        if (streamUrl == null || container == null) {
+            displayErrorNotice()
+            return
+        }
         container.visibility = View.VISIBLE
 
         val fermionFragment = FermionLiveStreamFragment()

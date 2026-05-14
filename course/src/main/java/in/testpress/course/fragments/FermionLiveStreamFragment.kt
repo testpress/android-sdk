@@ -15,7 +15,7 @@ import `in`.testpress.course.R
 class FermionLiveStreamFragment : Fragment() {
 
     private var initialLoadComplete = false
-    private lateinit var streamUrl: String
+    private var streamUrl: String? = null
     private var webView: WebView? = null
 
     override fun onCreateView(
@@ -28,7 +28,11 @@ class FermionLiveStreamFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        streamUrl = arguments?.getString(ARG_STREAM_URL) ?: return
+        streamUrl = arguments?.getString(ARG_STREAM_URL)
+        if (streamUrl == null) {
+            view.findViewById<View>(R.id.error_message).visibility = View.VISIBLE
+            return
+        }
         setupWebView()
     }
 
@@ -38,7 +42,7 @@ class FermionLiveStreamFragment : Fragment() {
             configureSettings()
             webChromeClient = buildChromeClient()
             webViewClient = buildWebViewClient()
-            loadUrl(streamUrl)
+            streamUrl?.let { loadUrl(it) }
         }
         container.addView(webView, ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT)
     }
@@ -54,6 +58,14 @@ class FermionLiveStreamFragment : Fragment() {
 
     private fun buildChromeClient() = object : WebChromeClient() {
         override fun onPermissionRequest(request: PermissionRequest) {
+            val expectedHost = streamUrl?.let { android.net.Uri.parse(it).host }
+            val requestHost = request.origin.host
+
+            if (expectedHost == null || requestHost != expectedHost) {
+                request.deny()
+                return
+            }
+
             val allowedResources = arrayOf(
                 PermissionRequest.RESOURCE_VIDEO_CAPTURE,
                 PermissionRequest.RESOURCE_AUDIO_CAPTURE
@@ -84,9 +96,16 @@ class FermionLiveStreamFragment : Fragment() {
     }
 
     private fun handleNavigation(url: String): Boolean {
-        if (initialLoadComplete && url != streamUrl && isAdded) {
-            requireActivity().finish()
-            return true
+        val currentUri = streamUrl?.let { android.net.Uri.parse(it) }
+        val newUri = android.net.Uri.parse(url)
+
+        if (initialLoadComplete && currentUri != null && isAdded) {
+            val isSamePage = currentUri.host == newUri.host && currentUri.path == newUri.path
+
+            if (!isSamePage) {
+                requireActivity().finish()
+                return true
+            }
         }
         return false
     }
