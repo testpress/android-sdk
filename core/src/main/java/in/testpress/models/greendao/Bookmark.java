@@ -58,7 +58,6 @@ public class Bookmark {
     // KEEP FIELDS - put your custom fields here
     @SerializedName("page_number")
     private Integer pageNumber;
-
     // KEEP FIELDS END
 
     @Generated
