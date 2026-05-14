@@ -9,7 +9,8 @@ data class DomainLiveStream(
     val duration: Int? = null,
     val status: String = "",
     val showRecordedVideo: Boolean? = false,
-    val chatEmbedUrl: String? = null
+    val chatEmbedUrl: String? = null,
+    val provider: String? = null
 )
 
 fun createDomainLiveStream(liveStream: LiveStream): DomainLiveStream =
@@ -20,7 +21,8 @@ fun createDomainLiveStream(liveStream: LiveStream): DomainLiveStream =
         streamUrl = liveStream.streamUrl,
         duration = liveStream.duration,
         showRecordedVideo = liveStream.showRecordedVideo,
-        chatEmbedUrl = liveStream.chatEmbedUrl
+        chatEmbedUrl = liveStream.chatEmbedUrl,
+        provider = liveStream.provider
     )
 
 fun LiveStream.asDomainContent(): DomainLiveStream = createDomainLiveStream(this)
