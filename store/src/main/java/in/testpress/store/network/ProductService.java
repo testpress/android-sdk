@@ -9,6 +9,7 @@ import in.testpress.store.data.model.NetworkProduct;
 import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.data.model.NetworkProductOffersResponse;
+import in.testpress.store.models.InstallmentPlansResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
@@ -89,6 +90,11 @@ public interface ProductService {
     @GET("api/v2.4/products/{product_slug}/offers/")
     RetrofitCall<NetworkProductOffersResponse> getProductOffers(
             @Path(value = "product_slug", encoded = true) String productSlug
+    );
+
+    @GET("api/v3/products/{slug}/installment-plans/")
+    RetrofitCall<InstallmentPlansResponse> getInstallmentPlans(
+            @Path(value = "slug", encoded = true) String slug
     );
 }
 

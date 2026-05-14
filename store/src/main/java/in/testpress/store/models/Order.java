@@ -27,6 +27,7 @@ public class Order implements Parcelable {
     private String landMark;
     private String productInfo;
     private String stripeClientSecret;
+    private InstallmentPlan installmentPlan;
 
     // Parcelling part
     public Order(Parcel parcel){
@@ -47,6 +48,7 @@ public class Order implements Parcelable {
         zip      = parcel.readString();
         landMark = parcel.readString();
         stripeClientSecret = parcel.readString();
+        installmentPlan = parcel.readParcelable(InstallmentPlan.class.getClassLoader());
         parcel.readTypedList(orderItems, OrderItem.CREATOR);
     }
 
@@ -74,6 +76,7 @@ public class Order implements Parcelable {
         parcel.writeString(zip);
         parcel.writeString(landMark);
         parcel.writeString(stripeClientSecret);
+        parcel.writeParcelable(installmentPlan, i);
         parcel.writeTypedList(orderItems);
     }
 
@@ -397,5 +400,13 @@ public class Order implements Parcelable {
 
     public void setStripeClientSecret(String stripeClientSecret) {
         this.stripeClientSecret = stripeClientSecret;
+    }
+
+    public InstallmentPlan getInstallmentPlan() {
+        return installmentPlan;
+    }
+
+    public void setInstallmentPlan(InstallmentPlan installmentPlan) {
+        this.installmentPlan = installmentPlan;
     }
 }

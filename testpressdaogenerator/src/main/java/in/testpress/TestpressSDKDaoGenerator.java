@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 84;
+    private static final int VERSION = 85;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -93,6 +93,12 @@ public class TestpressSDKDaoGenerator {
         Entity product = addProduct(schema);
         Entity price = addPrice(schema);
         addProductToPrice(price, product);
+
+        Entity installmentPlan = addInstallmentPlan(schema);
+        Entity installment = addInstallment(schema);
+        Entity userInstallmentPlan = addUserInstallmentPlan(schema);
+        addInstallmentPlanToInstallments(installment, installmentPlan);
+        addInstallmentPlanToUserInstallmentPlan(userInstallmentPlan, installmentPlan);
 
         schema.enableKeepSectionsByDefault();
         new DaoGenerator().generateAll(schema, "core/src/main/java");
@@ -890,6 +896,55 @@ public class TestpressSDKDaoGenerator {
         Entity direction = schema.addEntity("DirectionTranslation");
         direction.addLongProperty("id").primaryKey();
         direction.addStringProperty("html");
+    }
+
+    private static Entity addInstallmentPlan(Schema schema) {
+        Entity installmentPlan = schema.addEntity("InstallmentPlan");
+        installmentPlan.addLongProperty("id").primaryKey();
+        installmentPlan.addStringProperty("price");
+        installmentPlan.addIntProperty("numberOfInstallments");
+        installmentPlan.addIntProperty("period");
+        installmentPlan.addStringProperty("displayName");
+        return installmentPlan;
+    }
+
+    private static Entity addInstallment(Schema schema) {
+        Entity installment = schema.addEntity("Installment");
+        installment.addLongProperty("id").primaryKey();
+        installment.addIntProperty("order");
+        installment.addStringProperty("price");
+        installment.addBooleanProperty("isPaid");
+        installment.addStringProperty("paidOn");
+        installment.addBooleanProperty("isCurrentInstallment");
+        installment.addStringProperty("dueDate");
+        return installment;
+    }
+
+    private static Entity addUserInstallmentPlan(Schema schema) {
+        Entity userInstallmentPlan = schema.addEntity("UserInstallmentPlan");
+        userInstallmentPlan.addLongProperty("id").primaryKey();
+        userInstallmentPlan.addStringProperty("status");
+        userInstallmentPlan.addIntProperty("paidInstallmentCount");
+        userInstallmentPlan.addIntProperty("totalInstallments");
+        userInstallmentPlan.addStringProperty("nextDueAmount");
+        userInstallmentPlan.addStringProperty("nextDueDate");
+        userInstallmentPlan.addStringProperty("amountPaid");
+        userInstallmentPlan.addStringProperty("amountDue");
+        userInstallmentPlan.addBooleanProperty("isCustomPlan");
+        userInstallmentPlan.addBooleanProperty("isPaid");
+        userInstallmentPlan.addBooleanProperty("isPartiallyPaid");
+        userInstallmentPlan.addBooleanProperty("isOverdue");
+        return userInstallmentPlan;
+    }
+
+    private static void addInstallmentPlanToInstallments(Entity installment, Entity installmentPlan) {
+        Property installmentPlanId = installment.addLongProperty("installmentPlanId").getProperty();
+        installment.addToOne(installmentPlan, installmentPlanId, "installmentPlan");
+    }
+
+    private static void addInstallmentPlanToUserInstallmentPlan(Entity userInstallmentPlan, Entity installmentPlan) {
+        Property installmentPlanId = userInstallmentPlan.addLongProperty("installmentPlanId").getProperty();
+        userInstallmentPlan.addToOne(installmentPlan, installmentPlanId, "installmentPlan");
     }
 
 }

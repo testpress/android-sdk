@@ -32,6 +32,7 @@ public class Product implements Parcelable {
     private List<Exam> exams = new ArrayList<Exam>();
     private List<Notes> notes = new ArrayList<Notes>();
     private List<PricesItem> prices = new ArrayList<PricesItem>();
+    private Boolean hasInstallmentPlans;
 
     public Product(){}
 
@@ -57,6 +58,7 @@ public class Product implements Parcelable {
         parcel.readTypedList(exams, Exam.CREATOR);
         parcel.readTypedList(notes, Notes.CREATOR);
         parcel.readTypedList(prices,PricesItem.CREATOR);
+        hasInstallmentPlans = parcel.readByte() != 0;
     }
 
     @Override
@@ -86,6 +88,7 @@ public class Product implements Parcelable {
         parcel.writeTypedList(exams);
         parcel.writeTypedList(notes);
         parcel.writeTypedList(prices);
+        parcel.writeByte((byte) (hasInstallmentPlans ? 1 : 0));
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -468,6 +471,14 @@ public class Product implements Parcelable {
      */
     public void setPrices(List<PricesItem> prices) {
         this.prices = prices;
+    }
+
+    public Boolean getHasInstallmentPlans() {
+        return hasInstallmentPlans;
+    }
+
+    public void setHasInstallmentPlans(Boolean hasInstallmentPlans) {
+        this.hasInstallmentPlans = hasInstallmentPlans;
     }
 
 }
