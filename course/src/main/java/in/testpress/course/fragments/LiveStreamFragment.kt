@@ -54,9 +54,15 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initializeExoplayerFullscreenHelper()
+        showLoading()
+    }
+
+    private fun showLoading() {
+        view?.findViewById<View>(R.id.loading_screen)?.visibility = View.VISIBLE
     }
 
     override fun display() {
+        view?.findViewById<View>(R.id.loading_screen)?.visibility = View.GONE
         when (content.liveStream?.status) {
             "Running" -> {
                 displayPlayerViewWithChat()
