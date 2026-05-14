@@ -181,7 +181,7 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
             webViewFragment.arguments = bundle
             childFragmentManager.beginTransaction()
                 .replace(R.id.chat_view_fragment, webViewFragment)
-                .commitAllowingStateLoss()
+                .commit()
         }
     }
 
