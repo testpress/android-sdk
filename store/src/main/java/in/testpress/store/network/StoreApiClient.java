@@ -12,6 +12,7 @@ import in.testpress.store.data.model.NetworkProduct;
 import in.testpress.store.data.model.NetworkProductCategory;
 import in.testpress.store.data.model.NetworkProductListResponse;
 import in.testpress.store.data.model.NetworkProductOffersResponse;
+import in.testpress.store.models.InstallmentPlansResponse;
 import in.testpress.store.models.NetworkHash;
 import in.testpress.store.models.NetworkOrderStatus;
 import in.testpress.store.models.Order;
@@ -72,8 +73,15 @@ public class StoreApiClient extends TestpressApiClient {
     }
 
     public RetrofitCall<Order> order(List<OrderItem> orderItems) {
+        return order(orderItems, null);
+    }
+
+    public RetrofitCall<Order> order(List<OrderItem> orderItems, Integer installmentPlanId) {
         HashMap<String, Object> orderParameters = new HashMap<String, Object>();
         orderParameters.put("order_items", orderItems);
+        if (installmentPlanId != null) {
+            orderParameters.put("installment_plan_id", installmentPlanId);
+        }
         return getProductService().order(orderParameters);
     }
 
@@ -124,5 +132,9 @@ public class StoreApiClient extends TestpressApiClient {
 
     public RetrofitCall<NetworkProductOffersResponse> getProductOffers(String productSlug) {
         return getProductService().getProductOffers(productSlug);
+    }
+
+    public RetrofitCall<InstallmentPlansResponse> getInstallmentPlans(String slug) {
+        return getProductService().getInstallmentPlans(slug);
     }
 }
