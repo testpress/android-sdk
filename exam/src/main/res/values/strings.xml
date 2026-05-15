@@ -275,4 +275,5 @@
     <string name="testpress_pdf_preview">PDF Preview</string>
     <string name="testpress_floating_window_detected">Floating window detected. Please close it.</string>
     <string name="testpress_mindset_insights">Mindset Insights</string>
+    <string name="testpress_calculating_results">Calculating results…</string>
 </resources>
