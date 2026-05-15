@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.google.android.material.bottomsheet.BottomSheetDialogFragment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import in.testpress.store.R;
@@ -31,9 +32,20 @@ public class InstallmentPlanListBottomSheet extends BottomSheetDialogFragment {
 
     public static InstallmentPlanListBottomSheet newInstance(List<InstallmentPlan> plans, String productPrice) {
         InstallmentPlanListBottomSheet sheet = new InstallmentPlanListBottomSheet();
-        sheet.plans = plans;
-        sheet.productPrice = productPrice;
+        Bundle args = new Bundle();
+        args.putParcelableArrayList(ARG_PLANS, new ArrayList<>(plans));
+        args.putString(ARG_PRODUCT_PRICE, productPrice);
+        sheet.setArguments(args);
         return sheet;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            plans = getArguments().getParcelableArrayList(ARG_PLANS);
+            productPrice = getArguments().getString(ARG_PRODUCT_PRICE);
+        }
     }
 
     public void setPlanSelectedListener(PlanSelectedListener listener) {
@@ -57,7 +69,7 @@ public class InstallmentPlanListBottomSheet extends BottomSheetDialogFragment {
 
     private void setupSubtitle(View view) {
         TextView subtitle = view.findViewById(R.id.sheet_subtitle);
-        subtitle.setText("Installment plans are calculated based on the original price of ₹" + productPrice + ".");
+        subtitle.setText(getString(R.string.installment_plan_subtitle, productPrice));
     }
 
     private void populatePlans(View view) {

@@ -34,11 +34,25 @@ public class InstallmentDetailBottomSheet extends BottomSheetDialogFragment {
     private PayInstallmentListener listener;
     private Runnable onBackPressed;
 
+    private static final String ARG_PLAN = "plan";
+    private static final String ARG_SHOW_BACK = "showBack";
+
     public static InstallmentDetailBottomSheet newInstance(InstallmentPlan plan, boolean showBack) {
         InstallmentDetailBottomSheet sheet = new InstallmentDetailBottomSheet();
-        sheet.plan = plan;
-        sheet.showBack = showBack;
+        Bundle args = new Bundle();
+        args.putParcelable(ARG_PLAN, plan);
+        args.putBoolean(ARG_SHOW_BACK, showBack);
+        sheet.setArguments(args);
         return sheet;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        if (getArguments() != null) {
+            plan = getArguments().getParcelable(ARG_PLAN);
+            showBack = getArguments().getBoolean(ARG_SHOW_BACK);
+        }
     }
 
     public void setPayInstallmentListener(PayInstallmentListener listener) {
@@ -120,9 +134,10 @@ public class InstallmentDetailBottomSheet extends BottomSheetDialogFragment {
             line.setVisibility(View.INVISIBLE);
         }
 
-        label.setText(StringUtils.getOrdinal(installment.getOrder() + 1) + " Installment");
-        amount.setText("₹" + installment.getPrice());
-        dueDate.setText("due on " + DateUtils.formatDateToReadable(installment.getDueDate()));
+        String ordinal = StringUtils.getOrdinal(installment.getOrder() + 1);
+        label.setText(getString(R.string.installment_label, ordinal));
+        amount.setText(getString(R.string.testpress_amount_with_symbol, installment.getPrice()));
+        dueDate.setText(getString(R.string.installment_due_on, DateUtils.formatDateToReadable(installment.getDueDate())));
 
         setupTimelineIcon(icon, installment);
 
@@ -146,11 +161,12 @@ public class InstallmentDetailBottomSheet extends BottomSheetDialogFragment {
 
     private void setupFooter(View view, Installment currentInstallment) {
         TextView totalAmountView = view.findViewById(R.id.total_amount);
-        totalAmountView.setText("₹" + plan.getPrice());
+        totalAmountView.setText(getString(R.string.testpress_amount_with_symbol, plan.getPrice()));
 
         TextView payButton = view.findViewById(R.id.btn_pay_installment);
         if (currentInstallment != null) {
-            payButton.setText("Pay " + StringUtils.getOrdinal(currentInstallment.getOrder() + 1) + " Installment");
+            String ordinal = StringUtils.getOrdinal(currentInstallment.getOrder() + 1);
+            payButton.setText(getString(R.string.installment_pay_button_label, ordinal));
         } else {
             payButton.setText("Pay Installment");
         }

@@ -129,12 +129,19 @@ object DateUtils {
     @JvmStatic
     fun formatDateToReadable(dateString: String?): String {
         if (dateString.isNullOrEmpty()) return ""
+        val regex = Regex(""".\d{6}""")
+        val formattedDate = regex.replace(dateString, "")
+        val inputFormat = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssXXX", Locale.US)
+        } else {
+            SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZZZZZ", Locale.US)
+        }
+        inputFormat.timeZone = TimeZone.getTimeZone("UTC")
+
         try {
-            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
-            isoFormat.timeZone = TimeZone.getTimeZone("UTC")
-            val date = isoFormat.parse(dateString)
+            val date = inputFormat.parse(formattedDate)
             val readableFormat = SimpleDateFormat("d MMM, yyyy", Locale.getDefault())
-            return readableFormat.format(date!!)
+            return date?.let { readableFormat.format(it) } ?: dateString
         } catch (e: Exception) {
             return dateString
         }

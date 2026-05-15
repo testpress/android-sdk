@@ -414,7 +414,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     }
 
     private void configurePayInstallmentButton(InstallmentPlan plan, int nextNum) {
-        btnPayInstallment.setText("Pay " + StringUtils.getOrdinal(nextNum) + " Installment");
+        String ordinal = StringUtils.getOrdinal(nextNum);
+        btnPayInstallment.setText(getString(R.string.installment_pay_button_label, ordinal));
         btnPayInstallment.setVisibility(View.VISIBLE);
         btnPayInstallment.setOnClickListener(v -> {
             if (plan != null) {
