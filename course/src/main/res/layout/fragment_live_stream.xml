@@ -24,6 +24,13 @@
                 layout="@layout/testpress_exo_player_view" />
 
             <FrameLayout
+                android:id="@+id/fermion_player_container"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:visibility="gone" />
+
+            <FrameLayout
                 android:id="@+id/chat_view_fragment"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content" />
@@ -41,4 +48,12 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"/>
+
+    <ProgressBar
+        android:id="@+id/loading_screen"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true"
+        android:visibility="gone" />
+
 </RelativeLayout>
