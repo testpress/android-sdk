@@ -125,4 +125,18 @@ object DateUtils {
 
         return date?.let { outputFormat.format(it) } ?: "Nil"
     }
+
+    @JvmStatic
+    fun formatDateToReadable(dateString: String?): String {
+        if (dateString.isNullOrEmpty()) return ""
+        try {
+            val isoFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.getDefault())
+            isoFormat.timeZone = TimeZone.getTimeZone("UTC")
+            val date = isoFormat.parse(dateString)
+            val readableFormat = SimpleDateFormat("d MMM, yyyy", Locale.getDefault())
+            return readableFormat.format(date!!)
+        } catch (e: Exception) {
+            return dateString
+        }
+    }
 }

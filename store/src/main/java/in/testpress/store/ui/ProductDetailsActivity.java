@@ -43,17 +43,20 @@ import in.testpress.exam.TestpressExam;
 import in.testpress.models.InstituteSettings;
 import in.testpress.store.R;
 import in.testpress.store.data.model.NetworkProductOffersResponse;
+import in.testpress.store.models.InstallmentPlan;
+import in.testpress.store.models.InstallmentPlansResponse;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.UserInstallmentPlan;
 import in.testpress.store.network.StoreApiClient;
 import in.testpress.store.util.UtilKt;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UILImageGetter;
-import in.testpress.util.UIUtils;
 import in.testpress.util.StringUtils;
+import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
 import in.testpress.util.ZoomableImageString;
 import io.sentry.Scope;
@@ -88,6 +91,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private TextView appliedDiscountNameText;
     private EditText couponEditText;
     private Button applyCouponButton;
+    private Button btnPayInstallment;
+    private TextView installmentLink;
+    private List<InstallmentPlan> cachedPlans = new ArrayList<>();
 
     private StoreApiClient apiClient;
 
@@ -226,8 +232,12 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         View productDetailsView = findViewById(R.id.main_content);
         Button buyButton = (Button) findViewById(R.id.buy_button);
         progressBar.setVisibility(View.GONE);
-        findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
-        productDetailsView.setVisibility(View.VISIBLE);
+        if (!Boolean.TRUE.equals(product.getHasInstallmentPlans())) {
+            productDetailsView.setVisibility(View.VISIBLE);
+            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
+        } else {
+            progressBar.setVisibility(View.VISIBLE);
+        }
         buyButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -325,6 +335,149 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         ProductDetailsActivity.this.product = product;
         logEvent(EventsTrackerFacade.VIEWED_PRODUCT_EVENT);
         getAppliedOffers();
+        btnPayInstallment = findViewById(R.id.btn_pay_installment);
+        installmentLink = findViewById(R.id.installment_link);
+
+        if (Boolean.TRUE.equals(product.getHasInstallmentPlans()) && session != null) {
+            fetchInstallmentPlans();
+        }
+    }
+
+    private void fetchInstallmentPlans() {
+        apiClient.getInstallmentPlans(getProductSlug()).enqueue(new TestpressCallback<InstallmentPlansResponse>() {
+            @Override
+            public void onSuccess(InstallmentPlansResponse response) {
+                updateInstallmentUi(response);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                showContentAndHideProgress();
+            }
+        });
+    }
+
+    private void updateInstallmentUi(InstallmentPlansResponse response) {
+        if (response == null || isPlansEmpty(response)) {
+            return;
+        }
+
+        cachedPlans = response.getInstallmentPlans();
+
+        if (hasActiveInstallmentPlan(response)) {
+            setupActiveInstallmentUi(response.getUserInstallmentPlans().get(0));
+        } else {
+            setupNewInstallmentUi();
+        }
+
+        showContentAndHideProgress();
+    }
+
+    private boolean isPlansEmpty(InstallmentPlansResponse response) {
+        return response.getInstallmentPlans() == null || response.getInstallmentPlans().isEmpty();
+    }
+
+    private boolean hasActiveInstallmentPlan(InstallmentPlansResponse response) {
+        return response.getUserInstallmentPlans() != null && !response.getUserInstallmentPlans().isEmpty();
+    }
+
+    private void setupActiveInstallmentUi(UserInstallmentPlan userPlan) {
+        InstallmentPlan matchedPlan = findPlanById(cachedPlans, userPlan.getInstallmentPlanId());
+        int nextInstallmentNumber = getNextInstallmentNumber(userPlan);
+
+        hideStandardPurchaseOptions();
+        configurePayInstallmentButton(matchedPlan, nextInstallmentNumber);
+        configureViewInstallmentsLink(matchedPlan);
+    }
+
+    private void setupNewInstallmentUi() {
+        installmentLink.setText("Pay in installments");
+        installmentLink.setVisibility(View.VISIBLE);
+        installmentLink.setOnClickListener(v -> openPlanListSheet(cachedPlans));
+    }
+
+    private void showContentAndHideProgress() {
+        progressBar.setVisibility(View.GONE);
+        findViewById(R.id.main_content).setVisibility(View.VISIBLE);
+        findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
+    }
+
+    private int getNextInstallmentNumber(UserInstallmentPlan userPlan) {
+        return (userPlan.getPaidInstallmentCount() != null)
+                ? userPlan.getPaidInstallmentCount() + 1
+                : 1;
+    }
+
+    private void hideStandardPurchaseOptions() {
+        findViewById(R.id.buy_button).setVisibility(View.GONE);
+        discountPrompt.setVisibility(View.GONE);
+    }
+
+    private void configurePayInstallmentButton(InstallmentPlan plan, int nextNum) {
+        btnPayInstallment.setText("Pay " + StringUtils.getOrdinal(nextNum) + " Installment");
+        btnPayInstallment.setVisibility(View.VISIBLE);
+        btnPayInstallment.setOnClickListener(v -> {
+            if (plan != null) {
+                openDetailSheet(plan, false);
+            }
+        });
+    }
+
+    private void configureViewInstallmentsLink(InstallmentPlan plan) {
+        installmentLink.setText("View installments");
+        installmentLink.setVisibility(View.VISIBLE);
+        installmentLink.setOnClickListener(v -> {
+            if (plan != null) {
+                openDetailSheet(plan, false);
+            }
+        });
+    }
+
+    private InstallmentPlan findPlanById(List<InstallmentPlan> plans, Integer planId) {
+        if (planId == null || plans == null) return null;
+        for (InstallmentPlan p : plans) {
+            if (p.getId() != null && p.getId().equals(planId)) return p;
+        }
+        return null;
+    }
+
+
+    private void openPlanListSheet(List<InstallmentPlan> plans) {
+        InstallmentPlanListBottomSheet sheet = InstallmentPlanListBottomSheet.newInstance(
+                plans, getOriginalPrice());
+        sheet.setPlanSelectedListener(selectedPlan ->
+                openDetailSheet(selectedPlan, true));
+        sheet.show(getSupportFragmentManager(), "installment_plan_list");
+    }
+
+    private void openDetailSheet(InstallmentPlan plan, boolean showBack) {
+        InstallmentDetailBottomSheet sheet =
+                InstallmentDetailBottomSheet.newInstance(plan, showBack);
+        sheet.setPayInstallmentListener(this::createInstallmentOrder);
+        if (showBack) {
+            sheet.setOnBackPressedCallback(() -> openPlanListSheet(cachedPlans));
+        }
+        sheet.show(getSupportFragmentManager(), "installment_detail");
+    }
+
+    private void createInstallmentOrder(int planId) {
+        showProgressDialog("Creating your order...");
+        OrderItem orderItem = createOrderItem();
+        List<OrderItem> orderItems = new ArrayList<>();
+        orderItems.add(orderItem);
+        apiClient.order(orderItems, planId).enqueue(new TestpressCallback<Order>() {
+            @Override
+            public void onSuccess(Order createdOrder) {
+                progressDialog.dismiss();
+                order = createdOrder;
+                order();
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                handleOrderCreationFailure(exception);
+            }
+        });
     }
 
     private void getAppliedOffers() {

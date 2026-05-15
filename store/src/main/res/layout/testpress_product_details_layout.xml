@@ -86,15 +86,35 @@
         android:visibility="gone"
         android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/discount_prompt"
-            android:layout_width="wrap_content"
+        <LinearLayout
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="16dp"
             android:layout_marginBottom="16dp"
-            android:text="Have a discount code?"
-            android:textColor="@color/testpress_green"
-            android:textSize="16sp" />
+            android:paddingHorizontal="16dp"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/discount_prompt"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:text="Have a discount code?"
+                android:textColor="@color/testpress_green"
+                android:textSize="14sp" />
+
+            <TextView
+                android:id="@+id/installment_link"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:gravity="end"
+                android:text="Pay in installments"
+                android:textColor="@color/testpress_green"
+                android:textSize="14sp"
+                android:visibility="gone" />
+
+        </LinearLayout>
 
         <LinearLayout
             android:id="@+id/discount_container"
@@ -167,6 +187,19 @@
             android:textAllCaps="true"
             android:textColor="@color/testpress_white"
             android:textSize="@dimen/testpress_text_size_xxlarge" />
+
+        <!-- Shown in Case 3: user has an active plan. Replaces Buy Now. -->
+        <androidx.appcompat.widget.AppCompatButton
+            android:id="@+id/btn_pay_installment"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/testpress_orange"
+            android:textAllCaps="true"
+            android:textColor="@color/testpress_white"
+            android:textSize="@dimen/testpress_text_size_xxlarge"
+            android:visibility="gone" />
+
+
 
     </LinearLayout>
 
