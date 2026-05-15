@@ -60,12 +60,10 @@ class HtmlContentFragment : BaseContentDetailFragment() {
     inner class HtmlViewUtils(webView: WebView) : WebViewUtils(webView) {
         override fun onPageStarted() {
             super.onPageStarted()
-            swipeRefresh.isRefreshing = true
         }
 
         override fun onLoadFinished() {
             super.onLoadFinished()
-            swipeRefresh.isRefreshing = false
             webView.visibility = View.VISIBLE
             viewModel.createContentAttempt(contentId).observe(viewLifecycleOwner, Observer {
                 checkAndUnlockNextContent()
