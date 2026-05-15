@@ -70,4 +70,13 @@
     <string name="product_thumbnail_description">Product thumbnail image</string>
     <string name="testpress_offer_applied_name">Offer applied: %1$s</string>
 
+    <string name="installment_click_to_see_plans">Pay in installments</string>
+    <string name="installment_click_to_see">View installments</string>
+    <string name="installment_choose_a_plan">Choose a Plan</string>
+    <string name="installment_plan_subtitle">Installment plans are calculated based on the original price of ₹%1$s.</string>
+    <string name="installment_pay_button_label">Pay %1$s Installment</string>
+    <string name="installment_label">%1$s Installment</string>
+    <string name="installment_due_on">due on %1$s</string>
+    <string name="testpress_amount_with_symbol">₹%1$s</string>
+
 </resources>

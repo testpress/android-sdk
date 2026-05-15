@@ -13,6 +13,15 @@ object StringUtils{
     fun trimWhitespace(value: String?): String {
         return value?.trim().orEmpty()
     }
+
+    @JvmStatic
+    fun getOrdinal(n: Int): String {
+        val suffixes = arrayOf("th", "st", "nd", "rd", "th", "th", "th", "th", "th", "th")
+        return when (n % 100) {
+            11, 12, 13 -> n.toString() + "th"
+            else -> n.toString() + suffixes[n % 10]
+        }
+    }
 }
 
 fun String.isEmailValid(): Boolean {
