@@ -378,11 +378,12 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     }
 
     private boolean hasActiveInstallmentPlan(InstallmentPlansResponse response) {
-        if (response.getUserInstallmentPlans() == null || response.getUserInstallmentPlans().isEmpty()) {
+        List<UserInstallmentPlan> userPlans = response.getUserInstallmentPlans();
+        if (userPlans == null || userPlans.isEmpty()) {
             return false;
         }
-        UserInstallmentPlan userPlan = response.getUserInstallmentPlans().get(0);
-        return userPlan.getPaidInstallmentCount() != null && userPlan.getPaidInstallmentCount() > 0;
+        UserInstallmentPlan userPlan = userPlans.get(0);
+        return userPlan != null && userPlan.getPaidInstallmentCount() != null && userPlan.getPaidInstallmentCount() > 0;
     }
 
     private void setupActiveInstallmentUi(UserInstallmentPlan userPlan) {
