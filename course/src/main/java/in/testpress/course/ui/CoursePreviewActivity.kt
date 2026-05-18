@@ -9,8 +9,7 @@ import `in`.testpress.store.TestpressStore
 import `in`.testpress.ui.BaseToolBarActivity
 
 class CoursePreviewActivity: BaseToolBarActivity() {
-    private var isPurchaseSuccessful = false
-    private var continuePurchase = false
+    private var resultData: Intent? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -19,13 +18,22 @@ class CoursePreviewActivity: BaseToolBarActivity() {
         fragment.arguments = intent.extras
         supportFragmentManager.beginTransaction().replace(R.id.fragment_container, fragment)
             .commitAllowingStateLoss()
+
+        if (savedInstanceState != null) {
+            resultData = savedInstanceState.getParcelable("resultData")
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+        outState.putParcelable("resultData", resultData)
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == TestpressStore.STORE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
-            isPurchaseSuccessful = true
-            continuePurchase = data.getBooleanExtra(TestpressStore.CONTINUE_PURCHASE, false)
+            resultData = data
+            val continuePurchase = data.getBooleanExtra(TestpressStore.CONTINUE_PURCHASE, false)
             if (!continuePurchase) {
                 setResult(RESULT_OK, data)
                 finish()
@@ -34,12 +42,8 @@ class CoursePreviewActivity: BaseToolBarActivity() {
     }
 
     override fun finish() {
-        if (isPurchaseSuccessful) {
-            val intent = Intent().apply {
-                putExtra(TestpressStore.PAYMENT_SUCCESS, true)
-                putExtra(TestpressStore.CONTINUE_PURCHASE, continuePurchase)
-            }
-            setResult(RESULT_OK, intent)
+        resultData?.let {
+            setResult(RESULT_OK, it)
         }
         super.finish()
     }

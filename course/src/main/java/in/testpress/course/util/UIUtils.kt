@@ -29,6 +29,7 @@ object UIUtils {
             if (activity != null) {
                 activity.startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
             } else {
+                intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
                 context.startActivity(intent)
             }
         }
