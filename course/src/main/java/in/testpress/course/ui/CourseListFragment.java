@@ -163,10 +163,14 @@ public class CourseListFragment extends BaseFragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
-        if (requestCode == TestpressStore.STORE_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null && !data.getBooleanExtra(TestpressStore.CONTINUE_PURCHASE, false)) {
-            tabs.getTabAt(0).select();
+        if (requestCode == TestpressStore.STORE_REQUEST_CODE && resultCode == Activity.RESULT_OK && data != null) {
             MyCoursesFragment fragment = (MyCoursesFragment) adapter.getItem(0);
-            fragment.clearItemsAndRefresh();
+            if (fragment != null) {
+                fragment.clearItemsAndRefresh();
+            }
+            if (!data.getBooleanExtra(TestpressStore.CONTINUE_PURCHASE, false)) {
+                tabs.getTabAt(0).select();
+            }
         }
     }
 }

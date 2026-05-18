@@ -93,7 +93,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
 
     private void showProductDetail(Product product) {
         if (product.getCourseIds().size() >= 1) {
-            activity.startActivity(CoursePreviewActivity.createIntent(product.getCourseIds(), activity, product.getSlug()));
+            activity.startActivityForResult(CoursePreviewActivity.createIntent(product.getCourseIds(), activity, product.getSlug()), TestpressStore.STORE_REQUEST_CODE);
         } else {
             Intent intent = new Intent(activity, ProductDetailsActivity.class);
             intent.putExtra(ProductDetailsActivity.PRODUCT_SLUG, product.getSlug());

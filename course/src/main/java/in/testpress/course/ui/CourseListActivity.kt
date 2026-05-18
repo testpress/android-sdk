@@ -22,10 +22,8 @@ class CourseListActivity : BaseToolBarActivity() {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == TestpressStore.STORE_REQUEST_CODE && resultCode == Activity.RESULT_OK){
             data?.let {  intentData ->
-                if (!intentData.getBooleanExtra(TestpressStore.CONTINUE_PURCHASE, false)) {
-                    supportFragmentManager.fragments.forEach { fragment ->
-                        fragment.onActivityResult(requestCode, resultCode, intentData)
-                    }
+                supportFragmentManager.fragments.forEach { fragment ->
+                    fragment.onActivityResult(requestCode, resultCode, intentData)
                 }
             }
         }
