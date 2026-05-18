@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources xmlns:tools="http://schemas.android.com/tools"
+    tools:ignore="UnusedResources">
+
+    <!-- Dark mode style overrides -->
+    <style name="TestpressTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Dark" >
+        <item name="android:background">@color/testpress_white</item>
+    </style>
+
+    <style name="TestpressAppCompatAlertDialogStyle" parent="Theme.AppCompat.Dialog.Alert">
+        <item name="colorAccent">@color/testpress_dialog_accent</item>
+        <item name="android:textColorPrimary">@color/testpress_black</item>
+        <item name="android:background">@color/testpress_white</item>
+    </style>
+
+</resources>

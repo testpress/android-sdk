@@ -53,4 +53,5 @@
     <color name="testpress_blue_text">#3b99d8</color>
     <color name="testpress_blue_image">#3598db</color>
     <color name="ai_fab_background">#089669</color>
+    <color name="testpress_dialog_accent">#08AE9E</color>
 </resources>
