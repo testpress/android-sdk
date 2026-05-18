@@ -53,4 +53,6 @@
     <color name="testpress_blue_text">#3b99d8</color>
     <color name="testpress_blue_image">#3598db</color>
     <color name="ai_fab_background">#089669</color>
+    <color name="gray_text">#555555</color>
+    <color name="divider_color">#DDDDDD</color>
 </resources>

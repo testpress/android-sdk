@@ -8,11 +8,13 @@
     <!-- Header row: optional back + title -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingHorizontal="16dp"
         android:paddingTop="16dp"
         android:paddingBottom="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
 
         <TextView
@@ -22,8 +24,8 @@
             android:drawableStart="@drawable/ic_arrow_back"
             android:drawablePadding="8dp"
             android:paddingEnd="16dp"
-            android:text="Back"
-            android:textColor="#555555"
+            android:text="@string/back"
+            android:textColor="@color/gray_text"
             android:textSize="15sp"
             android:textStyle="normal"
             android:visibility="gone"
@@ -39,29 +41,36 @@
             android:textColor="@color/testpress_black"
             android:textSize="16sp"
             android:textStyle="bold"
+            android:layout_marginStart="84dp"
+            android:layout_marginEnd="84dp"
+            app:layout_constrainedWidth="true"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toEndOf="@id/btn_back"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <View
         android:id="@+id/divider"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="1dp"
-        android:background="#DDDDDD"
+        android:background="@color/divider_color"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/header" />
 
     <!-- Scrollable timeline area -->
     <androidx.core.widget.NestedScrollView
         android:id="@+id/scroll_view"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:paddingHorizontal="20dp"
         android:paddingTop="16dp"
         app:layout_constrainedHeight="true"
         app:layout_constraintBottom_toTopOf="@id/footer_total"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/divider"
         app:layout_constraintVertical_bias="0.0">
 
@@ -76,14 +85,16 @@
     <!-- Total row -->
     <LinearLayout
         android:id="@+id/footer_total"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:gravity="end"
+        android:orientation="horizontal"
         android:paddingHorizontal="20dp"
         android:paddingTop="8dp"
         android:paddingBottom="12dp"
-        android:orientation="horizontal"
-        android:gravity="end"
         app:layout_constraintBottom_toTopOf="@id/btn_pay_installment"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/scroll_view">
 
         <TextView
@@ -108,15 +119,18 @@
     <!-- Pay button -->
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_pay_installment"
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="52dp"
-        android:layout_marginHorizontal="16dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginEnd="16dp"
         android:background="@drawable/button_installment_green"
         android:textColor="@color/testpress_white"
         android:textSize="16sp"
         android:textAllCaps="false"
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/footer_total" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
