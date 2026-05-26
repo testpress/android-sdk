@@ -31,7 +31,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Checkout the repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
       - name: Cache Zoom SDK files
         id: zoom-cache
