@@ -105,7 +105,7 @@ data class DomainContent(
 
     private fun canRetakeExam(): Boolean {
         if (exam?.allowRetake == true) {
-            return (getAttemptsCount() <= (exam!!.maxRetakes ?: 0)) || (exam!!.maxRetakes == -1)
+            return (getAttemptsCount() <= (exam?.maxRetakes ?: 0)) || (exam?.maxRetakes == -1)
         }
 
         return false

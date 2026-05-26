@@ -64,7 +64,7 @@ class QuizContentFragment: BaseContentDetailFragment(), ExamRefreshListener {
 class QuizWidgetFactory {
     companion object {
         fun getWidget(content: DomainContent, context: Context): Fragment? {
-            if ((content.exam?.attemptsCount ?: content.attemptsCount ?: 0) > 0 && InternetConnectivityChecker.isConnected(context)){
+            if (content.getAttemptsCount() > 0 && InternetConnectivityChecker.isConnected(context)){
                 return QuizAttemptsList()
             }
             return null

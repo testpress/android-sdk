@@ -82,7 +82,7 @@ interface ExamRefreshListener {
 class ExamWidgetFactory {
     companion object {
         fun getWidget(content: DomainContent): Fragment {
-            val attemptsCount = content.exam?.attemptsCount ?: content.attemptsCount ?: 0
+            val attemptsCount = content.getAttemptsCount()
             if (attemptsCount > 0){
                 return AttemptsListFragment()
             }
