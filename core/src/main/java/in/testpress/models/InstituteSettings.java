@@ -508,4 +508,8 @@ public class InstituteSettings {
     public boolean isBrilliantPalaELearn() {
         return getDomainUrl().toLowerCase().contains("brilliantpala");
     }
+
+    public boolean isMetier() {
+        return getDomainUrl().toLowerCase().contains("metier");
+    }
 }

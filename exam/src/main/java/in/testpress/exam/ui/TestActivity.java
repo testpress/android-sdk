@@ -109,6 +109,7 @@ public class TestActivity extends BaseToolBarActivity  {
     private boolean reflectionCompleted = false;
     private static final int REFLECTION_REQUEST_CODE = 1001;
     private boolean isBrilliantPala;
+    private boolean isMetier;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -139,6 +140,7 @@ public class TestActivity extends BaseToolBarActivity  {
         apiClient = new TestpressExamApiClient(this);
         TestpressSession session = TestpressSdk.getTestpressSession(this);
         isBrilliantPala = session != null && session.getInstituteSettings().isBrilliantPalaELearn();
+        isMetier = session != null && session.getInstituteSettings().isMetier();
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
         assert data != null;
@@ -188,7 +190,7 @@ public class TestActivity extends BaseToolBarActivity  {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (isKioskModeRequired() || !isBrilliantPala) {
+        if (isKioskModeRequired() || (!isBrilliantPala && !isMetier)) {
             if (isOverlayDetected(ev)) return true;
         }
         if (blockInputIfUnpinned(ev)) return true;
