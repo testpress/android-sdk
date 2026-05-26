@@ -197,7 +197,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun canDownloadExam(): Boolean {
         return if (content.exam?.allowRetake == true) {
-            val totalAttemptTaken = content.attemptsCount!! + content.exam?.pausedAttemptsCount!!
+            val totalAttemptTaken = content.getAttemptsCount() + (content.exam?.pausedAttemptsCount ?: 0)
             (totalAttemptTaken <= content.exam!!.maxRetakes!!) || (content.exam!!.maxRetakes == -1)
         } else {
             return content.hasNotAttempted() && (content.exam?.pausedAttemptsCount!! == 0)
@@ -206,7 +206,7 @@ open class BaseExamWidgetFragment : Fragment() {
 
     private fun canAttemptOfflineExam(): Boolean {
         return if (content.exam?.allowRetake == true) {
-            val totalAttemptTaken = content.attemptsCount!! + content.exam?.pausedAttemptsCount!!
+            val totalAttemptTaken = content.getAttemptsCount() + (content.exam?.pausedAttemptsCount ?: 0)
             (totalAttemptTaken <= content.exam!!.maxRetakes!!) || (content.exam!!.maxRetakes == -1)
         } else {
             return content.hasNotAttempted() && (content.exam?.pausedAttemptsCount!! == 0)
@@ -309,7 +309,7 @@ open class BaseExamWidgetFragment : Fragment() {
     private fun updateAttemptsCountToDownloadedOfflineExam() {
         offlineExamViewModel.updateAttemptsCount(
             content.examId!!,
-            content.attemptsCount!!.toLong(),
+            content.getAttemptsCount().toLong(),
             content.exam?.pausedAttemptsCount!!.toLong()
         )
     }
