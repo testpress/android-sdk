@@ -23,9 +23,11 @@ import androidx.fragment.app.FragmentActivity
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import `in`.testpress.core.TestpressException
 import `in`.testpress.database.entities.DomainProduct
+import `in`.testpress.database.entities.PriceEntity
 import `in`.testpress.enums.Status
 import `in`.testpress.fragments.EmptyViewFragment
 import `in`.testpress.fragments.EmptyViewListener
+import `in`.testpress.store.R
 import `in`.testpress.store.TestpressStore
 import `in`.testpress.store.data.model.NetworkProductOffersResponse
 import `in`.testpress.store.data.model.mapping.asProduct
@@ -34,6 +36,7 @@ import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.store.util.generateRandom10CharString
+import `in`.testpress.util.DateUtils
 import `in`.testpress.util.StringUtils
 import `in`.testpress.util.ImageUtils
 import `in`.testpress.util.UILImageGetter
@@ -245,6 +248,8 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                     notesListContainer.isVisible = false
                 }
 
+                renderValidity()
+
                 buyButton.apply {
                     text = product.buyNowText
                     setOnClickListener {
@@ -315,6 +320,36 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 isVisible = true
             }
         }
+    }
+
+    private fun renderValidity() {
+        val prices = domainProduct?.prices ?: return
+        val price = prices.firstOrNull() ?: return
+        if (price.purchaseValidityType == null) return
+
+        val validityText = getValidityInfo(price) ?: return
+        binding.detailLayout.validityContainer.isVisible = true
+        binding.detailLayout.validityText.text = validityText
+    }
+
+    private fun getValidityInfo(price: PriceEntity): String? {
+        return when (price.purchaseValidityType) {
+            1 -> getRelativeValidityText(price)
+            2 -> getAbsoluteValidityText(price)
+            else -> null
+        }
+    }
+
+    private fun getRelativeValidityText(price: PriceEntity): String? {
+        val days = price.validity?.toIntOrNull() ?: return null
+        return context?.resources?.getQuantityString(R.plurals.valid_for_days, days, days)
+    }
+
+    private fun getAbsoluteValidityText(price: PriceEntity): String? {
+        val date = price.absoluteExpiryDate ?: return null
+        val formatted = DateUtils.formatDateToReadable(date)
+        if (formatted.isEmpty() || formatted == date) return null
+        return getString(R.string.valid_till, formatted)
     }
 
     private fun showErrorState(exception: TestpressException?) {

@@ -35,6 +35,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import in.testpress.store.models.PricesItem;
 import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
@@ -52,6 +53,7 @@ import in.testpress.store.models.UserInstallmentPlan;
 import in.testpress.store.network.StoreApiClient;
 import in.testpress.store.util.UtilKt;
 import in.testpress.ui.BaseToolBarActivity;
+import in.testpress.util.DateUtils;
 import in.testpress.util.EventsTrackerFacade;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.UILImageGetter;
@@ -292,6 +294,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             appliedDiscountNameText.setVisibility(View.GONE);
         }
 
+        renderValidity(product);
+
         // Update product description
         if(product.getDescription().isEmpty()) {
             descriptionContainer.setVisibility(View.GONE);
@@ -454,6 +458,48 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         sheet.setPlanSelectedListener(selectedPlan ->
                 openDetailSheet(selectedPlan, true));
         sheet.show(getSupportFragmentManager(), "installment_plan_list");
+    }
+
+    private void renderValidity(Product product) {
+        TextView validityText = (TextView) findViewById(R.id.validity_text);
+        View validityContainer = findViewById(R.id.validity_container);
+        if (validityText == null || validityContainer == null) return;
+
+        List<PricesItem> prices = product.getPrices();
+        if (prices == null || prices.isEmpty()) return;
+        PricesItem price = prices.get(0);
+        if (price.getPurchaseValidityType() == null) return;
+
+        String validityInfo = getValidityInfo(price);
+        if (validityInfo != null) {
+            validityText.setText(validityInfo);
+            validityContainer.setVisibility(View.VISIBLE);
+        }
+    }
+
+    private String getValidityInfo(PricesItem price) {
+        Integer purchaseValidityType = price.getPurchaseValidityType();
+        if (purchaseValidityType == null) {
+            return null;
+        }
+        if (purchaseValidityType == 1) {
+            Integer days = price.getValidity();
+            if (days != null) {
+                return getResources().getQuantityString(R.plurals.valid_for_days, days, days);
+            }
+        } else if (purchaseValidityType == 2) {
+            String date = price.getAbsoluteExpiryDate();
+            if (date != null && !date.isEmpty()) {
+                return formatAbsoluteDate(date);
+            }
+        }
+        return null;
+    }
+
+    private String formatAbsoluteDate(String date) {
+        String formatted = DateUtils.formatDateToReadable(date);
+        if (formatted.isEmpty() || formatted.equals(date)) return null;
+        return getString(R.string.valid_till, formatted);
     }
 
     private void openDetailSheet(InstallmentPlan plan, boolean showBack) {
