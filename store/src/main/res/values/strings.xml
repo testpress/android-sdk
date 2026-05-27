@@ -79,4 +79,11 @@
     <string name="installment_due_on">due on %1$s</string>
     <string name="testpress_amount_with_symbol">₹%1$s</string>
 
+    <plurals name="valid_for_days">
+        <item quantity="one">Valid for %d day</item>
+        <item quantity="other">Valid for %d days</item>
+    </plurals>
+
+    <string name="valid_till">Valid till %1$s</string>
+
 </resources>
