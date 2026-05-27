@@ -48,7 +48,9 @@ fun PriceEntity.asDomainPricesItem(): PricesItem {
         id = id,
         name = name,
         price = price,
-        validity = validity?.toInt(),
+        validity = validity?.toIntOrNull(),
+        purchaseValidityType = purchaseValidityType,
+        absoluteExpiryDate = absoluteExpiryDate,
         endDate = endDate,
         startDate = startDate
     )

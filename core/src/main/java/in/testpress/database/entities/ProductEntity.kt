@@ -45,6 +45,8 @@ data class PriceEntity(
     val name: String?,
     val price: String,
     val validity: String?,
+    val purchaseValidityType: Int? = null,
+    val absoluteExpiryDate: String? = null,
     val startDate: String?,
     val endDate: String?
 )
