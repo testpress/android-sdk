@@ -38,6 +38,8 @@ data class NetworkPrice(
     val name: String? = null,
     val price: String,
     val validity: String? = null,
+    val purchaseValidityType: Int? = null,
+    val absoluteExpiryDate: String? = null,
     val startDate: String? = null,
     val endDate: String? = null
 )
@@ -83,6 +85,8 @@ fun NetworkPrice.asDomainPrice(productId: Int): PriceEntity {
         name = this.name,
         price = this.price,
         validity = this.validity,
+        purchaseValidityType = this.purchaseValidityType,
+        absoluteExpiryDate = this.absoluteExpiryDate,
         startDate = this.startDate,
         endDate = this.endDate
     )

@@ -8,6 +8,8 @@ data class PricesItem(
     var name: String? = null,
     var price: String? = null,
     var validity: Int? = null,
+    var purchaseValidityType: Int? = null,
+    var absoluteExpiryDate: String? = null,
     var endDate: String? = null,
     var startDate: String? = null
 ) : Parcelable {
@@ -16,6 +18,8 @@ data class PricesItem(
         parcel.readString(),
         parcel.readString(),
         parcel.readValue(Int::class.java.classLoader) as? Int,
+        parcel.readValue(Int::class.java.classLoader) as? Int,
+        parcel.readString(),
         parcel.readString(),
         parcel.readString()
     )
@@ -25,6 +29,8 @@ data class PricesItem(
         parcel.writeString(name)
         parcel.writeString(price)
         parcel.writeValue(validity)
+        parcel.writeValue(purchaseValidityType)
+        parcel.writeString(absoluteExpiryDate)
         parcel.writeString(endDate)
         parcel.writeString(startDate)
     }
