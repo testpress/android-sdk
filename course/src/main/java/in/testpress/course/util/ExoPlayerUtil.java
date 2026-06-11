@@ -62,6 +62,7 @@ import com.google.android.exoplayer2.trackselection.AdaptiveTrackSelection;
 import com.google.android.exoplayer2.trackselection.DefaultTrackSelector;
 import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
+import com.google.android.exoplayer2.upstream.HttpDataSource;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
 
@@ -914,6 +915,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             errorMessage = activity.getString(R.string.exoplayer_audio_track_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (6000 <= exception.errorCode && exception.errorCode <= 7000) { // DRM errors
             errorMessage = activity.getString(R.string.exoplayer_drm_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
+            String drmFailureReasonCode = DrmErrorIdentifier.getFailureReason(exception);
+            if (drmFailureReasonCode != null && !drmFailureReasonCode.isEmpty()) {
+                errorMessage = errorMessage + "\n\n(Detail: " + drmFailureReasonCode + ")";
+            }
         }
         displayError(errorMessage, exception.errorCode);
         logPlaybackException(errorMessage, playbackId, exception);
@@ -1057,9 +1062,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     OfflineDRMLicenseHelper.renewLicense(url, content.getId(), activity, this);
                     displayError(R.string.syncing_video);
                 } else {
-                    String licenseRequestFailedMessage = activity.getString(R.string.license_request_failed, exception.errorCode, playBackId);
-                    displayError(licenseRequestFailedMessage, exception.errorCode);
-                    logPlaybackException(licenseRequestFailedMessage, playBackId, exception);
+                    handleError(exception, playBackId);
                 }
             } else {
                 handleError(exception,playBackId);
