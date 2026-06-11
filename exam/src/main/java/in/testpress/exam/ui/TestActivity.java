@@ -588,6 +588,36 @@ public class TestActivity extends BaseToolBarActivity  {
         }
     }
 
+
+    private void fetchSSOAndLaunchWebView(final String urlPath) {
+        progressBar.setVisibility(View.VISIBLE);
+        fragmentContainer.setVisibility(View.GONE);
+        apiClient.getSSOURL()
+            .enqueue(new in.testpress.core.TestpressCallback<in.testpress.models.SSOUrl>() {
+                @Override
+                public void onSuccess(in.testpress.models.SSOUrl result) {
+                    progressBar.setVisibility(View.GONE);
+                    String baseUrl = in.testpress.core.TestpressSdk.getTestpressSession(TestActivity.this).getInstituteSettings().getBaseUrl();
+                    String fullUrl = baseUrl + result.getSsoUrl() + "&next=" + urlPath;
+                    startActivityForResult(in.testpress.ui.WebViewWithSSOActivity.Companion.createIntent(
+                            TestActivity.this,
+                            exam.getTitle(),
+                            fullUrl,
+                            true,
+                            false,
+                            in.testpress.ui.WebViewWithSSOActivity.class
+                    ), 1002);
+                }
+
+                @Override
+                public void onException(in.testpress.core.TestpressException exception) {
+                    progressBar.setVisibility(View.GONE);
+                    in.testpress.util.ViewUtils.toast(TestActivity.this, "Failed to authenticate. Please try again.");
+                    finish();
+                }
+            });
+    }
+
     @SuppressLint("SetTextI18n")
     void displayStartExamScreen() {
         TextView examTitle = findViewById(R.id.exam_title);
@@ -775,6 +805,13 @@ public class TestActivity extends BaseToolBarActivity  {
             startLockTask();
             return;
         }
+
+        if (isBpscTemplate()) {
+            String urlPath = getBpscExamUrlPath(resumeExam);
+            fetchSSOAndLaunchWebView(urlPath);
+            return;
+        }
+
         if (resumeExam){
             examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
@@ -785,6 +822,26 @@ public class TestActivity extends BaseToolBarActivity  {
             }
         }
         examDetailsContainer.setVisibility(View.GONE);
+    }
+
+    private boolean isBpscTemplate() {
+        return exam != null && exam.getTemplateType() != null && exam.getTemplateType() == 22;
+    }
+
+    private String getBpscExamUrlPath(boolean resumeExam) {
+        if (resumeExam) {
+            if (courseContent != null) {
+                return "/exams/chapter_content/" + courseContent.getId() + "/" + courseAttempt.getId() + "/";
+            }
+            return "/exams/run/" + exam.getSlug() + "/start/" + attempt.getId() + "/";
+        }
+        if (courseContent != null) {
+            if (isPartialQuestions) {
+                return "/exams/chapter_content/" + courseContent.getId() + "/retake/incorrect/";
+            }
+            return "/exams/chapter_content/" + courseContent.getId() + "/";
+        }
+        return "/exams/run/" + exam.getSlug() + "/start/";
     }
 
     private void createContentAttempt() {
@@ -825,6 +882,11 @@ public class TestActivity extends BaseToolBarActivity  {
                 reflectionCompleted = true;
                 showWarningAlertOrStartExam();
             }
+            return;
+        }
+        if (requestCode == 1002) {
+            setResult(Activity.RESULT_OK);
+            finish();
             return;
         }
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
