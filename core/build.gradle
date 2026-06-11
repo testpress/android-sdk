@@ -6,6 +6,7 @@ apply plugin: 'kotlin-parcelize'
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
+    namespace 'in.testpress'
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
