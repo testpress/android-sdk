@@ -36,7 +36,7 @@ class CourseContentsRemoteMediator(
         state: PagingState<Int, ContentEntityLite>
     ): MediatorResult {
 
-        pageNumber = getPageNumber(loadType,state)
+        pageNumber = getPageNumber(loadType)
         if (pageNumber == -1) return MediatorResult.Success(endOfPaginationReached = true)
 
         return try {
@@ -52,28 +52,23 @@ class CourseContentsRemoteMediator(
         }
     }
 
-    private suspend fun getPageNumber(
-        loadType: LoadType,
-        state: PagingState<Int, ContentEntityLite>
-    ) : Int {
+    private suspend fun getPageNumber(loadType: LoadType) : Int {
         return when (loadType) {
             LoadType.REFRESH -> DEFAULT_PAGE_INDEX
             LoadType.PREPEND -> -1
-            LoadType.APPEND -> getNextPageNumber(state)
+            LoadType.APPEND -> getNextPageNumber()
         }
     }
 
-    private suspend fun getNextPageNumber(state: PagingState<Int, ContentEntityLite>) : Int{
-        val remoteKeys = getRemoteKeyForLastItem(state)
+    private suspend fun getNextPageNumber() : Int{
+        val remoteKeys = getRemoteKeyForLastItem()
         return remoteKeys?.nextKey ?: -1
     }
 
-    private suspend fun getRemoteKeyForLastItem(state: PagingState<Int, ContentEntityLite>): ContentEntityLiteRemoteKey? {
-        return state.pages.lastOrNull() { it.data.isNotEmpty() }?.data
-            ?.lastOrNull()
-            ?.let { content ->
-                contentLiteRemoteKeyDao.remoteKeysContentId(content.id,type)
-            }
+    private suspend fun getRemoteKeyForLastItem(): ContentEntityLiteRemoteKey? {
+        return contentLiteDao.getLastContent(courseId, type)?.let { content ->
+            contentLiteRemoteKeyDao.remoteKeysContentId(content.id, type)
+        }
     }
 
     private suspend fun fetchCourseContents(page: Int = 1): ApiResponse<List<ContentEntityLite>> {
