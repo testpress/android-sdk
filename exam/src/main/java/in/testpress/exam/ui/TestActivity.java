@@ -57,6 +57,8 @@ import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.Assert;
 import in.testpress.util.FormatDate;
 import in.testpress.util.UIUtils;
+import in.testpress.models.SSOUrl;
+import in.testpress.ui.WebViewWithSSOActivity;
 import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 
@@ -81,6 +83,7 @@ public class TestActivity extends BaseToolBarActivity  {
     public static final String PARAM_IS_PARTIAL_QUESTIONS = "isPartialQuestions";
     public static final String PARAM_ACTION = "action";
     public static final String PARAM_VALUE_ACTION_END = "end";
+    private static final int BPSC_WEBVIEW_REQUEST_CODE = 1002;
     private TestpressExamApiClient apiClient;
     Exam exam;
     Attempt attempt;
@@ -588,6 +591,42 @@ public class TestActivity extends BaseToolBarActivity  {
         }
     }
 
+
+    private void fetchSSOAndLaunchWebView(final String urlPath) {
+        progressBar.setVisibility(View.VISIBLE);
+        fragmentContainer.setVisibility(View.GONE);
+        apiClient.getSSOURL()
+            .enqueue(new TestpressCallback<SSOUrl>() {
+                @Override
+                public void onSuccess(SSOUrl result) {
+                    progressBar.setVisibility(View.GONE);
+                    TestpressSession session = TestpressSdk.getTestpressSession(TestActivity.this);
+                    if (session == null || result == null || result.getSsoUrl() == null) {
+                        ViewUtils.toast(TestActivity.this, "Failed to authenticate. Please try again.");
+                        finish();
+                        return;
+                    }
+                    String baseUrl = session.getInstituteSettings().getBaseUrl();
+                    String fullUrl = baseUrl + result.getSsoUrl() + "&next=" + urlPath;
+                    startActivityForResult(WebViewWithSSOActivity.Companion.createIntent(
+                            TestActivity.this,
+                            exam.getTitle(),
+                            fullUrl,
+                            true,
+                            false,
+                            WebViewWithSSOActivity.class
+                    ), BPSC_WEBVIEW_REQUEST_CODE);
+                }
+
+                @Override
+                public void onException(TestpressException exception) {
+                    progressBar.setVisibility(View.GONE);
+                    ViewUtils.toast(TestActivity.this, "Failed to authenticate. Please try again.");
+                    finish();
+                }
+            });
+    }
+
     @SuppressLint("SetTextI18n")
     void displayStartExamScreen() {
         TextView examTitle = findViewById(R.id.exam_title);
@@ -775,6 +814,13 @@ public class TestActivity extends BaseToolBarActivity  {
             startLockTask();
             return;
         }
+
+        if (isBpscTemplate()) {
+            String urlPath = getBpscExamUrlPath(resumeExam);
+            fetchSSOAndLaunchWebView(urlPath);
+            return;
+        }
+
         if (resumeExam){
             examViewModel.startAttempt(attempt.getStartUrlFrag());
         } else {
@@ -785,6 +831,29 @@ public class TestActivity extends BaseToolBarActivity  {
             }
         }
         examDetailsContainer.setVisibility(View.GONE);
+    }
+
+    private boolean isBpscTemplate() {
+        return exam != null && exam.getTemplateType() != null && exam.getTemplateType() == 22;
+    }
+
+    private String getBpscExamUrlPath(boolean resumeExam) {
+        if (resumeExam) {
+            if (courseContent != null && courseAttempt != null) {
+                return "/exams/chapter_content/" + courseContent.getId() + "/" + courseAttempt.getId() + "/";
+            }
+            if (exam != null && attempt != null) {
+                return "/exams/run/" + exam.getSlug() + "/start/" + attempt.getId() + "/";
+            }
+            return "";
+        }
+        if (courseContent != null) {
+            if (isPartialQuestions) {
+                return "/exams/chapter_content/" + courseContent.getId() + "/retake/incorrect/";
+            }
+            return "/exams/chapter_content/" + courseContent.getId() + "/";
+        }
+        return exam != null ? "/exams/run/" + exam.getSlug() + "/start/" : "";
     }
 
     private void createContentAttempt() {
@@ -825,6 +894,11 @@ public class TestActivity extends BaseToolBarActivity  {
                 reflectionCompleted = true;
                 showWarningAlertOrStartExam();
             }
+            return;
+        }
+        if (requestCode == BPSC_WEBVIEW_REQUEST_CODE) {
+            setResult(Activity.RESULT_OK);
+            finish();
             return;
         }
         if ((requestCode == CarouselFragment.TEST_TAKEN_REQUEST_CODE) && (Activity.RESULT_OK == resultCode)) {
