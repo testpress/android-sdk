@@ -11,6 +11,7 @@ import com.nostra13.universalimageloader.core.ImageLoader;
 
 import androidx.core.content.ContextCompat;
 import androidx.appcompat.app.AlertDialog;
+import android.content.DialogInterface;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.inputmethod.InputMethodManager;
@@ -91,12 +92,16 @@ public class UIUtils {
     }
 
     public static void showAlert(Context context, String title, String message) {
+        showAlert(context, title, message, null);
+    }
+
+    public static void showAlert(Context context, String title, String message, DialogInterface.OnClickListener listener) {
         AlertDialog.Builder builder = new AlertDialog.Builder(context,
                 R.style.TestpressAppCompatAlertDialogStyle);
 
         builder.setTitle(title);
         builder.setMessage(message);
-        builder.setPositiveButton(R.string.testpress_ok, null);
+        builder.setPositiveButton(R.string.testpress_ok, listener);
         builder.show();
     }
 
