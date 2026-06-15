@@ -46,7 +46,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     open fun initializeWebViewFragment() {
         webViewFragment = WebViewFragment()
         webViewFragment.arguments = getWebViewArguments()
-        webViewFragment.setListener(this)
+        webViewFragment.listener = this
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, webViewFragment)
             .commit()
@@ -92,4 +92,12 @@ class WebViewWithSSOActivity:AbstractWebViewActivity(){
 
     override fun onWebViewInitializationSuccess() {}
 
+    override fun shouldOverrideUrlLoading(url: String?): Boolean {
+        if (url?.contains("/review/") == true && (url.contains("/attempts/") || url.contains("/exams/"))) {
+            setResult(android.app.Activity.RESULT_OK)
+            finish()
+            return true
+        }
+        return false
+    }
 }

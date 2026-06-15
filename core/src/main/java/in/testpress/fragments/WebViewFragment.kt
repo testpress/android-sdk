@@ -29,7 +29,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     private val layout: WebviewFragmentBinding get() = _layout!!
     lateinit var webView: android.webkit.WebView
     var instituteSettings: InstituteSettings? = null
-    private var listener : Listener? = null
+    var listener : Listener? = null
     var imagePath: String? = null
     var filePathCallback: ValueCallback<Array<Uri>?>? = null
     private lateinit var emptyViewFragment: EmptyViewFragment
@@ -195,10 +195,6 @@ class WebViewFragment : Fragment(), EmptyViewListener {
         retryLoad()
     }
 
-    fun setListener(listener: Listener){
-        this.listener = listener
-    }
-
     @SuppressLint("JavascriptInterface")
     fun addJavascriptInterface(javascriptInterface: BaseJavaScriptInterface, name: String){
         webView.addJavascriptInterface(javascriptInterface,name)
@@ -226,6 +222,7 @@ class WebViewFragment : Fragment(), EmptyViewListener {
 
     interface Listener {
         fun onWebViewInitializationSuccess()
+        fun shouldOverrideUrlLoading(url: String?): Boolean = false
     }
 
     companion object {
