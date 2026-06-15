@@ -30,7 +30,7 @@ class MindsetInsightsActivity : AbstractWebViewActivity() {
             putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, true)
             putInt(WebViewFragment.CACHE_MODE, WebSettings.LOAD_NO_CACHE)
         }
-        webViewFragment.setListener(this)
+        webViewFragment.listener = this
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, webViewFragment)
             .commitAllowingStateLoss()

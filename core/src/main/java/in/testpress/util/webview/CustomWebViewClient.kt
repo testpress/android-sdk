@@ -14,6 +14,9 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
 
     override fun shouldOverrideUrlLoading(view: AndroidWebView?, request: WebResourceRequest?): Boolean {
         val url = request?.url.toString()
+        if (fragment.listener?.shouldOverrideUrlLoading(url) == true) {
+            return true
+        }
         return when {
             isPDFUrl(url) -> {
                 fragment.openUrlInBrowser(url)
@@ -43,6 +46,11 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
     private fun hasHttpScheme(url: String): Boolean {
         return url.startsWith("http://", ignoreCase = true) ||
                url.startsWith("https://", ignoreCase = true)
+    }
+
+    override fun doUpdateVisitedHistory(view: AndroidWebView?, url: String?, isReload: Boolean) {
+        super.doUpdateVisitedHistory(view, url, isReload)
+        fragment.listener?.shouldOverrideUrlLoading(url)
     }
 
     override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
