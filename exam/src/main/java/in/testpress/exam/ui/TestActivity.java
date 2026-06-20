@@ -654,7 +654,7 @@ public class TestActivity extends BaseToolBarActivity  {
         examTitle.setText(exam.getTitle());
         numberOfQuestions.setText(exam.getNumberOfQuestions().toString());
         if (attempt == null) {
-            MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+            MultiLanguagesUtil.supportMultiLanguage(this, findViewById(android.R.id.content), exam, startButton,
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {
@@ -662,7 +662,7 @@ public class TestActivity extends BaseToolBarActivity  {
                         }});
             examDuration.setText(exam.getDuration());
         } else {
-            MultiLanguagesUtil.supportMultiLanguage(this, exam, resumeButton,
+            MultiLanguagesUtil.supportMultiLanguage(this, findViewById(android.R.id.content), exam, resumeButton,
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {

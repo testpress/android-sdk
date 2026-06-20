@@ -412,7 +412,7 @@ open class BaseExamWidgetFragment : Fragment() {
         if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE)) {
             startButton.setOnClickListener {startExamInWebview(content)}
         } else if (contentAttempts.isEmpty()) {
-            MultiLanguagesUtil.supportMultiLanguage(requireActivity(), exam.asGreenDaoModel(), startButton) {
+            MultiLanguagesUtil.supportMultiLanguage(requireActivity(), requireView(), exam.asGreenDaoModel(), startButton) {
                 if (shouldShowPreExamReflection(exam)) {
                     openPreExamReflection(exam)
                 } else {
@@ -502,7 +502,7 @@ open class BaseExamWidgetFragment : Fragment() {
         if (exam.templateType in listOf(IELTS_TEMPLATE, CTET_TEMPLATE) || exam.hasAudioQuestions == true) {
             startButton.setOnClickListener { startExamInWebview(content) }
         } else if (contentAttempts.isEmpty()) {
-            MultiLanguagesUtil.supportMultiLanguage(activity, exam.asGreenDaoModel(), startButton) {
+            MultiLanguagesUtil.supportMultiLanguage(requireActivity(), requireView(), exam.asGreenDaoModel(), startButton) {
                 resumeExamBasedOnAttemptType(exam, true, pausedAttempt)
             }
         } else {

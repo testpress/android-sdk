@@ -19,10 +19,19 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 
 public class MultiLanguagesUtil {
 
-    public static void supportMultiLanguage(final Activity activity, final Exam exam, Button startButton,
+    public static void supportMultiLanguage(final Activity activity, View rootView, final Exam exam, Button startButton,
                                             final LanguageSelectionListener listener) {
 
-        View languageLayout = activity.findViewById(R.id.language_layout);
+        View languageLayout = rootView.findViewById(R.id.language_layout);
+        if (languageLayout == null) {
+            startButton.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    listener.onLanguageSelected();
+                }
+            });
+            return;
+        }
         final ArrayList<Language> languages = new ArrayList<>(exam.getRawLanguages());
         if (languages.size() > 1) {
             final ExploreSpinnerAdapter languageSpinnerAdapter =
@@ -32,7 +41,7 @@ public class MultiLanguagesUtil {
             for (Language language : languages) {
                 languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
             }
-            final Spinner languageSpinner = (Spinner) activity.findViewById(R.id.language_spinner);
+            final Spinner languageSpinner = (Spinner) rootView.findViewById(R.id.language_spinner);
             languageSpinner.setAdapter(languageSpinnerAdapter);
             languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
