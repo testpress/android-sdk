@@ -2,6 +2,7 @@ package in.testpress.exam.util;
 
 import android.app.Activity;
 import android.content.DialogInterface;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import android.view.View;
 import android.widget.AdapterView;
@@ -19,10 +20,10 @@ import in.testpress.ui.ExploreSpinnerAdapter;
 
 public class MultiLanguagesUtil {
 
-    public static void supportMultiLanguage(final Activity activity, View rootView, final Exam exam, Button startButton,
+    public static void supportMultiLanguage(final Activity activity, @NonNull View rootView, final Exam exam, Button startButton,
                                             final LanguageSelectionListener listener) {
 
-        View languageLayout = rootView.findViewById(R.id.language_layout);
+        View languageLayout = rootView != null ? rootView.findViewById(R.id.language_layout) : null;
         if (languageLayout == null) {
             startButton.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -42,6 +43,15 @@ public class MultiLanguagesUtil {
                 languageSpinnerAdapter.addItem(language.getCode(), language.getTitle(), true, 0);
             }
             final Spinner languageSpinner = (Spinner) rootView.findViewById(R.id.language_spinner);
+            if (languageSpinner == null) {
+                startButton.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        listener.onLanguageSelected();
+                    }
+                });
+                return;
+            }
             languageSpinner.setAdapter(languageSpinnerAdapter);
             languageSpinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
                 @Override
