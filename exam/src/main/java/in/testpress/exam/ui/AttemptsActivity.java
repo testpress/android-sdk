@@ -183,7 +183,7 @@ public class AttemptsActivity extends BaseToolBarActivity
             descriptionContent.setText(exam.getDescription());
         }
         if (canAttemptExam()) {
-            MultiLanguagesUtil.supportMultiLanguage(this, exam, startButton,
+            MultiLanguagesUtil.supportMultiLanguage(this, findViewById(android.R.id.content), exam, startButton,
                     new MultiLanguagesUtil.LanguageSelectionListener() {
                         @Override
                         public void onLanguageSelected() {

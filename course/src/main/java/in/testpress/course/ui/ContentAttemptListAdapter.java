@@ -105,6 +105,9 @@ public class ContentAttemptListAdapter extends RecyclerView.Adapter<RecyclerView
 
     @Override
     public int getItemCount() {
+        if (mAttempts.isEmpty()) {
+            return 0;
+        }
         return mAttempts.size() + 1;
     }
 
