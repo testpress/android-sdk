@@ -17,6 +17,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     private var isAuthenticationRequired: Boolean = true
     private var allowNonInstituteUrl: Boolean = false
     private var allowValidationErrors: Boolean = false
+    private var allowZoomControls: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,6 +42,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
         isAuthenticationRequired = intent.getBooleanExtra(IS_AUTHENTICATION_REQUIRED,true)
         allowNonInstituteUrl = intent.getBooleanExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, false)
         allowValidationErrors = intent.getBooleanExtra(ALLOW_VALIDATION_ERRORS, false)
+        allowZoomControls = intent.getBooleanExtra(WebViewFragment.ALLOW_ZOOM_CONTROLS, false)
     }
 
     open fun initializeWebViewFragment() {
@@ -57,6 +59,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             this.putString(WebViewFragment.URL_TO_OPEN, urlPath)
             this.putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
             this.putBoolean(WebViewFragment.ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allowNonInstituteUrl)
+            this.putBoolean(WebViewFragment.ALLOW_ZOOM_CONTROLS, allowZoomControls)
             this.putBoolean(ALLOW_VALIDATION_ERRORS, allowValidationErrors)
         }
     }
@@ -83,6 +86,27 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
                 putExtra(URL_TO_OPEN, urlPath)
                 putExtra(IS_AUTHENTICATION_REQUIRED, isAuthenticationRequired)
                 putExtra(ALLOW_NON_INSTITUTE_URL_IN_WEB_VIEW, allowNonInstituteUrl)
+            }
+        }
+
+        fun createIntent(
+            currentContext: Context,
+            title: String,
+            urlPath: String,
+            isAuthenticationRequired: Boolean,
+            allowNonInstituteUrl: Boolean = false,
+            allowZoomControls: Boolean = false,
+            activityToOpen: Class<out AbstractWebViewActivity>
+        ): Intent {
+            return createIntent(
+                currentContext,
+                title,
+                urlPath,
+                isAuthenticationRequired,
+                allowNonInstituteUrl,
+                activityToOpen
+            ).apply {
+                putExtra(WebViewFragment.ALLOW_ZOOM_CONTROLS, allowZoomControls)
             }
         }
     }

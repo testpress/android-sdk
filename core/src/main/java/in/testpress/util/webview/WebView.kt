@@ -27,10 +27,9 @@ open class WebView @JvmOverloads constructor(
             domStorageEnabled = true
             useWideViewPort = false
             loadWithOverviewMode = true
-            builtInZoomControls = true
-            displayZoomControls = false
+            builtInZoomControls = false
             cacheMode = WebSettings.LOAD_CACHE_ELSE_NETWORK
-            setSupportZoom(true)
+            setSupportZoom(false)
             userAgentString += " TestpressAndroidApp/WebView"
         }
         
