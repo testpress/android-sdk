@@ -506,9 +506,25 @@ public class InstituteSettings {
     }
 
     public boolean isFloatingWindowAllowedInstitute() {
-        String domain = getDomainUrl().toLowerCase();
-        return domain.contains("brilliantpala") || 
-               domain.contains("metier") || 
+        String domainUrl = getDomainUrl();
+        if (domainUrl == null) return false;
+        String domain = domainUrl.toLowerCase();
+        return domain.contains("brilliantpala") ||
+               domain.contains("metier") ||
                domain.contains("uyirmeitnpsctamilacademy");
+    }
+
+    /** @deprecated Use {@link #isFloatingWindowAllowedInstitute()} instead */
+    @Deprecated
+    public boolean isBrilliantPalaELearn() {
+        String domainUrl = getDomainUrl();
+        return domainUrl != null && domainUrl.toLowerCase().contains("brilliantpala");
+    }
+
+    /** @deprecated Use {@link #isFloatingWindowAllowedInstitute()} instead */
+    @Deprecated
+    public boolean isMetier() {
+        String domainUrl = getDomainUrl();
+        return domainUrl != null && domainUrl.toLowerCase().contains("metier");
     }
 }

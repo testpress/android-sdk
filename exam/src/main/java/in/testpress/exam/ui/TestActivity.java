@@ -141,7 +141,8 @@ public class TestActivity extends BaseToolBarActivity  {
         UIUtils.setIndeterminateDrawable(this, findViewById(R.id.progress_bar), 4);
         apiClient = new TestpressExamApiClient(this);
         TestpressSession session = TestpressSdk.getTestpressSession(this);
-        isFloatingWindowAllowedInstitute = session != null && session.getInstituteSettings().isFloatingWindowAllowedInstitute();
+        InstituteSettings settings = session != null ? session.getInstituteSettings() : null;
+        isFloatingWindowAllowedInstitute = settings != null && settings.isFloatingWindowAllowedInstitute();
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
         assert data != null;
