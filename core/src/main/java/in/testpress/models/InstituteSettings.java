@@ -505,11 +505,10 @@ public class InstituteSettings {
         return this;
     }
 
-    public boolean isBrilliantPalaELearn() {
-        return getDomainUrl().toLowerCase().contains("brilliantpala");
-    }
-
-    public boolean isMetier() {
-        return getDomainUrl().toLowerCase().contains("metier");
+    public boolean isFloatingWindowAllowedInstitute() {
+        String domain = getDomainUrl().toLowerCase();
+        return domain.contains("brilliantpala") || 
+               domain.contains("metier") || 
+               domain.contains("uyirmeitnpsctamilacademy");
     }
 }
