@@ -111,8 +111,7 @@ public class TestActivity extends BaseToolBarActivity  {
     private ExamViewModel examViewModel;
     private boolean reflectionCompleted = false;
     private static final int REFLECTION_REQUEST_CODE = 1001;
-    private boolean isBrilliantPala;
-    private boolean isMetier;
+    private boolean isFloatingWindowAllowedInstitute;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
@@ -142,8 +141,8 @@ public class TestActivity extends BaseToolBarActivity  {
         UIUtils.setIndeterminateDrawable(this, findViewById(R.id.progress_bar), 4);
         apiClient = new TestpressExamApiClient(this);
         TestpressSession session = TestpressSdk.getTestpressSession(this);
-        isBrilliantPala = session != null && session.getInstituteSettings().isBrilliantPalaELearn();
-        isMetier = session != null && session.getInstituteSettings().isMetier();
+        InstituteSettings settings = session != null ? session.getInstituteSettings() : null;
+        isFloatingWindowAllowedInstitute = settings != null && settings.isFloatingWindowAllowedInstitute();
         final Intent intent = getIntent();
         Bundle data = intent.getExtras();
         assert data != null;
@@ -193,7 +192,7 @@ public class TestActivity extends BaseToolBarActivity  {
 
     @Override
     public boolean dispatchTouchEvent(MotionEvent ev) {
-        if (isKioskModeRequired() || (!isBrilliantPala && !isMetier)) {
+        if (isKioskModeRequired() || !isFloatingWindowAllowedInstitute) {
             if (isOverlayDetected(ev)) return true;
         }
         if (blockInputIfUnpinned(ev)) return true;
