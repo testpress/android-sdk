@@ -812,8 +812,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             return;
         }
 
-        if (videoAttemptId == -1 && videoWatchDataRepository != null) {
-            videoWatchDataRepository.save(content, getVideoAttemptParameters());
+        if (videoAttemptId == -1) {
+            if (videoWatchDataRepository != null) {
+                videoWatchDataRepository.save(content, getVideoAttemptParameters());
+            }
             return;
         }
 
