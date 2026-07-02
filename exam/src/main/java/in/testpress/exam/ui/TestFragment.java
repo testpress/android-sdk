@@ -1160,6 +1160,39 @@ public class TestFragment extends BaseFragment implements
         attemptViewModel.updateSection(sectionStartUrlFrag,Action.START_SECTION);
     }
 
+    private void pollCourseAttemptForGamification(final CourseAttempt initialAttempt, final int retryCount) {
+        if (getActivity() == null) {
+            return;
+        }
+        if (!"NA".equals(initialAttempt.getTrophies()) || retryCount >= 5) {
+            initialAttempt.saveInDB(getActivity(), courseContent);
+            hideProgressBar();
+            showReview(ReviewStatsActivity.createIntent(getActivity(), exam, initialAttempt));
+            return;
+        }
+
+        showProgress(R.string.testpress_calculating_results);
+
+        new Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (getActivity() == null) return;
+                apiClient.getCourseAttempt(initialAttempt.getAttemptUrl())
+                        .enqueue(new TestpressCallback<CourseAttempt>() {
+                            @Override
+                            public void onSuccess(CourseAttempt updatedAttempt) {
+                                pollCourseAttemptForGamification(updatedAttempt, retryCount + 1);
+                            }
+
+                            @Override
+                            public void onException(TestpressException exception) {
+                                pollCourseAttemptForGamification(initialAttempt, retryCount + 1);
+                            }
+                        });
+            }
+        }, 1500);
+    }
+
     private void observeEndContentAttemptResources(){
         attemptViewModel.getEndContentAttemptResource().observe(getViewLifecycleOwner(), new Observer<Resource<CourseAttempt>>() {
             @Override
@@ -1176,9 +1209,12 @@ public class TestFragment extends BaseFragment implements
                             returnToHistory();
                             return;
                         }
-                        courseAttempt.saveInDB(getActivity(), courseContent);
-                        showReview(ReviewStatsActivity.createIntent(getActivity(), exam,
-                                courseAttempt));
+                        if (TestpressSdk.getTestpressSession(getActivity()).getInstituteSettings().isCoursesGamificationEnabled()) {
+                            pollCourseAttemptForGamification(courseAttempt, 0);
+                        } else {
+                            courseAttempt.saveInDB(getActivity(), courseContent);
+                            showReview(ReviewStatsActivity.createIntent(getActivity(), exam, courseAttempt));
+                        }
                         break;
                     }
                     case LOADING:{
