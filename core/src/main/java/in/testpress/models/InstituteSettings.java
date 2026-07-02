@@ -511,7 +511,8 @@ public class InstituteSettings {
         String domain = domainUrl.toLowerCase();
         return domain.contains("brilliantpala") ||
                domain.contains("metier") ||
-               domain.contains("uyirmeitnpsctamilacademy");
+               domain.contains("uyirmeitnpsctamilacademy"); ||
+               domain.contains("teammatesacademy")
     }
 
     /** @deprecated Use {@link #isFloatingWindowAllowedInstitute()} instead */
