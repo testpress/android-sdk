@@ -57,8 +57,17 @@ open class ContentRepository(
     ): LiveData<Resource<DomainContent>> {
         return object : NetworkBoundResource<DomainContent, NetworkContent>() {
             override fun saveNetworkResponseToDB(item: NetworkContent) {
-                roomContentDao.insert(item.asDatabaseModel())
-                storeContentAndItsRelationsToDB(item)
+                val existingContent = getContentFromDB(contentId)
+                val mergedItem = if (item.hasArtifacts == null && existingContent?.hasArtifacts != null) {
+                    item.copy(
+                        hasArtifacts = existingContent.hasArtifacts,
+                        artifactsUrl = item.artifactsUrl ?: existingContent.artifactsUrl
+                    )
+                } else {
+                    item
+                }
+                roomContentDao.insert(mergedItem.asDatabaseModel())
+                storeContentAndItsRelationsToDB(mergedItem)
             }
 
             override fun shouldFetch(data: DomainContent?): Boolean {

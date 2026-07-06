@@ -76,6 +76,8 @@ data class DomainContent(
     val treePath: String? = null,
     val icon: String? = null,
     val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
+    val hasArtifacts: Boolean? = null,
+    val artifactsUrl: String? = null,
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -225,7 +227,9 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         aiNotesUrl = contentEntity.aiNotesUrl,
         learnlensAssetStatus = contentEntity.learnlensAssetStatus,
         enableTranscript = contentEntity.enableTranscript,
-        videoSubtitle = contentEntity.toDomainVideoSubtitle()
+        videoSubtitle = contentEntity.toDomainVideoSubtitle(),
+        hasArtifacts = contentEntity.hasArtifacts,
+        artifactsUrl = contentEntity.artifactsUrl
     )
 }
 
@@ -283,7 +287,9 @@ fun createDomainContent(content: Content): DomainContent {
         aiNotesUrl = content.aiNotesUrl,
         learnlensAssetStatus = content.learnlensAssetStatus,
         enableTranscript = content.enableTranscript,
-        videoSubtitle = content.toDomainVideoSubtitle()
+        videoSubtitle = content.toDomainVideoSubtitle(),
+        hasArtifacts = content.hasArtifacts,
+        artifactsUrl = content.artifactsUrl
     )
 }
 
