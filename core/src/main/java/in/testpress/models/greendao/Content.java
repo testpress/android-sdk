@@ -77,10 +77,6 @@ public class Content implements android.os.Parcelable {
     private String videoSubtitleUrl;
     private String videoSubtitleLanguage;
     private String videoSubtitleJobStatus;
-    @SerializedName("has_artifacts")
-    private Boolean hasArtifacts;
-    @SerializedName("artifacts_url")
-    private String artifactsUrl;
     private Long courseId;
     private Long chapterId;
     private Long videoConferenceId;
@@ -89,6 +85,10 @@ public class Content implements android.os.Parcelable {
     private Long videoId;
     private Long attachmentId;
     private Long examId;
+    @SerializedName("has_artifacts")
+    private Boolean hasArtifacts;
+    @SerializedName("artifacts_url")
+    private String artifactsUrl;
 
     /** Used to resolve relations */
     @Generated
@@ -158,7 +158,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Boolean enableTranscript, String videoSubtitleUrl, String videoSubtitleLanguage, String videoSubtitleJobStatus, Boolean hasArtifacts, String artifactsUrl, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Boolean enableTranscript, String videoSubtitleUrl, String videoSubtitleLanguage, String videoSubtitleJobStatus, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId, Boolean hasArtifacts, String artifactsUrl) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -199,8 +199,6 @@ public class Content implements android.os.Parcelable {
         this.videoSubtitleUrl = videoSubtitleUrl;
         this.videoSubtitleLanguage = videoSubtitleLanguage;
         this.videoSubtitleJobStatus = videoSubtitleJobStatus;
-        this.hasArtifacts = hasArtifacts;
-        this.artifactsUrl = artifactsUrl;
         this.courseId = courseId;
         this.chapterId = chapterId;
         this.videoConferenceId = videoConferenceId;
@@ -209,6 +207,8 @@ public class Content implements android.os.Parcelable {
         this.videoId = videoId;
         this.attachmentId = attachmentId;
         this.examId = examId;
+        this.hasArtifacts = hasArtifacts;
+        this.artifactsUrl = artifactsUrl;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -538,22 +538,6 @@ public class Content implements android.os.Parcelable {
         this.videoSubtitleJobStatus = videoSubtitleJobStatus;
     }
 
-    public Boolean getHasArtifacts() {
-        return hasArtifacts;
-    }
-
-    public void setHasArtifacts(Boolean hasArtifacts) {
-        this.hasArtifacts = hasArtifacts;
-    }
-
-    public String getArtifactsUrl() {
-        return artifactsUrl;
-    }
-
-    public void setArtifactsUrl(String artifactsUrl) {
-        this.artifactsUrl = artifactsUrl;
-    }
-
     public Long getCourseId() {
         return courseId;
     }
@@ -616,6 +600,22 @@ public class Content implements android.os.Parcelable {
 
     public void setExamId(Long examId) {
         this.examId = examId;
+    }
+
+    public Boolean getHasArtifacts() {
+        return hasArtifacts;
+    }
+
+    public void setHasArtifacts(Boolean hasArtifacts) {
+        this.hasArtifacts = hasArtifacts;
+    }
+
+    public String getArtifactsUrl() {
+        return artifactsUrl;
+    }
+
+    public void setArtifactsUrl(String artifactsUrl) {
+        this.artifactsUrl = artifactsUrl;
     }
 
     /** To-one relationship, resolved on first access. */

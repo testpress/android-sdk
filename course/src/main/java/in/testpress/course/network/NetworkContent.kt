@@ -180,8 +180,6 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.videoSubtitle?.url,
         this.videoSubtitle?.language,
         this.videoSubtitle?.jobStatus,
-        this.hasArtifacts,
-        this.artifactsUrl,
         this.courseId,
         this.chapterId,
         this.videoConferenceId,
@@ -189,7 +187,9 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.htmlId,
         this.videoId,
         this.attachmentId,
-        this.examId
+        this.examId,
+        this.hasArtifacts,
+        this.artifactsUrl
     )
 }
 
