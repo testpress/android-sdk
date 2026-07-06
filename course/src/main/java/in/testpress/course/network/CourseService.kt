@@ -144,6 +144,11 @@ interface CourseService {
         @Path(value = "content_id", encoded = true) contentId: Long,
         @Path(value = "id", encoded = true) highlightId: Long
     ): RetrofitCall<Void>
+
+    @GET("/api/v3/contents/{content_id}/artifacts/")
+    fun getArtifacts(
+        @Path(value = "content_id", encoded = true) contentId: Long
+    ): RetrofitCall<NetworkContentArtifactsResponse>
 }
 
 
@@ -267,5 +272,9 @@ class CourseNetwork(context: Context) : TestpressApiClient(context, TestpressSdk
 
     fun deleteHighlight(contentId: Long, highlightId: Long): RetrofitCall<Void> {
         return getCourseService().deleteHighlight(contentId, highlightId)
+    }
+
+    fun getArtifacts(contentId: Long): RetrofitCall<NetworkContentArtifactsResponse> {
+        return getCourseService().getArtifacts(contentId)
     }
 }

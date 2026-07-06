@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/artifact_item_root"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
+    android:gravity="center_vertical"
+    android:minHeight="56dp"
+    android:orientation="horizontal"
+    android:paddingHorizontal="16dp"
+    android:paddingVertical="12dp">
+
+    <!-- File description/document icon on the left -->
+    <ImageView
+        android:layout_width="24dp"
+        android:layout_height="24dp"
+        android:importantForAccessibility="no"
+        android:src="@drawable/ic_file_text"
+        app:tint="@color/testpress_text_gray" />
+
+    <!-- Artifact name in the center -->
+    <TextView
+        android:id="@+id/tv_artifact_name"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="12dp"
+        android:layout_weight="1"
+        android:fontFamily="sans-serif-medium"
+        android:textColor="#333333"
+        android:textSize="16sp"
+        tools:text="Study Material - Chapter 1.pdf" />
+
+    <!-- Action icon (Download or Lock) on the right -->
+    <FrameLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <ImageView
+            android:id="@+id/iv_artifact_download"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/testpress_download"
+            android:src="@drawable/ic_download_outline"
+            android:visibility="gone"
+            app:tint="@color/testpress_black" />
+
+        <ImageView
+            android:id="@+id/iv_artifact_locked"
+            android:layout_width="24dp"
+            android:layout_height="24dp"
+            android:contentDescription="@string/testpress_locked"
+            android:src="@drawable/ic_lock"
+            android:visibility="gone"
+            app:tint="@color/testpress_text_gray_light" />
+    </FrameLayout>
+
+</LinearLayout>
