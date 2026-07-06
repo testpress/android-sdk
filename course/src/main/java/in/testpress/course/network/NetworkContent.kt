@@ -70,7 +70,11 @@ data class NetworkContent(
     @SerializedName("enable_transcript")
     val enableTranscript: Boolean? = null,
     @SerializedName("video_subtitle")
-    val videoSubtitle: NetworkVideoSubtitle? = null
+    val videoSubtitle: NetworkVideoSubtitle? = null,
+    @SerializedName("has_artifacts")
+    val hasArtifacts: Boolean? = null,
+    @SerializedName("artifacts_url")
+    val artifactsUrl: String? = null
 )
 
 data class NetworkVideoSubtitle(
@@ -116,7 +120,9 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         enableTranscript = this.enableTranscript,
         videoSubtitleUrl = this.videoSubtitle?.url,
         videoSubtitleLanguage = this.videoSubtitle?.language,
-        videoSubtitleJobStatus = this.videoSubtitle?.jobStatus
+        videoSubtitleJobStatus = this.videoSubtitle?.jobStatus,
+        hasArtifacts = this.hasArtifacts,
+        artifactsUrl = this.artifactsUrl
     )
     contentEntity.title = this.title
     contentEntity.order = this.order
@@ -181,7 +187,9 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.htmlId,
         this.videoId,
         this.attachmentId,
-        this.examId
+        this.examId,
+        this.hasArtifacts,
+        this.artifactsUrl
     )
 }
 

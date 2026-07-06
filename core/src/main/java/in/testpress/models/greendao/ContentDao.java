@@ -75,6 +75,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property VideoId = new Property(45, Long.class, "videoId", false, "VIDEO_ID");
         public final static Property AttachmentId = new Property(46, Long.class, "attachmentId", false, "ATTACHMENT_ID");
         public final static Property ExamId = new Property(47, Long.class, "examId", false, "EXAM_ID");
+        public final static Property HasArtifacts = new Property(48, Boolean.class, "hasArtifacts", false, "HAS_ARTIFACTS");
+        public final static Property ArtifactsUrl = new Property(49, String.class, "artifactsUrl", false, "ARTIFACTS_URL");
     }
 
     private DaoSession daoSession;
@@ -142,7 +144,9 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"HTML_ID\" INTEGER," + // 44: htmlId
                 "\"VIDEO_ID\" INTEGER," + // 45: videoId
                 "\"ATTACHMENT_ID\" INTEGER," + // 46: attachmentId
-                "\"EXAM_ID\" INTEGER);"); // 47: examId
+                "\"EXAM_ID\" INTEGER," + // 47: examId
+                "\"HAS_ARTIFACTS\" INTEGER," + // 48: hasArtifacts
+                "\"ARTIFACTS_URL\" TEXT);"); // 49: artifactsUrl
     }
 
     /** Drops the underlying database table. */
@@ -386,6 +390,16 @@ public class ContentDao extends AbstractDao<Content, Long> {
         if (examId != null) {
             stmt.bindLong(48, examId);
         }
+ 
+        Boolean hasArtifacts = entity.getHasArtifacts();
+        if (hasArtifacts != null) {
+            stmt.bindLong(49, hasArtifacts ? 1L: 0L);
+        }
+ 
+        String artifactsUrl = entity.getArtifactsUrl();
+        if (artifactsUrl != null) {
+            stmt.bindString(50, artifactsUrl);
+        }
     }
 
     @Override
@@ -623,6 +637,16 @@ public class ContentDao extends AbstractDao<Content, Long> {
         if (examId != null) {
             stmt.bindLong(48, examId);
         }
+ 
+        Boolean hasArtifacts = entity.getHasArtifacts();
+        if (hasArtifacts != null) {
+            stmt.bindLong(49, hasArtifacts ? 1L: 0L);
+        }
+ 
+        String artifactsUrl = entity.getArtifactsUrl();
+        if (artifactsUrl != null) {
+            stmt.bindString(50, artifactsUrl);
+        }
     }
 
     @Override
@@ -686,7 +710,9 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 44) ? null : cursor.getLong(offset + 44), // htmlId
             cursor.isNull(offset + 45) ? null : cursor.getLong(offset + 45), // videoId
             cursor.isNull(offset + 46) ? null : cursor.getLong(offset + 46), // attachmentId
-            cursor.isNull(offset + 47) ? null : cursor.getLong(offset + 47) // examId
+            cursor.isNull(offset + 47) ? null : cursor.getLong(offset + 47), // examId
+            cursor.isNull(offset + 48) ? null : cursor.getShort(offset + 48) != 0, // hasArtifacts
+            cursor.isNull(offset + 49) ? null : cursor.getString(offset + 49) // artifactsUrl
         );
         return entity;
     }
@@ -741,6 +767,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setVideoId(cursor.isNull(offset + 45) ? null : cursor.getLong(offset + 45));
         entity.setAttachmentId(cursor.isNull(offset + 46) ? null : cursor.getLong(offset + 46));
         entity.setExamId(cursor.isNull(offset + 47) ? null : cursor.getLong(offset + 47));
+        entity.setHasArtifacts(cursor.isNull(offset + 48) ? null : cursor.getShort(offset + 48) != 0);
+        entity.setArtifactsUrl(cursor.isNull(offset + 49) ? null : cursor.getString(offset + 49));
      }
     
     @Override
