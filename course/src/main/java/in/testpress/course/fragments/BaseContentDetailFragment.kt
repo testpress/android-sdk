@@ -30,7 +30,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import `in`.testpress.course.ui.ContentActivity.*
 import android.view.Menu
 import android.view.MenuInflater
-import android.util.Log
+
 
 abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, ContentActivity.OnBackPressedListener,
     EmptyViewListener {
@@ -51,7 +51,6 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     open lateinit var viewModel: ContentViewModel
     private var hideBottomNavigation: Boolean = false
     private var forceReloadContent: Boolean = false
-    private var optionsMenu: Menu? = null
 
     override val bookmarkId: Long?
         get() = if (!::content.isInitialized) null else content.bookmarkId
@@ -101,13 +100,11 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
-        optionsMenu = menu
         inflater.inflate(R.menu.content_artifacts_menu, menu)
     }
 
     override fun onPrepareOptionsMenu(menu: Menu) {
         super.onPrepareOptionsMenu(menu)
-        optionsMenu = menu
         val hasArtifacts = isContentInitialized() && content.hasArtifacts == true
         menu.findItem(R.id.view_resources)?.isVisible = hasArtifacts
     }

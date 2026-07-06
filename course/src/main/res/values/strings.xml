@@ -139,6 +139,7 @@
     <string name="testpress_no_resources_available">No resources available for this content.</string>
     <string name="testpress_failed_to_load_resources">Failed to load resources. Please try again.</string>
     <string name="testpress_download">Download</string>
+    <string name="testpress_download_started">%1$s started</string>
     <string name="testpress_locked">Locked — complete exam to access</string>
     <string name="testpress_retry">Retry</string>
     <string name="testpress_resource_locked_message">Complete the exam first to access this resource.</string>

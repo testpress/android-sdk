@@ -65,7 +65,7 @@ class ContentArtifactsBottomSheet : BottomSheetDialogFragment() {
         viewModel = ViewModelProvider(this, object : ViewModelProvider.Factory {
             @Suppress("UNCHECKED_CAST")
             override fun <T : ViewModel> create(modelClass: Class<T>): T {
-                return ContentArtifactsViewModel(ContentArtifactsRepository(requireContext())) as T
+                return ContentArtifactsViewModel(ContentArtifactsRepository(requireContext().applicationContext)) as T
             }
         })[ContentArtifactsViewModel::class.java]
     }
@@ -124,7 +124,7 @@ class ContentArtifactsBottomSheet : BottomSheetDialogFragment() {
     }
 
     private fun onArtifactClicked(artifact: DomainContentArtifact) {
-        if (artifact.isAccessible && artifact.url != null) {
+        if (artifact.isAccessible) {
             downloadArtifact(artifact)
         } else {
             Toast.makeText(
@@ -139,7 +139,12 @@ class ContentArtifactsBottomSheet : BottomSheetDialogFragment() {
         val url = artifact.url ?: return
         try {
             val uri = Uri.parse(url)
-            val fileName = "${artifact.name}.${uri.lastPathSegment?.substringAfterLast('.') ?: "file"}"
+            val extension = uri.lastPathSegment?.substringAfterLast('.') ?: "file"
+            val fileName = if (artifact.name.endsWith(".$extension", ignoreCase = true)) {
+                artifact.name
+            } else {
+                "${artifact.name}.$extension"
+            }
             val request = DownloadManager.Request(uri).apply {
                 setTitle(artifact.name)
                 setDescription(getString(R.string.testpress_download))
@@ -152,14 +157,20 @@ class ContentArtifactsBottomSheet : BottomSheetDialogFragment() {
             downloadManager.enqueue(request)
             Toast.makeText(
                 requireContext(),
-                getString(R.string.testpress_download) + " started",
+                getString(R.string.testpress_download_started, getString(R.string.testpress_download)),
                 Toast.LENGTH_SHORT
             ).show()
         } catch (e: Exception) {
             // Fallback: open in browser
-            val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
-            if (intent.resolveActivity(requireContext().packageManager) != null) {
+            try {
+                val intent = Intent(Intent.ACTION_VIEW, Uri.parse(url))
                 startActivity(intent)
+            } catch (anfe: android.content.ActivityNotFoundException) {
+                Toast.makeText(
+                    requireContext(),
+                    "No app found to open this link",
+                    Toast.LENGTH_SHORT
+                ).show()
             }
         }
     }

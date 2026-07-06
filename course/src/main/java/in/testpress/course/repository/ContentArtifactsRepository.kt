@@ -6,6 +6,7 @@ import `in`.testpress.course.domain.DomainContentArtifact
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.course.network.NetworkContentArtifact
 import `in`.testpress.network.Resource
+import `in`.testpress.course.network.asDomainModels
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
@@ -22,7 +23,7 @@ class ContentArtifactsRepository(private val context: Context) {
         courseNetwork.getArtifacts(contentId).enqueue(
             object : TestpressCallback<`in`.testpress.course.network.NetworkContentArtifactsResponse>() {
                 override fun onSuccess(response: `in`.testpress.course.network.NetworkContentArtifactsResponse) {
-                    val artifacts = response.results.map { it.toDomain() }
+                    val artifacts = response.results.asDomainModels()
                     result.postValue(Resource.success(artifacts))
                 }
 
@@ -34,11 +35,4 @@ class ContentArtifactsRepository(private val context: Context) {
 
         return result
     }
-
-    private fun NetworkContentArtifact.toDomain() = DomainContentArtifact(
-        id = id,
-        name = name,
-        url = url,
-        accessibleWithoutAttempt = accessibleWithoutAttempt
-    )
 }

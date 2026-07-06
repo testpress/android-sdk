@@ -36,12 +36,12 @@ class ContentArtifactsAdapter(
             if (artifact.isAccessible) {
                 binding.ivArtifactDownload.isVisible = true
                 binding.ivArtifactLocked.isVisible = false
-                binding.artifactItemRoot.isEnabled = true
+                binding.artifactItemRoot.alpha = 1.0f
                 binding.artifactItemRoot.setOnClickListener { onArtifactClick(artifact) }
             } else {
                 binding.ivArtifactDownload.isVisible = false
                 binding.ivArtifactLocked.isVisible = true
-                binding.artifactItemRoot.isEnabled = false
+                binding.artifactItemRoot.alpha = 0.5f
                 binding.artifactItemRoot.setOnClickListener {
                     onArtifactClick(artifact) // still notify so Fragment can show a toast
                 }
