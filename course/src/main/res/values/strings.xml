@@ -133,4 +133,14 @@
     <string name="question_button_check">Check</string>
     <string name="question_button_continue">Continue</string>
     <string name="question_correct_answer">Correct answer is: %1$s</string>
+
+    <string name="testpress_view_resources">Resources</string>
+    <string name="testpress_resources">Resources</string>
+    <string name="testpress_no_resources_available">No resources available for this content.</string>
+    <string name="testpress_failed_to_load_resources">Failed to load resources. Please try again.</string>
+    <string name="testpress_download">Download</string>
+    <string name="testpress_locked">Locked — complete exam to access</string>
+    <string name="testpress_retry">Retry</string>
+    <string name="testpress_resource_locked_message">Complete the exam first to access this resource.</string>
+    <string name="testpress_resources_subheading">Download files and study material for this content</string>
 </resources>

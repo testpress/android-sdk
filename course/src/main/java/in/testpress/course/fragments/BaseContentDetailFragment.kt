@@ -28,6 +28,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import `in`.testpress.course.ui.ContentActivity.*
+import android.view.Menu
+import android.view.MenuInflater
+import android.util.Log
 
 abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, ContentActivity.OnBackPressedListener,
     EmptyViewListener {
@@ -48,6 +51,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     open lateinit var viewModel: ContentViewModel
     private var hideBottomNavigation: Boolean = false
     private var forceReloadContent: Boolean = false
+    private var optionsMenu: Menu? = null
 
     override val bookmarkId: Long?
         get() = if (!::content.isInitialized) null else content.bookmarkId
@@ -80,6 +84,10 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        if (item.itemId == R.id.view_resources) {
+            openResourcesBottomSheet()
+            return true
+        }
         val intent = Intent()
         intent.putExtra(TestpressSdk.ACTION_PRESSED_HOME, true)
 
@@ -91,6 +99,25 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
         return false
     }
 
+    override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
+        super.onCreateOptionsMenu(menu, inflater)
+        optionsMenu = menu
+        inflater.inflate(R.menu.content_artifacts_menu, menu)
+    }
+
+    override fun onPrepareOptionsMenu(menu: Menu) {
+        super.onPrepareOptionsMenu(menu)
+        optionsMenu = menu
+        val hasArtifacts = isContentInitialized() && content.hasArtifacts == true
+        menu.findItem(R.id.view_resources)?.isVisible = hasArtifacts
+    }
+
+    private fun openResourcesBottomSheet() {
+        if (!isContentInitialized()) return
+        val bottomSheet = ContentArtifactsBottomSheet.newInstance(contentId)
+        bottomSheet.show(childFragmentManager, ContentArtifactsBottomSheet.TAG)
+    }
+
 
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     fun loadContentAndInitializeBoomarkFragment() {
@@ -99,6 +126,7 @@ abstract class BaseContentDetailFragment : Fragment(), BookmarkListener, Content
                 Status.SUCCESS -> {
                     content = resource.data!!
                     display()
+                    activity?.invalidateOptionsMenu()
 
                     if (isBookmarkEnabled && !::bookmarkFragment.isInitialized) {
                         initializeBookmarkFragment()
