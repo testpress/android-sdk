@@ -8,6 +8,7 @@ import android.util.Log
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import io.sentry.Breadcrumb
 import io.sentry.Sentry
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -38,8 +39,27 @@ class OfflineAttachmentBroadcastReceiver : BroadcastReceiver() {
         val repository = OfflineAttachmentsRepository(dao)
         val downloadManager = context.getSystemService(DownloadManager::class.java) ?: return
 
-        val attachment = repository.getByDownloadId(downloadId) ?: return
+        val attachment = repository.getByDownloadId(downloadId)
+        if (attachment == null) {
+            // Race condition: broadcast fired before DB insert completed
+            Sentry.captureMessage(
+                "BroadcastReceiver: No DB record for downloadId=$downloadId. " +
+                "Race condition — broadcast fired before DB insert completed."
+            )
+            return
+        }
         val downloadInfo = queryDownloadInfo(downloadManager, downloadId)
+
+        Sentry.addBreadcrumb(Breadcrumb().apply {
+            category = "download"
+            message = "Broadcast received"
+            data["downloadId"] = downloadId
+            data["attachmentId"] = attachment.id
+            data["status"] = if (downloadInfo.status == DownloadManager.STATUS_SUCCESSFUL) "SUCCESSFUL" else "FAILED"
+            if (downloadInfo.status == DownloadManager.STATUS_FAILED) {
+                data["failureReason"] = downloadInfo.reason.toString()
+            }
+        })
 
         when (downloadInfo.status) {
             DownloadManager.STATUS_SUCCESSFUL -> {
@@ -54,6 +74,10 @@ class OfflineAttachmentBroadcastReceiver : BroadcastReceiver() {
             }
 
             DownloadManager.STATUS_FAILED -> {
+                Sentry.captureMessage(
+                    "BroadcastReceiver: Download FAILED for attachmentId=${attachment.id}, " +
+                    "downloadId=$downloadId, reason=${downloadInfo.reason}"
+                )
                 repository.update(
                     attachment.copy(
                         path = "",
@@ -73,10 +97,12 @@ class OfflineAttachmentBroadcastReceiver : BroadcastReceiver() {
         var path: String? = null
         var contentUri: String? = null
         var status = -1
+        var reason = 0
 
         cursor?.use {
             if (it.moveToFirst()) {
                 status = it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_STATUS))
+                reason = it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
                 if (status == DownloadManager.STATUS_SUCCESSFUL) {
                     path = it.getString(it.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI))
                     contentUri =
@@ -88,12 +114,13 @@ class OfflineAttachmentBroadcastReceiver : BroadcastReceiver() {
                 }
             }
         }
-        return DownloadInfo(path, contentUri, status)
+        return DownloadInfo(path, contentUri, status, reason)
     }
 
     private data class DownloadInfo(
         val path: String?,
         val contentUri: String?,
-        val status: Int
+        val status: Int,
+        val reason: Int = 0
     )
 }
