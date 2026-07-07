@@ -55,4 +55,5 @@
     <color name="ai_fab_background">#089669</color>
     <color name="gray_text">#555555</color>
     <color name="divider_color">#DDDDDD</color>
+    <color name="testpress_video_watermark_color">#99FF2727</color>
 </resources>

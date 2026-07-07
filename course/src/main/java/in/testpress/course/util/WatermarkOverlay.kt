@@ -40,6 +40,16 @@ class WatermarkOverlay @JvmOverloads constructor(
         invalidate()
     }
 
+    fun setTextColor(color: Int) {
+        textPaint.color = color
+        invalidate()
+    }
+
+    fun setTextSize(size: Float) {
+        textPaint.textSize = size
+        invalidate()
+    }
+
     fun setDynamicWatermark() {
         isDynamic = true
         doOnLayout {
