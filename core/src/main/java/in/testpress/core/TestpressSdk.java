@@ -339,6 +339,7 @@ public final class TestpressSdk {
                 options -> {
                     options.setDsn(androidSentryDns);
                     options.setEnableAutoSessionTracking(true);
+                    options.setDebug(in.testpress.BuildConfig.DEBUG);
                 });
     }
 }

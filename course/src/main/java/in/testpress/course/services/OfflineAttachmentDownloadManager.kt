@@ -21,21 +21,45 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
     private val activeJobs = mutableMapOf<Long, Job>()
 
     fun enqueueDownload(context: Context, domainAttachmentContent: DomainAttachmentContent) {
+        // Log immediately to Sentry to verify connection and track user intent
+        Sentry.captureMessage("Download initiated for attachmentId=${domainAttachmentContent.id} (${domainAttachmentContent.title})")
+
         val downloadManager = context.getSystemService(DownloadManager::class.java)
         if (downloadManager == null) {
             Toast.makeText(context, "DownloadManager not available", Toast.LENGTH_SHORT).show()
+            Sentry.captureMessage("DownloadManager system service is null for attachmentId=${domainAttachmentContent.id}")
             return
         }
 
         if (domainAttachmentContent.attachmentUrl == null) {
             Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
+            Sentry.captureMessage("Attachment URL is null for attachmentId=${domainAttachmentContent.id}")
             return
         }
         val fileName =
             "${domainAttachmentContent.title}${getFileExtensionFromUrl(domainAttachmentContent.attachmentUrl)}".sanitizeFileName()
-        val request = getDownloadManagerRequest(domainAttachmentContent.attachmentUrl, fileName)
 
-        val downloadId = downloadManager.enqueue(request)
+        val downloadId = try {
+            val request = getDownloadManagerRequest(domainAttachmentContent.attachmentUrl, fileName)
+            downloadManager.enqueue(request)
+        } catch (e: IllegalArgumentException) {
+            Sentry.captureException(e) { scope ->
+                scope.setExtra("attachmentId", domainAttachmentContent.id.toString())
+                scope.setExtra("url", domainAttachmentContent.attachmentUrl ?: "")
+            }
+            Log.e("AttachDownload", "Invalid download request for attachmentId=${domainAttachmentContent.id}", e)
+            Toast.makeText(context, "Cannot download: invalid file URL", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+            category = "download"
+            message = "Download enqueued"
+            data["attachmentId"] = domainAttachmentContent.id
+            data["downloadId"] = downloadId
+            data["fileName"] = fileName
+            data["url"] = domainAttachmentContent.attachmentUrl
+        })
 
         val offlineAttachment = OfflineAttachment(
             id = domainAttachmentContent.id,
@@ -92,17 +116,33 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
                                 it.getLong(it.getColumnIndexOrThrow(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR))
                             val localUri =
                                 it.getString(it.getColumnIndexOrThrow(DownloadManager.COLUMN_LOCAL_URI))
+                            val reason =
+                                it.getInt(it.getColumnIndexOrThrow(DownloadManager.COLUMN_REASON))
 
                             val progress = calculateProgress(downloadedSize, totalSize)
 
-                            handleStatusChange(downloadId, status, localUri, lastStatus)
+                            handleStatusChange(downloadId, status, localUri, reason, lastStatus)
                                 .also { lastStatus = status }
 
                             handleProgressChange(downloadId, progress, lastProgress)
                                 .also { lastProgress = progress }
 
                             isDownloadFinished(status)
-                        } else true
+                        } else {
+                            // DM entry gone — attachment is permanently stuck as QUEUED/DOWNLOADING
+                            Sentry.captureMessage(
+                                "DownloadManager entry disappeared for downloadId=$downloadId. " +
+                                "DB record will be stuck. Last known status=${dmStatusName(lastStatus)}"
+                            )
+                            Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                                category = "download"
+                                message = "DM entry disappeared — marking FAILED in DB"
+                                data["downloadId"] = downloadId
+                                data["lastStatus"] = dmStatusName(lastStatus)
+                            })
+                            repository.updateStatusWithDownloadId(downloadId, OfflineAttachmentDownloadStatus.FAILED)
+                            true
+                        }
                     } ?: true
                 } catch (e: SecurityException) {
                     Sentry.captureException(e)
@@ -143,9 +183,21 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
         downloadId: Long,
         currentStatus: Int,
         localUri: String?,
+        reason: Int,
         lastStatus: Int?
     ) {
         if (currentStatus != lastStatus) {
+            Sentry.addBreadcrumb(io.sentry.Breadcrumb().apply {
+                category = "download"
+                message = "Status changed: ${dmStatusName(lastStatus)} → ${dmStatusName(currentStatus)}"
+                data["downloadId"] = downloadId
+                data["fromStatus"] = dmStatusName(lastStatus)
+                data["toStatus"] = dmStatusName(currentStatus)
+                if (currentStatus == DownloadManager.STATUS_FAILED) {
+                    data["failureReason"] = dmErrorName(reason)
+                }
+            })
+
             when (currentStatus) {
                 DownloadManager.STATUS_PENDING -> {
                     repository.updateStatusWithDownloadId(downloadId, OfflineAttachmentDownloadStatus.QUEUED)
@@ -157,6 +209,13 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
                     }
                     repository.updateStatusWithDownloadId(downloadId, OfflineAttachmentDownloadStatus.DOWNLOADING)
                 }
+
+                DownloadManager.STATUS_FAILED -> {
+                    Sentry.captureMessage(
+                        "Download FAILED for downloadId=$downloadId. " +
+                        "Reason: ${dmErrorName(reason)} (code=$reason)"
+                    )
+                }
             }
         }
     }
@@ -165,6 +224,40 @@ class OfflineAttachmentDownloadManager private constructor(private val repositor
         if (currentProgress != lastProgress) {
             repository.updateProgressWithDownloadId(downloadId, currentProgress)
         }
+    }
+
+    /**
+     * Maps DownloadManager status integers to human-readable names for Sentry.
+     */
+    private fun dmStatusName(status: Int?): String = when (status) {
+        DownloadManager.STATUS_PENDING   -> "PENDING"
+        DownloadManager.STATUS_RUNNING   -> "RUNNING"
+        DownloadManager.STATUS_PAUSED    -> "PAUSED"
+        DownloadManager.STATUS_SUCCESSFUL -> "SUCCESSFUL"
+        DownloadManager.STATUS_FAILED    -> "FAILED"
+        null                             -> "UNKNOWN(null)"
+        else                             -> "UNKNOWN($status)"
+    }
+
+    /**
+     * Maps DownloadManager COLUMN_REASON codes to human-readable names for Sentry.
+     * See https://developer.android.com/reference/android/app/DownloadManager for all codes.
+     */
+    private fun dmErrorName(reason: Int): String = when (reason) {
+        DownloadManager.ERROR_UNKNOWN                     -> "ERROR_UNKNOWN"
+        DownloadManager.ERROR_FILE_ERROR                  -> "ERROR_FILE_ERROR"
+        DownloadManager.ERROR_UNHANDLED_HTTP_CODE         -> "ERROR_UNHANDLED_HTTP_CODE"
+        DownloadManager.ERROR_HTTP_DATA_ERROR             -> "ERROR_HTTP_DATA_ERROR"
+        DownloadManager.ERROR_TOO_MANY_REDIRECTS          -> "ERROR_TOO_MANY_REDIRECTS"
+        DownloadManager.ERROR_INSUFFICIENT_SPACE          -> "ERROR_INSUFFICIENT_SPACE"
+        DownloadManager.ERROR_DEVICE_NOT_FOUND            -> "ERROR_DEVICE_NOT_FOUND"
+        DownloadManager.ERROR_CANNOT_RESUME               -> "ERROR_CANNOT_RESUME"
+        DownloadManager.ERROR_FILE_ALREADY_EXISTS         -> "ERROR_FILE_ALREADY_EXISTS"
+        DownloadManager.PAUSED_WAITING_TO_RETRY           -> "PAUSED_WAITING_TO_RETRY"
+        DownloadManager.PAUSED_WAITING_FOR_NETWORK        -> "PAUSED_WAITING_FOR_NETWORK"
+        DownloadManager.PAUSED_QUEUED_FOR_WIFI            -> "PAUSED_QUEUED_FOR_WIFI"
+        DownloadManager.PAUSED_UNKNOWN                    -> "PAUSED_UNKNOWN"
+        else -> "HTTP_$reason"  // HTTP error codes like 403, 404, 500 come through here
     }
 
     fun cancelDownload(context: Context, offlineAttachment: OfflineAttachment) {
