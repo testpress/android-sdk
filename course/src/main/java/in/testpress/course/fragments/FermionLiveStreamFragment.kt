@@ -11,12 +11,14 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import `in`.testpress.course.R
+import `in`.testpress.util.webview.BaseWebChromeClient
 
 class FermionLiveStreamFragment : Fragment() {
 
     private var initialLoadComplete = false
     private var streamUrl: String? = null
     private var webView: WebView? = null
+    private var chromeClient: BaseWebChromeClient? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -38,9 +40,10 @@ class FermionLiveStreamFragment : Fragment() {
 
     private fun setupWebView() {
         val container = requireView() as ViewGroup
+        chromeClient = buildChromeClient()
         webView = WebView(requireContext()).apply {
             configureSettings()
-            webChromeClient = buildChromeClient()
+            webChromeClient = chromeClient
             webViewClient = buildWebViewClient()
             streamUrl?.let { loadUrl(it) }
         }
@@ -56,8 +59,9 @@ class FermionLiveStreamFragment : Fragment() {
         settings.mediaPlaybackRequiresUserGesture = false
     }
 
-    private fun buildChromeClient() = object : WebChromeClient() {
-        override fun onPermissionRequest(request: PermissionRequest) {
+    private fun buildChromeClient() = object : BaseWebChromeClient(this) {
+        override fun onPermissionRequest(request: PermissionRequest?) {
+            if (request == null) return
             val expectedHost = streamUrl?.let { android.net.Uri.parse(it).host }
             val requestHost = request.origin.host
 
@@ -112,6 +116,8 @@ class FermionLiveStreamFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        chromeClient?.cleanup()
+        chromeClient = null
         webView?.destroy()
         webView = null
     }
