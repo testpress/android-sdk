@@ -18,6 +18,7 @@ class FermionLiveStreamFragment : Fragment() {
     private var initialLoadComplete = false
     private var streamUrl: String? = null
     private var webView: WebView? = null
+    private var chromeClient: BaseWebChromeClient? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -39,9 +40,10 @@ class FermionLiveStreamFragment : Fragment() {
 
     private fun setupWebView() {
         val container = requireView() as ViewGroup
+        chromeClient = buildChromeClient()
         webView = WebView(requireContext()).apply {
             configureSettings()
-            webChromeClient = buildChromeClient()
+            webChromeClient = chromeClient
             webViewClient = buildWebViewClient()
             streamUrl?.let { loadUrl(it) }
         }
@@ -114,6 +116,8 @@ class FermionLiveStreamFragment : Fragment() {
 
     override fun onDestroyView() {
         super.onDestroyView()
+        chromeClient?.cleanup()
+        chromeClient = null
         webView?.destroy()
         webView = null
     }

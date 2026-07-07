@@ -75,7 +75,7 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
             "Not Started" -> displayNotStartedNotice()
             "Completed" -> {
                 if (isFermionProvider() && liveStream.showRecordedVideo == true) {
-                    showFermionRecording()
+                    showFermionPlayer(showChat = false)
                 } else {
                     displayEndedNotice()
                 }
@@ -160,18 +160,13 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
         }
     }
 
-    private fun showFermionPlayer() {
+    private fun showFermionPlayer(showChat: Boolean = true) {
         setupFermionPlayer()
-        setupChatWebView()
-        viewModel.createContentAttempt(contentId)
-        swipeRefresh.isEnabled = false
-        hideBottomNavigationBar()
-    }
-
-    private fun showFermionRecording() {
-        setupFermionPlayer()
-        view?.findViewById<View>(R.id.chat_view_fragment)?.visibility = View.GONE
-        
+        if (showChat) {
+            setupChatWebView()
+        } else {
+            view?.findViewById<View>(R.id.chat_view_fragment)?.visibility = View.GONE
+        }
         viewModel.createContentAttempt(contentId)
         swipeRefresh.isEnabled = false
         hideBottomNavigationBar()
