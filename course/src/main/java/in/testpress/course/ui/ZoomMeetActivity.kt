@@ -7,9 +7,9 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressUserDetails
 import `in`.testpress.course.util.WatermarkOverlay
 import `in`.testpress.models.ProfileDetails
-import android.graphics.Color
 import android.view.View
 import android.view.ViewGroup
+import android.view.ViewTreeObserver
 import android.view.WindowManager
 import androidx.core.content.ContextCompat
 import us.zoom.sdk.NewMeetingActivity
@@ -17,6 +17,7 @@ import us.zoom.sdk.NewMeetingActivity
 class ZoomMeetActivity: NewMeetingActivity() {
     val session = TestpressSdk.getTestpressSession(this)
     private var watermarkOverlay: WatermarkOverlay? = null
+    private var globalLayoutListener: ViewTreeObserver.OnGlobalLayoutListener? = null
 
     override fun setContentView(layoutResID: Int) {
         disableScreenRecording()
@@ -33,6 +34,16 @@ class ZoomMeetActivity: NewMeetingActivity() {
         addWatermarkOverlay()
     }
 
+    override fun onDestroy() {
+        super.onDestroy()
+        TestpressUserDetails.getInstance().cancel()
+        watermarkOverlay?.let { overlay ->
+            globalLayoutListener?.let { listener ->
+                overlay.viewTreeObserver.removeOnGlobalLayoutListener(listener)
+            }
+        }
+    }
+
     private fun disableScreenRecording() {
         if (session != null && session.instituteSettings.isScreenshotDisabled) {
             window.setFlags(
@@ -46,7 +57,7 @@ class ZoomMeetActivity: NewMeetingActivity() {
         val settings = session?.instituteSettings ?: return
         val watermarkType = settings.videoWatermarkType
 
-        if (watermarkType == null || watermarkType == "Hidden") {
+        if (watermarkType == null || watermarkType == WatermarkOverlay.TYPE_HIDDEN) {
             return
         }
 
@@ -86,10 +97,10 @@ class ZoomMeetActivity: NewMeetingActivity() {
             val watermarkColor = ContextCompat.getColor(this@ZoomMeetActivity, R.color.testpress_video_watermark_color)
             setTextColor(watermarkColor)
             setTextSize(40f)
-            if (type == "Dynamic") {
+            if (type == WatermarkOverlay.TYPE_DYNAMIC) {
                 setDynamicWatermark()
             } else {
-                setStaticWatermark(position ?: "top-right")
+                setStaticWatermark(position ?: WatermarkOverlay.POSITION_TOP_RIGHT)
             }
         }
         watermarkOverlay = newWatermarkOverlay
@@ -104,14 +115,12 @@ class ZoomMeetActivity: NewMeetingActivity() {
 
         newWatermarkOverlay.bringToFront()
 
-        decorView.setOnHierarchyChangeListener(object : ViewGroup.OnHierarchyChangeListener {
-            override fun onChildViewAdded(parent: View?, child: View?) {
-                if (child != newWatermarkOverlay) {
-                    newWatermarkOverlay.bringToFront()
-                }
+        globalLayoutListener = ViewTreeObserver.OnGlobalLayoutListener {
+            val parent = newWatermarkOverlay.parent as? ViewGroup
+            if (parent != null && parent.indexOfChild(newWatermarkOverlay) < parent.childCount - 1) {
+                newWatermarkOverlay.bringToFront()
             }
-
-            override fun onChildViewRemoved(parent: View?, child: View?) {}
-        })
+        }
+        newWatermarkOverlay.viewTreeObserver.addOnGlobalLayoutListener(globalLayoutListener)
     }
 }

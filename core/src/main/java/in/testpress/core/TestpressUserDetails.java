@@ -63,4 +63,11 @@ public class TestpressUserDetails {
         return retrofitCall;
     }
 
+    public void cancel() {
+        if (retrofitCall != null) {
+            retrofitCall.cancel();
+        }
+        callBack = null;
+    }
+
 }
