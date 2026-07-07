@@ -67,12 +67,19 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
 
     override fun display() {
         view?.findViewById<View>(R.id.loading_screen)?.visibility = View.GONE
-        when (content.liveStream?.status) {
+        val liveStream = content.liveStream
+        when (liveStream?.status) {
             "Running" -> {
                 displayPlayerViewWithChat()
             }
             "Not Started" -> displayNotStartedNotice()
-            "Completed" -> displayEndedNotice()
+            "Completed" -> {
+                if (isFermionProvider() && liveStream.showRecordedVideo == true) {
+                    showFermionRecording()
+                } else {
+                    displayEndedNotice()
+                }
+            }
         }
     }
 
@@ -156,6 +163,15 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     private fun showFermionPlayer() {
         setupFermionPlayer()
         setupChatWebView()
+        viewModel.createContentAttempt(contentId)
+        swipeRefresh.isEnabled = false
+        hideBottomNavigationBar()
+    }
+
+    private fun showFermionRecording() {
+        setupFermionPlayer()
+        view?.findViewById<View>(R.id.chat_view_fragment)?.visibility = View.GONE
+        
         viewModel.createContentAttempt(contentId)
         swipeRefresh.isEnabled = false
         hideBottomNavigationBar()

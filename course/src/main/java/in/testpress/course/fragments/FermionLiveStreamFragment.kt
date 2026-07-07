@@ -11,6 +11,7 @@ import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
 import `in`.testpress.course.R
+import `in`.testpress.util.webview.BaseWebChromeClient
 
 class FermionLiveStreamFragment : Fragment() {
 
@@ -56,8 +57,9 @@ class FermionLiveStreamFragment : Fragment() {
         settings.mediaPlaybackRequiresUserGesture = false
     }
 
-    private fun buildChromeClient() = object : WebChromeClient() {
-        override fun onPermissionRequest(request: PermissionRequest) {
+    private fun buildChromeClient() = object : BaseWebChromeClient(this) {
+        override fun onPermissionRequest(request: PermissionRequest?) {
+            if (request == null) return
             val expectedHost = streamUrl?.let { android.net.Uri.parse(it).host }
             val requestHost = request.origin.host
 
