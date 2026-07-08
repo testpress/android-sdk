@@ -16,8 +16,20 @@ class WatermarkOverlay @JvmOverloads constructor(
     attrs: AttributeSet? = null
 ) : View(context, attrs) {
 
-    private var watermarkText: String = ""
-    private val textPaint = Paint().apply {
+    companion object {
+        const val TYPE_DYNAMIC = "Dynamic"
+        const val TYPE_STATIC = "Static"
+        const val TYPE_HIDDEN = "Hidden"
+
+        const val POSITION_TOP_LEFT = "top-left"
+        const val POSITION_TOP_RIGHT = "top-right"
+        const val POSITION_BOTTOM_LEFT = "bottom-left"
+        const val POSITION_BOTTOM_RIGHT = "bottom-right"
+        const val POSITION_MIDDLE = "middle"
+    }
+
+    internal var watermarkText: String = ""
+    internal val textPaint = Paint().apply {
         color = Color.BLACK
         textSize = 30f
         isAntiAlias = true
@@ -40,6 +52,16 @@ class WatermarkOverlay @JvmOverloads constructor(
         invalidate()
     }
 
+    fun setTextColor(color: Int) {
+        textPaint.color = color
+        invalidate()
+    }
+
+    fun setTextSize(size: Float) {
+        textPaint.textSize = size
+        invalidate()
+    }
+
     fun setDynamicWatermark() {
         isDynamic = true
         doOnLayout {
@@ -56,11 +78,11 @@ class WatermarkOverlay @JvmOverloads constructor(
     fun setStaticWatermark(position: String) {
         isDynamic = false
         staticPosition = when (position) {
-            "top-left" -> StaticPosition.TOP_LEFT
-            "top-right" -> StaticPosition.TOP_RIGHT
-            "bottom-left" -> StaticPosition.BOTTOM_LEFT
-            "bottom-right" -> StaticPosition.BOTTOM_RIGHT
-            "middle" -> StaticPosition.CENTER
+            POSITION_TOP_LEFT -> StaticPosition.TOP_LEFT
+            POSITION_TOP_RIGHT -> StaticPosition.TOP_RIGHT
+            POSITION_BOTTOM_LEFT -> StaticPosition.BOTTOM_LEFT
+            POSITION_BOTTOM_RIGHT -> StaticPosition.BOTTOM_RIGHT
+            POSITION_MIDDLE -> StaticPosition.CENTER
             else -> StaticPosition.TOP_RIGHT
         }
         invalidate()
