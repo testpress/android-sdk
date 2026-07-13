@@ -24,6 +24,8 @@ import java.net.SocketTimeoutException
 import java.net.URL
 import `in`.testpress.course.domain.NewOfflineAttachmentDownloadFailureReason
 import `in`.testpress.course.domain.NewOfflineAttachmentDownloadListener
+import java.util.Collections
+import java.util.WeakHashMap
 import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
@@ -178,7 +180,7 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
     private val pendingQueue = LinkedBlockingQueue<DomainAttachmentContent>()
     private val activeJobs = ConcurrentHashMap<Long, Job>()
     private val activeDownloaders = ConcurrentHashMap<Long, NewOfflineAttachmentDownloader>()
-    private val listeners = Collections.synchronizedSet(
+    private val listeners: MutableSet<NewOfflineAttachmentDownloadListener> = Collections.synchronizedSet(
         Collections.newSetFromMap(WeakHashMap<NewOfflineAttachmentDownloadListener, Boolean>())
     )
 
