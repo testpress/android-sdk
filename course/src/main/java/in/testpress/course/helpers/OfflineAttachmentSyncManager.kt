@@ -33,7 +33,7 @@ class OfflineAttachmentSyncManager(
     private suspend fun checkAndUpdateAttachmentStatus(attachment: OfflineAttachment) {
         val resolver = context.contentResolver
         try {
-            val fileExists = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            val fileExists = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && !attachment.contentUri.isNullOrBlank()) {
                 val uri = attachment.contentUri?.let(Uri::parse)
                 uri != null && runCatching {
                     resolver.openAssetFileDescriptor(uri, "r")?.use { true } ?: false
