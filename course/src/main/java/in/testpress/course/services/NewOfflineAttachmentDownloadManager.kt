@@ -72,7 +72,25 @@ class NewOfflineAttachmentDownloader(
 
             connection?.connect()
 
-            val responseCode = connection?.responseCode ?: -1
+            var responseCode = connection?.responseCode ?: -1
+
+            // Handle 416 Range Not Satisfiable: stale or oversized partial file. Clear it and start from scratch.
+            if (responseCode == 416) {
+                connection?.disconnect()
+                if (file.exists()) {
+                    file.delete()
+                }
+                existingLength = 0L
+
+                connection = url.openConnection() as HttpURLConnection
+                connection?.connectTimeout = connectTimeout
+                connection?.readTimeout = readTimeout
+                connection?.instanceFollowRedirects = true
+                connection?.connect()
+
+                responseCode = connection?.responseCode ?: -1
+            }
+
             val isResume = responseCode == HttpURLConnection.HTTP_PARTIAL
 
             // If range response is not 206 (Partial Content), rewrite file from scratch
@@ -155,22 +173,21 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
     private val progressScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val dbMutex = Mutex()
 
+    @Volatile
     private var maxParallelDownloads = 3
     private val pendingQueue = LinkedBlockingQueue<DomainAttachmentContent>()
     private val activeJobs = ConcurrentHashMap<Long, Job>()
     private val activeDownloaders = ConcurrentHashMap<Long, NewOfflineAttachmentDownloader>()
-    private val listeners = mutableListOf<NewOfflineAttachmentDownloadListener>()
+    private val listeners = Collections.synchronizedSet(
+        Collections.newSetFromMap(WeakHashMap<NewOfflineAttachmentDownloadListener, Boolean>())
+    )
 
     fun addListener(listener: NewOfflineAttachmentDownloadListener) {
-        synchronized(listeners) {
-            listeners.add(listener)
-        }
+        listeners.add(listener)
     }
 
     fun removeListener(listener: NewOfflineAttachmentDownloadListener) {
-        synchronized(listeners) {
-            listeners.remove(listener)
-        }
+        listeners.remove(listener)
     }
 
     fun setMaxParallelDownloads(max: Int) {
@@ -181,6 +198,12 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
     fun enqueueDownload(context: Context, domainAttachmentContent: DomainAttachmentContent) {
         if (domainAttachmentContent.attachmentUrl == null) {
             Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
+            return
+        }
+
+        // De-duplication check: if task is already running or queued, ignore the duplicate request
+        if (activeJobs.containsKey(domainAttachmentContent.id) ||
+            pendingQueue.any { it.id == domainAttachmentContent.id }) {
             return
         }
 
@@ -223,99 +246,111 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
     }
 
     private suspend fun runDownloadTask(content: DomainAttachmentContent) {
-        val attachment = dbMutex.withLock { repository.getById(content.id) } ?: return
-        val url = content.attachmentUrl ?: return
-        val filePath = Uri.parse(attachment.path).path ?: return
+        try {
+            val attachment = dbMutex.withLock { repository.getById(content.id) } ?: return
+            val url = content.attachmentUrl ?: return
+            val filePath = Uri.parse(attachment.path).path ?: return
 
-        var attempt = 1
-        val maxRetries = 5
-        var succeeded = false
-        var lastException: Exception? = null
-        var failureReason = NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_NONE
+            var attempt = 1
+            val maxRetries = 5
+            var succeeded = false
+            var lastException: Exception? = null
+            var failureReason = NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_NONE
 
-        val downloader = NewOfflineAttachmentDownloader(Uri.parse(url), filePath)
-        activeDownloaders[content.id] = downloader
+            val downloader = NewOfflineAttachmentDownloader(Uri.parse(url), filePath)
+            activeDownloaders[content.id] = downloader
 
-        // Update DB status to DOWNLOADING before start
-        dbMutex.withLock {
-            val record = repository.getById(content.id)
-            record?.let {
-                repository.update(it.copy(status = OfflineAttachmentDownloadStatus.DOWNLOADING))
+            // Update DB status to DOWNLOADING before start
+            dbMutex.withLock {
+                val record = repository.getById(content.id)
+                record?.let {
+                    repository.update(it.copy(status = OfflineAttachmentDownloadStatus.DOWNLOADING))
+                }
             }
-        }
 
-        while (attempt <= maxRetries && !succeeded) {
-            try {
-                downloader.download(object : NewOfflineAttachmentDownloader.ProgressListener {
-                    override fun onProgress(contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float) {
-                        val progressPercent = if (percentDownloaded >= 0) percentDownloaded.toInt() else 0
-                        progressScope.launch {
-                            dbMutex.withLock {
-                                val record = repository.getById(content.id)
-                                record?.let {
-                                    if (it.status != OfflineAttachmentDownloadStatus.COMPLETED &&
-                                        it.status != OfflineAttachmentDownloadStatus.FAILED) {
-                                        repository.update(it.copy(progress = progressPercent))
+            var lastUpdatedPercent = -1
+
+            while (attempt <= maxRetries && !succeeded) {
+                try {
+                    downloader.download(object : NewOfflineAttachmentDownloader.ProgressListener {
+                        override fun onProgress(contentLength: Long, bytesDownloaded: Long, percentDownloaded: Float) {
+                            val progressPercent = if (percentDownloaded >= 0) percentDownloaded.toInt() else 0
+                            
+                            // Only update database when the rounded percentage changes to throttle I/O roundtrips
+                            if (progressPercent != lastUpdatedPercent) {
+                                lastUpdatedPercent = progressPercent
+                                progressScope.launch {
+                                    dbMutex.withLock {
+                                        val record = repository.getById(content.id)
+                                        record?.let {
+                                            if (it.status != OfflineAttachmentDownloadStatus.COMPLETED &&
+                                                it.status != OfflineAttachmentDownloadStatus.FAILED) {
+                                                repository.update(it.copy(progress = progressPercent))
+                                            }
+                                        }
                                     }
                                 }
                             }
+
+                            // Dispatch progress to UI listeners immediately for smooth updates
                             synchronized(listeners) {
                                 listeners.forEach {
                                     it.onDownloadProgress(content.id, bytesDownloaded, contentLength, percentDownloaded)
                                 }
                             }
                         }
+                    })
+                    succeeded = true
+                } catch (e: Exception) {
+                    lastException = e
+                    failureReason = when (e) {
+                        is SocketTimeoutException -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_NETWORK
+                        is HttpDownloadException -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_HTTP
+                        is IOException -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_IO
+                        else -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_UNKNOWN
                     }
-                })
-                succeeded = true
-            } catch (e: Exception) {
-                lastException = e
-                failureReason = when (e) {
-                    is SocketTimeoutException -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_NETWORK
-                    is HttpDownloadException -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_HTTP
-                    is IOException -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_IO
-                    else -> NewOfflineAttachmentDownloadFailureReason.FAILURE_REASON_UNKNOWN
-                }
 
-                Log.w("NewOfflineAttachmentDownloadManager", "Download ID=${content.id} failed on attempt $attempt: ${e.message}")
+                    Log.w("NewOfflineAttachmentDownloadManager", "Download ID=${content.id} failed on attempt $attempt: ${e.message}")
 
-                if (attempt < maxRetries) {
-                    val backoffMs = Math.min(1000L * attempt, 30000L)
-                    delay(backoffMs)
-                    attempt++
-                } else {
-                    break
+                    if (attempt < maxRetries) {
+                        val backoffMs = Math.min(1000L * attempt, 30000L)
+                        delay(backoffMs)
+                        attempt++
+                    } else {
+                        break
+                    }
                 }
             }
-        }
 
-        activeDownloaders.remove(content.id)
-        dbMutex.withLock {
-            activeJobs.remove(content.id)
-        }
-
-        progressScope.launch {
-            dbMutex.withLock {
-                val record = repository.getById(content.id)
-                record?.let {
-                    if (succeeded) {
-                        repository.update(it.copy(
-                            status = OfflineAttachmentDownloadStatus.COMPLETED,
-                            progress = 100
-                        ))
-                        synchronized(listeners) {
-                            listeners.forEach { l -> l.onDownloadCompleted(content.id, filePath) }
-                        }
-                    } else {
-                        repository.update(it.copy(
-                            status = OfflineAttachmentDownloadStatus.FAILED,
-                            progress = 0
-                        ))
-                        synchronized(listeners) {
-                            listeners.forEach { l -> l.onDownloadFailed(content.id, failureReason, lastException) }
+            progressScope.launch {
+                dbMutex.withLock {
+                    val record = repository.getById(content.id)
+                    record?.let {
+                        if (succeeded) {
+                            repository.update(it.copy(
+                                status = OfflineAttachmentDownloadStatus.COMPLETED,
+                                progress = 100
+                            ))
+                            synchronized(listeners) {
+                                listeners.forEach { l -> l.onDownloadCompleted(content.id, filePath) }
+                            }
+                        } else {
+                            repository.update(it.copy(
+                                status = OfflineAttachmentDownloadStatus.FAILED,
+                                progress = 0
+                            ))
+                            synchronized(listeners) {
+                                listeners.forEach { l -> l.onDownloadFailed(content.id, failureReason, lastException) }
+                            }
                         }
                     }
                 }
+                processQueue()
+            }
+        } finally {
+            activeDownloaders.remove(content.id)
+            dbMutex.withLock {
+                activeJobs.remove(content.id)
             }
             processQueue()
         }
