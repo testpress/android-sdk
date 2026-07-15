@@ -9,7 +9,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.viewModelScope
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
-import `in`.testpress.course.services.OfflineAttachmentDownloadManager
+import `in`.testpress.course.services.NewOfflineAttachmentDownloadManager
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,19 +32,19 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         context: Context,
         attachment: DomainAttachmentContent
     ) {
-        OfflineAttachmentDownloadManager.getInstance().enqueueDownload(context, attachment)
+        NewOfflineAttachmentDownloadManager.getInstance().enqueueDownload(context, attachment)
     }
 
     fun cancel(context: Context, offlineAttachment: OfflineAttachment) {
-        OfflineAttachmentDownloadManager.getInstance().cancelDownload(context, offlineAttachment)
+        NewOfflineAttachmentDownloadManager.getInstance().cancelDownload(context, offlineAttachment)
     }
 
     fun delete(context: Context, offlineAttachment: OfflineAttachment) {
-        OfflineAttachmentDownloadManager.getInstance().deleteDownload(context, offlineAttachment)
+        NewOfflineAttachmentDownloadManager.getInstance().deleteDownload(context, offlineAttachment)
     }
 
     fun openFile(context: Context, offlineAttachment: OfflineAttachment) {
-        OfflineAttachmentDownloadManager.getInstance().openFile(context, offlineAttachment)
+        NewOfflineAttachmentDownloadManager.getInstance().openFile(context, offlineAttachment)
     }
 
     fun deleteById(id: Long) {

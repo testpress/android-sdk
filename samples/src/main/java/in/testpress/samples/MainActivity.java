@@ -7,7 +7,7 @@ import android.view.View;
 
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.repository.OfflineAttachmentsRepository;
-import in.testpress.course.services.OfflineAttachmentDownloadManager;
+import in.testpress.course.services.NewOfflineAttachmentDownloadManager;
 import in.testpress.database.TestpressDatabase;
 import in.testpress.database.dao.OfflineAttachmentsDao;
 import in.testpress.exam.TestpressExam;
@@ -68,8 +68,8 @@ public class MainActivity extends BaseToolBarActivity {
     private void initOfflineAttachmentDownloadManager() {
         OfflineAttachmentsDao offlineAttachmentDao = TestpressDatabase.Companion.invoke(this).offlineAttachmentDao();
         OfflineAttachmentsRepository offlineAttachmentsRepository =new OfflineAttachmentsRepository(offlineAttachmentDao);
-        OfflineAttachmentDownloadManager.Companion.init(offlineAttachmentsRepository);
-        OfflineAttachmentDownloadManager.Companion.getInstance().restartDownloadProgressTracking(this);
+        NewOfflineAttachmentDownloadManager.Companion.init(offlineAttachmentsRepository);
+        NewOfflineAttachmentDownloadManager.Companion.getInstance().restartDownloadProgressTracking(this);
     }
 
     private void showAnalytics() {

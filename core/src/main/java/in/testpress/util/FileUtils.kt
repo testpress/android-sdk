@@ -215,7 +215,7 @@ fun getMimeTypeFromUri(context: Context, filePath: String?, contentUri: String?)
             // For file paths
             !filePath.isNullOrBlank() -> {
                 val file = File(Uri.parse(filePath).path ?: return "*/*")
-                val extension = MimeTypeMap.getFileExtensionFromUrl(file.name)
+                val extension = file.name.substringAfterLast('.', "")
                 MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension.lowercase()) ?: "*/*"
             }
 
