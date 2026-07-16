@@ -45,6 +45,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
 import `in`.testpress.course.R
 import `in`.testpress.course.helpers.OfflineAttachmentSyncManager
 import `in`.testpress.course.util.extension.debouncedClickable
@@ -71,7 +72,17 @@ class OfflineAttachmentListFragment : Fragment() {
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                OfflineAttachmentScreen(viewModel = viewModel)
+                OfflineAttachmentScreen(
+                    viewModel = viewModel,
+                    onMoreClick = { attachment ->
+                        val bottomSheet = OfflineAttachmentOptionsBottomSheet.newInstance(attachment)
+                        bottomSheet.setListeners(
+                            onDelete = { viewModel.delete(requireContext(), attachment) },
+                            onCancel = { viewModel.cancel(requireContext(), attachment) }
+                        )
+                        bottomSheet.show(childFragmentManager, OfflineAttachmentOptionsBottomSheet.TAG)
+                    }
+                )
             }
         }
     }
@@ -85,8 +96,58 @@ class OfflineAttachmentListFragment : Fragment() {
     }
 }
 
+class OfflineAttachmentOptionsBottomSheet : BottomSheetDialogFragment() {
+    var attachment: OfflineAttachment? = null
+    private var onDeleteDownload: (() -> Unit)? = null
+    private var onCancelDownload: (() -> Unit)? = null
+
+    fun setListeners(onDelete: () -> Unit, onCancel: () -> Unit) {
+        this.onDeleteDownload = onDelete
+        this.onCancelDownload = onCancel
+    }
+
+    override fun onCreateView(
+        inflater: LayoutInflater,
+        container: ViewGroup?,
+        savedInstanceState: Bundle?
+    ): View {
+        return ComposeView(requireContext()).apply {
+            setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
+            setContent {
+                attachment?.let {
+                    AttachmentBottomSheet(
+                        attachment = it,
+                        onDeleteDownload = {
+                            onDeleteDownload?.invoke()
+                            dismiss()
+                        },
+                        onCancelDownload = {
+                            onCancelDownload?.invoke()
+                            dismiss()
+                        },
+                        onDismiss = { dismiss() }
+                    )
+                }
+            }
+        }
+    }
+
+    companion object {
+        const val TAG = "OfflineAttachmentOptionsBottomSheet"
+
+        fun newInstance(attachment: OfflineAttachment): OfflineAttachmentOptionsBottomSheet {
+            return OfflineAttachmentOptionsBottomSheet().apply {
+                this.attachment = attachment
+            }
+        }
+    }
+}
+
 @Composable
-fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
+fun OfflineAttachmentScreen(
+    viewModel: OfflineAttachmentViewModel,
+    onMoreClick: (OfflineAttachment) -> Unit
+) {
     val attachments by viewModel.files.collectAsState()
     val context = LocalContext.current
 
@@ -107,8 +168,7 @@ fun OfflineAttachmentScreen(viewModel: OfflineAttachmentViewModel) {
                         viewModel.openFile(context, file)
                     }
                 },
-                onDeleteDownload = { file -> viewModel.delete(context, file) },
-                onCancelDownload = { file -> viewModel.cancel(context, file) }
+                onMoreClick = onMoreClick
             )
         }
     }
@@ -230,28 +290,12 @@ fun EmptyState() {
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun OfflineAttachmentList(
     attachments: List<OfflineAttachment>,
     onOpenFile: (OfflineAttachment) -> Unit,
-    onDeleteDownload: (OfflineAttachment) -> Unit,
-    onCancelDownload: (OfflineAttachment) -> Unit
+    onMoreClick: (OfflineAttachment) -> Unit
 ) {
-
-    val scope = rememberCoroutineScope()
-    val sheetState = rememberModalBottomSheetState()
-    var selectedAttachmentId by rememberSaveable { mutableStateOf<Long?>(null) }
-    var selectedAttachment by remember { mutableStateOf<OfflineAttachment?>(null) }
-    var isBottomSheetOpen by rememberSaveable { mutableStateOf(false) }
-
-    // Update the BottomSheet UI when the download status changes for the selected item
-    LaunchedEffect(attachments, selectedAttachmentId, isBottomSheetOpen) {
-        if (isBottomSheetOpen) {
-            selectedAttachment = attachments.firstOrNull { it.id == selectedAttachmentId }
-        }
-    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
@@ -262,39 +306,8 @@ fun OfflineAttachmentList(
             OfflineAttachmentItem(
                 attachment = attachment,
                 onOpenFile = { onOpenFile(attachment) },
-                onMoreClick = {
-                    selectedAttachmentId = attachment.id
-                    isBottomSheetOpen = true
-                }
+                onMoreClick = { onMoreClick(attachment) }
             )
-        }
-    }
-
-    if (selectedAttachmentId != null) {
-        LaunchedEffect(selectedAttachmentId) {
-            sheetState.show()
-        }
-
-        ModalBottomSheet(
-            onDismissRequest = {
-                scope.launch { sheetState.hide() }
-                selectedAttachmentId = null
-                isBottomSheetOpen = false
-            },
-            containerColor = Color.White,
-            sheetState = sheetState,
-        ) {
-            selectedAttachment?.let {
-                AttachmentBottomSheet(
-                    attachment = it,
-                    onDeleteDownload = onDeleteDownload,
-                    onCancelDownload = onCancelDownload,
-                    onDismiss = {
-                        scope.launch { sheetState.hide() }
-                        selectedAttachmentId = null
-                    }
-                )
-            }
         }
     }
 }
@@ -472,8 +485,7 @@ fun OfflineAttachmentListPreview() {
     OfflineAttachmentList(
         attachments = sampleAttachments,
         onOpenFile = {},
-        onDeleteDownload = {},
-        onCancelDownload = {}
+        onMoreClick = {}
     )
 }
 
