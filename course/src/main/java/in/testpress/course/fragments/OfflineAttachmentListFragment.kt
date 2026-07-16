@@ -23,11 +23,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -75,12 +70,14 @@ class OfflineAttachmentListFragment : Fragment() {
                 OfflineAttachmentScreen(
                     viewModel = viewModel,
                     onMoreClick = { attachment ->
-                        val bottomSheet = OfflineAttachmentOptionsBottomSheet.newInstance(attachment)
-                        bottomSheet.setListeners(
-                            onDelete = { viewModel.delete(requireContext(), attachment) },
-                            onCancel = { viewModel.cancel(requireContext(), attachment) }
-                        )
-                        bottomSheet.show(childFragmentManager, OfflineAttachmentOptionsBottomSheet.TAG)
+                        if (childFragmentManager.findFragmentByTag(OfflineAttachmentOptionsBottomSheet.TAG) == null) {
+                            val bottomSheet = OfflineAttachmentOptionsBottomSheet.newInstance(attachment.id)
+                            bottomSheet.setListeners(
+                                onDelete = { latestAttachment -> viewModel.delete(requireContext(), latestAttachment) },
+                                onCancel = { latestAttachment -> viewModel.cancel(requireContext(), latestAttachment) }
+                            )
+                            bottomSheet.show(childFragmentManager, OfflineAttachmentOptionsBottomSheet.TAG)
+                        }
                     }
                 )
             }
@@ -97,13 +94,18 @@ class OfflineAttachmentListFragment : Fragment() {
 }
 
 class OfflineAttachmentOptionsBottomSheet : BottomSheetDialogFragment() {
-    var attachment: OfflineAttachment? = null
-    private var onDeleteDownload: (() -> Unit)? = null
-    private var onCancelDownload: (() -> Unit)? = null
+    private var attachmentId: Long = -1L
+    private var onDeleteDownload: ((OfflineAttachment) -> Unit)? = null
+    private var onCancelDownload: ((OfflineAttachment) -> Unit)? = null
 
-    fun setListeners(onDelete: () -> Unit, onCancel: () -> Unit) {
+    fun setListeners(onDelete: (OfflineAttachment) -> Unit, onCancel: (OfflineAttachment) -> Unit) {
         this.onDeleteDownload = onDelete
         this.onCancelDownload = onCancel
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        attachmentId = arguments?.getLong(ARG_ATTACHMENT_ID, -1L) ?: -1L
     }
 
     override fun onCreateView(
@@ -111,22 +113,32 @@ class OfflineAttachmentOptionsBottomSheet : BottomSheetDialogFragment() {
         container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        val viewModel = OfflineAttachmentViewModel.get(requireActivity())
         return ComposeView(requireContext()).apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                attachment?.let {
-                    AttachmentBottomSheet(
-                        attachment = it,
-                        onDeleteDownload = {
-                            onDeleteDownload?.invoke()
-                            dismiss()
-                        },
-                        onCancelDownload = {
-                            onCancelDownload?.invoke()
-                            dismiss()
-                        },
-                        onDismiss = { dismiss() }
-                    )
+                val attachments by viewModel.files.collectAsState()
+                val currentAttachment = attachments?.firstOrNull { it.id == attachmentId }
+
+                currentAttachment?.let { attachment ->
+                    Surface(color = Color.White) {
+                        AttachmentBottomSheet(
+                            attachment = attachment,
+                            onDeleteDownload = { att ->
+                                onDeleteDownload?.invoke(att)
+                                dismiss()
+                            },
+                            onCancelDownload = { att ->
+                                onCancelDownload?.invoke(att)
+                                dismiss()
+                            },
+                            onDismiss = { dismiss() }
+                        )
+                    }
+                } ?: run {
+                    LaunchedEffect(Unit) {
+                        dismiss()
+                    }
                 }
             }
         }
@@ -134,10 +146,13 @@ class OfflineAttachmentOptionsBottomSheet : BottomSheetDialogFragment() {
 
     companion object {
         const val TAG = "OfflineAttachmentOptionsBottomSheet"
+        private const val ARG_ATTACHMENT_ID = "arg_attachment_id"
 
-        fun newInstance(attachment: OfflineAttachment): OfflineAttachmentOptionsBottomSheet {
+        fun newInstance(attachmentId: Long): OfflineAttachmentOptionsBottomSheet {
             return OfflineAttachmentOptionsBottomSheet().apply {
-                this.attachment = attachment
+                arguments = Bundle().apply {
+                    putLong(ARG_ATTACHMENT_ID, attachmentId)
+                }
             }
         }
     }
