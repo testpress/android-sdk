@@ -532,7 +532,7 @@ public class ReviewQuestionsActivity extends BaseToolBarActivity  {
             }
         }
         if (uniqueLanguages.size() < languageCodes.size()) {
-            if (!languagesFetched) {
+            if (!languagesFetched && exam != null) {
                 fetchLanguages();
                 return;
             }
