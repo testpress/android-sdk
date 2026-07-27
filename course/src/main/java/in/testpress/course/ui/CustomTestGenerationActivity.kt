@@ -14,9 +14,9 @@ import `in`.testpress.util.BaseJavaScriptInterface
 import `in`.testpress.util.extension.toast
 import android.content.Intent
 import android.os.Bundle
-import androidx.activity.OnBackPressedCallback
 import android.webkit.JavascriptInterface
 import android.widget.Toolbar
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import `in`.testpress.exam.network.NetworkAttempt
 import `in`.testpress.exam.network.asGreenDaoModel
@@ -31,9 +31,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
             if (testFragment != null) {
                 testFragment.showEndExamAlert()
             } else {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
-                isEnabled = true
+                this@CustomTestGenerationActivity.finish()
             }
         }
     }
@@ -110,8 +108,6 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
         supportFragmentManager.beginTransaction()
             .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss()
     }
-
-
 
 }
 

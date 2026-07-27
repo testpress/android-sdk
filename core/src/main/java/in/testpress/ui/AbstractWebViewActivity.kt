@@ -7,6 +7,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import androidx.activity.OnBackPressedCallback
+import `in`.testpress.util.extension.passThrough
 
 abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.Listener {
 
@@ -25,9 +26,7 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
             if (webViewFragment.canGoBack()) {
                 webViewFragment.goBack()
             } else {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
-                isEnabled = true
+                passThrough(onBackPressedDispatcher)
             }
         }
     }

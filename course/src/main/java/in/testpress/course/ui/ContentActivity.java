@@ -65,9 +65,12 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
             delegateBackPressToFragments();
             
             if (!backPressedHandled) {
-                setEnabled(false);
-                getOnBackPressedDispatcher().onBackPressed();
-                setEnabled(true);
+                try {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                } finally {
+                    setEnabled(true);
+                }
             }
         }
     };
@@ -87,6 +90,11 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
+            if (getCallingActivity() != null) {
+                backPressedHandled = false;
+                delegateBackPressToFragments();
+                return false;
+            }
             getOnBackPressedDispatcher().onBackPressed();
             return true;
         }

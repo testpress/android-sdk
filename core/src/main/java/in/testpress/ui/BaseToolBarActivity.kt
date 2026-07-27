@@ -16,6 +16,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
+import `in`.testpress.util.extension.passThrough
 
 /**
  * Base activity used to support the toolbar & handle backpress.
@@ -39,12 +40,9 @@ open class BaseToolBarActivity: AppCompatActivity() {
                 setResult(RESULT_CANCELED, Intent().putExtra(TestpressSdk.ACTION_PRESSED_HOME, false))
             }
             try {
-                isEnabled = false
-                onBackPressedDispatcher.onBackPressed()
+                passThrough(onBackPressedDispatcher)
             } catch (e: IllegalStateException) {
                 supportFinishAfterTransition()
-            } finally {
-                isEnabled = true
             }
         }
     }
@@ -114,12 +112,9 @@ open class BaseToolBarActivity: AppCompatActivity() {
             } else {
                 setResult(RESULT_CANCELED, Intent().putExtras(getDataToSetResult()))
                 try {
-                    toolBarBackPressedCallback.isEnabled = false
-                    onBackPressedDispatcher.onBackPressed()
+                    toolBarBackPressedCallback.passThrough(onBackPressedDispatcher)
                 } catch (e: IllegalStateException) {
                     supportFinishAfterTransition()
-                } finally {
-                    toolBarBackPressedCallback.isEnabled = true
                 }
             }
             return true
