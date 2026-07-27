@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
@@ -57,9 +58,27 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         return intent;
     }
 
+    private final OnBackPressedCallback fragmentBackPressedCallback = new OnBackPressedCallback(true) {
+        @Override
+        public void handleOnBackPressed() {
+            backPressedHandled = false;
+            delegateBackPressToFragments();
+            
+            if (!backPressedHandled) {
+                try {
+                    setEnabled(false);
+                    getOnBackPressedDispatcher().onBackPressed();
+                } finally {
+                    setEnabled(true);
+                }
+            }
+        }
+    };
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        getOnBackPressedDispatcher().addCallback(this, fragmentBackPressedCallback);
         setContentView(R.layout.content_detail_activity);
         Bundle bundle = getIntent().getExtras();
         ContentLoadingFragment fragment = new ContentLoadingFragment();
@@ -71,29 +90,18 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     @Override
     public boolean onOptionsItemSelected(final MenuItem item) {
         if(item.getItemId() == android.R.id.home) {
-            backPressedHandled = false;
-            delegateBackPressToFragments();
             if (getCallingActivity() != null) {
+                backPressedHandled = false;
+                delegateBackPressToFragments();
                 return false;
-            } else if (!backPressedHandled) {
-                super.onBackPressed();
             }
+            getOnBackPressedDispatcher().onBackPressed();
             return true;
         }
         return super.onOptionsItemSelected(item);
     }
 
     private boolean backPressedHandled = false;
-    
-    @Override
-    public void onBackPressed() {
-        backPressedHandled = false;
-        delegateBackPressToFragments();
-        
-        if (!backPressedHandled) {
-            super.onBackPressed();
-        }
-    }
 
     private void delegateBackPressToFragments() {
         for (Fragment fragment : getSupportFragmentManager().getFragments()) {

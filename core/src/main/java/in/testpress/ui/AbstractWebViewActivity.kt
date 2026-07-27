@@ -6,6 +6,8 @@ import `in`.testpress.fragments.WebViewFragment
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
+import `in`.testpress.util.extension.passThrough
 
 abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.Listener {
 
@@ -19,21 +21,24 @@ abstract class AbstractWebViewActivity: BaseToolBarActivity(), WebViewFragment.L
     private var allowValidationErrors: Boolean = false
     private var allowZoomControls: Boolean = false
 
+    private val webViewBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (webViewFragment.canGoBack()) {
+                webViewFragment.goBack()
+            } else {
+                passThrough(onBackPressedDispatcher)
+            }
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, webViewBackPressedCallback)
         _layout = BaseTestpressWebviewContainerLayoutBinding.inflate(layoutInflater)
         setContentView(layout.root)
         parseArguments()
         setActionBarTitle(title)
         initializeWebViewFragment()
-    }
-
-    override fun onBackPressed() {
-        if (webViewFragment.canGoBack()) {
-            webViewFragment.goBack()
-        } else {
-            super.onBackPressed()
-        }
     }
 
     private fun parseArguments() {
