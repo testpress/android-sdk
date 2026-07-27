@@ -12,6 +12,7 @@ import android.view.MenuItem
 import android.view.View
 import android.view.WindowManager
 import android.widget.ImageView
+import androidx.activity.OnBackPressedCallback
 import androidx.annotation.StringRes
 import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
@@ -31,6 +32,27 @@ open class BaseToolBarActivity: AppCompatActivity() {
     private var session: TestpressSession? = null
     protected lateinit var logo: ImageView
     protected lateinit var toolbar: Toolbar
+
+    protected val toolBarBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            if (callingActivity != null) {
+                setResult(RESULT_CANCELED, Intent().putExtra(TestpressSdk.ACTION_PRESSED_HOME, false))
+            }
+            try {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+            } catch (e: IllegalStateException) {
+                supportFinishAfterTransition()
+            } finally {
+                isEnabled = true
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, toolBarBackPressedCallback)
+    }
 
     override fun setContentView(layoutResId: Int) {
         super.setContentView(layoutResId)
@@ -88,10 +110,17 @@ open class BaseToolBarActivity: AppCompatActivity() {
              * [.startActivity] instead of [.startActivityForResult]
              */
             if (callingActivity == null) {
-                onBackPressed()
+                onBackPressedDispatcher.onBackPressed()
             } else {
                 setResult(RESULT_CANCELED, Intent().putExtras(getDataToSetResult()))
-                super.onBackPressed()
+                try {
+                    toolBarBackPressedCallback.isEnabled = false
+                    onBackPressedDispatcher.onBackPressed()
+                } catch (e: IllegalStateException) {
+                    supportFinishAfterTransition()
+                } finally {
+                    toolBarBackPressedCallback.isEnabled = true
+                }
             }
             return true
         }
@@ -104,21 +133,6 @@ open class BaseToolBarActivity: AppCompatActivity() {
 
     open fun getRetrofitCalls(): Array<RetrofitCall<*>> {
         return arrayOf()
-    }
-
-    override fun onBackPressed() {
-        /**
-         * Set result with home button pressed flag false if activity is started by
-         * [.startActivityForResult]
-         */
-        if (callingActivity != null) {
-            setResult(RESULT_CANCELED, Intent().putExtra(TestpressSdk.ACTION_PRESSED_HOME, false))
-        }
-        try {
-            super.onBackPressed()
-        } catch (e: IllegalStateException) {
-            supportFinishAfterTransition()
-        }
     }
 
     override fun onResume() {

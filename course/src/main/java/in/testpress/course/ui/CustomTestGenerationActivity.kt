@@ -14,6 +14,7 @@ import `in`.testpress.util.BaseJavaScriptInterface
 import `in`.testpress.util.extension.toast
 import android.content.Intent
 import android.os.Bundle
+import androidx.activity.OnBackPressedCallback
 import android.webkit.JavascriptInterface
 import android.widget.Toolbar
 import androidx.core.view.isVisible
@@ -22,6 +23,25 @@ import `in`.testpress.exam.network.asGreenDaoModel
 
 
 class CustomTestGenerationActivity: AbstractWebViewActivity() {
+
+    private val customTestBackPressedCallback = object : OnBackPressedCallback(true) {
+        override fun handleOnBackPressed() {
+            val testFragment: TestFragment? =
+                (supportFragmentManager.findFragmentById(R.id.fragment_container) as? TestFragment?)
+            if (testFragment != null) {
+                testFragment.showEndExamAlert()
+            } else {
+                isEnabled = false
+                onBackPressedDispatcher.onBackPressed()
+                isEnabled = true
+            }
+        }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        onBackPressedDispatcher.addCallback(this, customTestBackPressedCallback)
+    }
 
     override fun onWebViewInitializationSuccess() {
         webViewFragment.addJavascriptInterface(JavaScriptInterface(this),"AndroidInterface")
@@ -91,15 +111,7 @@ class CustomTestGenerationActivity: AbstractWebViewActivity() {
             .replace(R.id.fragment_container, testFragment).commitAllowingStateLoss()
     }
 
-    override fun onBackPressed() {
-        val testFragment: TestFragment? =
-            (supportFragmentManager.findFragmentById(R.id.fragment_container) as? TestFragment?)
-        if (testFragment != null) {
-            testFragment.showEndExamAlert()
-        } else {
-            this.finish()
-        }
-    }
+
 
 }
 
