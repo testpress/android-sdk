@@ -32,19 +32,19 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
         context: Context,
         attachment: DomainAttachmentContent
     ) {
-        NewOfflineAttachmentDownloadManager.getInstance(context).enqueueDownload(context, attachment)
+        NewOfflineAttachmentDownloadManager.getInstance(getApplication()).enqueueDownload(context, attachment)
     }
 
     fun cancel(context: Context, offlineAttachment: OfflineAttachment) {
-        NewOfflineAttachmentDownloadManager.getInstance(context).cancelDownload(context, offlineAttachment)
+        NewOfflineAttachmentDownloadManager.getInstance(getApplication()).cancelDownload(context, offlineAttachment)
     }
 
     fun delete(context: Context, offlineAttachment: OfflineAttachment) {
-        NewOfflineAttachmentDownloadManager.getInstance(context).deleteDownload(context, offlineAttachment)
+        NewOfflineAttachmentDownloadManager.getInstance(getApplication()).deleteDownload(context, offlineAttachment)
     }
 
     fun openFile(context: Context, offlineAttachment: OfflineAttachment) {
-        NewOfflineAttachmentDownloadManager.getInstance(context).openFile(context, offlineAttachment)
+        NewOfflineAttachmentDownloadManager.getInstance(getApplication()).openFile(context, offlineAttachment)
     }
 
     fun deleteById(id: Long) {
