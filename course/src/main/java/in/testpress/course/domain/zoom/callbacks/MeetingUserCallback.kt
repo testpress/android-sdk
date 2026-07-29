@@ -14,14 +14,18 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
 
     private var userListener = object: SimpleInMeetingListener() {
         override fun onMeetingUserJoin(list: List<Long>) {
-            for (event in callbacks) {
-                event?.onMeetingUserJoin(list)
+            if (ZoomSDK.getInstance().meetingService.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
+                for (event in callbacks) {
+                    event?.onMeetingUserJoin(list)
+                }
             }
         }
 
         override fun onMeetingUserLeave(list: List<Long>) {
-            for (event in callbacks) {
-                event?.onMeetingUserLeave(list)
+            if (ZoomSDK.getInstance().meetingService.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
+                for (event in callbacks) {
+                    event?.onMeetingUserLeave(list)
+                }
             }
         }
 

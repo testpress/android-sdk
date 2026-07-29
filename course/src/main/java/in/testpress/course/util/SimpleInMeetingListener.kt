@@ -59,7 +59,7 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     }
 
     override fun onMeetingActiveVideo(userId: Long) {}
-    override fun onSinkAttendeeChatPriviledgeChanged(privilege: Int) {}
+    override fun onSinkAttendeeChatPrivilegeChanged(privilege: Int) {}
     override fun onSinkAllowAttendeeChatNotification(privilege: Int) {}
     override fun onSinkPanelistChatPrivilegeChanged(privilege: MobileRTCWebinarPanelistChatPrivilege) {}
     override fun onUserNamesChanged(userList: List<Long>) {}
@@ -105,7 +105,15 @@ open class SimpleInMeetingListener : InMeetingServiceListener {
     override fun onMuteOnEntryStatusChange(isEnabled: Boolean) {}
     override fun onMeetingTopicChanged(topic: String) {}
     override fun onMeetingFullToWatchLiveStream(liveStreamUrl: String) {}
-    override fun onRobotRelationChanged(userId: Long) {}
+    override fun onBotAuthorizerRelationChanged(userId: Long) {}
     override fun onVirtualNameTagStatusChanged(isEnabled: Boolean, userId: Long) {}
     override fun onVirtualNameTagRosterInfoUpdated(userId: Long) {}
+    override fun onMeetingNeedConfirmPreview(handler: InMeetingPreviewHandler) {}
+    override fun onChatMessageEditNotification(message: InMeetingChatMessage) {}
+    override fun onCreateCompanionRelation(p0: Long, p1: Long) {}
+    override fun onRemoveCompanionRelation(p0: Long) {}
+    override fun onUserConfirmRecoverMeeting(p0: IRecoverMeetingHandle) {}
+    override fun onGrantCoOwnerPrivilegeChanged(p0: Boolean) {}
+    override fun onUserNetworkStatusChanged(p0: EnumComponentType, p1: MobileRTCNetworkQuality, p2: Long, p3: Boolean) {}
+    override fun onAppSignalPanelUpdated(p0: InMeetingAppSignalPanelHandler) {}
 }
