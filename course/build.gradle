@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
+apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 
 android {
     compileSdkVersion rootProject.compileSdkVersion
@@ -34,9 +35,6 @@ android {
     buildFeatures {
         viewBinding true
         compose true
-    }
-    composeOptions {
-        kotlinCompilerExtensionVersion '1.4.1'
     }
     namespace 'in.testpress.course'
     testNamespace 'in.testpress.course.androidTest'
