@@ -6,6 +6,7 @@ import android.util.Log
 import android.widget.Toast
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
+import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
 import `in`.testpress.util.getFileExtensionFromUrl
@@ -418,9 +419,19 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
             }
         }
 
+        fun getInstance(context: Context): NewOfflineAttachmentDownloadManager {
+            return INSTANCE ?: synchronized(this) {
+                INSTANCE ?: NewOfflineAttachmentDownloadManager(
+                    OfflineAttachmentsRepository(
+                        TestpressDatabase.invoke(context.applicationContext).offlineAttachmentDao()
+                    )
+                ).also { INSTANCE = it }
+            }
+        }
+
         fun getInstance(): NewOfflineAttachmentDownloadManager {
             return INSTANCE ?: throw IllegalStateException(
-                "NewOfflineAttachmentDownloadManager is not initialized. Call init() in your Application class."
+                "NewOfflineAttachmentDownloadManager is not initialized. Call init() in your Application class or use getInstance(context)."
             )
         }
     }
