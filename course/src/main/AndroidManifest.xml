@@ -16,12 +16,12 @@
     <application
         android:allowBackup="true"
         android:supportsRtl="true"
-        android:largeHeap="true"
-        android:hardwareAccelerated="true">
+        android:largeHeap="true">
         <activity
             android:name=".ui.CustomMeetingActivity"
             android:exported="false"
             android:configChanges="screenSize"
+            android:hardwareAccelerated="true"
             android:screenOrientation="sensorLandscape"
             android:theme="@style/TestpressTheme" />
 
