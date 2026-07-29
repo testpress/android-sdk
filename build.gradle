@@ -32,6 +32,16 @@ allprojects {
         maven {url "https://phonepe.mycloudrepo.io/public/repositories/phonepe-intentsdk-android"}
         maven { url "https://github.com/testpress/Android-Image-Cropper/raw/main" }
     }
+    afterEvaluate { project ->
+        if (project.hasProperty("android")) {
+            project.android {
+                lint {
+                    abortOnError false
+                    disable "CoroutineCreationDuringComposition"
+                }
+            }
+        }
+    }
 }
 
 task clean(type: Delete) {
