@@ -15,3 +15,10 @@
 #-keepclassmembers class fqcn.of.javascript.interface.for.webview {
 #   public *;
 #}
+
+# Zoom Meeting SDK
+-keep class us.zoom.** { *; }
+-keep class com.zipow.** { *; }
+-keep interface us.zoom.** { *; }
+-keep class com.m_bridge.** { *; }
+
