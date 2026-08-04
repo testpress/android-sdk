@@ -72,8 +72,19 @@ object MeetingCommonCallback : BaseCallback<MeetingCommonCallback.CommonEvent?>(
 
     }
 
-    init {
-        ZoomSDK.getInstance().inMeetingService.addListener(commonListener)
-        ZoomSDK.getInstance().meetingService.addListener(serviceListener)
+    @Volatile private var isRegistered = false
+
+    fun register() {
+        if (isRegistered) return
+        ZoomSDK.getInstance().inMeetingService?.addListener(commonListener)
+        ZoomSDK.getInstance().meetingService?.addListener(serviceListener)
+        isRegistered = true
+    }
+
+    fun unregister() {
+        if (!isRegistered) return
+        ZoomSDK.getInstance().inMeetingService?.removeListener(commonListener)
+        ZoomSDK.getInstance().meetingService?.removeListener(serviceListener)
+        isRegistered = false
     }
 }

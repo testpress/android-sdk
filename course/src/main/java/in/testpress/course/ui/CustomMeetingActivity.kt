@@ -152,6 +152,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onMeetingUserJoin(list: List<Long?>?) {
         audioController.connectAudioWithVoIP()
+        audioController.setLoudSpeakerStatus(true)
         audioController.muteMyAudio(true)
     }
 
