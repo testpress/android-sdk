@@ -67,6 +67,8 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     private fun registerCallbackListener() {
+        MeetingCommonCallback.register()
+        MeetingUserCallback.register()
         MeetingCommonCallback.addListener(this)
         MeetingUserCallback.addListener(this)
     }

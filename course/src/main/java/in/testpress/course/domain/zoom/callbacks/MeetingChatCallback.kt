@@ -25,7 +25,11 @@ object MeetingChatCallback : BaseCallback<MeetingChatCallback.ChatEvent?>() {
         }
     }
 
-    init {
-        ZoomSDK.getInstance().inMeetingService.addListener(chatListener)
+    fun register() {
+        ZoomSDK.getInstance().inMeetingService?.addListener(chatListener)
+    }
+
+    fun unregister() {
+        ZoomSDK.getInstance().inMeetingService?.removeListener(chatListener)
     }
 }

@@ -48,7 +48,11 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         }
     }
 
-    init{
-        ZoomSDK.getInstance().inMeetingService.addListener(userListener)
+    fun register() {
+        ZoomSDK.getInstance().inMeetingService?.addListener(userListener)
+    }
+
+    fun unregister() {
+        ZoomSDK.getInstance().inMeetingService?.removeListener(userListener)
     }
 }

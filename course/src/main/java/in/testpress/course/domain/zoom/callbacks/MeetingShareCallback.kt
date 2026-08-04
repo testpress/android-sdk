@@ -24,7 +24,11 @@ object MeetingShareCallback : BaseCallback<MeetingShareCallback.ShareEvent?>() {
         override fun onShareSettingTypeChanged(p0: ShareSettingType?) {}
     }
 
-    init {
-        ZoomSDK.getInstance().inMeetingService.inMeetingShareController.addListener(shareListener)
-    }
-}
+    fun register() {
+        ZoomSDK.getInstance().inMeetingService?.inMeetingShareController?.addListener(shareListener)
+     }
+ 
+     fun unregister() {
+        ZoomSDK.getInstance().inMeetingService?.inMeetingShareController?.removeListener(shareListener)
+     }
+ }

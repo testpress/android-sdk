@@ -4,6 +4,9 @@ import `in`.testpress.core.TestpressSdk
 import `in`.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE
 import `in`.testpress.course.domain.DomainVideoConferenceContent
 import `in`.testpress.course.domain.zoom.callbacks.MeetingCommonCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingUserCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingShareCallback
+import `in`.testpress.course.domain.zoom.callbacks.MeetingChatCallback
 import `in`.testpress.course.ui.CustomMeetingActivity
 import `in`.testpress.course.ui.ZoomMeetActivity
 import `in`.testpress.models.InstituteSettings
@@ -104,7 +107,15 @@ class ZoomMeetHandler(
         }
     }
 
+    private fun registerCallbacks() {
+        MeetingCommonCallback.register()
+        MeetingUserCallback.register()
+        MeetingShareCallback.register()
+        MeetingChatCallback.register()
+    }
+
     private fun registerMeetingServiceListener() {
+        registerCallbacks()
         MeetingCommonCallback.addListener(this)
     }
 
@@ -205,9 +216,17 @@ class ZoomMeetHandler(
         return
     }
 
+    private fun unregisterCallbacks() {
+        MeetingCommonCallback.unregister()
+        MeetingUserCallback.unregister()
+        MeetingShareCallback.unregister()
+        MeetingChatCallback.unregister()
+    }
+
     fun removeListeners() {
         if (zoomSDK.isInitialized) {
             MeetingCommonCallback.removeListener(this)
+            unregisterCallbacks()
         }
     }
 
