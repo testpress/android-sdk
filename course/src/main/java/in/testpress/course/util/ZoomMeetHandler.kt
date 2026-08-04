@@ -53,6 +53,8 @@ class ZoomMeetHandler(
             TestpressSdk.getTestpressSession(context)!!.instituteSettings
         useCustomMeetingUi = instituteSettings.isCustomMeetingUIEnabled
         zoomSDK.meetingSettingsHelper.isCustomizedMeetingUIEnabled = useCustomMeetingUi
+        zoomSDK.meetingSettingsHelper.setAutoConnectVoIPWhenJoinMeeting(true)
+        zoomSDK.meetingSettingsHelper.setMuteMyMicrophoneWhenJoinMeeting(true)
     }
 
     private fun configureMeetingUi() {

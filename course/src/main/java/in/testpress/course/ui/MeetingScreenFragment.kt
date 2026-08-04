@@ -28,8 +28,6 @@ class MeetingScreenFragment : Fragment(), MeetingShareCallback.ShareEvent, Meeti
     }
 
     private fun registerCallback() {
-        MeetingShareCallback.register()
-        MeetingUserCallback.register()
         MeetingShareCallback.addListener(this)
         MeetingUserCallback.addListener(this)
     }

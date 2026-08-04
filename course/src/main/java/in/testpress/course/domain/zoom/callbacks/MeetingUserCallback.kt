@@ -14,7 +14,7 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
 
     private var userListener = object: SimpleInMeetingListener() {
         override fun onMeetingUserJoin(list: List<Long>) {
-            if (ZoomSDK.getInstance().meetingService.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
+            if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
                     event?.onMeetingUserJoin(list)
                 }
@@ -22,7 +22,7 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         }
 
         override fun onMeetingUserLeave(list: List<Long>) {
-            if (ZoomSDK.getInstance().meetingService.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
+            if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
                     event?.onMeetingUserLeave(list)
                 }
@@ -48,11 +48,17 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         }
     }
 
+    @Volatile private var isRegistered = false
+
     fun register() {
+        if (isRegistered) return
         ZoomSDK.getInstance().inMeetingService?.addListener(userListener)
+        isRegistered = true
     }
 
     fun unregister() {
+        if (!isRegistered) return
         ZoomSDK.getInstance().inMeetingService?.removeListener(userListener)
+        isRegistered = false
     }
 }

@@ -67,8 +67,6 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
     }
 
     private fun registerCallbackListener() {
-        MeetingCommonCallback.register()
-        MeetingUserCallback.register()
         MeetingCommonCallback.addListener(this)
         MeetingUserCallback.addListener(this)
     }
@@ -154,6 +152,7 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
 
     override fun onMeetingUserJoin(list: List<Long?>?) {
         audioController.connectAudioWithVoIP()
+        audioController.setLoudSpeakerStatus(true)
         audioController.muteMyAudio(true)
     }
 

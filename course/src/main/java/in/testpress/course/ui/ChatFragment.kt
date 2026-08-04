@@ -19,8 +19,8 @@ class ChatFragment : Fragment(), MeetingChatCallback.ChatEvent{
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        inMeetingChatController = ZoomSDK.getInstance().inMeetingService.inMeetingChatController
-        currentUserId = ZoomSDK.getInstance().inMeetingService.myUserID
+        inMeetingChatController = ZoomSDK.getInstance().inMeetingService?.inMeetingChatController ?: run { return }
+        currentUserId = ZoomSDK.getInstance().inMeetingService?.myUserID ?: 0
         MeetingChatCallback.addListener(this)
     }
 
@@ -44,7 +44,7 @@ class ChatFragment : Fragment(), MeetingChatCallback.ChatEvent{
     private fun sendMessage(){
         val inputBox = binding.inputBox
         val recyclerView = binding.recyclerChat
-        val chatController = ZoomSDK.getInstance().inMeetingService.inMeetingChatController
+        val chatController = ZoomSDK.getInstance().inMeetingService?.inMeetingChatController
 
         if (inputBox.text?.isNotBlank() == true && chatController != null) {
             val chatMessage = ChatMessageBuilder()

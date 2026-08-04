@@ -138,8 +138,9 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
 
     private fun loadProfileAndInitializeConference(videoConference: DomainVideoConferenceContent?) {
-        TestpressUserDetails.getInstance().load(requireContext(),object : TestpressCallback<ProfileDetails>(){
+        TestpressUserDetails.getInstance().load(requireContext(), object : TestpressCallback<ProfileDetails>() {
             override fun onSuccess(result: ProfileDetails?) {
+                if (!isAdded) return
                 profileDetails = result
                 profileDetails?.let {
                     initVideoConferenceHandler(videoConference, it)
@@ -147,16 +148,21 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             }
 
             override fun onException(exception: TestpressException) {
+                if (!isAdded) return
                 emptyViewFragment.displayError(exception)
             }
         })
     }
 
     private fun initVideoConferenceHandler(
-        videoConference: DomainVideoConferenceContent?, 
+        videoConference: DomainVideoConferenceContent?,
         profileDetails: ProfileDetails,
         onInitComplete: (() -> Unit)? = null
     ) {
+        if (!isAdded) {
+            onInitComplete?.invoke()
+            return
+        }
         try {
             videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference ?: throw NullPointerException("videoConference is null during initialization"), profileDetails)
             videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
@@ -185,7 +191,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 hideLoadingAndEnableStartButton()
             }
             Sentry.captureException(e) { scope ->
-                scope.setTag("user_name", profileDetails.username?:"")
+                scope.setTag("user_name", profileDetails.username ?: "")
                 scope.setContexts(
                     "Video Conference Error",
                     object : HashMap<String?, Any?>() {
@@ -196,6 +202,10 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     }
                 )
             }
+            onInitComplete?.invoke()
+        } catch (e: IllegalStateException) {
+            // Fragment detached from activity mid-initialization (e.g. user navigated away)
+            Sentry.captureException(e)
             onInitComplete?.invoke()
         }
     }

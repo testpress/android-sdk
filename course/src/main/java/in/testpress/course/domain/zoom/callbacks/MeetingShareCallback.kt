@@ -24,11 +24,18 @@ object MeetingShareCallback : BaseCallback<MeetingShareCallback.ShareEvent?>() {
         override fun onShareSettingTypeChanged(p0: ShareSettingType?) {}
     }
 
+    @Volatile private var isRegistered = false
+
     fun register() {
+        if (isRegistered) return
         ZoomSDK.getInstance().inMeetingService?.inMeetingShareController?.addListener(shareListener)
-     }
- 
-     fun unregister() {
+        isRegistered = true
+    }
+
+    fun unregister() {
+        if (!isRegistered) return
         ZoomSDK.getInstance().inMeetingService?.inMeetingShareController?.removeListener(shareListener)
-     }
- }
+        isRegistered = false
+    }
+}
+
