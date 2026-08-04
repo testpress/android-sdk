@@ -218,8 +218,8 @@ public class TestFragment extends BaseFragment implements
         if (exam != null && exam.hasMultipleLanguages()) {
             initializeLanguageFilter();
         }
-        if (exam == null && attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME)) {
-            view.findViewById(R.id.timer).setVisibility(View.GONE);
+        if (hasNoDuration()) {
+            timer.setVisibility(View.GONE);
         }
         observeAttemptItemResources();
         observeSaveAnswerResource();
@@ -729,7 +729,7 @@ public class TestFragment extends BaseFragment implements
                         }
 
                         attemptItemList = listResource.getData();
-                        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00")) {
+                        if (!hasNoDuration() && (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00") || attempt.getRemainingTime().equals("00:00:00"))) {
                             endExam();
                             return;
                         }
@@ -1365,7 +1365,25 @@ public class TestFragment extends BaseFragment implements
         questionsListAdapter.setItems(filterItems.toArray());
     }
 
+    boolean hasNoDuration() {
+        if (exam != null) {
+            String duration = exam.getDuration();
+            return duration == null || duration.equals("0:00:00") || duration.equals("00:00:00") || duration.isEmpty();
+        }
+        return attempt != null && (attempt.getRemainingTime() == null ||
+                attempt.getRemainingTime().equals("0:00:00") ||
+                attempt.getRemainingTime().equals("00:00:00") ||
+                attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME));
+    }
+
     void startCountDownTimer() {
+        if (hasNoDuration()) {
+            timer.setVisibility(View.GONE);
+            if (attemptItemList.isEmpty()) {
+                fetchAttemptItems();
+            }
+            return;
+        }
         String remainingTime = attempt.getRemainingTime();
         if (attempt.hasSectionalLock()) {
             AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
