@@ -218,7 +218,7 @@ public class TestFragment extends BaseFragment implements
         if (exam != null && exam.hasMultipleLanguages()) {
             initializeLanguageFilter();
         }
-        if (hasNoDuration()) {
+        if (!attempt.hasSectionalLock() && hasNoDuration()) {
             timer.setVisibility(View.GONE);
         }
         observeAttemptItemResources();
