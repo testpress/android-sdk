@@ -218,8 +218,8 @@ public class TestFragment extends BaseFragment implements
         if (exam != null && exam.hasMultipleLanguages()) {
             initializeLanguageFilter();
         }
-        if (exam == null && attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME)) {
-            view.findViewById(R.id.timer).setVisibility(View.GONE);
+        if (!attempt.hasSectionalLock() && hasNoDuration()) {
+            timer.setVisibility(View.GONE);
         }
         observeAttemptItemResources();
         observeSaveAnswerResource();
@@ -729,7 +729,7 @@ public class TestFragment extends BaseFragment implements
                         }
 
                         attemptItemList = listResource.getData();
-                        if (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00")) {
+                        if (!hasNoDuration() && isZeroDuration(attempt.getRemainingTime())) {
                             endExam();
                             return;
                         }
@@ -1365,6 +1365,17 @@ public class TestFragment extends BaseFragment implements
         questionsListAdapter.setItems(filterItems.toArray());
     }
 
+    boolean hasNoDuration() {
+        if (exam != null) {
+            return isZeroDuration(exam.getDuration());
+        }
+        return false;
+    }
+
+    private boolean isZeroDuration(String duration) {
+        return duration == null || duration.equals(INFINITE_EXAM_TIME) || duration.equals("00:00:00") || duration.isEmpty();
+    }
+
     void startCountDownTimer() {
         String remainingTime = attempt.getRemainingTime();
         if (attempt.hasSectionalLock()) {
@@ -1374,6 +1385,12 @@ public class TestFragment extends BaseFragment implements
                 return;
             }
             remainingTime = section.getRemainingTime();
+        } else if (hasNoDuration()) {
+            timer.setVisibility(View.GONE);
+            if (attemptItemList.isEmpty()) {
+                fetchAttemptItems();
+            }
+            return;
         }
         long millisRemainingFetchedInAttempt = formatMillisecond(remainingTime);
 
