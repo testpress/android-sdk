@@ -1385,13 +1385,6 @@ public class TestFragment extends BaseFragment implements
                 return;
             }
             remainingTime = section.getRemainingTime();
-            if (isZeroDuration(section.getDuration())) {
-                timer.setVisibility(View.GONE);
-                if (attemptItemList.isEmpty()) {
-                    fetchAttemptItems();
-                }
-                return;
-            }
         } else if (hasNoDuration()) {
             timer.setVisibility(View.GONE);
             if (attemptItemList.isEmpty()) {
