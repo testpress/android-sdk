@@ -729,7 +729,7 @@ public class TestFragment extends BaseFragment implements
                         }
 
                         attemptItemList = listResource.getData();
-                        if (!hasNoDuration() && (attempt.getRemainingTime() == null || attempt.getRemainingTime().equals("0:00:00") || attempt.getRemainingTime().equals("00:00:00"))) {
+                        if (!hasNoDuration() && isZeroDuration(attempt.getRemainingTime())) {
                             endExam();
                             return;
                         }
@@ -1367,23 +1367,16 @@ public class TestFragment extends BaseFragment implements
 
     boolean hasNoDuration() {
         if (exam != null) {
-            String duration = exam.getDuration();
-            return duration == null || duration.equals("0:00:00") || duration.equals("00:00:00") || duration.isEmpty();
+            return isZeroDuration(exam.getDuration());
         }
-        return attempt != null && (attempt.getRemainingTime() == null ||
-                attempt.getRemainingTime().equals("0:00:00") ||
-                attempt.getRemainingTime().equals("00:00:00") ||
-                attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME));
+        return attempt != null && attempt.getRemainingTime() != null && attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME);
+    }
+
+    private boolean isZeroDuration(String duration) {
+        return duration == null || duration.equals(INFINITE_EXAM_TIME) || duration.equals("00:00:00") || duration.isEmpty();
     }
 
     void startCountDownTimer() {
-        if (hasNoDuration()) {
-            timer.setVisibility(View.GONE);
-            if (attemptItemList.isEmpty()) {
-                fetchAttemptItems();
-            }
-            return;
-        }
         String remainingTime = attempt.getRemainingTime();
         if (attempt.hasSectionalLock()) {
             AttemptSection section = sections.get(attempt.getCurrentSectionPosition());
@@ -1392,6 +1385,13 @@ public class TestFragment extends BaseFragment implements
                 return;
             }
             remainingTime = section.getRemainingTime();
+        }
+        if (hasNoDuration()) {
+            timer.setVisibility(View.GONE);
+            if (attemptItemList.isEmpty()) {
+                fetchAttemptItems();
+            }
+            return;
         }
         long millisRemainingFetchedInAttempt = formatMillisecond(remainingTime);
 
