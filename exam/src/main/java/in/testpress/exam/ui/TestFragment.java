@@ -1369,7 +1369,7 @@ public class TestFragment extends BaseFragment implements
         if (exam != null) {
             return isZeroDuration(exam.getDuration());
         }
-        return attempt != null && attempt.getRemainingTime() != null && attempt.getRemainingTime().equals(DEFAULT_EXAM_TIME);
+        return false;
     }
 
     private boolean isZeroDuration(String duration) {
@@ -1385,8 +1385,14 @@ public class TestFragment extends BaseFragment implements
                 return;
             }
             remainingTime = section.getRemainingTime();
-        }
-        if (hasNoDuration()) {
+            if (isZeroDuration(section.getDuration())) {
+                timer.setVisibility(View.GONE);
+                if (attemptItemList.isEmpty()) {
+                    fetchAttemptItems();
+                }
+                return;
+            }
+        } else if (hasNoDuration()) {
             timer.setVisibility(View.GONE);
             if (attemptItemList.isEmpty()) {
                 fetchAttemptItems();
