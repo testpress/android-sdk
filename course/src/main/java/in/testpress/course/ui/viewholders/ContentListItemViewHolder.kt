@@ -21,6 +21,7 @@ class ContentListItemViewHolder(view: View) : BaseContentListItemViewHolder(view
         super.bindContentDetails(content)
         when (content.contentTypeEnum) {
             ContentType.Notes -> contentTypeIcon.setImageResource(R.drawable.writing)
+            ContentType.Assignment -> contentTypeIcon.setImageResource(R.drawable.ic_assignment)
             ContentType.Attachment -> setAttachmentIcon(content)
             else -> contentTypeIcon.setImageResource(R.drawable.ic_live)
         }
