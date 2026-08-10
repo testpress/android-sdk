@@ -27,7 +27,18 @@ class AssignmentFragment : BaseContentDetailFragment() {
     override fun display() {
         val session = TestpressSdk.getTestpressSession(requireContext())
         val baseUrl = session?.instituteSettings?.baseUrl
-        val assignmentUrl = "$baseUrl/courses/${content.courseId}/contents/${content.id}/"
+        if (baseUrl.isNullOrBlank()) {
+            emptyViewFragment.displayError(TestpressException.unexpectedError(Exception("Base URL cannot be null or empty")))
+            return
+        }
+
+        val courseId = content.courseId
+        if (courseId == null) {
+            emptyViewFragment.displayError(TestpressException.unexpectedError(Exception("Course ID cannot be null")))
+            return
+        }
+
+        val assignmentUrl = "$baseUrl/courses/$courseId/contents/${content.id}/"
 
         TestpressApiClient(requireContext(), session).ssourl
             .enqueue(object : TestpressCallback<SSOUrl>() {
