@@ -17,6 +17,10 @@ class ContentFragmentFactoryTest {
             attachment = DomainAttachmentContent(1,isRenderable = true)
     )
 
+    private val assignmentContent = DomainContent(3, chapterId = 1,
+            active = true, contentType = "Assignment", hasStarted = true,
+            isLocked = false, isScheduled = false, isCourseAvailable = false)
+
     @Test
     fun whenRenderableFalseAttachmentContentShouldBeReturned() {
         val fragment = ContentFragmentFactory.getFragment(content = attachmentContent)
@@ -27,5 +31,11 @@ class ContentFragmentFactoryTest {
     fun whenRenderableDocumentViewerShouldBeReturned() {
         val fragment = ContentFragmentFactory.getFragment(renderableContent)
         assertTrue(fragment is DocumentViewerFragment)
+    }
+
+    @Test
+    fun whenAssignmentContentAssignmentFragmentShouldBeReturned() {
+        val fragment = ContentFragmentFactory.getFragment(assignmentContent)
+        assertTrue(fragment is AssignmentFragment)
     }
 }

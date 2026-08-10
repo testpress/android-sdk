@@ -356,7 +356,7 @@ fun DomainContent.getGreenDaoContentAttempts(context: Context): List<CourseAttem
 }
 
 enum class ContentType {
-    Exam, Quiz, Video, Attachment, Notes, LiveStream, Unknown
+    Exam, Quiz, Video, Attachment, Notes, LiveStream, Assignment, Unknown
 }
 
 inline fun <reified T : Enum<T>> String.asEnumOrDefault(defaultValue: T? = null): T? =

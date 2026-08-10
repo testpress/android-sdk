@@ -177,6 +177,7 @@ open class ContentFragmentFactory {
                     }
                     return LiveStreamFragment()
                 }
+                "Assignment" -> AssignmentFragment()
                 else -> ContentLoadingFragment()
             }
         }
