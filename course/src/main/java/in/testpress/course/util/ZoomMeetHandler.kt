@@ -36,25 +36,47 @@ class ZoomMeetHandler(
     private var activityUsableErrorLogged: Boolean = false
 
     fun init(callback: VideoConferenceInitializeListener) {
-        zoomSDK = ZoomSDK.getInstance()
-        activity = context as Activity
+        val currentActivity = context as? Activity
+        if (currentActivity == null) {
+            callback.onFailure()
+            return
+        }
+        activity = currentActivity
         this.onInitializeCallback = callback
-        zoomSDK.initialize(context, this, getInitializationParams())
+        zoomSDK = ZoomSDK.getInstance()
+
+        if (!isTokenValid(videoConference.accessToken)) {
+            logZoomInitializationFailure(ZoomError.ZOOM_ERROR_INVALID_ARGUMENTS, -1)
+            callback.onFailure()
+            return
+        }
 
         if (zoomSDK.isInitialized) {
             registerMeetingServiceListener()
             setIsCustomizedMeetingUIEnabled()
             configureMeetingUi()
+            callback.onSuccess()
+            return
         }
+
+        val initParams = getInitializationParams()
+        if (initParams == null) {
+            callback.onFailure()
+            return
+        }
+
+        zoomSDK.initialize(context, this, initParams)
     }
 
     private fun setIsCustomizedMeetingUIEnabled(){
-        val instituteSettings: InstituteSettings =
-            TestpressSdk.getTestpressSession(context)!!.instituteSettings
-        useCustomMeetingUi = instituteSettings.isCustomMeetingUIEnabled
-        zoomSDK.meetingSettingsHelper.isCustomizedMeetingUIEnabled = useCustomMeetingUi
-        zoomSDK.meetingSettingsHelper.setAutoConnectVoIPWhenJoinMeeting(true)
-        zoomSDK.meetingSettingsHelper.setMuteMyMicrophoneWhenJoinMeeting(true)
+        val instituteSettings: InstituteSettings? =
+            TestpressSdk.getTestpressSession(context)?.instituteSettings
+        useCustomMeetingUi = instituteSettings?.isCustomMeetingUIEnabled == true
+        zoomSDK.meetingSettingsHelper?.let { helper ->
+            helper.isCustomizedMeetingUIEnabled = useCustomMeetingUi
+            helper.setAutoConnectVoIPWhenJoinMeeting(true)
+            helper.setMuteMyMicrophoneWhenJoinMeeting(true)
+        }
     }
 
     private fun configureMeetingUi() {
@@ -63,9 +85,13 @@ class ZoomMeetHandler(
         }
     }
 
-    fun getInitializationParams(): ZoomSDKInitParams {
+    fun getInitializationParams(): ZoomSDKInitParams? {
+        val token = videoConference.accessToken
+        if (token.isNullOrBlank()) {
+            return null
+        }
         val initParams = ZoomSDKInitParams()
-        initParams.jwtToken = videoConference.accessToken
+        initParams.jwtToken = token
         initParams.enableLog = true
         initParams.logSize = 50
         initParams.domain = "zoom.us"
@@ -73,7 +99,8 @@ class ZoomMeetHandler(
     }
 
     fun goToMeet(onInitializeCallback: VideoConferenceInitializeListener) {
-        if (zoomSDK.isInitialized) {
+        this.onInitializeCallback = onInitializeCallback
+        if (::zoomSDK.isInitialized && zoomSDK.isInitialized) {
             onInitializeCallback.onSuccess()
             joinMeeting()
         } else {
@@ -88,24 +115,27 @@ class ZoomMeetHandler(
                 }
             })
         }
-
     }
 
     private fun joinMeeting() {
+        if (!::zoomSDK.isInitialized || !zoomSDK.isInitialized) {
+            onInitializeCallback?.onFailure()
+            return
+        }
         zoomSDK.meetingService?.let { meetingService ->
             if (meetingService.meetingStatus == MeetingStatus.MEETING_STATUS_IDLE) {
                 startMeeting()
             } else {
                 returnToMeeting()
             }
-        }
+        } ?: onInitializeCallback?.onFailure()
     }
 
     private fun returnToMeeting(){
         if (useCustomMeetingUi) {
             showCustomMeetingUI(true)
-        }else{
-            zoomSDK.meetingService.returnToMeeting(context)
+        } else {
+            zoomSDK.meetingService?.returnToMeeting(context)
         }
     }
 
@@ -226,22 +256,33 @@ class ZoomMeetHandler(
     }
 
     fun removeListeners() {
-        if (zoomSDK.isInitialized) {
+        if (::zoomSDK.isInitialized && zoomSDK.isInitialized) {
             MeetingCommonCallback.removeListener(this)
             unregisterCallbacks()
         }
     }
 
     fun startMeeting() {
+        if (!::zoomSDK.isInitialized || !zoomSDK.isInitialized) {
+            onInitializeCallback?.onFailure()
+            return
+        }
         configureMeetingUi()
 
         val meetingService = zoomSDK.meetingService
+        if (meetingService == null) {
+            onInitializeCallback?.onFailure()
+            return
+        }
         val ret = meetingService.joinMeetingWithParams(
             context,
             getMeetingParameters(),
             getMeetingOptions()
         )
-        zoomSDK.zoomUIService.hideMeetingInviteUrl(true)
+        if (ret != MeetingError.MEETING_ERROR_SUCCESS) {
+            onInitializeCallback?.onFailure()
+        }
+        zoomSDK.zoomUIService?.hideMeetingInviteUrl(true)
     }
 
     private fun getMeetingOptions(): JoinMeetingOptions {
