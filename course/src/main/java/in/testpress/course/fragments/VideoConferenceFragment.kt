@@ -19,7 +19,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat
 import androidx.core.view.isVisible
-import com.auth0.android.jwt.JWT
+import `in`.testpress.course.util.isTokenValid
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import io.sentry.Sentry
@@ -86,21 +86,18 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             return
         }
 
-        if (videoConference == null || videoConference.isZoom()) {
-            videoConference?.accessToken?.let { token ->
-                try {
-                    if (JWT(token).isExpired(10) && reloadContent < maxReloadContent) {
-                        reloadContent++
-                        forceReloadContent()
-                        return
-                    }
-                } catch (e: Exception) {
-                    Sentry.captureException(e)
+        if (videoConference != null && videoConference.isZoom()) {
+            val token = videoConference.accessToken
+            if (!token.isNullOrBlank()) {
+                if (!isTokenValid(token) && reloadContent < maxReloadContent) {
+                    reloadContent++
+                    forceReloadContent()
                     return
                 }
+                initializeVideoConferenceHandler(videoConference)
+            } else {
+                hideLoadingAndEnableStartButton()
             }
-
-            initializeVideoConferenceHandler(videoConference)
         }
 
         startButton.visibility = View.VISIBLE
@@ -159,12 +156,15 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         profileDetails: ProfileDetails,
         onInitComplete: (() -> Unit)? = null
     ) {
-        if (!isAdded) {
+        if (!isAdded || videoConference == null || videoConference.accessToken.isNullOrBlank()) {
+            if (!isRetryingAfterFailure) {
+                hideLoadingAndEnableStartButton()
+            }
             onInitComplete?.invoke()
             return
         }
         try {
-            videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference ?: throw NullPointerException("videoConference is null during initialization"), profileDetails)
+            videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference, profileDetails)
             videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
                 override fun onSuccess() {
                     if (!isRetryingAfterFailure) {
@@ -186,7 +186,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             }
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
             onInitComplete?.invoke()
-        } catch (e: NullPointerException) {
+        } catch (e: Exception) {
             if (!isRetryingAfterFailure) {
                 hideLoadingAndEnableStartButton()
             }
@@ -202,10 +202,6 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     }
                 )
             }
-            onInitComplete?.invoke()
-        } catch (e: IllegalStateException) {
-            // Fragment detached from activity mid-initialization (e.g. user navigated away)
-            Sentry.captureException(e)
             onInitComplete?.invoke()
         }
     }
@@ -226,7 +222,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         if (!isConferenceDataValid(videoConference)) {
             forceReloadContent {
                 val refreshedConference = content.videoConference
-                if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null) {
+                if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null && !refreshedConference.accessToken.isNullOrBlank()) {
                     videoConferenceHandler?.destroy()
                     profileDetails?.let {
                         initVideoConferenceHandler(refreshedConference, it) {
@@ -252,17 +248,11 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     }
     
     private fun isConferenceDataValid(videoConference: DomainVideoConferenceContent?): Boolean {
-        if (videoConference?.conferenceId == null || videoConference.password == null) {
+        if (videoConference?.conferenceId == null || videoConference.password == null || videoConference.accessToken.isNullOrBlank()) {
             return false
         }
         
-        return videoConference.accessToken?.let { token ->
-            try {
-                !JWT(token).isExpired(10)
-            } catch (e: Exception) {
-                false
-            }
-        } ?: false
+        return isTokenValid(videoConference.accessToken)
     }
     
     private fun performJoinAttempt() {
