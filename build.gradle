@@ -50,9 +50,9 @@ task clean(type: Delete) {
 
 ext {
     compileSdkVersion = 36
-    minSdkVersion = 26
+    minSdkVersion = 28
     targetSdkVersion = 36
-    minSdkVersionForUITest = 26
+    minSdkVersionForUITest = 28
     buildToolsVersion = '30.0.3'
 
     //AndroidX Dependencies
