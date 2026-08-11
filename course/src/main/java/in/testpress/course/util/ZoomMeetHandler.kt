@@ -279,6 +279,9 @@ class ZoomMeetHandler(
             getMeetingParameters(),
             getMeetingOptions()
         )
+        if (ret != MeetingError.MEETING_ERROR_SUCCESS) {
+            onInitializeCallback?.onFailure()
+        }
         zoomSDK.zoomUIService?.hideMeetingInviteUrl(true)
     }
 
