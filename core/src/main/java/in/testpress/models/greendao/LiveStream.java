@@ -22,6 +22,7 @@ public class LiveStream {
     private Boolean showRecordedVideo;
     private String chatEmbedUrl;
     private String provider;
+    private String fermionUrl;
 
     // KEEP FIELDS - put your custom fields here
     // KEEP FIELDS END
@@ -35,7 +36,7 @@ public class LiveStream {
     }
 
     @Generated
-    public LiveStream(Long id, String title, String streamUrl, Integer duration, String status, Boolean showRecordedVideo, String chatEmbedUrl, String provider) {
+    public LiveStream(Long id, String title, String streamUrl, Integer duration, String status, Boolean showRecordedVideo, String chatEmbedUrl, String provider, String fermionUrl) {
         this.id = id;
         this.title = title;
         this.streamUrl = streamUrl;
@@ -44,6 +45,7 @@ public class LiveStream {
         this.showRecordedVideo = showRecordedVideo;
         this.chatEmbedUrl = chatEmbedUrl;
         this.provider = provider;
+        this.fermionUrl = fermionUrl;
     }
 
     public Long getId() {
@@ -108,6 +110,14 @@ public class LiveStream {
 
     public void setProvider(String provider) {
         this.provider = provider;
+    }
+
+    public String getFermionUrl() {
+        return fermionUrl;
+    }
+
+    public void setFermionUrl(String fermionUrl) {
+        this.fermionUrl = fermionUrl;
     }
 
     // KEEP METHODS - put your custom methods here
