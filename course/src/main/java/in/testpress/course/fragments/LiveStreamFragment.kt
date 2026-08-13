@@ -173,10 +173,10 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
     }
 
     private fun setupFermionPlayer() {
-        val streamUrl = content.liveStream?.streamUrl
+        val fermionUrl = content.liveStream?.fermionUrl
         val container = view?.findViewById<ViewGroup>(R.id.fermion_player_container)
 
-        if (streamUrl == null || container == null) {
+        if (fermionUrl == null || container == null) {
             displayErrorNotice()
             return
         }
@@ -184,8 +184,13 @@ class LiveStreamFragment : BaseContentDetailFragment(), LiveStreamCallbackListen
 
         val fermionFragment = FermionLiveStreamFragment()
         fermionFragment.arguments = Bundle().apply {
-            putString(ARG_STREAM_URL, streamUrl)
+            putString(ARG_STREAM_URL, fermionUrl)
             putString(ARG_TITLE, content.title ?: "")
+        }
+        fermionFragment.listener = object : FermionLiveStreamFragment.Listener {
+            override fun onMeetingLeft() {
+                activity?.finish()
+            }
         }
         childFragmentManager.beginTransaction()
             .replace(R.id.fermion_player_container, fermionFragment)

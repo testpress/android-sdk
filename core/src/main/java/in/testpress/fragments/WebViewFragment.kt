@@ -223,6 +223,8 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     interface Listener {
         fun onWebViewInitializationSuccess()
         fun shouldOverrideUrlLoading(url: String?): Boolean = false
+        fun onPageStarted(url: String?) {}
+        fun onPageFinished(url: String?) {}
     }
 
     companion object {
