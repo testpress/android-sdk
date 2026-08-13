@@ -30,6 +30,7 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
         public final static Property ShowRecordedVideo = new Property(5, Boolean.class, "showRecordedVideo", false, "SHOW_RECORDED_VIDEO");
         public final static Property ChatEmbedUrl = new Property(6, String.class, "chatEmbedUrl", false, "CHAT_EMBED_URL");
         public final static Property Provider = new Property(7, String.class, "provider", false, "PROVIDER");
+        public final static Property FermionUrl = new Property(8, String.class, "fermionUrl", false, "FERMION_URL");
     }
 
 
@@ -52,7 +53,8 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
                 "\"STATUS\" TEXT," + // 4: status
                 "\"SHOW_RECORDED_VIDEO\" INTEGER," + // 5: showRecordedVideo
                 "\"CHAT_EMBED_URL\" TEXT," + // 6: chatEmbedUrl
-                "\"PROVIDER\" TEXT);"); // 7: provider
+                "\"PROVIDER\" TEXT," + // 7: provider
+                "\"FERMION_URL\" TEXT);"); // 8: fermionUrl
     }
 
     /** Drops the underlying database table. */
@@ -104,6 +106,11 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
         if (provider != null) {
             stmt.bindString(8, provider);
         }
+ 
+        String fermionUrl = entity.getFermionUrl();
+        if (fermionUrl != null) {
+            stmt.bindString(9, fermionUrl);
+        }
     }
 
     @Override
@@ -149,6 +156,11 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
         if (provider != null) {
             stmt.bindString(8, provider);
         }
+ 
+        String fermionUrl = entity.getFermionUrl();
+        if (fermionUrl != null) {
+            stmt.bindString(9, fermionUrl);
+        }
     }
 
     @Override
@@ -166,7 +178,8 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
             cursor.isNull(offset + 4) ? null : cursor.getString(offset + 4), // status
             cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0, // showRecordedVideo
             cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6), // chatEmbedUrl
-            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7) // provider
+            cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7), // provider
+            cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8) // fermionUrl
         );
         return entity;
     }
@@ -181,6 +194,7 @@ public class LiveStreamDao extends AbstractDao<LiveStream, Long> {
         entity.setShowRecordedVideo(cursor.isNull(offset + 5) ? null : cursor.getShort(offset + 5) != 0);
         entity.setChatEmbedUrl(cursor.isNull(offset + 6) ? null : cursor.getString(offset + 6));
         entity.setProvider(cursor.isNull(offset + 7) ? null : cursor.getString(offset + 7));
+        entity.setFermionUrl(cursor.isNull(offset + 8) ? null : cursor.getString(offset + 8));
      }
     
     @Override

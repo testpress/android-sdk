@@ -10,7 +10,7 @@ import org.greenrobot.greendao.generator.ToOne;
 
 public class TestpressSDKDaoGenerator {
     // Increase the version if any modification has been made in this file.
-    private static final int VERSION = 86;
+    private static final int VERSION = 87;
 
     public static void main(String args[]) throws Exception {
         Schema schema = new Schema(VERSION, "in.testpress.models.greendao");
@@ -473,6 +473,7 @@ public class TestpressSDKDaoGenerator {
         liveStream.addBooleanProperty("showRecordedVideo");
         liveStream.addStringProperty("chatEmbedUrl");
         liveStream.addStringProperty("provider");
+        liveStream.addStringProperty("fermionUrl");
         return liveStream;
     }
 

@@ -10,7 +10,8 @@ data class NetworkLiveStream(
     val status: String = "",
     val showRecordedVideo: Boolean? = false,
     val chatEmbedUrl: String = "",
-    val provider: String? = null
+    val provider: String? = null,
+    val fermionUrl: String? = null
 )
 
 fun NetworkLiveStream.asGreenDaoModel(): LiveStream {
@@ -22,6 +23,7 @@ fun NetworkLiveStream.asGreenDaoModel(): LiveStream {
         this.status,
         this.showRecordedVideo,
         this.chatEmbedUrl,
-        this.provider
+        this.provider,
+        this.fermionUrl
     )
 }
