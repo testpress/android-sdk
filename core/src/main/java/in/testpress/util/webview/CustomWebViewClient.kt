@@ -55,12 +55,14 @@ class CustomWebViewClient(val fragment: WebViewFragment) : AndroidWebViewClient(
 
     override fun onPageStarted(view: AndroidWebView?, url: String?, favicon: Bitmap?) {
         if (fragment.showLoadingBetweenPages) fragment.showLoading()
+        fragment.listener?.onPageStarted(url)
     }
 
     override fun onPageFinished(view: AndroidWebView?, url: String?) {
         fragment.hideLoading()
         fragment.hideEmptyViewShowWebView()
         checkWebViewHasError()
+        fragment.listener?.onPageFinished(url)
     }
 
     override fun onReceivedError(
