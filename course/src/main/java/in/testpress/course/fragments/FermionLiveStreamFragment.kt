@@ -30,6 +30,7 @@ class FermionLiveStreamFragment : Fragment() {
     private var fermionHost: String? = null
     private var fermionPath: String? = null
     private var fermionPageLoaded = false
+    private var hasNotifiedLeave = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -50,30 +51,31 @@ class FermionLiveStreamFragment : Fragment() {
     }
 
     private fun fetchSsoUrlAndLoad() {
+        val currentStreamUrl = streamUrl ?: return
         val session = TestpressSdk.getTestpressSession(requireContext())
         if (session != null) {
             TestpressApiClient(requireContext(), session).ssourl.enqueue(object : TestpressCallback<SSOUrl>() {
                 override fun onSuccess(result: SSOUrl?) {
                     val ssoUrl = result?.ssoUrl
                     if (!ssoUrl.isNullOrBlank()) {
-                        val loginUrl = buildSsoLoginUrl(ssoUrl, session.instituteSettings.baseUrl)
+                        val loginUrl = buildSsoLoginUrl(ssoUrl, session.instituteSettings.baseUrl, currentStreamUrl)
                         loadInWebViewFragment(loginUrl)
                     } else {
-                        loadInWebViewFragment(streamUrl!!)
+                        loadInWebViewFragment(currentStreamUrl)
                     }
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    loadInWebViewFragment(streamUrl!!)
+                    loadInWebViewFragment(currentStreamUrl)
                 }
             })
         } else {
-            loadInWebViewFragment(streamUrl!!)
+            loadInWebViewFragment(currentStreamUrl)
         }
     }
 
-    private fun buildSsoLoginUrl(ssoUrl: String, baseUrl: String): String {
-        val nextUrl = Uri.encode(streamUrl)
+    private fun buildSsoLoginUrl(ssoUrl: String, baseUrl: String, targetUrl: String): String {
+        val nextUrl = Uri.encode(targetUrl)
         val separator = if (ssoUrl.contains("?")) "&" else "?"
         val cleanBaseUrl = baseUrl.trimEnd('/')
         val cleanSsoUrl = if (ssoUrl.startsWith("/")) ssoUrl else "/$ssoUrl"
@@ -86,6 +88,7 @@ class FermionLiveStreamFragment : Fragment() {
         fermionHost = streamUrl?.let { Uri.parse(it).host }
         fermionPath = streamUrl?.let { Uri.parse(it).path?.trimEnd('/') }
         fermionPageLoaded = false
+        hasNotifiedLeave = false
 
         val webViewFragment = createWebViewFragment(urlToLoad)
         childFragmentManager.beginTransaction()
@@ -116,15 +119,16 @@ class FermionLiveStreamFragment : Fragment() {
 
             override fun onPageStarted(url: String?) {
                 if (fermionPageLoaded && !isStillOnFermionPage(url)) {
-                    webViewFragment.webView.stopLoading()
                     notifyMeetingLeft()
                 }
             }
 
             override fun onPageFinished(url: String?) {
-                val urlPath = url?.let { Uri.parse(it).path?.trimEnd('/') }
+                val uri = url?.let { Uri.parse(it) }
+                val urlHost = uri?.host
+                val urlPath = uri?.path?.trimEnd('/')
                 when {
-                    urlPath == fermionPath -> {
+                    urlHost == fermionHost && urlPath == fermionPath -> {
                         fermionPageLoaded = true
                         webViewFragment.webView.evaluateJavascript(
                             buildPostMessageListenerScript(fermionHost), null
@@ -148,12 +152,22 @@ class FermionLiveStreamFragment : Fragment() {
 
     private fun isStillOnFermionPage(url: String?): Boolean {
         if (url == null) return true
-        return Uri.parse(url).path?.trimEnd('/') == fermionPath
+        val uri = Uri.parse(url)
+        val path = uri.path ?: return false
+        // Use prefix match, not exact match: Fermion uses SPA routing internally
+        // and may push sub-routes within the meeting room (e.g. /live-room/10622/stage/).
+        // An exact path check would mistake those internal navigations for a leave event.
+        return uri.host == fermionHost &&
+               (path.trimEnd('/') == fermionPath || path.startsWith("$fermionPath/"))
     }
 
     private fun buildPostMessageListenerScript(fermionHost: String?): String {
         val originCheck = if (fermionHost != null) {
-            "if (!event.origin.includes('$fermionHost')) return;"
+            """
+                try {
+                    if (new URL(event.origin).hostname !== '$fermionHost') return;
+                } catch(e) { return; }
+            """.trimIndent()
         } else {
             ""
         }
@@ -178,8 +192,14 @@ class FermionLiveStreamFragment : Fragment() {
 
     /** Notifies the parent that the user has left the meeting. */
     private fun notifyMeetingLeft() {
+        if (hasNotifiedLeave) return
+        hasNotifiedLeave = true
         activity?.runOnUiThread {
-            listener?.onMeetingLeft() ?: activity?.finish()
+            if (listener != null) {
+                listener?.onMeetingLeft()
+            } else {
+                activity?.finish()
+            }
         }
     }
 
