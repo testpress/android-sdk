@@ -245,6 +245,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         val videoConference = content.videoConference
         
         if (!isConferenceDataValid(videoConference)) {
+            isRetryingAfterFailure = true
             forceReloadContent {
                 val refreshedConference = content.videoConference
                 if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null && !refreshedConference.accessToken.isNullOrBlank()) {
@@ -254,10 +255,12 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                             performJoinAttempt()
                         }
                     } ?: run {
+                        isRetryingAfterFailure = false
                         hideLoadingAndEnableStartButton()
                         Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
+                    isRetryingAfterFailure = false
                     hideLoadingAndEnableStartButton()
                     val message = if (refreshedConference?.conferenceId == null || refreshedConference?.password == null) {
                         "Meeting has not started yet. Please try again after the meeting starts."
@@ -282,6 +285,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     
     private fun performJoinAttempt() {
         if (videoConferenceHandler == null) {
+            isRetryingAfterFailure = false
             hideLoadingAndEnableStartButton()
             Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
             return
