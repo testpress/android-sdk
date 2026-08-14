@@ -38,6 +38,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private var reloadContent = 0
     private val maxReloadContent = 3
     private var isRetryingAfterFailure = false
+    private var isInitializingVideoConference = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,26 +128,42 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_text_gray))
     }
 
-    private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
+    private fun initializeVideoConferenceHandler(
+        videoConference: DomainVideoConferenceContent?,
+        onInitComplete: (() -> Unit)? = null
+    ) {
+        if (isInitializingVideoConference) return
+        isInitializingVideoConference = true
         showLoadingAndDisableStartButton()
         profileDetails?.let {
-            initVideoConferenceHandler(videoConference, it)
-        } ?: loadProfileAndInitializeConference(videoConference)
+            initVideoConferenceHandler(videoConference, it, onInitComplete)
+        } ?: loadProfileAndInitializeConference(videoConference, onInitComplete)
     }
 
-    private fun loadProfileAndInitializeConference(videoConference: DomainVideoConferenceContent?) {
+    private fun loadProfileAndInitializeConference(
+        videoConference: DomainVideoConferenceContent?,
+        onInitComplete: (() -> Unit)? = null
+    ) {
         TestpressUserDetails.getInstance().load(requireContext(), object : TestpressCallback<ProfileDetails>() {
             override fun onSuccess(result: ProfileDetails?) {
-                if (!isAdded) return
+                if (!isAdded) {
+                    isInitializingVideoConference = false
+                    return
+                }
                 profileDetails = result
                 profileDetails?.let {
-                    initVideoConferenceHandler(videoConference, it)
+                    initVideoConferenceHandler(videoConference, it, onInitComplete)
+                } ?: run {
+                    isInitializingVideoConference = false
+                    onInitComplete?.invoke()
                 }
             }
 
             override fun onException(exception: TestpressException) {
+                isInitializingVideoConference = false
                 if (!isAdded) return
                 emptyViewFragment.displayError(exception)
+                onInitComplete?.invoke()
             }
         })
     }
@@ -157,6 +174,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         onInitComplete: (() -> Unit)? = null
     ) {
         if (!isAdded || videoConference == null || videoConference.accessToken.isNullOrBlank()) {
+            isInitializingVideoConference = false
             if (!isRetryingAfterFailure) {
                 hideLoadingAndEnableStartButton()
             }
@@ -167,6 +185,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
             videoConferenceHandler = VideoConferenceHandler(requireContext(), videoConference, profileDetails)
             videoConferenceHandler?.init(object : VideoConferenceInitializeListener {
                 override fun onSuccess() {
+                    isInitializingVideoConference = false
                     if (!isRetryingAfterFailure) {
                         hideLoadingAndEnableStartButton()
                     }
@@ -174,6 +193,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 }
 
                 override fun onFailure() {
+                    isInitializingVideoConference = false
                     if (!isRetryingAfterFailure) {
                         hideLoadingAndEnableStartButton()
                     }
@@ -181,12 +201,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 }
             })
         } catch (e: NoClassDefFoundError) {
+            isInitializingVideoConference = false
             if (!isRetryingAfterFailure) {
                 hideLoadingAndEnableStartButton()
             }
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
             onInitComplete?.invoke()
         } catch (e: Exception) {
+            isInitializingVideoConference = false
             if (!isRetryingAfterFailure) {
                 hideLoadingAndEnableStartButton()
             }
@@ -225,7 +247,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null && !refreshedConference.accessToken.isNullOrBlank()) {
                     videoConferenceHandler?.destroy()
                     profileDetails?.let {
-                        initVideoConferenceHandler(refreshedConference, it) {
+                        initializeVideoConferenceHandler(refreshedConference) {
                             performJoinAttempt()
                         }
                     } ?: run {
@@ -275,7 +297,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                         profileDetails?.let {
                             if (videoConference != null && videoConference.conferenceId != null && videoConference.password != null) {
                                 videoConferenceHandler?.destroy()
-                                initVideoConferenceHandler(videoConference, it) {
+                                initializeVideoConferenceHandler(videoConference) {
                                     videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
                                         override fun onSuccess() {
                                             handleJoinSuccess()
