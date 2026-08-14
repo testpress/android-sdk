@@ -38,6 +38,8 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private var reloadContent = 0
     private val maxReloadContent = 3
     private var isRetryingAfterFailure = false
+    private var isInitializingVideoConference = false
+    private val pendingInitializationCallbacks = mutableListOf<() -> Unit>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -127,7 +129,13 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         startButton.setBackgroundColor(ContextCompat.getColor(requireContext(), R.color.testpress_text_gray))
     }
 
-    private fun initializeVideoConferenceHandler(videoConference: DomainVideoConferenceContent?) {
+    private fun initializeVideoConferenceHandler(
+        videoConference: DomainVideoConferenceContent?,
+        onInitComplete: (() -> Unit)? = null
+    ) {
+        onInitComplete?.let(pendingInitializationCallbacks::add)
+        if (isInitializingVideoConference) return
+        isInitializingVideoConference = true
         showLoadingAndDisableStartButton()
         profileDetails?.let {
             initVideoConferenceHandler(videoConference, it)
@@ -137,30 +145,38 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     private fun loadProfileAndInitializeConference(videoConference: DomainVideoConferenceContent?) {
         TestpressUserDetails.getInstance().load(requireContext(), object : TestpressCallback<ProfileDetails>() {
             override fun onSuccess(result: ProfileDetails?) {
-                if (!isAdded) return
+                if (!isAdded) {
+                    completeVideoConferenceInitialization()
+                    return
+                }
                 profileDetails = result
                 profileDetails?.let {
                     initVideoConferenceHandler(videoConference, it)
+                } ?: run {
+                    completeVideoConferenceInitialization()
                 }
             }
 
             override fun onException(exception: TestpressException) {
-                if (!isAdded) return
+                if (!isAdded) {
+                    completeVideoConferenceInitialization()
+                    return
+                }
                 emptyViewFragment.displayError(exception)
+                completeVideoConferenceInitialization()
             }
         })
     }
 
     private fun initVideoConferenceHandler(
         videoConference: DomainVideoConferenceContent?,
-        profileDetails: ProfileDetails,
-        onInitComplete: (() -> Unit)? = null
+        profileDetails: ProfileDetails
     ) {
         if (!isAdded || videoConference == null || videoConference.accessToken.isNullOrBlank()) {
             if (!isRetryingAfterFailure) {
                 hideLoadingAndEnableStartButton()
             }
-            onInitComplete?.invoke()
+            completeVideoConferenceInitialization()
             return
         }
         try {
@@ -170,14 +186,14 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     if (!isRetryingAfterFailure) {
                         hideLoadingAndEnableStartButton()
                     }
-                    onInitComplete?.invoke()
+                    completeVideoConferenceInitialization()
                 }
 
                 override fun onFailure() {
                     if (!isRetryingAfterFailure) {
                         hideLoadingAndEnableStartButton()
                     }
-                    onInitComplete?.invoke()
+                    completeVideoConferenceInitialization()
                 }
             })
         } catch (e: NoClassDefFoundError) {
@@ -185,7 +201,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                 hideLoadingAndEnableStartButton()
             }
             Toast.makeText(context, "Zoom integration is not enabled in the app, please contact admin", Toast.LENGTH_LONG).show()
-            onInitComplete?.invoke()
+            completeVideoConferenceInitialization()
         } catch (e: Exception) {
             if (!isRetryingAfterFailure) {
                 hideLoadingAndEnableStartButton()
@@ -202,7 +218,16 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                     }
                 )
             }
-            onInitComplete?.invoke()
+            completeVideoConferenceInitialization()
+        }
+    }
+
+    private fun completeVideoConferenceInitialization() {
+        isInitializingVideoConference = false
+        val callbacks = pendingInitializationCallbacks.toList()
+        pendingInitializationCallbacks.clear()
+        if (isAdded) {
+            callbacks.forEach { it.invoke() }
         }
     }
 
@@ -220,19 +245,22 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
         val videoConference = content.videoConference
         
         if (!isConferenceDataValid(videoConference)) {
+            isRetryingAfterFailure = true
             forceReloadContent {
                 val refreshedConference = content.videoConference
                 if (refreshedConference != null && refreshedConference.conferenceId != null && refreshedConference.password != null && !refreshedConference.accessToken.isNullOrBlank()) {
                     videoConferenceHandler?.destroy()
                     profileDetails?.let {
-                        initVideoConferenceHandler(refreshedConference, it) {
+                        initializeVideoConferenceHandler(refreshedConference) {
                             performJoinAttempt()
                         }
                     } ?: run {
+                        isRetryingAfterFailure = false
                         hideLoadingAndEnableStartButton()
                         Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
                     }
                 } else {
+                    isRetryingAfterFailure = false
                     hideLoadingAndEnableStartButton()
                     val message = if (refreshedConference?.conferenceId == null || refreshedConference?.password == null) {
                         "Meeting has not started yet. Please try again after the meeting starts."
@@ -257,6 +285,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
     
     private fun performJoinAttempt() {
         if (videoConferenceHandler == null) {
+            isRetryingAfterFailure = false
             hideLoadingAndEnableStartButton()
             Toast.makeText(context, "Unable to join meeting. Please try again.", Toast.LENGTH_SHORT).show()
             return
@@ -275,7 +304,7 @@ class VideoConferenceFragment : BaseContentDetailFragment() {
                         profileDetails?.let {
                             if (videoConference != null && videoConference.conferenceId != null && videoConference.password != null) {
                                 videoConferenceHandler?.destroy()
-                                initVideoConferenceHandler(videoConference, it) {
+                                initializeVideoConferenceHandler(videoConference) {
                                     videoConferenceHandler?.joinMeet(object: VideoConferenceInitializeListener {
                                         override fun onSuccess() {
                                             handleJoinSuccess()
