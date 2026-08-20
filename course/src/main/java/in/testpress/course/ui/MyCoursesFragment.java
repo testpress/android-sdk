@@ -55,7 +55,11 @@ public class MyCoursesFragment extends BaseDataBaseFragment<Course, Long> {
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setHasOptionsMenu(instituteSettings.getEnableCustomTest());
+        boolean showCustomExam = instituteSettings.getEnableCustomTest();
+        if (tags != null && (tags.contains("classes") || tags.contains("info"))) {
+            showCustomExam = false;
+        }
+        setHasOptionsMenu(showCustomExam);
     }
 
     private void initializeTags() {
