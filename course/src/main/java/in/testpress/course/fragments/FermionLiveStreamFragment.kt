@@ -31,6 +31,7 @@ class FermionLiveStreamFragment : Fragment() {
     private var fermionPath: String? = null
     private var fermionPageLoaded = false
     private var hasNotifiedLeave = false
+    private var allowedHosts = setOf<String>()
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -85,6 +86,29 @@ class FermionLiveStreamFragment : Fragment() {
     @SuppressLint("AddJavascriptInterface")
     private fun loadInWebViewFragment(urlToLoad: String) {
         if (!isAdded) return
+
+        val hosts = mutableSetOf<String>()
+        streamUrl?.let { Uri.parse(it).host }?.let { hosts.add(it.lowercase()) }
+
+        val session = TestpressSdk.getTestpressSession(requireContext())
+        if (session != null) {
+            runCatching { Uri.parse(session.instituteSettings.baseUrl)?.host }
+                .getOrNull()?.let { hosts.add(it.lowercase()) }
+
+            val whiteLabeledHostUrl = session.instituteSettings.whiteLabeledHostUrl
+            if (!whiteLabeledHostUrl.isNullOrBlank()) {
+                val whiteLabeledHost = runCatching {
+                    if (whiteLabeledHostUrl.startsWith("http://") || whiteLabeledHostUrl.startsWith("https://")) {
+                        Uri.parse(whiteLabeledHostUrl)?.host
+                    } else {
+                        Uri.parse("https://$whiteLabeledHostUrl")?.host
+                    }
+                }.getOrNull()
+                whiteLabeledHost?.let { hosts.add(it.lowercase()) }
+            }
+        }
+        allowedHosts = hosts
+
         fermionHost = streamUrl?.let { Uri.parse(it).host }
         fermionPath = streamUrl?.let { Uri.parse(it).path?.trimEnd('/') }
         fermionPageLoaded = false
@@ -125,13 +149,16 @@ class FermionLiveStreamFragment : Fragment() {
 
             override fun onPageFinished(url: String?) {
                 val uri = url?.let { Uri.parse(it) }
-                val urlHost = uri?.host
+                val urlHost = uri?.host?.lowercase()
                 val urlPath = uri?.path?.trimEnd('/')
+
+                val isMatchingHost = urlHost?.let { allowedHosts.contains(it) } ?: false
+
                 when {
-                    urlHost == fermionHost && urlPath == fermionPath -> {
+                    isMatchingHost && urlPath == fermionPath -> {
                         fermionPageLoaded = true
                         webViewFragment.webView.evaluateJavascript(
-                            buildPostMessageListenerScript(fermionHost), null
+                            buildPostMessageListenerScript(), null
                         )
                     }
                     fermionPageLoaded && !isStillOnFermionPage(url) -> {
@@ -154,29 +181,23 @@ class FermionLiveStreamFragment : Fragment() {
         if (url == null) return true
         val uri = Uri.parse(url)
         val path = uri.path ?: return false
-        // Use prefix match, not exact match: Fermion uses SPA routing internally
-        // and may push sub-routes within the meeting room (e.g. /live-room/10622/stage/).
-        // An exact path check would mistake those internal navigations for a leave event.
-        return uri.host == fermionHost &&
+        val host = uri.host?.lowercase() ?: return false
+        return allowedHosts.contains(host) &&
                (path.trimEnd('/') == fermionPath || path.startsWith("$fermionPath/"))
     }
 
-    private fun buildPostMessageListenerScript(fermionHost: String?): String {
-        val originCheck = if (fermionHost != null) {
-            """
-                try {
-                    if (new URL(event.origin).hostname !== '$fermionHost') return;
-                } catch(e) { return; }
-            """.trimIndent()
-        } else {
-            ""
-        }
+    private fun buildPostMessageListenerScript(): String {
+        val hostsArrayJson = allowedHosts.joinToString(separator = ",", prefix = "[", postfix = "]") { "'$it'" }
         return """
             (function() {
                 if (window._fermionAndroidListenerAttached) return;
                 window._fermionAndroidListenerAttached = true;
+                var allowedHosts = $hostsArrayJson;
                 window.addEventListener('message', function(event) {
-                    $originCheck
+                    try {
+                        var originHost = new URL(event.origin).hostname;
+                        if (!allowedHosts.includes(originHost)) return;
+                    } catch(e) { return; }
                     var payload = event.data;
                     if (!payload || typeof payload !== 'object') return;
                     var type = payload.type;
