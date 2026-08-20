@@ -17,6 +17,9 @@ import `in`.testpress.fragments.WebViewFragment
 import `in`.testpress.models.SSOUrl
 import `in`.testpress.network.TestpressApiClient
 import `in`.testpress.util.BaseJavaScriptInterface
+import android.content.res.Configuration
+import `in`.testpress.util.webview.CustomWebChromeClient
+import androidx.appcompat.app.AppCompatActivity
 
 class FermionLiveStreamFragment : Fragment() {
 
@@ -32,6 +35,7 @@ class FermionLiveStreamFragment : Fragment() {
     private var fermionPageLoaded = false
     private var hasNotifiedLeave = false
     private var allowedHosts = setOf<String>()
+    private var webViewFragment: WebViewFragment? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -49,6 +53,7 @@ class FermionLiveStreamFragment : Fragment() {
             return
         }
         fetchSsoUrlAndLoad()
+        updateLayoutForOrientation()
     }
 
     private fun fetchSsoUrlAndLoad() {
@@ -114,9 +119,10 @@ class FermionLiveStreamFragment : Fragment() {
         fermionPageLoaded = false
         hasNotifiedLeave = false
 
-        val webViewFragment = createWebViewFragment(urlToLoad)
+        val fragment = createWebViewFragment(urlToLoad)
+        webViewFragment = fragment
         childFragmentManager.beginTransaction()
-            .replace(R.id.fermion_webview_container, webViewFragment)
+            .replace(R.id.fermion_webview_container, fragment)
             .commitAllowingStateLoss()
     }
 
@@ -230,6 +236,48 @@ class FermionLiveStreamFragment : Fragment() {
         fun onLeave() {
             onLeave()
         }
+    }
+
+    private fun hideSystemUI() {
+        activity?.window?.decorView?.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY or
+                    View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
+                    View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN or
+                    View.SYSTEM_UI_FLAG_HIDE_NAVIGATION or
+                    View.SYSTEM_UI_FLAG_FULLSCREEN
+    }
+
+    private fun showSystemUI() {
+        activity?.window?.decorView?.systemUiVisibility =
+            View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+    }
+
+    private fun updateLayoutForOrientation() {
+        val appCompatActivity = activity as? AppCompatActivity ?: return
+        val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+        if (isLandscape) {
+            appCompatActivity.supportActionBar?.hide()
+            hideSystemUI()
+            appCompatActivity.findViewById<View>(R.id.chat_view_fragment)?.visibility = View.GONE
+        } else {
+            appCompatActivity.supportActionBar?.show()
+            showSystemUI()
+            appCompatActivity.findViewById<View>(R.id.chat_view_fragment)?.visibility = View.VISIBLE
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        updateLayoutForOrientation()
+    }
+
+    override fun onDestroyView() {
+        val appCompatActivity = activity as? AppCompatActivity
+        appCompatActivity?.supportActionBar?.show()
+        showSystemUI()
+        super.onDestroyView()
     }
 
     companion object {
