@@ -5,6 +5,7 @@ apply plugin: 'org.jetbrains.kotlin.plugin.compose'
 android {
     compileSdkVersion rootProject.compileSdkVersion
     buildToolsVersion rootProject.buildToolsVersion
+    namespace 'in.testpress.course'
 
     defaultConfig {
         minSdkVersion rootProject.minSdkVersion
