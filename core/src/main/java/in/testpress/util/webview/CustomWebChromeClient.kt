@@ -53,6 +53,8 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
     private var previousOrientation: Int? = null
     private var previousSystemUiVisibility: Int? = null
 
+    fun isFullScreen(): Boolean = customView != null
+
     private fun capturedImageNotAvailable(): Array<Uri>? {
         return if (fragment.imagePath != null) {
             arrayOf(Uri.parse(fragment.imagePath))
