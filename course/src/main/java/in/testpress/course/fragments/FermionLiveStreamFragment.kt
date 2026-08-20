@@ -127,9 +127,15 @@ class FermionLiveStreamFragment : Fragment() {
                 val uri = url?.let { Uri.parse(it) }
                 val urlHost = uri?.host
                 val urlPath = uri?.path?.trimEnd('/')
+                
+                val isMatchingHost = urlHost == fermionHost || isInstituteHost(urlHost)
+                
                 when {
-                    urlHost == fermionHost && urlPath == fermionPath -> {
+                    isMatchingHost && urlPath == fermionPath -> {
                         fermionPageLoaded = true
+                        if (urlHost != null) {
+                            fermionHost = urlHost
+                        }
                         webViewFragment.webView.evaluateJavascript(
                             buildPostMessageListenerScript(fermionHost), null
                         )
@@ -154,11 +160,30 @@ class FermionLiveStreamFragment : Fragment() {
         if (url == null) return true
         val uri = Uri.parse(url)
         val path = uri.path ?: return false
-        // Use prefix match, not exact match: Fermion uses SPA routing internally
-        // and may push sub-routes within the meeting room (e.g. /live-room/10622/stage/).
-        // An exact path check would mistake those internal navigations for a leave event.
-        return uri.host == fermionHost &&
+        val hostMatch = uri.host == fermionHost || isInstituteHost(uri.host)
+        return hostMatch &&
                (path.trimEnd('/') == fermionPath || path.startsWith("$fermionPath/"))
+    }
+
+    private fun isInstituteHost(host: String?): Boolean {
+        if (host == null) return false
+        val session = TestpressSdk.getTestpressSession(requireContext()) ?: return false
+        
+        val baseHost = runCatching { Uri.parse(session.instituteSettings.baseUrl)?.host }.getOrNull()
+        if (host.equals(baseHost, ignoreCase = true)) return true
+        
+        val whiteLabeledHostUrl = session.instituteSettings.whiteLabeledHostUrl
+        if (!whiteLabeledHostUrl.isNullOrBlank()) {
+            val whiteLabeledHost = runCatching {
+                if (whiteLabeledHostUrl.startsWith("http://") || whiteLabeledHostUrl.startsWith("https://")) {
+                    Uri.parse(whiteLabeledHostUrl)?.host
+                } else {
+                    Uri.parse("https://$whiteLabeledHostUrl")?.host
+                }
+            }.getOrNull()
+            if (host.equals(whiteLabeledHost, ignoreCase = true)) return true
+        }
+        return false
     }
 
     private fun buildPostMessageListenerScript(fermionHost: String?): String {
