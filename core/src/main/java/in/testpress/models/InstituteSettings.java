@@ -512,7 +512,8 @@ public class InstituteSettings {
         return domain.contains("brilliantpala") ||
                domain.contains("metier") ||
                domain.contains("uyirmeitnpsctamilacademy") ||
-               domain.contains("teammatesacademy");
+               domain.contains("teammatesacademy") ||
+               domain.contains("xandylearning");
     }
 
     /** @deprecated Use {@link #isFloatingWindowAllowedInstitute()} instead */
