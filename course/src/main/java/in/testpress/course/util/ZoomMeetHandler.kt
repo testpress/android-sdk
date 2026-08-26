@@ -165,12 +165,24 @@ class ZoomMeetHandler(
                 val message = when (errorCode) {
                     MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE ->
                         "Version of ZoomSDK is too low! Please update your App"
-                    MeetingError.MEETING_ERROR_CONNECTION_ERR ->
+                    MeetingError.MEETING_ERROR_CONNECTION_ERR,
+                    MeetingError.MEETING_ERROR_NETWORK_UNAVAILABLE ->
                         "You are experiencing network connectivity problems, which is preventing you from joining the class."
+                    MeetingError.MEETING_ERROR_TIMEOUT ->
+                        "Connection timed out. Please check your internet connection and try again."
                     MeetingError.MEETING_ERROR_LOCKED ->
                         "The host has locked this meeting. You cannot join."
                     MeetingError.MEETING_ERROR_USER_FULL ->
                         "The meeting has reached its maximum capacity."
+                    MeetingError.MEETING_ERROR_RESTRICTED ->
+                        "Your access to this meeting is restricted."
+                    MeetingError.MEETING_ERROR_RESTRICTED_JBH ->
+                        "The host has not started this meeting yet. Please try again after the host starts it."
+                    MeetingError.MEETING_ERROR_SESSION_ERROR,
+                    MeetingError.MEETING_ERROR_MMR_ERROR ->
+                        "A server connection issue occurred. Please try again shortly."
+                    MeetingError.MEETING_ERROR_WEB_SERVICE_FAILED ->
+                        "Failed to connect to Zoom services. Please try again later."
                     else ->
                         "Could not join the meeting. Possibly meeting expired or ended"
                 }
