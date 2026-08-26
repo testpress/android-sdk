@@ -349,8 +349,8 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == RESULT_OK && requestCode == STORE_REQUEST_CODE) {
-            boolean paymentStatus = data.getBooleanExtra(PAYMENT_SUCCESS, false);
-            if (paymentStatus) {
+            boolean paymentStatus = data != null && data.getBooleanExtra(PAYMENT_SUCCESS, false);
+            if (paymentStatus && chapter != null) {
                 fetchCourseAndLoadChaptersOrContents(chapter.getCourseId().toString());
             }
         }
