@@ -321,6 +321,9 @@ class ZoomMeetHandler(
         val params = JoinMeetingParams()
         params.meetingNo = videoConference.conferenceId
         params.password = videoConference.password
+        params.displayName = profileDetails.displayName?.takeIf { it.isNotBlank() }
+            ?: profileDetails.username?.takeIf { it.isNotBlank() }
+            ?: "Student ${profileDetails.id}"
         return params
     }
 
