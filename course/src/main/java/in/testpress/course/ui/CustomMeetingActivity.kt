@@ -110,12 +110,9 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         needUsername: Boolean,
         inMeetingEventHandler: InMeetingEventHandler
     ) {
-        val displayName = profileDetails?.displayName?.takeIf { it.isNotBlank() }
-            ?: profileDetails?.username?.takeIf { it.isNotBlank() }
-            ?: "Student"
         inMeetingEventHandler.setMeetingNamePassword(
             inMeetingService.meetingPassword,
-            displayName,
+            ProfileDetails.resolveDisplayName(profileDetails),
             false
         )
     }

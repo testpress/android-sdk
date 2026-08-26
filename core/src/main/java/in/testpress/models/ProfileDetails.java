@@ -492,4 +492,17 @@ public class ProfileDetails implements Parcelable {
         return "null";
     }
 
+    public static String resolveDisplayName(ProfileDetails profileDetails) {
+        if (profileDetails == null) {
+            return "Student";
+        }
+        if (profileDetails.displayName != null && !profileDetails.displayName.trim().isEmpty()) {
+            return profileDetails.displayName;
+        }
+        if (profileDetails.username != null && !profileDetails.username.trim().isEmpty()) {
+            return profileDetails.username;
+        }
+        return "Student" + (profileDetails.id != null ? " " + profileDetails.id : "");
+    }
+
 }
