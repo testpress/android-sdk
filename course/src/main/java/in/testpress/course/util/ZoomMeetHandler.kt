@@ -162,11 +162,18 @@ class ZoomMeetHandler(
     ) {
         when (meetingStatus) {
             MeetingStatus.MEETING_STATUS_FAILED -> {
-                val message =
-                    if (errorCode == MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE)
+                val message = when (errorCode) {
+                    MeetingError.MEETING_ERROR_CLIENT_INCOMPATIBLE ->
                         "Version of ZoomSDK is too low! Please update your App"
-                    else
+                    MeetingError.MEETING_ERROR_CONNECTION_ERR ->
+                        "You are experiencing network connectivity problems, which is preventing you from joining the class."
+                    MeetingError.MEETING_ERROR_LOCKED ->
+                        "The host has locked this meeting. You cannot join."
+                    MeetingError.MEETING_ERROR_USER_FULL ->
+                        "The meeting has reached its maximum capacity."
+                    else ->
                         "Could not join the meeting. Possibly meeting expired or ended"
+                }
                 Toast.makeText(context, message, Toast.LENGTH_LONG).show()
             }
             MeetingStatus.MEETING_STATUS_CONNECTING -> {
