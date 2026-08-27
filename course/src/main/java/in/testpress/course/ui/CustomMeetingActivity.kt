@@ -8,13 +8,9 @@ import `in`.testpress.course.domain.zoom.callbacks.MeetingCommonCallback
 import `in`.testpress.course.domain.zoom.callbacks.MeetingUserCallback
 import `in`.testpress.models.ProfileDetails
 import android.app.AlertDialog
-import android.app.Dialog
 import android.content.DialogInterface
 import android.os.Bundle
-import android.text.TextUtils
 import android.view.WindowManager
-import android.widget.Button
-import android.widget.EditText
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
 import us.zoom.sdk.*
@@ -114,40 +110,11 @@ class CustomMeetingActivity : FragmentActivity(), MeetingUserCallback.UserEvent,
         needUsername: Boolean,
         inMeetingEventHandler: InMeetingEventHandler
     ) {
-        showUsernameDialog(needPassword, needUsername, inMeetingEventHandler)
-    }
-
-
-    var dialog: Dialog? = null
-    private fun showUsernameDialog(
-        needPassword: Boolean,
-        needDisplayName: Boolean,
-        handler: InMeetingEventHandler
-    ) {
-        dialog?.dismiss()
-        dialog = Dialog(this, R.style.TestpressAppCompatAlertDialogStyle)
-        dialog!!.setTitle("Please enter your name")
-        dialog!!.setContentView(R.layout.layout_input_username)
-        val username: EditText = dialog!!.findViewById(R.id.edit_name)
-        username.setText(profileDetails?.displayName ?: "")
-        dialog!!.findViewById<Button>(R.id.btn_cancel).setOnClickListener {
-            dialog!!.dismiss()
-            inMeetingService.leaveCurrentMeeting(true)
-        }
-        dialog!!.findViewById<Button>(R.id.btn_join).setOnClickListener {
-            val userName = username.text.toString()
-            if (TextUtils.isEmpty(userName)) {
-                dialog!!.dismiss()
-                onMeetingNeedPasswordOrDisplayName(needPassword, needDisplayName, handler)
-            }
-            dialog!!.dismiss()
-            handler.setMeetingNamePassword(inMeetingService.meetingPassword, userName, false)
-        }
-
-        dialog!!.setCancelable(false)
-        dialog!!.setCanceledOnTouchOutside(false)
-        dialog!!.show()
-        username.requestFocus()
+        inMeetingEventHandler.setMeetingNamePassword(
+            inMeetingService.meetingPassword,
+            ProfileDetails.resolveDisplayName(profileDetails),
+            false
+        )
     }
 
     override fun onMeetingUserJoin(list: List<Long?>?) {
