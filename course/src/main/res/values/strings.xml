@@ -128,6 +128,9 @@
     <string name="exoplayer_content_parsing_error">A content parsing error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_decoding_error">A decoding error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
     <string name="exoplayer_audio_track_error">An AudioTrack error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
+    <string name="exoplayer_cause_eof">\nCause: Video stream ended unexpectedly (EOF).</string>
+    <string name="exoplayer_cause_playlist_stuck">\nCause: Video playlist failed to update (PlaylistStuck).</string>
+    <string name="exoplayer_cause_bad_padding">\nCause: Video decryption failed due to network packet corruption.</string>
     <string name="exoplayer_drm_error">A DRM error occurred. Please try again later.\n\n%1$s\n(Code: %2$d, ID: %3$s)</string>
 
     <string name="question_button_check">Check</string>

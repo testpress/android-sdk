@@ -494,22 +494,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         DefaultLoadErrorHandlingPolicy customLoadErrorHandlingPolicy = new DefaultLoadErrorHandlingPolicy() {
             @Override
             public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
-                Throwable exception = loadErrorInfo.exception;
-                boolean isTransientChunkError =
-                        exception instanceof EOFException ||
-                        exception instanceof PlaylistStuckException ||
-                        (exception.getCause() != null && exception.getCause() instanceof BadPaddingException) ||
-                        (exception.getCause() != null && exception.getCause().getCause() instanceof BadPaddingException);
-
-                if (isTransientChunkError && loadErrorInfo.errorCount <= 5) {
+                if (isTransientChunkError(loadErrorInfo.exception) && loadErrorInfo.errorCount <= 5) {
                     return Math.min(500L * (long) Math.pow(2, loadErrorInfo.errorCount - 1), 4000L);
                 }
                 return super.getRetryDelayMsFor(loadErrorInfo);
-            }
-
-            @Override
-            public int getMinimumLoadableRetryCount(int dataType) {
-                return 5;
             }
         };
         mediaSourceFactory.setLoadErrorHandlingPolicy(customLoadErrorHandlingPolicy);
@@ -631,6 +619,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     public void releasePlayer() {
+        code2000AutoRetryCount = 0;
         if (audioManager != null) {
             audioManager.abandonAudioFocus(audioFocusChangeListener);
         }
@@ -954,17 +943,27 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (cause == null) return "";
 
         if (cause instanceof EOFException) {
-            return "\nCause: Video stream ended unexpectedly (EOF).";
+            return activity.getString(R.string.exoplayer_cause_eof);
         }
         if (cause instanceof PlaylistStuckException) {
-            return "\nCause: Video playlist failed to update (PlaylistStuck).";
+            return activity.getString(R.string.exoplayer_cause_playlist_stuck);
         }
-        if (cause instanceof BadPaddingException ||
-                (cause.getCause() != null && cause.getCause() instanceof BadPaddingException) ||
-                (cause.getCause() != null && cause.getCause().getCause() != null && cause.getCause().getCause() instanceof BadPaddingException)) {
-            return "\nCause: Video decryption failed due to network packet corruption.";
+        if (isTransientChunkError(cause) || isTransientChunkError(exception)) {
+            return activity.getString(R.string.exoplayer_cause_bad_padding);
         }
         return "";
+    }
+
+    public static boolean isTransientChunkError(Throwable exception) {
+        if (exception == null) return false;
+        if (exception instanceof EOFException || exception instanceof PlaylistStuckException) {
+            return true;
+        }
+        Throwable cause = exception.getCause();
+        if (cause instanceof BadPaddingException) return true;
+        if (cause != null && cause.getCause() instanceof BadPaddingException) return true;
+        if (cause != null && cause.getCause() != null && cause.getCause().getCause() instanceof BadPaddingException) return true;
+        return false;
     }
 
     private boolean isScreenCasted() {
@@ -1066,6 +1065,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             } else {
                 hideError(R.string.testpress_usb_connected);
                 if (playbackState == Player.STATE_READY) {
+                    code2000AutoRetryCount = 0;
                     errorMessageTextView.setVisibility(View.GONE);
                 }
             }
