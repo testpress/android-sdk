@@ -64,6 +64,12 @@ import com.google.android.exoplayer2.trackselection.ExoTrackSelection;
 import com.google.android.exoplayer2.trackselection.MappingTrackSelector;
 import com.google.android.exoplayer2.util.Log;
 import com.google.android.exoplayer2.util.Util;
+import com.google.android.exoplayer2.upstream.DefaultLoadErrorHandlingPolicy;
+import com.google.android.exoplayer2.upstream.LoadErrorHandlingPolicy.LoadErrorInfo;
+import com.google.android.exoplayer2.source.hls.playlist.HlsPlaylistTracker.PlaylistStuckException;
+
+import java.io.EOFException;
+import javax.crypto.BadPaddingException;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -168,6 +174,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private ProfileDetails profileDetails = null;
     private Handler positionCallbackHandler = null;
     private List<Integer> callbackPositions = new ArrayList<>();
+    private int code2000AutoRetryCount = 0;
 
     public ExoPlayerUtil(Activity activity, FrameLayout exoPlayerMainFrame, String url,
                          float startPosition, LiveStreamCallbackListener liveStreamCallbackListener) {
@@ -483,7 +490,29 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void buildPlayer() {
-        MediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(new ExoPlayerDataSourceFactory(activity).build());
+        DefaultMediaSourceFactory mediaSourceFactory = new DefaultMediaSourceFactory(new ExoPlayerDataSourceFactory(activity).build());
+        DefaultLoadErrorHandlingPolicy customLoadErrorHandlingPolicy = new DefaultLoadErrorHandlingPolicy() {
+            @Override
+            public long getRetryDelayMsFor(LoadErrorInfo loadErrorInfo) {
+                Throwable exception = loadErrorInfo.exception;
+                boolean isTransientChunkError =
+                        exception instanceof EOFException ||
+                        exception instanceof PlaylistStuckException ||
+                        (exception.getCause() != null && exception.getCause() instanceof BadPaddingException) ||
+                        (exception.getCause() != null && exception.getCause().getCause() instanceof BadPaddingException);
+
+                if (isTransientChunkError && loadErrorInfo.errorCount <= 5) {
+                    return Math.min(500L * (long) Math.pow(2, loadErrorInfo.errorCount - 1), 4000L);
+                }
+                return super.getRetryDelayMsFor(loadErrorInfo);
+            }
+
+            @Override
+            public int getMinimumLoadableRetryCount(int dataType) {
+                return 5;
+            }
+        };
+        mediaSourceFactory.setLoadErrorHandlingPolicy(customLoadErrorHandlingPolicy);
         DownloadTask downloadTask = new DownloadTask(url, activity);
         MediaItem mediaItem = getMediaItem(downloadTask.isDownloaded());
         if (!downloadTask.isDownloaded()) {
@@ -901,7 +930,8 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         } else if (2001 == exception.errorCode) { // No network error
             errorMessage = activity.getString(R.string.testpress_no_internet_try_again);
         } else if (2000 <= exception.errorCode && exception.errorCode <= 3000) { // Input/Output errors
-            errorMessage = activity.getString(R.string.exoplayer_input_or_output_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
+            String diagnosticDetails = getDiagnosticDetailsForIoError(exception);
+            errorMessage = activity.getString(R.string.exoplayer_input_or_output_error, exception.getErrorCodeName(), exception.errorCode, playbackId) + diagnosticDetails;
         } else if (3000 <= exception.errorCode && exception.errorCode <= 4000) { // Content parsing errors
             errorMessage = activity.getString(R.string.exoplayer_content_parsing_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         } else if (4001 == exception.errorCode) {
@@ -917,6 +947,24 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         }
         displayError(errorMessage, exception.errorCode);
         logPlaybackException(errorMessage, playbackId, exception);
+    }
+
+    private String getDiagnosticDetailsForIoError(PlaybackException exception) {
+        Throwable cause = exception.getCause();
+        if (cause == null) return "";
+
+        if (cause instanceof EOFException) {
+            return "\nCause: Video stream ended unexpectedly (EOF).";
+        }
+        if (cause instanceof PlaylistStuckException) {
+            return "\nCause: Video playlist failed to update (PlaylistStuck).";
+        }
+        if (cause instanceof BadPaddingException ||
+                (cause.getCause() != null && cause.getCause() instanceof BadPaddingException) ||
+                (cause.getCause() != null && cause.getCause().getCause() != null && cause.getCause().getCause() instanceof BadPaddingException)) {
+            return "\nCause: Video decryption failed due to network packet corruption.";
+        }
+        return "";
     }
 
     private boolean isScreenCasted() {
@@ -1040,11 +1088,21 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
             String playBackId = VideoUtils.INSTANCE.generatePlayerIdString();
             Throwable cause = exception.getCause();
 
-            if(isLivestreamNotStartedError(exception)){
+            if (isLivestreamNotStartedError(exception)) {
                 showLiveStreamNotStartedScreen();
                 liveStreamCallbackListener.onUrlReturnError(url);
                 return;
             }
+
+            if (exception.errorCode == 2000 && code2000AutoRetryCount < 1 && InternetConnectivityChecker.isConnected(activity)) {
+                code2000AutoRetryCount++;
+                float currentPosition = getCurrentPosition();
+                preparePlayer();
+                player.setPlayWhenReady(true);
+                player.seekTo((long) (currentPosition * 1000));
+                return;
+            }
+            code2000AutoRetryCount = 0;
 
             if (isDRMException(cause)) {
                 DownloadTask downloadTask = new DownloadTask(url, activity);
