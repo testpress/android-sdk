@@ -19,6 +19,14 @@ class RazorpayPaymentGateway(order: Order, context: Activity): PaymentGateway(or
     }
 
     private fun startPayment() {
+        val orderId = order.orderId
+        // Razorpay order IDs strictly follow the "order_" prefix convention (e.g., "order_TXUjjmGORUrOmz").
+        // Payments initiated without a valid order_id will be auto-refunded by Razorpay.
+        if (orderId.isNullOrEmpty() || !orderId.startsWith("order_")) {
+            paymentGatewayListener?.onPaymentError("Invalid or missing Razorpay Order ID")
+            return
+        }
+
         val co = Checkout()
         co.setKeyID(order.apikey)
         co.open(context, getParameters())
