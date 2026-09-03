@@ -53,6 +53,8 @@ import com.google.android.exoplayer2.drm.DefaultDrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSession;
 import com.google.android.exoplayer2.drm.DrmSessionManager;
 import com.google.android.exoplayer2.drm.DrmSessionManagerProvider;
+import com.google.android.exoplayer2.drm.ExoMediaDrm;
+import com.google.android.exoplayer2.drm.FrameworkMediaDrm;
 import com.google.android.exoplayer2.drm.MediaDrmCallbackException;
 import com.google.android.exoplayer2.offline.DownloadRequest;
 import com.google.android.exoplayer2.source.DefaultMediaSourceFactory;
@@ -145,6 +147,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private boolean iscloseFullscreenDialogCalled;
     private float startPosition;
     private boolean playWhenReady = true;
+    private boolean isL3FallbackAttempted = false;
     boolean isPreparing = false;
     private float speedRate = 1;
     private Spinner speedRateSpinner;
@@ -626,7 +629,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         if (player != null) {
             startPosition = getCurrentPosition();
             playWhenReady = player.getPlayWhenReady();
-            player.release();
+            try {
+                player.release();
+            } catch (Exception e) {
+                Log.e("ExoPlayerUtil", "Error releasing player: " + e.getMessage());
+                Sentry.captureException(e);
+            }
             player = null;
         }
         if (usbConnectionStateReceiver != null) {
@@ -913,6 +921,15 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void handleError(PlaybackException exception,String playbackId) {
+        if ((exception.errorCode == 4001 || exception.errorCode == 4003 || exception.errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED || exception.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED) && !isL3FallbackAttempted) {
+            isL3FallbackAttempted = true;
+            if (player != null) {
+                startPosition = getCurrentPosition();
+            }
+            releasePlayer();
+            initializePlayer();
+            return;
+        }
         String errorMessage = "";
         if (1000 <= exception.errorCode && exception.errorCode < 2000) { // Miscellaneous errors
             errorMessage = activity.getString(R.string.exoplayer_miscellaneous_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
@@ -995,7 +1012,19 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
 
     @Override
     public DrmSessionManager get(MediaItem mediaItem) {
-        return new DefaultDrmSessionManager.Builder().build(new CustomHttpDrmMediaCallback(activity, content.getId()));
+        DefaultDrmSessionManager.Builder builder = new DefaultDrmSessionManager.Builder();
+        if (isL3FallbackAttempted) {
+            builder.setUuidAndExoMediaDrmProvider(C.WIDEVINE_UUID, uuid -> {
+                try {
+                    ExoMediaDrm mediaDrm = FrameworkMediaDrm.newInstance(uuid);
+                    mediaDrm.setPropertyString("securityLevel", "L3");
+                    return mediaDrm;
+                } catch (Exception e) {
+                    return FrameworkMediaDrm.DEFAULT_PROVIDER.acquireExoMediaDrm(uuid);
+                }
+            });
+        }
+        return builder.build(new CustomHttpDrmMediaCallback(activity, content.getId()));
     }
 
     public void registerPositionCallbacks(List<Integer> positions, Handler callbackHandler) {

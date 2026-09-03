@@ -23,7 +23,8 @@ fun logPlaybackException(
         "Error Cause" to (exception.cause?.toString() ?: "Cause not found")
     )
 
-    if (exception.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED) {
+    if (exception.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED ||
+        exception.errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED) {
         extraInfo["Codec Details"] = runCatching { getAVCCodecSupportInfo() }
             .getOrElse { ex -> "Failed to get codec info: ${ex.message}" }
     }
