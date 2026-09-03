@@ -921,11 +921,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void handleError(PlaybackException exception,String playbackId) {
-        if ((exception.errorCode == 4001 || exception.errorCode == 4003 || exception.errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED || exception.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED) && !isL3FallbackAttempted) {
+        if ((exception.errorCode == PlaybackException.ERROR_CODE_DECODER_INIT_FAILED || exception.errorCode == PlaybackException.ERROR_CODE_DECODING_FAILED) && !isL3FallbackAttempted) {
             isL3FallbackAttempted = true;
-            if (player != null) {
-                startPosition = getCurrentPosition();
-            }
+            String fallbackMsg = "<html><body><p>An error occurred while playing the video. Try restarting your device or playing another video. More help <a href='https://tpstreams.com/help/troubleshooting-steps-for-error-code-4001'>click here</a>.<br> Player code: "+exception.errorCode+". Player Id: "+playbackId+"</p></body></html>";
+            logPlaybackException(fallbackMsg, playbackId, exception);
             releasePlayer();
             initializePlayer();
             return;
@@ -1020,6 +1019,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     mediaDrm.setPropertyString("securityLevel", "L3");
                     return mediaDrm;
                 } catch (Exception e) {
+                    Sentry.captureException(e);
                     return FrameworkMediaDrm.DEFAULT_PROVIDER.acquireExoMediaDrm(uuid);
                 }
             });
