@@ -121,6 +121,9 @@ public interface ExamService {
     RetrofitCall<TestpressApiResponse<CourseAttempt>> getContentAttempts(@Url String attemptsUrl);
 
     @GET
+    RetrofitCall<CourseAttempt> getCourseAttempt(@Url String attemptUrl);
+
+    @GET
     RetrofitCall<TestpressApiResponse<ReviewItem>> getReviewItems(
             @Url String reviewUrl,
             @QueryMap Map<String, Object> options);
