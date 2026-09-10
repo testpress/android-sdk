@@ -13,7 +13,27 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
     }
 
     private var userListener = object: SimpleInMeetingListener() {
+        private var lastUserJoinNotifyTime = 0L
+        private val USER_JOIN_DEBOUNCE_MS = 300L
+
+        private fun isCurrentUserHost(): Boolean {
+            return try {
+                val inMeetingService = ZoomSDK.getInstance().inMeetingService ?: return false
+                val myUserId = inMeetingService.myUserID
+                inMeetingService.isHostUser(myUserId)
+            } catch (e: Exception) {
+                false
+            }
+        }
+
         override fun onMeetingUserJoin(list: List<Long>) {
+            // Only host needs participant join events. Attendees do not have a participant UI.
+            if (!isCurrentUserHost()) return
+
+            val now = System.currentTimeMillis()
+            if (now - lastUserJoinNotifyTime < USER_JOIN_DEBOUNCE_MS) return
+            lastUserJoinNotifyTime = now
+
             if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
                     event?.onMeetingUserJoin(list)
@@ -22,6 +42,8 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         }
 
         override fun onMeetingUserLeave(list: List<Long>) {
+            if (!isCurrentUserHost()) return
+
             if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
                     event?.onMeetingUserLeave(list)

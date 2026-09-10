@@ -139,9 +139,22 @@ class ZoomMeetHandler(
         }
     }
 
+    private fun isCurrentUserHost(): Boolean {
+        return try {
+            if (!::zoomSDK.isInitialized) return false
+            val inMeetingService = zoomSDK.inMeetingService ?: return false
+            val myUserId = inMeetingService.myUserID
+            inMeetingService.isHostUser(myUserId)
+        } catch (e: Exception) {
+            false
+        }
+    }
+
     private fun registerCallbacks() {
         MeetingCommonCallback.register()
-        MeetingUserCallback.register()
+        if (isCurrentUserHost()) {
+            MeetingUserCallback.register()
+        }
         MeetingShareCallback.register()
         MeetingChatCallback.register()
     }
