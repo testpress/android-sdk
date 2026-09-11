@@ -10,6 +10,9 @@
     <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
     <uses-permission android:name="android.permission.VIBRATE" />
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MEDIA_PROJECTION" />
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_MICROPHONE" />
 
     <uses-sdk tools:overrideLibrary="us.zoom.androidlib,us.zoom.videomeetings" />
 
@@ -143,6 +146,16 @@
             android:name=".util.SdkInitializer"
             android:authorities="${applicationId}.sdkinitializer"
             android:exported="false" />
+
+        <!-- Override Zoom SDK's ScreenShareServiceForSDK to declare foregroundServiceType
+             required for Android 10+ (API 29+). Without this, on OPPO/Vivo devices targeting
+             Android 14+ the service can start before VideoBoxApplication is initialized,
+             causing a NullPointerException crash. -->
+        <service
+            android:name="com.zipow.videobox.share.ScreenShareServiceForSDK"
+            android:exported="false"
+            android:foregroundServiceType="mediaProjection|microphone"
+            tools:node="merge" />
 
     </application>
 

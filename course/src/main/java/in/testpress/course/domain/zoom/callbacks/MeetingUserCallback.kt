@@ -1,6 +1,7 @@
 package `in`.testpress.course.domain.zoom.callbacks
 
 import `in`.testpress.course.util.SimpleInMeetingListener
+import io.sentry.Sentry
 import us.zoom.sdk.ZoomSDK
 
 object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
@@ -13,7 +14,21 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
     }
 
     private var userListener = object: SimpleInMeetingListener() {
+        private fun isCurrentUserHost(): Boolean {
+            return try {
+                val inMeetingService = ZoomSDK.getInstance().inMeetingService ?: return false
+                val myUserId = inMeetingService.myUserID
+                inMeetingService.isHostUser(myUserId)
+            } catch (e: Exception) {
+                Sentry.captureException(e)
+                false
+            }
+        }
+
         override fun onMeetingUserJoin(list: List<Long>) {
+            // Only host needs participant join events. Attendees do not have a participant UI.
+            if (!isCurrentUserHost()) return
+
             if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
                     event?.onMeetingUserJoin(list)
@@ -22,6 +37,8 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         }
 
         override fun onMeetingUserLeave(list: List<Long>) {
+            if (!isCurrentUserHost()) return
+
             if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
                     event?.onMeetingUserLeave(list)
