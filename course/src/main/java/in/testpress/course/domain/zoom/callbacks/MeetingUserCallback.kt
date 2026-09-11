@@ -1,6 +1,7 @@
 package `in`.testpress.course.domain.zoom.callbacks
 
 import `in`.testpress.course.util.SimpleInMeetingListener
+import io.sentry.Sentry
 import us.zoom.sdk.ZoomSDK
 
 object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
@@ -13,15 +14,13 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
     }
 
     private var userListener = object: SimpleInMeetingListener() {
-        private var lastUserJoinNotifyTime = 0L
-        private val USER_JOIN_DEBOUNCE_MS = 300L
-
         private fun isCurrentUserHost(): Boolean {
             return try {
                 val inMeetingService = ZoomSDK.getInstance().inMeetingService ?: return false
                 val myUserId = inMeetingService.myUserID
                 inMeetingService.isHostUser(myUserId)
             } catch (e: Exception) {
+                Sentry.captureException(e)
                 false
             }
         }
@@ -29,10 +28,6 @@ object MeetingUserCallback: BaseCallback<MeetingUserCallback.UserEvent?>() {
         override fun onMeetingUserJoin(list: List<Long>) {
             // Only host needs participant join events. Attendees do not have a participant UI.
             if (!isCurrentUserHost()) return
-
-            val now = System.currentTimeMillis()
-            if (now - lastUserJoinNotifyTime < USER_JOIN_DEBOUNCE_MS) return
-            lastUserJoinNotifyTime = now
 
             if (ZoomSDK.getInstance().meetingService?.meetingStatus == us.zoom.sdk.MeetingStatus.MEETING_STATUS_INMEETING) {
                 for (event in callbacks) {
