@@ -517,7 +517,9 @@ public class InstituteSettings {
                domain.contains("crashclass") ||
                domain.contains("siddhiprep") ||
                domain.contains("chedgemakers") ||
-               domain.contains("benzil");
+               domain.contains("benzil") ||
+               domain.contains("ssgrbcc") ||
+               domain.contains("pyramidiasacademy");
     }
 
     /** @deprecated Use {@link #isFloatingWindowAllowedInstitute()} instead */
