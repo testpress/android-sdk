@@ -34,7 +34,8 @@ data class ProductEntity(
     val strikeThroughPrice: String?,
     val institute: String?,
     val requiresShipping: Boolean?,
-    val buyNowText: String?
+    val buyNowText: String?,
+    val purchaseState: String? = null
 )
 
 @Entity

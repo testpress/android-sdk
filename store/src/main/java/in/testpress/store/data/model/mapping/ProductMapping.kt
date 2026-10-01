@@ -23,6 +23,7 @@ fun ProductWithPrices.asProduct(): Product {
     product.price = this.product.price
     product.images = this.product.images?.map { it.asDomainImage() }
     product.buyNowText = this.product.buyNowText
+    product.purchaseState = this.product.purchaseState
     product.description = this.product.description
     product.additionalInfo = null
     product.paymentLink = this.product.paymentLink

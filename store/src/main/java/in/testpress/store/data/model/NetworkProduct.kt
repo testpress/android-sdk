@@ -31,6 +31,7 @@ data class NetworkProduct(
     val institute: String? = null,
     val requiresShipping: Boolean? = null,
     val buyNowText: String? = null,
+    val purchaseState: String? = null,
 )
 
 data class NetworkPrice(
@@ -70,7 +71,8 @@ fun NetworkProduct.toProductEntity(): ProductEntity {
         strikeThroughPrice = strikeThroughPrice,
         institute = institute,
         requiresShipping = requiresShipping,
-        buyNowText = buyNowText
+        buyNowText = buyNowText,
+        purchaseState = purchaseState
     )
 }
 
