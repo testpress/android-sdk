@@ -291,21 +291,8 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 }
 
                 val state = PurchaseState.fromValue(product.purchaseState)
-                when (state) {
-                    PurchaseState.ENROLLED -> {
-                        couponAndBuyButtonContainer.isVisible = false
-                    }
-                    PurchaseState.INSTALLMENT_DUE -> {
-                        buyButton.isVisible = false
-                        discountContainer.isVisible = false
-                        discountPrompt.isVisible = false
-                        couponAndBuyButtonContainer.isVisible = false
-                    }
-                    PurchaseState.AVAILABLE -> {
-                        couponAndBuyButtonContainer.isVisible = true
-                        buyButton.isVisible = true
-                    }
-                }
+                couponAndBuyButtonContainer.isVisible = (state == PurchaseState.AVAILABLE)
+                buyButton.isVisible = (state == PurchaseState.AVAILABLE)
 
                 renderDescription(product.descriptionHtml)
             }
@@ -396,16 +383,12 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
     private fun handleOrderCreationFailure(exception: TestpressException?) {
         loadingDialog?.dismiss()
-        val errorBody = exception?.errorBodyString.orEmpty()
-        val errorMessage = exception?.message.orEmpty()
-        val isAlreadyPurchased = errorBody.contains("already purchased", ignoreCase = true) ||
-                errorMessage.contains("already purchased", ignoreCase = true)
-
         if (exception?.isNetworkError == true) {
             showToast("Please check your internet connection")
-        } else if (isAlreadyPurchased) {
+        } else if (PurchaseState.isAlreadyPurchased(exception)) {
             showToast("You have already purchased this product.")
             binding.couponAndBuyButtonContainer.isVisible = false
+            productViewModel.retry()
         } else {
             val orderCreationId: String = generateRandom10CharString()
             exception?.let {

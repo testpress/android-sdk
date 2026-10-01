@@ -49,6 +49,7 @@ import in.testpress.store.models.InstallmentPlansResponse;
 import in.testpress.store.models.Order;
 import in.testpress.store.models.OrderItem;
 import in.testpress.store.models.Product;
+import in.testpress.store.models.PurchaseState;
 import in.testpress.store.models.UserInstallmentPlan;
 import in.testpress.store.network.StoreApiClient;
 import in.testpress.store.util.UtilKt;
@@ -234,8 +235,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         View productDetailsView = findViewById(R.id.main_content);
         Button buyButton = (Button) findViewById(R.id.buy_button);
         progressBar.setVisibility(View.GONE);
-        String purchaseState = product.getPurchaseState();
-        if ("enrolled".equalsIgnoreCase(purchaseState)) {
+        PurchaseState state = PurchaseState.fromValue(product.getPurchaseState());
+        if (state == PurchaseState.ENROLLED || state == PurchaseState.INSTALLMENT_DUE) {
             productDetailsView.setVisibility(View.VISIBLE);
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
         } else if (!Boolean.TRUE.equals(product.getHasInstallmentPlans())) {
@@ -412,7 +413,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private void showContentAndHideProgress() {
         progressBar.setVisibility(View.GONE);
         findViewById(R.id.main_content).setVisibility(View.VISIBLE);
-        if ("enrolled".equalsIgnoreCase(product.getPurchaseState())) {
+        PurchaseState state = PurchaseState.fromValue(product.getPurchaseState());
+        if (state == PurchaseState.ENROLLED || state == PurchaseState.INSTALLMENT_DUE) {
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
         } else {
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
@@ -663,18 +665,17 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void handleOrderCreationFailure(TestpressException exception) {
         progressDialog.dismiss();
-        String errorBody = (exception != null && exception.getErrorBodyString() != null) ? exception.getErrorBodyString() : "";
-        String errorMessage = (exception != null && exception.getMessage() != null) ? exception.getMessage() : "";
-        boolean isAlreadyPurchased = errorBody.toLowerCase().contains("already purchased") || errorMessage.toLowerCase().contains("already purchased");
-
         if (exception != null && exception.isNetworkError()) {
             showToast("Please check your internet connection");
-        } else if (isAlreadyPurchased) {
+        } else if (PurchaseState.isAlreadyPurchased(exception)) {
             showToast("You have already purchased this product.");
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
+            loadProductDetails();
         } else {
             String orderCreationId = UtilKt.generateRandom10CharString();
-            Sentry.captureException(exception, scope -> scope.setTag("orderCreationId", orderCreationId));
+            if (exception != null) {
+                Sentry.captureException(exception, scope -> scope.setTag("orderCreationId", orderCreationId));
+            }
             showToast("Failed to create order. Please contact support with ID: " + orderCreationId);
         }
     }
