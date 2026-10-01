@@ -234,7 +234,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         View productDetailsView = findViewById(R.id.main_content);
         Button buyButton = (Button) findViewById(R.id.buy_button);
         progressBar.setVisibility(View.GONE);
-        if (!Boolean.TRUE.equals(product.getHasInstallmentPlans())) {
+        String purchaseState = product.getPurchaseState();
+        if ("enrolled".equalsIgnoreCase(purchaseState)) {
+            productDetailsView.setVisibility(View.VISIBLE);
+            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
+        } else if (!Boolean.TRUE.equals(product.getHasInstallmentPlans())) {
             productDetailsView.setVisibility(View.VISIBLE);
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
         } else {
@@ -408,7 +412,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
     private void showContentAndHideProgress() {
         progressBar.setVisibility(View.GONE);
         findViewById(R.id.main_content).setVisibility(View.VISIBLE);
-        findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
+        if ("enrolled".equalsIgnoreCase(product.getPurchaseState())) {
+            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
+        } else {
+            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
+        }
     }
 
     private int getNextInstallmentNumber(UserInstallmentPlan userPlan) {
@@ -655,8 +663,15 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void handleOrderCreationFailure(TestpressException exception) {
         progressDialog.dismiss();
-        if (exception.isNetworkError()) {
+        String errorBody = (exception != null && exception.getErrorBodyString() != null) ? exception.getErrorBodyString() : "";
+        String errorMessage = (exception != null && exception.getMessage() != null) ? exception.getMessage() : "";
+        boolean isAlreadyPurchased = errorBody.toLowerCase().contains("already purchased") || errorMessage.toLowerCase().contains("already purchased");
+
+        if (exception != null && exception.isNetworkError()) {
             showToast("Please check your internet connection");
+        } else if (isAlreadyPurchased) {
+            showToast("You have already purchased this product.");
+            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
         } else {
             String orderCreationId = UtilKt.generateRandom10CharString();
             Sentry.captureException(exception, scope -> scope.setTag("orderCreationId", orderCreationId));

@@ -34,6 +34,7 @@ import `in`.testpress.store.data.model.mapping.asProduct
 import `in`.testpress.store.databinding.DialogProgressBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
+import `in`.testpress.store.models.PurchaseState
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.store.util.generateRandom10CharString
 import `in`.testpress.util.DateUtils
@@ -289,7 +290,22 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                     }
                 }
 
-                couponAndBuyButtonContainer.isVisible = true
+                val state = PurchaseState.fromValue(product.purchaseState)
+                when (state) {
+                    PurchaseState.ENROLLED -> {
+                        couponAndBuyButtonContainer.isVisible = false
+                    }
+                    PurchaseState.INSTALLMENT_DUE -> {
+                        buyButton.isVisible = false
+                        discountContainer.isVisible = false
+                        discountPrompt.isVisible = false
+                        couponAndBuyButtonContainer.isVisible = false
+                    }
+                    PurchaseState.AVAILABLE -> {
+                        couponAndBuyButtonContainer.isVisible = true
+                        buyButton.isVisible = true
+                    }
+                }
 
                 renderDescription(product.descriptionHtml)
             }
@@ -380,8 +396,16 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
     private fun handleOrderCreationFailure(exception: TestpressException?) {
         loadingDialog?.dismiss()
+        val errorBody = exception?.errorBodyString.orEmpty()
+        val errorMessage = exception?.message.orEmpty()
+        val isAlreadyPurchased = errorBody.contains("already purchased", ignoreCase = true) ||
+                errorMessage.contains("already purchased", ignoreCase = true)
+
         if (exception?.isNetworkError == true) {
             showToast("Please check your internet connection")
+        } else if (isAlreadyPurchased) {
+            showToast("You have already purchased this product.")
+            binding.couponAndBuyButtonContainer.isVisible = false
         } else {
             val orderCreationId: String = generateRandom10CharString()
             exception?.let {
