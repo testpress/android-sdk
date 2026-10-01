@@ -86,11 +86,11 @@ public class Product implements Parcelable {
         parcel.writeString(additionalInfo);
         parcel.writeString(paymentLink);
         parcel.writeString(institute);
-        parcel.writeByte((byte) (requiresShipping ? 1 : 0));
+        parcel.writeByte((byte) (Boolean.TRUE.equals(requiresShipping) ? 1 : 0));
         parcel.writeTypedList(exams);
         parcel.writeTypedList(notes);
         parcel.writeTypedList(prices);
-        parcel.writeByte((byte) (hasInstallmentPlans ? 1 : 0));
+        parcel.writeByte((byte) (Boolean.TRUE.equals(hasInstallmentPlans) ? 1 : 0));
         parcel.writeString(purchaseState);
     }
 
@@ -485,7 +485,7 @@ public class Product implements Parcelable {
     }
 
     public String getPurchaseState() {
-        return purchaseState != null ? purchaseState : "available";
+        return PurchaseState.fromValue(purchaseState).getValue();
     }
 
     public void setPurchaseState(String purchaseState) {
