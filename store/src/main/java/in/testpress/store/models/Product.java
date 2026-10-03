@@ -33,6 +33,7 @@ public class Product implements Parcelable {
     private List<Notes> notes = new ArrayList<Notes>();
     private List<PricesItem> prices = new ArrayList<PricesItem>();
     private Boolean hasInstallmentPlans;
+    private String purchaseState;
 
     public Product(){}
 
@@ -59,6 +60,7 @@ public class Product implements Parcelable {
         parcel.readTypedList(notes, Notes.CREATOR);
         parcel.readTypedList(prices,PricesItem.CREATOR);
         hasInstallmentPlans = parcel.readByte() != 0;
+        purchaseState = parcel.readString();
     }
 
     @Override
@@ -84,11 +86,12 @@ public class Product implements Parcelable {
         parcel.writeString(additionalInfo);
         parcel.writeString(paymentLink);
         parcel.writeString(institute);
-        parcel.writeByte((byte) (requiresShipping ? 1 : 0));
+        parcel.writeByte((byte) (Boolean.TRUE.equals(requiresShipping) ? 1 : 0));
         parcel.writeTypedList(exams);
         parcel.writeTypedList(notes);
         parcel.writeTypedList(prices);
-        parcel.writeByte((byte) (hasInstallmentPlans ? 1 : 0));
+        parcel.writeByte((byte) (Boolean.TRUE.equals(hasInstallmentPlans) ? 1 : 0));
+        parcel.writeString(purchaseState);
     }
 
     public static final Parcelable.Creator CREATOR = new Parcelable.Creator() {
@@ -479,6 +482,14 @@ public class Product implements Parcelable {
 
     public void setHasInstallmentPlans(Boolean hasInstallmentPlans) {
         this.hasInstallmentPlans = hasInstallmentPlans;
+    }
+
+    public String getPurchaseState() {
+        return PurchaseState.fromValue(purchaseState).getValue();
+    }
+
+    public void setPurchaseState(String purchaseState) {
+        this.purchaseState = purchaseState;
     }
 
 }
