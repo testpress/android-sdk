@@ -34,6 +34,7 @@ import `in`.testpress.store.data.model.mapping.asProduct
 import `in`.testpress.store.databinding.DialogProgressBinding
 import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
+import `in`.testpress.store.models.PurchaseState
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
 import `in`.testpress.store.util.generateRandom10CharString
 import `in`.testpress.util.DateUtils
@@ -289,7 +290,20 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                     }
                 }
 
-                couponAndBuyButtonContainer.isVisible = true
+                val state = PurchaseState.fromValue(product.purchaseState)
+                if (state == PurchaseState.ENROLLED) {
+                    couponAndBuyButtonContainer.isVisible = true
+                    discountPrompt.isVisible = false
+                    discountContainer.isVisible = false
+                    buyButton.apply {
+                        isVisible = true
+                        text = getString(R.string.testpress_already_enrolled)
+                        isEnabled = false
+                    }
+                } else {
+                    couponAndBuyButtonContainer.isVisible = (state == PurchaseState.AVAILABLE)
+                    buyButton.isEnabled = true
+                }
 
                 renderDescription(product.descriptionHtml)
             }
@@ -382,6 +396,17 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
         loadingDialog?.dismiss()
         if (exception?.isNetworkError == true) {
             showToast("Please check your internet connection")
+        } else if (PurchaseState.isAlreadyPurchased(exception)) {
+            showToast("You have already purchased this product.")
+            binding.couponAndBuyButtonContainer.isVisible = true
+            binding.discountPrompt.isVisible = false
+            binding.discountContainer.isVisible = false
+            binding.buyButton.apply {
+                isVisible = true
+                text = getString(R.string.testpress_already_enrolled)
+                isEnabled = false
+            }
+            productViewModel.retry()
         } else {
             val orderCreationId: String = generateRandom10CharString()
             exception?.let {
