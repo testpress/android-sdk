@@ -67,6 +67,7 @@
     <string name="testpress_product_categories">Product Categories</string>
     <string name="retry">Retry</string>
     <string name="buy_now_button_text">Buy Now</string>
+    <string name="testpress_already_enrolled">Enrolled</string>
     <string name="product_thumbnail_description">Product thumbnail image</string>
     <string name="testpress_offer_applied_name">Offer applied: %1$s</string>
 

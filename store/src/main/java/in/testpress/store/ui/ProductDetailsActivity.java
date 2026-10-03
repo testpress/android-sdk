@@ -238,7 +238,8 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         PurchaseState state = PurchaseState.fromValue(product.getPurchaseState());
         if (state == PurchaseState.ENROLLED) {
             productDetailsView.setVisibility(View.VISIBLE);
-            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
+            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
+            setupAlreadyEnrolledUi();
         } else if (!Boolean.TRUE.equals(product.getHasInstallmentPlans())) {
             productDetailsView.setVisibility(View.VISIBLE);
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
@@ -259,7 +260,11 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
                 : "";
         imageLoader.displayImage(productImageURL, image, options);
         titleText.setText(product.getTitle());
-        buyButton.setText(product.getBuyNowText());
+        if (state == PurchaseState.ENROLLED) {
+            setupAlreadyEnrolledUi();
+        } else {
+            buyButton.setText(product.getBuyNowText());
+        }
 
         if(product.getExams().size() != 0) {
             int examsCount = product.getExams().size();
@@ -368,6 +373,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void updateInstallmentUi(InstallmentPlansResponse response) {
         if (response == null || isPlansEmpty(response)) {
+            showContentAndHideProgress();
             return;
         }
 
@@ -410,14 +416,29 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         installmentLink.setOnClickListener(v -> openPlanListSheet(cachedPlans));
     }
 
+    private void setupAlreadyEnrolledUi() {
+        Button buyButton = (Button) findViewById(R.id.buy_button);
+        if (buyButton != null) {
+            buyButton.setText(R.string.testpress_already_enrolled);
+            buyButton.setEnabled(false);
+            buyButton.setVisibility(View.VISIBLE);
+        }
+        if (btnPayInstallment != null) btnPayInstallment.setVisibility(View.GONE);
+        if (installmentLink != null) installmentLink.setVisibility(View.GONE);
+        if (discountPrompt != null) discountPrompt.setVisibility(View.GONE);
+        View discountContainer = findViewById(R.id.discount_container);
+        if (discountContainer != null) discountContainer.setVisibility(View.GONE);
+    }
+
     private void showContentAndHideProgress() {
         progressBar.setVisibility(View.GONE);
         findViewById(R.id.main_content).setVisibility(View.VISIBLE);
+        findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
         PurchaseState state = PurchaseState.fromValue(product.getPurchaseState());
         if (state == PurchaseState.ENROLLED) {
-            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
-        } else {
-            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
+            setupAlreadyEnrolledUi();
+        } else if (state == PurchaseState.INSTALLMENT_DUE) {
+            hideStandardPurchaseOptions();
         }
     }
 
@@ -669,7 +690,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             showToast("Please check your internet connection");
         } else if (PurchaseState.isAlreadyPurchased(exception)) {
             showToast("You have already purchased this product.");
-            findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
+            setupAlreadyEnrolledUi();
             loadProductDetails();
         } else {
             String orderCreationId = UtilKt.generateRandom10CharString();

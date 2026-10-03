@@ -291,8 +291,19 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
                 }
 
                 val state = PurchaseState.fromValue(product.purchaseState)
-                couponAndBuyButtonContainer.isVisible = (state == PurchaseState.AVAILABLE)
-                buyButton.isVisible = (state == PurchaseState.AVAILABLE)
+                if (state == PurchaseState.ENROLLED) {
+                    couponAndBuyButtonContainer.isVisible = true
+                    discountPrompt.isVisible = false
+                    discountContainer.isVisible = false
+                    buyButton.apply {
+                        isVisible = true
+                        text = getString(R.string.testpress_already_enrolled)
+                        isEnabled = false
+                    }
+                } else {
+                    couponAndBuyButtonContainer.isVisible = (state == PurchaseState.AVAILABLE)
+                    buyButton.isEnabled = true
+                }
 
                 renderDescription(product.descriptionHtml)
             }
@@ -387,7 +398,14 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
             showToast("Please check your internet connection")
         } else if (PurchaseState.isAlreadyPurchased(exception)) {
             showToast("You have already purchased this product.")
-            binding.couponAndBuyButtonContainer.isVisible = false
+            binding.couponAndBuyButtonContainer.isVisible = true
+            binding.discountPrompt.isVisible = false
+            binding.discountContainer.isVisible = false
+            binding.buyButton.apply {
+                isVisible = true
+                text = getString(R.string.testpress_already_enrolled)
+                isEnabled = false
+            }
             productViewModel.retry()
         } else {
             val orderCreationId: String = generateRandom10CharString()
