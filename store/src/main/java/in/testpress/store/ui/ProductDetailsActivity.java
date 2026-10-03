@@ -236,7 +236,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         Button buyButton = (Button) findViewById(R.id.buy_button);
         progressBar.setVisibility(View.GONE);
         PurchaseState state = PurchaseState.fromValue(product.getPurchaseState());
-        if (state == PurchaseState.ENROLLED || state == PurchaseState.INSTALLMENT_DUE) {
+        if (state == PurchaseState.ENROLLED) {
             productDetailsView.setVisibility(View.VISIBLE);
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
         } else if (!Boolean.TRUE.equals(product.getHasInstallmentPlans())) {
@@ -392,7 +392,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
             return false;
         }
         UserInstallmentPlan userPlan = userPlans.get(0);
-        return userPlan != null && userPlan.getPaidInstallmentCount() != null && userPlan.getPaidInstallmentCount() > 0;
+        return userPlan != null;
     }
 
     private void setupActiveInstallmentUi(UserInstallmentPlan userPlan) {
@@ -414,7 +414,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         progressBar.setVisibility(View.GONE);
         findViewById(R.id.main_content).setVisibility(View.VISIBLE);
         PurchaseState state = PurchaseState.fromValue(product.getPurchaseState());
-        if (state == PurchaseState.ENROLLED || state == PurchaseState.INSTALLMENT_DUE) {
+        if (state == PurchaseState.ENROLLED) {
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.GONE);
         } else {
             findViewById(R.id.coupon_and_buy_button_container).setVisibility(View.VISIBLE);
