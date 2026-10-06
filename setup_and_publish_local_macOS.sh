@@ -1,24 +1,25 @@
-@echo off
+#!/bin/bash
 
-echo 📦 Downloading Zoom SDK...
-curl -o zoom_sdk.zip https://media.testpress.in/static/android/zoom_sdk.zip
+set -e
 
-echo 📂 Extracting Zoom SDK...
-tar -xf zoom_sdk.zip
+echo "📦 Downloading Zoom SDK..."
+curl -fL -o zoom_sdk.zip https://media.testpress.in/static/android/zoom_sdk.zip
 
-echo 🧹 Cleaning up archive...
-del zoom_sdk.zip
+echo "📂 Extracting Zoom SDK..."
+unzip -qo zoom_sdk.zip
 
-echo 🛠️ Building and publishing...
+echo "🧹 Cleaning up archive..."
+rm -f zoom_sdk.zip
 
-IF EXIST gradlew (
-    echo Using gradlew
-    call gradlew clean build -x test
-    call gradlew publishToMavenLocal
-) ELSE (
-    echo gradlew not found, using system gradle
-    call gradle clean build -x test
-    call gradle publishToMavenLocal
-)
+echo "🛠️ Building and publishing to Maven Local..."
 
-echo ✅ Done! Library published to local Maven and Zoom SDK is ready.
+if [ -f "./gradlew" ]; then
+  echo "Using ./gradlew"
+  chmod +x ./gradlew
+  ./gradlew clean && ./gradlew assembleRelease && ./gradlew publishToMavenLocal
+else
+  echo "gradlew not found, using system gradle"
+  gradle clean && gradle assembleRelease && gradle publishToMavenLocal
+fi
+
+echo "✅ Done! Library published to local Maven and Zoom SDK is ready."
