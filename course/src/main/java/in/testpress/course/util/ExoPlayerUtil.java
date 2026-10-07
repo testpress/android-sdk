@@ -119,6 +119,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     private DoubleTapPlayerView playerView;
     private LottieAnimationView progressBar;
     private TextView errorMessageTextView;
+    private View errorMessageContainer;
     @VisibleForTesting(otherwise = VisibleForTesting.PRIVATE)
     public ExoPlayer player;
     private ImageView fullscreenIcon;
@@ -200,6 +201,10 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         fullscreenIcon = exoPlayerMainFrame.findViewById(R.id.exo_fullscreen_icon);
         progressBar = exoPlayerMainFrame.findViewById(R.id.exo_player_progress);
         errorMessageTextView = exoPlayerMainFrame.findViewById(R.id.error_message);
+        errorMessageContainer = exoPlayerMainFrame.findViewById(R.id.error_message_container);
+        if (errorMessageTextView != null) {
+            errorMessageTextView.setMovementMethod(LinkMovementMethod.getInstance());
+        }
         speedRateSpinner = exoPlayerMainFrame.findViewById(R.id.exo_speed_rate_spinner);
         String[] speedValues = activity.getResources().getStringArray(R.array.exo_speed_values);
         speedSpinnerAdapter =
@@ -889,18 +894,36 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         player.setPlayWhenReady(false);
         player.getPlaybackState();
         errorMessageTextView.setText(message);
-        errorMessageTextView.setVisibility(View.VISIBLE);
+        if (errorMessageContainer != null) {
+            errorMessageContainer.setVisibility(View.VISIBLE);
+        } else {
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     private void displayError(String message,int errorCode) {
+        displayError(message, errorCode, null, null);
+    }
+
+    private void displayError(String message, int errorCode, PlaybackException exception, String playbackId) {
         player.setPlayWhenReady(false);
         player.getPlaybackState();
-        if (errorCode == 4001 || errorCode == 4003){
-            setHtmlText(errorMessageTextView, message);
-        } else {
-            errorMessageTextView.setText(message);
+        String finalMessage = message;
+        if (exception != null) {
+            finalMessage = PlayerDebugDiagnostics.formatErrorMessageWithDebugDetails(
+                    activity, message, exception, playbackId, content, url, isL3FallbackAttempted
+            );
         }
-        errorMessageTextView.setVisibility(View.VISIBLE);
+        if (errorCode == 4001 || errorCode == 4003 || finalMessage.contains("<html>")){
+            setHtmlText(errorMessageTextView, finalMessage);
+        } else {
+            errorMessageTextView.setText(finalMessage);
+        }
+        if (errorMessageContainer != null) {
+            errorMessageContainer.setVisibility(View.VISIBLE);
+        } else {
+            errorMessageTextView.setVisibility(View.VISIBLE);
+        }
     }
 
     public void setHtmlText(TextView textView, String message) {
@@ -913,8 +936,12 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
     }
 
     private void hideError(@StringRes int message) {
-        if (errorMessageTextView.getText().equals(activity.getString(message))) {
-            errorMessageTextView.setVisibility(View.GONE);
+        if (errorMessageTextView.getText() != null && errorMessageTextView.getText().toString().contains(activity.getString(message))) {
+            if (errorMessageContainer != null) {
+                errorMessageContainer.setVisibility(View.GONE);
+            } else {
+                errorMessageTextView.setVisibility(View.GONE);
+            }
             player.setPlayWhenReady(true);
             player.getPlaybackState();
         }
@@ -950,7 +977,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         } else if (6000 <= exception.errorCode && exception.errorCode <= 7000) { // DRM errors
             errorMessage = activity.getString(R.string.exoplayer_drm_error, exception.getErrorCodeName(), exception.errorCode, playbackId);
         }
-        displayError(errorMessage, exception.errorCode);
+        displayError(errorMessage, exception.errorCode, exception, playbackId);
         logPlaybackException(errorMessage, playbackId, exception);
     }
 
@@ -1095,7 +1122,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 hideError(R.string.testpress_usb_connected);
                 if (playbackState == Player.STATE_READY) {
                     code2000AutoRetryCount = 0;
+                if (errorMessageContainer != null) {
+                    errorMessageContainer.setVisibility(View.GONE);
+                } else {
                     errorMessageTextView.setVisibility(View.GONE);
+                }
                 }
             }
             if (playbackState == Player.STATE_BUFFERING) {
@@ -1145,7 +1176,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                     displayError(R.string.syncing_video);
                 } else {
                     String licenseRequestFailedMessage = activity.getString(R.string.license_request_failed, exception.errorCode, playBackId);
-                    displayError(licenseRequestFailedMessage, exception.errorCode);
+                    displayError(licenseRequestFailedMessage, exception.errorCode, exception, playBackId);
                     logPlaybackException(licenseRequestFailedMessage, playBackId, exception);
                 }
             } else {
@@ -1183,7 +1214,11 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
                 float currentPosition = getCurrentPosition();
                 MediaItem mediaItem = getMediaItem(true);
                 player.setMediaItem(mediaItem);
-                errorMessageTextView.setVisibility(View.GONE);
+                if (errorMessageContainer != null) {
+                    errorMessageContainer.setVisibility(View.GONE);
+                } else {
+                    errorMessageTextView.setVisibility(View.GONE);
+                }
                 preparePlayer();
                 player.setPlayWhenReady(true);
                 player.seekTo((long) (currentPosition * 1000));
