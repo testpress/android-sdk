@@ -41,14 +41,15 @@ object PlayerDebugDiagnostics {
         exception: PlaybackException?,
         playbackId: String?,
         content: Content?,
-        mediaUrl: String?
+        mediaUrl: String?,
+        isL3FallbackAttempted: Boolean = false
     ): String {
         if (!BuildConfig.DEBUG || exception == null) {
             return userFacingMessage
         }
 
         // 1. Build UI debug details section
-        val uiDetails = buildUiDebugDetails(exception, playbackId, content, mediaUrl)
+        val uiDetails = buildUiDebugDetails(exception, playbackId, content, mediaUrl, isL3FallbackAttempted)
 
         // 2. Append to user-facing message, handling HTML if needed
         return if (userFacingMessage.contains("<html>", ignoreCase = true)) {
@@ -73,14 +74,16 @@ object PlayerDebugDiagnostics {
         exception: PlaybackException,
         playbackId: String?,
         content: Content?,
-        mediaUrl: String?
+        mediaUrl: String?,
+        isL3FallbackAttempted: Boolean
     ): String {
         val sb = StringBuilder()
 
         val errorCode = exception.errorCode.toString()
         val errorName = exception.errorCodeName
         val exceptionClass = exception.javaClass.name
-        val rootCause = getRootCauseSummary(exception)
+        val causeChain = getExceptionCauseChain(exception).joinToString("\n")
+        val stackTrace = exception.stackTraceToString().take(800)
         val playId = playbackId ?: NA
         val contentId = content?.id?.toString() ?: NA
 
@@ -98,9 +101,11 @@ object PlayerDebugDiagnostics {
         sb.append("Error: ").append(errorCode).append("\n")
         sb.append("Name: ").append(errorName).append("\n")
         sb.append("Exception: ").append(exceptionClass).append("\n")
-        sb.append("Cause: ").append(rootCause).append("\n")
+        sb.append("Cause Chain:\n").append(causeChain).append("\n")
+        sb.append("Stack Trace:\n").append(stackTrace).append("\n\n")
         sb.append("Playback ID: ").append(playId).append("\n")
-        sb.append("Content ID: ").append(contentId).append("\n\n")
+        sb.append("Content ID: ").append(contentId).append("\n")
+        sb.append("L3 Fallback Attempted: ").append(isL3FallbackAttempted).append("\n\n")
 
         sb.append("Device: ").append(deviceManufacturer).append(" ").append(deviceModel).append("\n")
         sb.append("Android: ").append(androidVer).append("\n")
@@ -234,7 +239,7 @@ object PlayerDebugDiagnostics {
         val seen = mutableSetOf<Throwable>()
 
         while (current != null && depth <= 12 && seen.add(current)) {
-            list.add("-> [#$depth] ${current.javaClass.name}: ${current.message ?: "(no message)"}")
+            list.add("  -> [#$depth] ${current.javaClass.name}: ${current.message ?: "(no message)"}")
             current = current.cause
             depth++
         }
@@ -313,8 +318,11 @@ object PlayerDebugDiagnostics {
                 is MediaDrmCallbackException -> {
                     val hostPath = extractHostAndPath(current.dataSpec.uri.toString())
                     licenseHostPath = hostPath
+                    val headersStr = current.responseHeaders.filterKeys { key ->
+                        key != null && !key.equals("Authorization", true) && !key.equals("Cookie", true) && !key.equals("Set-Cookie", true)
+                    }.map { "${it.key}: ${it.value.joinToString(",")}" }.joinToString(" | ")
                     if (summary == NA) {
-                        summary = "MediaDrmCallbackException: License fetch failed for $hostPath"
+                        summary = "MediaDrmCallbackException: License fetch failed for $hostPath. Headers: $headersStr"
                     }
                 }
 
@@ -323,6 +331,10 @@ object PlayerDebugDiagnostics {
                         summary = "DrmSessionException: ${current.message ?: "DRM session error"}"
                     }
                 }
+            }
+            if (current.javaClass.simpleName == "DrmPhaseException") {
+                val phase = current.message ?: "UNKNOWN_PHASE"
+                summary = if (summary == NA) phase else "$phase -> $summary"
             }
             current = current.cause
         }
@@ -369,7 +381,19 @@ object PlayerDebugDiagnostics {
                     httpStatus = "${current.responseCode} $statusMsg".trim()
                     val hostPath = extractHostAndPath(current.dataSpec.uri.toString())
                     requestHostPath = hostPath
-                    networkError = "HTTP ${current.responseCode}: ${current.message ?: "Invalid response code"}"
+                    
+                    val headersStr = current.headerFields.filterKeys { key ->
+                        key != null && !key.equals("Authorization", true) && !key.equals("Cookie", true) && !key.equals("Set-Cookie", true)
+                    }.map { "${it.key}: ${it.value.joinToString(",")}" }.joinToString(" | ")
+                    
+                    val bodyBytes = try {
+                        val field = current.javaClass.getField("responseBody")
+                        field.get(current) as? ByteArray
+                    } catch (e: Exception) { null }
+                    
+                    val bodyStr = if (bodyBytes != null && bodyBytes.isNotEmpty()) String(bodyBytes).take(300) else "N/A"
+                    
+                    networkError = "HTTP ${current.responseCode}: ${current.message ?: "Invalid response code"}\nHeaders: $headersStr\nBody: $bodyStr"
                 }
 
                 is HttpDataSource.InvalidContentTypeException -> {

@@ -911,7 +911,7 @@ public class ExoPlayerUtil implements VideoTimeRangeListener, DrmSessionManagerP
         String finalMessage = message;
         if (exception != null) {
             finalMessage = PlayerDebugDiagnostics.formatErrorMessageWithDebugDetails(
-                    activity, message, exception, playbackId, content, url
+                    activity, message, exception, playbackId, content, url, isL3FallbackAttempted
             );
         }
         if (errorCode == 4001 || errorCode == 4003 || finalMessage.contains("<html>")){
