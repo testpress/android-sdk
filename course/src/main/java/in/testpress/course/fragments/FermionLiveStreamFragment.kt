@@ -128,6 +128,7 @@ class FermionLiveStreamFragment : Fragment() {
 
     private fun createWebViewFragment(urlToLoad: String): WebViewFragment {
         return WebViewFragment().apply {
+            lockToLandscape = true
             arguments = Bundle().apply {
                 putString(WebViewFragment.URL_TO_OPEN, urlToLoad)
                 putBoolean(WebViewFragment.IS_AUTHENTICATION_REQUIRED, true)
@@ -256,6 +257,11 @@ class FermionLiveStreamFragment : Fragment() {
     private fun updateLayoutForOrientation() {
         val appCompatActivity = activity as? AppCompatActivity ?: return
         val isLandscape = resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE
+
+        if (webViewFragment?.isFullScreen() == true) {
+            appCompatActivity.findViewById<View>(R.id.chat_view_fragment)?.visibility = View.GONE
+            return
+        }
 
         if (isLandscape) {
             appCompatActivity.supportActionBar?.hide()
