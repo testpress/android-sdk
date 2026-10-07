@@ -16,6 +16,12 @@ import com.google.android.exoplayer2.drm.MediaDrmCallbackException
 import com.google.android.exoplayer2.upstream.HttpDataSource
 import `in`.testpress.course.BuildConfig
 import `in`.testpress.models.greendao.Content
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
+import java.util.Date
+import java.util.TimeZone
+import java.text.SimpleDateFormat
+import java.util.Locale
 import java.net.ConnectException
 import java.net.SocketTimeoutException
 import java.net.UnknownHostException
@@ -28,7 +34,13 @@ import javax.net.ssl.SSLException
  */
 object PlayerDebugDiagnostics {
 
-    private const val NA = "N/A"
+    const val NA = "N/A"
+    
+    var lastProvisioningUrl: String = NA
+    var lastProvisioningRequestSize: Int = 0
+    var lastProvisioningResponseSize: Int = -1
+    var lastProvisioningTimeMs: Long = 0
+    var lastProvisioningException: String = NA
 
     /**
      * Formats an existing user-facing error message with DEBUG DETAILS appended if running in a DEBUG build.
@@ -49,7 +61,7 @@ object PlayerDebugDiagnostics {
         }
 
         // 1. Build UI debug details section
-        val uiDetails = buildUiDebugDetails(exception, playbackId, content, mediaUrl, isL3FallbackAttempted)
+        val uiDetails = buildUiDebugDetails(context, exception, playbackId, content, mediaUrl, isL3FallbackAttempted)
 
         // 2. Append to user-facing message, handling HTML if needed
         return if (userFacingMessage.contains("<html>", ignoreCase = true)) {
@@ -71,6 +83,7 @@ object PlayerDebugDiagnostics {
      * Builds the concise UI-friendly debug details section.
      */
     private fun buildUiDebugDetails(
+        context: Context?,
         exception: PlaybackException,
         playbackId: String?,
         content: Content?,
@@ -83,7 +96,14 @@ object PlayerDebugDiagnostics {
         val errorName = exception.errorCodeName
         val exceptionClass = exception.javaClass.name
         val causeChain = getExceptionCauseChain(exception).joinToString("\n")
-        val stackTrace = exception.stackTraceToString().take(800)
+        
+        var deepest: Throwable = exception
+        while (deepest.cause != null) {
+            deepest = deepest.cause!!
+        }
+        val stackTrace = "${deepest.javaClass.name}: ${deepest.message}\n" +
+                deepest.stackTrace.take(8).joinToString("\n") { "  at $it" }.take(2000)
+
         val playId = playbackId ?: NA
         val contentId = content?.id?.toString() ?: NA
 
@@ -107,6 +127,34 @@ object PlayerDebugDiagnostics {
         sb.append("Content ID: ").append(contentId).append("\n")
         sb.append("L3 Fallback Attempted: ").append(isL3FallbackAttempted).append("\n\n")
 
+        val dateFormat = SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ssZ", Locale.US)
+        dateFormat.timeZone = TimeZone.getDefault()
+        val timeString = dateFormat.format(Date())
+        var connectivityStr = NA
+        if (context != null) {
+            try {
+                val cm = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
+                val activeNetwork = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) cm.activeNetwork else null
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M && activeNetwork != null) {
+                    val caps = cm.getNetworkCapabilities(activeNetwork)
+                    if (caps != null) {
+                        val isWifi = caps.hasTransport(NetworkCapabilities.TRANSPORT_WIFI)
+                        val isCell = caps.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR)
+                        val isVpn = caps.hasTransport(NetworkCapabilities.TRANSPORT_VPN)
+                        val isMetered = !caps.hasCapability(NetworkCapabilities.NET_CAPABILITY_NOT_METERED)
+                        connectivityStr = "WiFi:$isWifi Cell:$isCell VPN:$isVpn Metered:$isMetered"
+                    }
+                } else {
+                    connectivityStr = "Legacy/No active network info"
+                }
+            } catch (e: Exception) {
+                connectivityStr = "Error reading connectivity"
+            }
+        }
+
+        sb.append("Time: ").append(timeString).append("\n")
+        sb.append("Network: ").append(connectivityStr).append("\n\n")
+
         sb.append("Device: ").append(deviceManufacturer).append(" ").append(deviceModel).append("\n")
         sb.append("Android: ").append(androidVer).append("\n")
         sb.append("ExoPlayer: ").append(exoVer).append("\n")
@@ -120,6 +168,17 @@ object PlayerDebugDiagnostics {
         sb.append("Network Error: ").append(netErr).append("\n")
         sb.append("HTTP Status: ").append(httpStatus).append("\n")
         sb.append("License Host: ").append(licenseHost)
+
+        if (lastProvisioningUrl != NA) {
+            sb.append("\n\nDRM Phase: PROVISION_REQUEST\n")
+            sb.append("Prov URL: ").append(lastProvisioningUrl).append("\n")
+            sb.append("Prov Req Size: ").append(lastProvisioningRequestSize).append(" bytes\n")
+            sb.append("Prov Time: ").append(lastProvisioningTimeMs).append(" ms\n")
+            sb.append("Prov Resp Size: ").append(lastProvisioningResponseSize).append(" bytes\n")
+            if (lastProvisioningException != NA) {
+                sb.append("Prov Exception: ").append(lastProvisioningException).append("\n")
+            }
+        }
 
         return sb.toString()
     }
@@ -331,10 +390,6 @@ object PlayerDebugDiagnostics {
                         summary = "DrmSessionException: ${current.message ?: "DRM session error"}"
                     }
                 }
-            }
-            if (current.javaClass.simpleName == "DrmPhaseException") {
-                val phase = current.message ?: "UNKNOWN_PHASE"
-                summary = if (summary == NA) phase else "$phase -> $summary"
             }
             current = current.cause
         }
