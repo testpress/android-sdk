@@ -55,6 +55,7 @@ public class InstituteSettings {
     private Boolean useNewDiscountFeat;
     private Boolean requireQuestionReportDescription;
     private Integer questionReportDescriptionMinLength;
+    private String deviceBindingMode;
 
     public InstituteSettings(String baseUrl) {
         setBaseUrl(baseUrl);
@@ -502,6 +503,15 @@ public class InstituteSettings {
 
     public InstituteSettings setQuestionReportDescriptionMinLength(Integer questionReportDescriptionMinLength) {
         this.questionReportDescriptionMinLength = questionReportDescriptionMinLength;
+        return this;
+    }
+
+    public String getDeviceBindingMode() {
+        return deviceBindingMode;
+    }
+
+    public InstituteSettings setDeviceBindingMode(String deviceBindingMode) {
+        this.deviceBindingMode = deviceBindingMode;
         return this;
     }
 
