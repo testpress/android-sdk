@@ -35,8 +35,12 @@ import in.testpress.network.RetrofitCall;
 import in.testpress.ui.BaseToolBarActivity;
 import in.testpress.util.UIUtils;
 
+import android.app.Activity;
+import android.content.ContextWrapper;
+
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.TestpressCourse.SHOW_BUY_NOW_BUTTON;
@@ -68,6 +72,16 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     private Boolean showBuyNowButton;
     InstituteSettings instituteSettings;
 
+    private static Activity getActivityFromContext(Context context) {
+        while (context instanceof ContextWrapper) {
+            if (context instanceof Activity) {
+                return (Activity) context;
+            }
+            context = ((ContextWrapper) context).getBaseContext();
+        }
+        return null;
+    }
+
     public static Intent createIntent(String title, String courseId, Context context, String productSlug) {
         return createIntent(title, courseId, context, productSlug, true);
     }
@@ -78,6 +92,17 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         intent.putExtra(COURSE_ID, courseId);
         intent.putExtra(PRODUCT_SLUG, productSlug);
         intent.putExtra(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
+        Activity activity = getActivityFromContext(context);
+        if (activity != null && activity.getIntent() != null) {
+            intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD,
+                    activity.getIntent().getBooleanExtra(ENABLE_LOCAL_FILE_DOWNLOAD, true));
+        }
+        return intent;
+    }
+
+    public static Intent createIntent(String title, String courseId, Context context, String productSlug, boolean showBuyNowButton, boolean enableLocalFileDownload) {
+        Intent intent = createIntent(title, courseId, context, productSlug, showBuyNowButton);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         return intent;
     }
 
@@ -89,6 +114,17 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(CHAPTER_URL, chaptersUrl);
         intent.putExtra(PRODUCT_SLUG, productSlug);
+        Activity activity = getActivityFromContext(context);
+        if (activity != null && activity.getIntent() != null) {
+            intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD,
+                    activity.getIntent().getBooleanExtra(ENABLE_LOCAL_FILE_DOWNLOAD, true));
+        }
+        return intent;
+    }
+
+    public static Intent createIntent(String chaptersUrl, Context context, String productSlug, boolean showBuyNowButton, boolean enableLocalFileDownload) {
+        Intent intent = createIntent(chaptersUrl, context, productSlug, showBuyNowButton);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         return intent;
     }
 

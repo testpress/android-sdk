@@ -1,6 +1,7 @@
 package in.testpress.course.ui;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
@@ -362,17 +363,39 @@ public class BookmarksFragment extends BaseFragment {
     }
 
     private void startPdfViewActivity(){
+        boolean enableLocalFileDownload = true;
+        if (getActivity() != null && getActivity().getIntent() != null) {
+            enableLocalFileDownload = getActivity().getIntent()
+                    .getBooleanExtra(in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
+        }
         getActivity().startActivity(ContentActivity.createIntent(
                 content.getId(),
                 getContext(),
-                content.getChapterSlug(),false)
+                content.getChapterSlug(),
+                false,
+                false,
+                enableLocalFileDownload)
         );
     }
 
     private void startAttachmentDownloadActivity(){
         final Attachment attachment = content.getRawAttachment();
-        startActivity(new Intent(Intent.ACTION_VIEW,
-                Uri.parse(attachment.getAttachmentUrl())));
+        if (attachment == null || attachment.getAttachmentUrl() == null) {
+            return;
+        }
+
+        Context ctx = getContext();
+        if (ctx == null) {
+            return;
+        }
+
+        boolean enableLocalFileDownload = true;
+        if (getActivity() != null && getActivity().getIntent() != null) {
+            enableLocalFileDownload = getActivity().getIntent()
+                    .getBooleanExtra(in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
+        }
+
+        in.testpress.course.TestpressCourse.downloadAttachment(ctx, attachment, enableLocalFileDownload);
     }
 
     /**

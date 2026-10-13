@@ -21,6 +21,9 @@ import android.view.*
 import androidx.annotation.VisibleForTesting
 import androidx.lifecycle.Observer
 import java.net.URI
+import java.io.File
+import `in`.testpress.course.TestpressCourse
+import `in`.testpress.course.downloadAttachment
 
 class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         DisplayPDFListener {
@@ -127,35 +130,42 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
         }
     }
 
-    private fun onDownloadPdfClick() {
-        val attachment = content.attachment
-        if (attachment?.allowDownload != true) return
+    private fun isLocalFileDownloadEnabled(): Boolean {
+        if (arguments?.containsKey(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD) == true) {
+            return arguments?.getBoolean(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
+        }
+        if (activity?.intent?.hasExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD) == true) {
+            return activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
+        }
+        return true
+    }
 
-        if (!permissionsUtils.isStoragePermissionGranted) {
+    private fun onDownloadPdfClick() {
+        val attachment = content.attachment ?: return
+        if (attachment.allowDownload != true) return
+        val enableLocalFileDownload = isLocalFileDownloadEnabled()
+
+        if (enableLocalFileDownload && !permissionsUtils.isStoragePermissionGranted) {
             permissionsUtils.requestStoragePermissionWithSnackbar()
+            return
+        }
+
+        if (attachment.attachmentUrl.isNullOrBlank()) {
+            ViewUtils.toast(requireContext(), getString(R.string.download_url_not_available))
             return
         }
 
         if (attachment.isAttachmentUrlExpired()) {
             forceReloadContent {
-                startPdfPublicDownload()
+                if (!isAdded) return@forceReloadContent
+                content.attachment?.let {
+                    downloadAttachment(requireContext(), it, enableLocalFileDownload = enableLocalFileDownload)
+                }
                 updateDownloadMenuVisibility()
             }
         } else {
-            startPdfPublicDownload()
+            downloadAttachment(requireContext(), attachment, enableLocalFileDownload = enableLocalFileDownload)
         }
-    }
-
-    private fun startPdfPublicDownload() {
-        val url = content.attachment?.attachmentUrl
-        if (url.isNullOrBlank()) {
-            ViewUtils.toast(requireContext(), getString(R.string.download_url_not_available))
-            return
-        }
-
-        val title = content.attachment?.title?.takeIf { it.isNotBlank() } ?: "Attachment-$contentId"
-        val fileName = "$title${getFileExtensionFromUrl(url)}".sanitizeFileName()
-        FileDownloader(requireContext()).downloadFile(url, fileName)
     }
 
     private fun navigateToPdfViewerActivity() {

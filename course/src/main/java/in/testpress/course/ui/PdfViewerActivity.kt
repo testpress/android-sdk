@@ -6,10 +6,13 @@ import `in`.testpress.course.util.PDFViewer
 import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.view.View
 import android.view.WindowManager
 import androidx.appcompat.app.AppCompatActivity
+import java.io.File
 
 class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFListener {
     private lateinit var binding: LayoutPdfViewerBinding
@@ -23,6 +26,8 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     private lateinit var password: String
 
+    private var pdfPath: String? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         disableScreenShot()
@@ -30,11 +35,16 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         setContentView(binding.root)
         hideStatusBar()
         getDataFromBundle()
-        pdfDownloadManager = PDFDownloadManager(this,this,fileName)
-        if (pdfDownloadManager.isDownloaded()) {
-            displayPDF()
+
+        if (!pdfPath.isNullOrBlank()) {
+            displayLocalPDF(File(pdfPath!!))
         } else {
-            pdfDownloadManager.download(url)
+            pdfDownloadManager = PDFDownloadManager(this, this, fileName)
+            if (pdfDownloadManager.isDownloaded()) {
+                displayPDF()
+            } else {
+                pdfDownloadManager.download(url)
+            }
         }
     }
 
@@ -58,6 +68,30 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
         password = intent.getStringExtra("password") ?: ""
         url = intent.getStringExtra("pdfUrl") ?: ""
         fileName = intent.getStringExtra("fileName") ?: ""
+        pdfPath = intent.getStringExtra(PDF_PATH)
+    }
+
+    private fun displayLocalPDF(file: File) {
+        val base = File(filesDir, "offline_attachments").canonicalFile
+        val canonicalTarget = try {
+            file.canonicalFile
+        } catch (e: Exception) {
+            showErrorView()
+            return
+        }
+
+        if (!canonicalTarget.path.startsWith(base.path + File.separator) ||
+            !canonicalTarget.exists() || !canonicalTarget.isFile) {
+            showErrorView()
+            return
+        }
+
+        binding.encryptionProgressbar.visibility = View.VISIBLE
+        PDFViewer(this, displayPDFListener = this).display(
+                pageNumber = pageNumber,
+                file = canonicalTarget,
+                pdfView = binding.pdfView
+        )
     }
 
     override fun onDownloadSuccess() {
@@ -117,7 +151,21 @@ class PdfViewerActivity : AppCompatActivity(), PdfDownloadListener, DisplayPDFLi
 
     override fun onDestroy() {
         super.onDestroy()
-        pdfDownloadManager.cancel()
-        pdfDownloadManager.cleanup()
+        if (::pdfDownloadManager.isInitialized) {
+            pdfDownloadManager.cancel()
+            pdfDownloadManager.cleanup()
+        }
+    }
+
+    companion object {
+        const val PDF_PATH = "pdfPath"
+
+        @JvmStatic
+        fun createIntent(context: Context, pdfPath: String, pageNumber: Int = 0): Intent {
+            return Intent(context, PdfViewerActivity::class.java).apply {
+                putExtra(PDF_PATH, pdfPath)
+                putExtra("pageNumber", pageNumber)
+            }
+        }
     }
 }
