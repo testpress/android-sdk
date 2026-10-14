@@ -121,7 +121,15 @@ class ContentBottomNavigationFragment : Fragment() {
             return
 
         previousButton.setOnClickListener {
-            startActivity(createIntent(contents[position-1].id, activity, productSlug))
+            val enableLocalFileDownload = activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
+            startActivity(createIntent(
+                    contents[position - 1].id,
+                    activity,
+                    productSlug,
+                    false,
+                    false,
+                    enableLocalFileDownload)
+            )
             finishActivity()
         }
         previousButton.visibility = View.VISIBLE
@@ -155,7 +163,15 @@ class ContentBottomNavigationFragment : Fragment() {
         if (!contents[nextPosition].isLocked!!) {
             nextButton.text = getString(R.string.testpress_next_content)
             nextButton.setOnClickListener {
-                startActivity(createIntent(contents[nextPosition].id, activity, productSlug))
+                val enableLocalFileDownload = activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
+                startActivity(createIntent(
+                        contents[nextPosition].id,
+                        activity,
+                        productSlug,
+                        false,
+                        false,
+                        enableLocalFileDownload)
+                )
                 finishActivity()
             }
             nextButton.visibility = View.VISIBLE

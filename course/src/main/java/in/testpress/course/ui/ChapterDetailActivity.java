@@ -37,6 +37,7 @@ import in.testpress.util.UIUtils;
 
 import static in.testpress.course.TestpressCourse.CHAPTER_URL;
 import static in.testpress.course.TestpressCourse.COURSE_ID;
+import static in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
 import static in.testpress.course.TestpressCourse.SHOW_BUY_NOW_BUTTON;
@@ -69,7 +70,12 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
     InstituteSettings instituteSettings;
 
     public static Intent createIntent(String title, String courseId, Context context, String productSlug) {
-        return createIntent(title, courseId, context, productSlug, true);
+        Intent intent = new Intent(context, ChapterDetailActivity.class);
+        intent.putExtra(ACTIONBAR_TITLE, title);
+        intent.putExtra(COURSE_ID, courseId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(SHOW_BUY_NOW_BUTTON, true);
+        return intent;
     }
 
     public static Intent createIntent(String title, String courseId, Context context, String productSlug, boolean showBuyNowButton) {
@@ -81,14 +87,31 @@ public class ChapterDetailActivity extends BaseToolBarActivity {
         return intent;
     }
 
+    public static Intent createIntent(String title, String courseId, Context context, String productSlug, boolean showBuyNowButton, boolean enableLocalFileDownload) {
+        Intent intent = createIntent(title, courseId, context, productSlug, showBuyNowButton);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
+        return intent;
+    }
+
     public static Intent createIntent(String chaptersUrl, Context context, String productSlug) {
-        return ChapterDetailActivity.createIntent(chaptersUrl, context, productSlug, false);
+        Intent intent = new Intent(context, ChapterDetailActivity.class);
+        intent.putExtra(CHAPTER_URL, chaptersUrl);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(SHOW_BUY_NOW_BUTTON, false);
+        return intent;
     }
 
     public static Intent createIntent(String chaptersUrl, Context context, String productSlug, boolean showBuyNowButton) {
         Intent intent = new Intent(context, ChapterDetailActivity.class);
         intent.putExtra(CHAPTER_URL, chaptersUrl);
         intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(SHOW_BUY_NOW_BUTTON, showBuyNowButton);
+        return intent;
+    }
+
+    public static Intent createIntent(String chaptersUrl, Context context, String productSlug, boolean showBuyNowButton, boolean enableLocalFileDownload) {
+        Intent intent = createIntent(chaptersUrl, context, productSlug, showBuyNowButton);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         return intent;
     }
 

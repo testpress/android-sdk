@@ -11,6 +11,8 @@ import `in`.testpress.models.greendao.ChapterDao
 import `in`.testpress.models.greendao.CourseDao
 import `in`.testpress.store.TestpressStore
 import `in`.testpress.store.ui.ProductDetailsActivity
+import `in`.testpress.course.TestpressCourse
+import `in`.testpress.course.util.getActivity
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
@@ -69,11 +71,16 @@ class ContentListAdapter(val chapterId: Long,
                 (context as Activity).startActivityForResult(intent, TestpressStore.STORE_REQUEST_CODE)
             }
         } else if (content.isLocked != true && content.isScheduled != true && content.hasEnded != true) {
+            val activity = context.getActivity()
+            val enableLocalFileDownload = activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
             context.startActivity(ContentActivity.createIntent(
                     content.id,
                     context,
-                    productSlug)
-            );
+                    productSlug,
+                    false,
+                    false,
+                    enableLocalFileDownload)
+            )
         }
     }
 

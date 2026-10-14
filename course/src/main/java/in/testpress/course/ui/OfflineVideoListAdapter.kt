@@ -4,6 +4,8 @@ import `in`.testpress.course.domain.DomainOfflineVideo
 import `in`.testpress.course.helpers.DownloadTask
 import `in`.testpress.course.ui.ContentActivity.HIDE_BOTTOM_NAVIGATION
 import `in`.testpress.course.ui.viewholders.OfflineVideoViewHolder
+import `in`.testpress.course.TestpressCourse
+import `in`.testpress.course.util.getActivity
 import android.content.Context
 import android.content.Intent
 import android.view.ViewGroup
@@ -42,8 +44,16 @@ class OfflineVideoListAdapter :
             }
 
             override fun onClick(offlineVideo: DomainOfflineVideo) {
-                val intent = ContentActivity.createIntent(offlineVideo.contentId, context, null)
-                intent.putExtra(HIDE_BOTTOM_NAVIGATION, true)
+                val activity = context.getActivity()
+                val enableLocalFileDownload = activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
+                val intent = ContentActivity.createIntent(
+                    offlineVideo.contentId,
+                    context,
+                    null,
+                    true,
+                    false,
+                    enableLocalFileDownload
+                )
                 context.startActivity(intent)
             }
 

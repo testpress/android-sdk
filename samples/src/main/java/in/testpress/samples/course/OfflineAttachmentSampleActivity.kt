@@ -92,9 +92,10 @@ class OfflineAttachmentSampleActivity : AppCompatActivity() {
     }
 
     private fun startDownload(attachment: DomainAttachmentContent) {
-        viewModel.requestDownload(
+        viewModel.requestOrNotify(
             this,
             attachment,
+            openIfCompleted = true
         )
     }
 

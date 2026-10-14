@@ -27,6 +27,9 @@ import static in.testpress.core.TestpressSdk.COURSE_CHAPTER_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_DETAIL_REQUEST_CODE;
 import static in.testpress.core.TestpressSdk.COURSE_CONTENT_LIST_REQUEST_CODE;
 
+import in.testpress.course.domain.DomainAttachmentContent;
+import in.testpress.models.greendao.Attachment;
+
 import java.util.ArrayList;
 
 public class TestpressCourse {
@@ -40,6 +43,18 @@ public class TestpressCourse {
     public static final String CONTENT_TYPE = "contentType";
     public static final String CHAPTER_ID = "chapterId";
     public static final String CONTENTS_URL_FRAG = "contentsUrlFrag";
+    /**
+     * Intent extra key and policy flag to control whether downloaded attachments are saved to
+     * public device storage or kept in app-private internal storage for secure in-app viewing.
+     *
+     * <p>When {@code true} (default): Files are downloaded to public device storage and can be accessed
+     * by external applications and file managers.
+     *
+     * <p>When {@code false}: Files are sandboxed in app-private storage and opened exclusively through
+     * the SDK's built-in PDF viewer. External file access and public downloads are restricted
+     * (ideal for MDM / managed enterprise environments).
+     */
+    public static final String ENABLE_LOCAL_FILE_DOWNLOAD = "enableLocalFileDownload";
 
     /**
      * Use when testpress courses need to be open in a container as a fragment.
@@ -85,10 +100,15 @@ public class TestpressCourse {
      * @param testpressSession TestpressSession got from the core module.
      */
     public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession) {
+        show(context, testpressSession, true);
+    }
+
+    public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, boolean enableLocalFileDownload) {
         Assert.assertNotNull("Context must not be null.", context);
 
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, CourseListActivity.class);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         context.startActivity(intent);
     }
 
@@ -113,12 +133,17 @@ public class TestpressCourse {
      * @param excludeTags A list of course tags to exclude during filtering.
      */
     public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, @Nullable ArrayList<String> tags, @Nullable ArrayList<String> excludeTags) {
+        show(context, testpressSession, tags, excludeTags, true);
+    }
+
+    public static void show(@NonNull Context context, @NonNull TestpressSession testpressSession, @Nullable ArrayList<String> tags, @Nullable ArrayList<String> excludeTags, boolean enableLocalFileDownload) {
         Assert.assertNotNull("Context must not be null.", context);
 
         init(context.getApplicationContext(), testpressSession);
         Intent intent = new Intent(context, CourseListActivity.class);
         intent.putStringArrayListExtra(TestpressApiClient.TAGS, tags);
         intent.putStringArrayListExtra(TestpressApiClient.EXCLUDE_TAGS, excludeTags);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         context.startActivity(intent);
     }
 
@@ -158,13 +183,33 @@ public class TestpressCourse {
                                     String courseName,
                                     @NonNull Integer courseId,
                                     @NonNull TestpressSession testpressSession) {
+        showChapters(activity, courseName, courseId, testpressSession, true);
+    }
+
+    /**
+     * Show chapters of a specific course as new Activity with explicit download policy control.
+     *
+     * @param activity Activity from which chapters needs to show.
+     * @param courseName Course name to be displayed in the action bar of new activity.
+     * @param courseId Id of the Course which chapters need to be display.
+     * @param testpressSession TestpressSession got from the core module.
+     * @param enableLocalFileDownload If true, allows public file downloads to device storage;
+     *                                if false, restricts downloads to app-private storage with in-app viewing (MDM mode).
+     */
+    public static void showChapters(@NonNull Activity activity,
+                                    String courseName,
+                                    @NonNull Integer courseId,
+                                    @NonNull TestpressSession testpressSession,
+                                    boolean enableLocalFileDownload) {
 
         Assert.assertNotNull("Activity must not be null.", activity);
         Assert.assertNotNull("courseId must not be null.", courseId);
 
         init(activity.getApplicationContext(), testpressSession);
+        Intent intent = ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity, null);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(courseName, courseId.toString(), activity, null),
+                intent,
                 COURSE_CHAPTER_REQUEST_CODE
         );
     }
@@ -179,13 +224,31 @@ public class TestpressCourse {
     public static void showChapterContents(@NonNull Activity activity,
                                            @NonNull String chapterUrl,
                                            @NonNull TestpressSession testpressSession) {
+        showChapterContents(activity, chapterUrl, testpressSession, true);
+    }
+
+    /**
+     * Load chapter & display child chapters or contents of the chapter in new Activity with explicit download policy control.
+     *
+     * @param activity activity from which child list needs to show.
+     * @param chapterUrl Url of the chapter which children needs to show.
+     * @param testpressSession TestpressSession got from the core module.
+     * @param enableLocalFileDownload If true, allows public file downloads to device storage;
+     *                                if false, restricts downloads to app-private storage with in-app viewing (MDM mode).
+     */
+    public static void showChapterContents(@NonNull Activity activity,
+                                           @NonNull String chapterUrl,
+                                           @NonNull TestpressSession testpressSession,
+                                           boolean enableLocalFileDownload) {
 
         Assert.assertNotNull("Activity must not be null.", activity);
         Assert.assertNotNullAndNotEmpty("chapterUrl must not be null or empty.", chapterUrl);
 
         init(activity.getApplicationContext(), testpressSession);
+        Intent intent = ChapterDetailActivity.createIntent(chapterUrl, activity, null);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         activity.startActivityForResult(
-                ChapterDetailActivity.createIntent(chapterUrl, activity, null),
+                intent,
                 COURSE_CONTENT_LIST_REQUEST_CODE
         );
     }
@@ -198,6 +261,20 @@ public class TestpressCourse {
      */
     public static void showBookmarks(@NonNull Context context,
                                      @NonNull TestpressSession testpressSession) {
+        showBookmarks(context, testpressSession, true);
+    }
+
+    /**
+     * Use when bookmarked items need to be open as a new Activity with explicit download policy control.
+     *
+     * @param context Context to start the new activity.
+     * @param testpressSession TestpressSession got from the core module.
+     * @param enableLocalFileDownload If true, allows public file downloads to device storage;
+     *                                if false, restricts downloads to app-private storage with in-app viewing (MDM mode).
+     */
+    public static void showBookmarks(@NonNull Context context,
+                                     @NonNull TestpressSession testpressSession,
+                                     boolean enableLocalFileDownload) {
 
         //noinspection ConstantConditions
         if (context == null) {
@@ -205,6 +282,7 @@ public class TestpressCourse {
         }
         init(context, testpressSession);
         Intent intent = new Intent(context, BookmarksActivity.class);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         context.startActivity(intent);
     }
 
@@ -218,15 +296,87 @@ public class TestpressCourse {
     public static void showContentDetail(@NonNull Activity activity,
                                          @NonNull String contentId,
                                          @NonNull TestpressSession testpressSession) {
+        showContentDetail(activity, contentId, testpressSession, true);
+    }
+
+    /**
+     * Load content from given content id & show in new Activity with explicit download policy control.
+     *
+     * @param activity activity from which content detail need to show.
+     * @param contentId id of the content.
+     * @param testpressSession TestpressSession got from the core module.
+     * @param enableLocalFileDownload If true, allows public file downloads to device storage;
+     *                                if false, restricts downloads to app-private storage with in-app viewing (MDM mode).
+     */
+    public static void showContentDetail(@NonNull Activity activity,
+                                         @NonNull String contentId,
+                                         @NonNull TestpressSession testpressSession,
+                                         boolean enableLocalFileDownload) {
 
         Assert.assertNotNull("Activity must not be null.", activity);
         Assert.assertNotNullAndNotEmpty("contentId must not be null or empty.", contentId);
 
         init(activity.getApplicationContext(), testpressSession);
+        Intent intent = ContentActivity.createIntent(Long.parseLong(contentId), activity, null);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         activity.startActivityForResult(
-                ContentActivity.createIntent(Long.parseLong(contentId), activity, null),
+                intent,
                 COURSE_CONTENT_DETAIL_REQUEST_CODE
         );
+    }
+
+    /**
+     * Download attachment using local file download by default.
+     *
+     * @param context Context
+     * @param attachment Attachment to download
+     */
+    public static void downloadAttachment(@NonNull Context context,
+                                          @NonNull Attachment attachment) {
+        downloadAttachment(context, attachment, true);
+    }
+
+    /**
+     * Download attachment with explicit control over local file download behavior.
+     *
+     * @param context Context
+     * @param attachment Attachment to download
+     * @param enableLocalFileDownload If true, downloads to device local storage (accessible via file manager).
+     *                                If false, uses in-app download flow (internal app storage, in-app PDF viewer).
+     */
+    public static void downloadAttachment(@NonNull Context context,
+                                          @NonNull Attachment attachment,
+                                          boolean enableLocalFileDownload) {
+        Assert.assertNotNull("Context must not be null.", context);
+        Assert.assertNotNull("Attachment must not be null.", attachment);
+        TestpressCourseDownloadExtensionsKt.downloadAttachment(context, attachment, enableLocalFileDownload);
+    }
+
+    /**
+     * Download attachment using local file download by default.
+     *
+     * @param context Context
+     * @param attachment DomainAttachmentContent to download
+     */
+    public static void downloadAttachment(@NonNull Context context,
+                                          @NonNull DomainAttachmentContent attachment) {
+        downloadAttachment(context, attachment, true);
+    }
+
+    /**
+     * Download attachment with explicit control over local file download behavior.
+     *
+     * @param context Context
+     * @param attachment DomainAttachmentContent to download
+     * @param enableLocalFileDownload If true, downloads to device local storage (accessible via file manager).
+     *                                If false, uses in-app download flow (internal app storage, in-app PDF viewer).
+     */
+    public static void downloadAttachment(@NonNull Context context,
+                                          @NonNull DomainAttachmentContent attachment,
+                                          boolean enableLocalFileDownload) {
+        Assert.assertNotNull("Context must not be null.", context);
+        Assert.assertNotNull("Attachment must not be null.", attachment);
+        TestpressCourseDownloadExtensionsKt.downloadAttachment(context, attachment, enableLocalFileDownload);
     }
 
 

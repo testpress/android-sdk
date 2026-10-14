@@ -168,11 +168,11 @@ class AttachmentContentFragment : BaseContentDetailFragment() {
         if (attachment.isAttachmentUrlExpired()) {
             forceReloadContent {
                 content.attachment?.let {
-                    offlineAttachmentViewModel.requestDownload(requireContext(), attachment = it)
+                    offlineAttachmentViewModel.requestOrNotify(requireContext(), it)
                 }
             }
         } else {
-            offlineAttachmentViewModel.requestDownload(requireContext(), attachment = attachment)
+            offlineAttachmentViewModel.requestOrNotify(requireContext(), attachment)
         }
     }
 

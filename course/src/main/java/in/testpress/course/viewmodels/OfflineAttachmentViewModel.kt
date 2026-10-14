@@ -28,11 +28,12 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 
     fun getOfflineAttachment(id: Long) = repo.getAttachment(id)
 
-    fun requestDownload(
+    fun requestOrNotify(
         context: Context,
-        attachment: DomainAttachmentContent
+        attachment: DomainAttachmentContent,
+        openIfCompleted: Boolean = false
     ) {
-        NewOfflineAttachmentDownloadManager.getInstance(getApplication()).enqueueDownload(context, attachment)
+        NewOfflineAttachmentDownloadManager.getInstance(getApplication()).requestOrNotify(context, attachment, openIfCompleted)
     }
 
     fun cancel(context: Context, offlineAttachment: OfflineAttachment) {

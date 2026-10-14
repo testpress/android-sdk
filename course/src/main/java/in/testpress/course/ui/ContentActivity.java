@@ -20,6 +20,7 @@ import in.testpress.ui.BaseToolBarActivity;
 
 import static in.testpress.course.TestpressCourse.CONTENT_TYPE;
 import static in.testpress.course.TestpressCourse.PRODUCT_SLUG;
+import static in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD;
 
 public class ContentActivity extends BaseToolBarActivity implements ContentFragmentChangeListener {
 
@@ -41,20 +42,26 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         return intent;
     }
 
-    public static Intent createIntent(Long contentId, Context context, String productSlug,Boolean hideBottomNavigation) {
+    public static Intent createIntent(Long contentId, Context context, String productSlug, Boolean hideBottomNavigation) {
         Intent intent = new Intent(context, ContentActivity.class);
         intent.putExtra(CONTENT_ID, contentId);
         intent.putExtra(PRODUCT_SLUG, productSlug);
-        intent.putExtra(HIDE_BOTTOM_NAVIGATION,hideBottomNavigation);
+        intent.putExtra(HIDE_BOTTOM_NAVIGATION, hideBottomNavigation);
         return intent;
     }
 
-    public static Intent createIntent(Long contentId, Context context, String productSlug,Boolean hideBottomNavigation,Boolean forceRefreshContent) {
+    public static Intent createIntent(Long contentId, Context context, String productSlug, Boolean hideBottomNavigation, Boolean forceRefreshContent) {
         Intent intent = new Intent(context, ContentActivity.class);
         intent.putExtra(CONTENT_ID, contentId);
         intent.putExtra(PRODUCT_SLUG, productSlug);
-        intent.putExtra(HIDE_BOTTOM_NAVIGATION,hideBottomNavigation);
-        intent.putExtra(FORCE_REFRESH_CONTENT,forceRefreshContent);
+        intent.putExtra(HIDE_BOTTOM_NAVIGATION, hideBottomNavigation);
+        intent.putExtra(FORCE_REFRESH_CONTENT, forceRefreshContent);
+        return intent;
+    }
+
+    public static Intent createIntent(Long contentId, Context context, String productSlug, Boolean hideBottomNavigation, Boolean forceRefreshContent, boolean enableLocalFileDownload) {
+        Intent intent = createIntent(contentId, context, productSlug, hideBottomNavigation, forceRefreshContent);
+        intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         return intent;
     }
 
@@ -124,6 +131,8 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         bundle.putString(PRODUCT_SLUG, getIntent().getStringExtra(PRODUCT_SLUG));
         bundle.putBoolean(HIDE_BOTTOM_NAVIGATION, getIntent().getBooleanExtra(HIDE_BOTTOM_NAVIGATION, false));
         bundle.putLong(COURSE_ID, content.getCourseId());
+        bundle.putBoolean(ENABLE_LOCAL_FILE_DOWNLOAD,
+                getIntent().getBooleanExtra(ENABLE_LOCAL_FILE_DOWNLOAD, true));
 
         fragment.setArguments(bundle);
         getSupportFragmentManager().beginTransaction()

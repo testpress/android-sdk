@@ -8,6 +8,7 @@ import `in`.testpress.course.fragments.OfflineExamOptionsBottomSheet
 import `in`.testpress.course.util.ProgressDialog
 import `in`.testpress.course.util.SwipeToDeleteCallback
 import `in`.testpress.course.viewmodels.OfflineExamViewModel
+import `in`.testpress.course.TestpressCourse
 import `in`.testpress.database.entities.OfflineExam
 import `in`.testpress.enums.Status
 import `in`.testpress.exam.TestpressExam
@@ -389,11 +390,15 @@ class OfflineExamListActivity : BaseToolBarActivity() {
                 bottomSheetFragment.offlineExam = exam
                 bottomSheetFragment.setBottomSheetListener(object :OfflineExamOptionsBottomSheet.BottomSheetListener{
                     override fun onOpenExam() {
+                        val enableLocalFileDownload = this@OfflineExamListActivity.intent.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true)
                         startActivity(
                             ContentActivity.createIntent(
                                 exam.contentId,
                                 this@OfflineExamListActivity,
-                                ""
+                                "",
+                                false,
+                                false,
+                                enableLocalFileDownload
                             )
                         )
                         bottomSheetFragment.dismiss()

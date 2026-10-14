@@ -4,16 +4,20 @@ import android.content.Context
 import android.net.Uri
 import android.util.Log
 import android.widget.Toast
+import `in`.testpress.course.ui.PdfViewerActivity
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.OfflineAttachment
 import `in`.testpress.database.entities.OfflineAttachmentDownloadStatus
+import `in`.testpress.database.entities.getLocalFile
+import `in`.testpress.database.entities.isPdf
 import `in`.testpress.util.getFileExtensionFromUrl
 import `in`.testpress.util.getMimeTypeFromUri
 import `in`.testpress.util.openFile
 import `in`.testpress.util.sanitizeFileName
 import kotlinx.coroutines.*
+import kotlin.coroutines.resume
 import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import java.io.File
@@ -32,6 +36,12 @@ import java.util.concurrent.LinkedBlockingQueue
 import java.util.concurrent.atomic.AtomicBoolean
 
 class HttpDownloadException(val responseCode: Int, message: String) : IOException(message)
+
+internal enum class RequestDecision {
+    ENQUEUED,
+    ALREADY_IN_PROGRESS,
+    ALREADY_COMPLETED
+}
 
 
 class NewOfflineAttachmentDownloader(
@@ -198,39 +208,134 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
         processQueue()
     }
 
-    fun enqueueDownload(context: Context, domainAttachmentContent: DomainAttachmentContent) {
-        if (domainAttachmentContent.attachmentUrl == null) {
-            Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
+    @JvmOverloads
+    fun enqueueDownload(
+        context: Context,
+        domainAttachmentContent: DomainAttachmentContent,
+        showToasts: Boolean = false,
+        openIfCompleted: Boolean = false
+    ) {
+        if (domainAttachmentContent.attachmentUrl.isNullOrBlank()) {
+            if (showToasts) {
+                Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
+            }
             return
         }
 
-        // De-duplication check: if task is already running or queued, ignore the duplicate request
-        if (activeJobs.containsKey(domainAttachmentContent.id) ||
-            pendingQueue.any { it.id == domainAttachmentContent.id }) {
-            return
-        }
-
-        val fileName = "${domainAttachmentContent.title}${getFileExtensionFromUrl(domainAttachmentContent.attachmentUrl)}".sanitizeFileName()
-        val directory = File(context.filesDir, "offline_attachments")
-        val destFile = File(directory, fileName)
-
-        val offlineAttachment = OfflineAttachment(
-            id = domainAttachmentContent.id,
-            title = domainAttachmentContent.title ?: "Attachment ${domainAttachmentContent.id}",
-            url = domainAttachmentContent.attachmentUrl,
-            path = Uri.fromFile(destFile).toString(),
-            contentUri = null,
-            downloadId = 0L, // placeholder
-            status = OfflineAttachmentDownloadStatus.QUEUED,
-            progress = 0
+        handleDownloadRequest(
+            context = context,
+            domainAttachmentContent = domainAttachmentContent,
+            showToasts = showToasts,
+            openIfCompleted = openIfCompleted
         )
+    }
+
+    @JvmOverloads
+    fun requestOrNotify(
+        context: Context,
+        domainAttachmentContent: DomainAttachmentContent,
+        openIfCompleted: Boolean = false
+    ) {
+        handleDownloadRequest(
+            context = context,
+            domainAttachmentContent = domainAttachmentContent,
+            showToasts = true,
+            openIfCompleted = openIfCompleted
+        )
+    }
+
+    private fun handleDownloadRequest(
+        context: Context,
+        domainAttachmentContent: DomainAttachmentContent,
+        showToasts: Boolean,
+        openIfCompleted: Boolean
+    ) {
+        val attachmentUrl = domainAttachmentContent.attachmentUrl
+        if (attachmentUrl.isNullOrBlank()) {
+            if (showToasts) {
+                Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
 
         progressScope.launch {
-            dbMutex.withLock {
-                repository.insert(offlineAttachment)
+            var existingCompletedRecord: OfflineAttachment? = null
+            val decision: RequestDecision = dbMutex.withLock {
+                if (activeJobs.containsKey(domainAttachmentContent.id) ||
+                    pendingQueue.any { it.id == domainAttachmentContent.id }
+                ) {
+                    return@withLock RequestDecision.ALREADY_IN_PROGRESS
+                }
+
+                val existingRecord = repository.getById(domainAttachmentContent.id)
+                if (existingRecord != null) {
+                    when (existingRecord.status) {
+                        OfflineAttachmentDownloadStatus.COMPLETED -> {
+                            val localFile = existingRecord.getLocalFile()
+                            if (localFile != null && localFile.exists()) {
+                                existingCompletedRecord = existingRecord
+                                return@withLock RequestDecision.ALREADY_COMPLETED
+                            }
+                        }
+                        else -> {} // QUEUED/DOWNLOADING with no live job is stale: re-enqueue
+                    }
+                }
+
+                val fileName = "${domainAttachmentContent.title}${getFileExtensionFromUrl(attachmentUrl)}".sanitizeFileName()
+                val directory = File(context.filesDir, "offline_attachments")
+                val destFile = File(directory, fileName)
+
+                val offlineAttachment = OfflineAttachment(
+                    id = domainAttachmentContent.id,
+                    title = domainAttachmentContent.title ?: "Attachment ${domainAttachmentContent.id}",
+                    url = attachmentUrl,
+                    path = Uri.fromFile(destFile).toString(),
+                    contentUri = null,
+                    downloadId = 0L,
+                    status = OfflineAttachmentDownloadStatus.QUEUED,
+                    progress = 0
+                )
+
+                if (existingRecord != null) {
+                    repository.update(offlineAttachment)
+                } else {
+                    repository.insert(offlineAttachment)
+                }
+                pendingQueue.add(domainAttachmentContent)
+                RequestDecision.ENQUEUED
             }
-            pendingQueue.add(domainAttachmentContent)
-            processQueue()
+
+            when (decision) {
+                RequestDecision.ENQUEUED -> {
+                    processQueue()
+                    if (showToasts) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Download Started...", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                RequestDecision.ALREADY_IN_PROGRESS -> {
+                    if (showToasts) {
+                        withContext(Dispatchers.Main) {
+                            Toast.makeText(context, "Download already in progress", Toast.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+                RequestDecision.ALREADY_COMPLETED -> {
+                    withContext(Dispatchers.Main) {
+                        if (showToasts) {
+                            Toast.makeText(
+                                context,
+                                "Attachment already downloaded",
+                                Toast.LENGTH_SHORT
+                            ).show()
+                        }
+                        if (openIfCompleted && existingCompletedRecord != null) {
+                            openFile(context, existingCompletedRecord!!)
+                        }
+                    }
+                }
+            }
         }
     }
 
@@ -325,31 +430,30 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
                 }
             }
 
-            progressScope.launch {
-                dbMutex.withLock {
-                    val record = repository.getById(content.id)
-                    record?.let {
-                        if (succeeded) {
-                            repository.update(it.copy(
-                                status = OfflineAttachmentDownloadStatus.COMPLETED,
-                                progress = 100
-                            ))
-                            synchronized(listeners) {
-                                listeners.forEach { l -> l.onDownloadCompleted(content.id, filePath) }
-                            }
-                        } else {
-                            repository.update(it.copy(
-                                status = OfflineAttachmentDownloadStatus.FAILED,
-                                progress = 0
-                            ))
-                            synchronized(listeners) {
-                                listeners.forEach { l -> l.onDownloadFailed(content.id, failureReason, lastException) }
-                            }
+            dbMutex.withLock {
+                val record = repository.getById(content.id)
+                record?.let {
+                    if (succeeded) {
+                        repository.update(it.copy(
+                            status = OfflineAttachmentDownloadStatus.COMPLETED,
+                            progress = 100
+                        ))
+                        synchronized(listeners) {
+                            listeners.forEach { l -> l.onDownloadCompleted(content.id, filePath) }
+                        }
+                    } else {
+                        repository.update(it.copy(
+                            status = OfflineAttachmentDownloadStatus.FAILED,
+                            progress = 0
+                        ))
+                        synchronized(listeners) {
+                            listeners.forEach { l -> l.onDownloadFailed(content.id, failureReason, lastException) }
                         }
                     }
                 }
-                processQueue()
+                activeJobs.remove(content.id)
             }
+            processQueue()
         } finally {
             activeDownloaders.remove(content.id)
             dbMutex.withLock {
@@ -368,6 +472,8 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
 
         progressScope.launch {
             dbMutex.withLock {
+                pendingQueue.removeAll { it.id == offlineAttachment.id }
+                activeJobs.remove(offlineAttachment.id)
                 repository.delete(offlineAttachment.id)
             }
             val file = Uri.parse(offlineAttachment.path).path?.let { File(it) }
@@ -383,6 +489,20 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
     }
 
     fun openFile(context: Context, offlineAttachment: OfflineAttachment) {
+        if (offlineAttachment.isPdf(context)) {
+            val localFile = offlineAttachment.getLocalFile()
+            if (localFile != null && localFile.exists()) {
+                val intent = PdfViewerActivity.createIntent(context, localFile.absolutePath)
+                if (context !is android.app.Activity) {
+                    intent.addFlags(android.content.Intent.FLAG_ACTIVITY_NEW_TASK)
+                }
+                context.startActivity(intent)
+            } else {
+                Toast.makeText(context, "File not found", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
         val filePathUri = offlineAttachment.path
         val contentUri = offlineAttachment.contentUri
         val mimeType = getMimeTypeFromUri(context, filePathUri, contentUri)
@@ -391,19 +511,24 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
 
     fun restartDownloadProgressTracking(context: Context) {
         progressScope.launch {
-            val downloadingAttachments = repository.getAllWithStatus(OfflineAttachmentDownloadStatus.DOWNLOADING)
-            val queuedAttachments = repository.getAllWithStatus(OfflineAttachmentDownloadStatus.QUEUED)
+            dbMutex.withLock {
+                val downloadingAttachments = repository.getAllWithStatus(OfflineAttachmentDownloadStatus.DOWNLOADING)
+                val queuedAttachments = repository.getAllWithStatus(OfflineAttachmentDownloadStatus.QUEUED)
 
-            val attachmentsToTrack = downloadingAttachments + queuedAttachments
-            attachmentsToTrack.forEach { attachment ->
-                val domainAttachmentContent = DomainAttachmentContent(
-                    id = attachment.id,
-                    title = attachment.title,
-                    attachmentUrl = attachment.url,
-                    allowDownload = true
-                )
-                enqueueDownload(context, domainAttachmentContent)
+                val attachmentsToTrack = downloadingAttachments + queuedAttachments
+                attachmentsToTrack.forEach { attachment ->
+                    if (!activeJobs.containsKey(attachment.id) && pendingQueue.none { it.id == attachment.id }) {
+                        val domainAttachmentContent = DomainAttachmentContent(
+                            id = attachment.id,
+                            title = attachment.title,
+                            attachmentUrl = attachment.url,
+                            allowDownload = true
+                        )
+                        pendingQueue.add(domainAttachmentContent)
+                    }
+                }
             }
+            processQueue()
         }
     }
 

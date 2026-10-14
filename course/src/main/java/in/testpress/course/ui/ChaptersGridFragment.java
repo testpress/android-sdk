@@ -30,6 +30,7 @@ import in.testpress.util.UIUtils;
 
 import static in.testpress.course.TestpressCourse.COURSE_ID;
 import static in.testpress.course.TestpressCourse.PARENT_ID;
+import in.testpress.course.TestpressCourse;
 
 public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
 
@@ -159,9 +160,12 @@ public class ChaptersGridFragment extends BaseGridFragment<Chapter> {
             view.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    boolean enableLocalFileDownload = getActivity().getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
                     getActivity().startActivity(ChapterDetailActivity.createIntent(
                             chapter.getUrl(),
-                            getContext(), null)
+                            getContext(), null,
+                            false,
+                            enableLocalFileDownload)
                     );
                 }
             });

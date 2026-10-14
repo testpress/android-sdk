@@ -13,6 +13,7 @@ import in.testpress.models.greendao.Course;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 import in.testpress.util.extension.CourseKt;
+import in.testpress.course.TestpressCourse;
 
 class CourseListAdapter extends SingleTypeAdapter<Course> {
 
@@ -96,10 +97,13 @@ class CourseListAdapter extends SingleTypeAdapter<Course> {
     public void openCourseContentsOrExternalLink(Activity activity, Course course, boolean openCourseContent) {
 
         if (openCourseContent) {
+            boolean enableLocalFileDownload = activity.getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
             activity.startActivity(ChapterDetailActivity.createIntent(
                     course.getTitle(),
                     course.getId().toString(),
-                    activity, this.productSlug));
+                    activity, this.productSlug,
+                    true,
+                    enableLocalFileDownload));
         } else {
             Intent intent = new Intent(activity, WebViewActivity.class);
             intent.putExtra("URL", course.getExternal_content_link());

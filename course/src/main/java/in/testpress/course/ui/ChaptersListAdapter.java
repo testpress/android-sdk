@@ -16,6 +16,7 @@ import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.Course;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.course.TestpressCourse;
 
 class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
 
@@ -97,11 +98,13 @@ class ChaptersListAdapter extends SingleTypeAdapter<Chapter> {
             view(4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    boolean enableLocalFileDownload = activity.getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
                     activity.startActivity(ChapterDetailActivity.createIntent(
                             chapter.getUrl(),
                             activity,
                             productSlug,
-                            productSlug != null && !productSlug.isEmpty())
+                            productSlug != null && !productSlug.isEmpty(),
+                            enableLocalFileDownload)
                     );
                 }
             });

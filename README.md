@@ -99,8 +99,80 @@ To use the locally published SDK in the [Testpress Android App](https://github.c
    In the Android application, update `testpressSDK` to match the updated `VERSION_NAME`:
 
    ```groovy
-   testpressSDK = '1.2.4'
+   testpressSDK = '1.4.313'
    ```
+
+---
+
+## Attachment Download Policy (Local Storage vs. In-App MDM Policy)
+
+The Testpress Course SDK provides host applications with explicit control over how offline attachments (such as PDFs and course documents) are downloaded and stored. Host applications are responsible for passing this policy based on their device management (MDM) configuration, organizational policies, or user permissions.
+
+### Storage Modes
+
+| Mode | `enableLocalFileDownload` | Storage Location | Accessibility & Viewer |
+| :--- | :--- | :--- | :--- |
+| **Public Device Storage** *(Default)* | `true` | Public external storage (`Environment.DIRECTORY_DOWNLOADS`) | Files can be accessed by third-party apps, external file managers, and system viewers. |
+| **In-App Sandboxed Storage** *(MDM / Restricted)* | `false` | App-private internal storage (`context.filesDir/offline_attachments`) | Files are isolated from external apps and file managers. Viewing is restricted exclusively to the SDK's built-in `PdfViewerActivity`. |
+
+### Host Application Integration
+
+Host applications pass the `enableLocalFileDownload` boolean policy through the `TestpressCourse` entry points:
+
+#### 1. Launching Chapters
+```java
+// Default behavior (allows public device download):
+TestpressCourse.showChapters(activity, courseName, courseId, testpressSession);
+
+// Enforce in-app sandboxed downloads (MDM policy):
+TestpressCourse.showChapters(activity, courseName, courseId, testpressSession, false);
+```
+
+#### 2. Launching Chapter Contents
+```java
+// Enforce in-app sandboxed downloads:
+TestpressCourse.showChapterContents(activity, chapterUrl, testpressSession, false);
+```
+
+#### 3. Launching Content Details
+```java
+// Enforce in-app sandboxed downloads:
+TestpressCourse.showContentDetail(activity, contentId, testpressSession, false);
+```
+
+#### 4. Launching Bookmarks
+```java
+// Enforce in-app sandboxed downloads:
+TestpressCourse.showBookmarks(context, testpressSession, false);
+```
+
+#### 5. Direct Attachment Downloads
+```kotlin
+// Kotlin extension:
+TestpressCourse.downloadAttachment(context, domainAttachmentContent, enableLocalFileDownload = false)
+```
+```java
+// Java:
+TestpressCourse.downloadAttachment(context, attachment, false);
+```
+
+#### 6. Custom Intent Launching
+If launching `ContentActivity` directly:
+```java
+Intent intent = ContentActivity.createIntent(
+    contentId,
+    context,
+    productSlug,
+    hideBottomNavigation,
+    forceRefreshContent,
+    enableLocalFileDownload // boolean policy flag
+);
+context.startActivity(intent);
+```
+Or set the intent extra directly on any course intent:
+```java
+intent.putExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, false);
+```
 
 
 
