@@ -37,6 +37,13 @@ import java.util.concurrent.atomic.AtomicBoolean
 
 class HttpDownloadException(val responseCode: Int, message: String) : IOException(message)
 
+internal enum class RequestDecision {
+    ENQUEUED,
+    ALREADY_IN_PROGRESS,
+    ALREADY_COMPLETED,
+    INVALID_REQUEST
+}
+
 
 class NewOfflineAttachmentDownloader(
     private val uri: Uri,
@@ -202,39 +209,38 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
         processQueue()
     }
 
-    enum class RequestDecision {
-        ENQUEUED,
-        ALREADY_IN_PROGRESS,
-        ALREADY_COMPLETED,
-        INVALID_REQUEST
-    }
-
-    /**
-     * Submits an attachment download request for asynchronous processing.
-     *
-     * @param context Application or activity context.
-     * @param domainAttachmentContent The attachment metadata to download.
-     * @param onDecision Optional callback invoked when the mutex-protected database check resolves,
-     *                   receiving the final [RequestDecision]. Dispatched on the main thread ([Dispatchers.Main]).
-     * @return `true` if the request was accepted and submitted for background processing; `false` if
-     *         rejected immediately due to invalid parameters (e.g., blank URL).
-     *         Note: A `true` return value means the request was submitted, not that a new download was
-     *         guaranteed to be started. If the database check resolves that the attachment is already
-     *         completed or queued, the request will finish with [RequestDecision.ALREADY_COMPLETED] or
-     *         [RequestDecision.ALREADY_IN_PROGRESS] without enqueueing a duplicate download.
-     */
     @JvmOverloads
     fun enqueueDownload(
         context: Context,
         domainAttachmentContent: DomainAttachmentContent,
-        onDecision: ((RequestDecision) -> Unit)? = null
-    ): Boolean {
+        showToasts: Boolean = false,
+        openIfCompleted: Boolean = false
+    ) {
+        if (domainAttachmentContent.attachmentUrl.isNullOrBlank()) {
+            if (showToasts) {
+                Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
+            }
+            return
+        }
+
+        handleDownloadRequest(
+            context = context,
+            domainAttachmentContent = domainAttachmentContent,
+            showToasts = showToasts,
+            openIfCompleted = openIfCompleted
+        )
+    }
+
+    internal fun enqueueDownload(
+        context: Context,
+        domainAttachmentContent: DomainAttachmentContent,
+        onDecision: ((RequestDecision) -> Unit)?
+    ) {
         if (domainAttachmentContent.attachmentUrl.isNullOrBlank()) {
             progressScope.launch(Dispatchers.Main) {
-                Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
                 onDecision?.invoke(RequestDecision.INVALID_REQUEST)
             }
-            return false
+            return
         }
 
         handleDownloadRequest(
@@ -244,18 +250,9 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
             openIfCompleted = false,
             onDecision = onDecision
         )
-        return true
     }
 
-    /**
-     * Submits an attachment download request and suspends until the request decision has been determined
-     * under the database lock.
-     *
-     * @return The resulting [RequestDecision] indicating whether the item was [RequestDecision.ENQUEUED],
-     *         [RequestDecision.ALREADY_IN_PROGRESS], [RequestDecision.ALREADY_COMPLETED],
-     *         or [RequestDecision.INVALID_REQUEST].
-     */
-    suspend fun enqueueDownloadAwait(
+    internal suspend fun enqueueDownloadAwait(
         context: Context,
         domainAttachmentContent: DomainAttachmentContent
     ): RequestDecision = suspendCancellableCoroutine { continuation ->
@@ -289,12 +286,10 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
     ) {
         val attachmentUrl = domainAttachmentContent.attachmentUrl
         if (attachmentUrl.isNullOrBlank()) {
-            progressScope.launch(Dispatchers.Main) {
-                if (showToasts) {
-                    Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
-                }
-                onDecision?.invoke(RequestDecision.INVALID_REQUEST)
+            if (showToasts) {
+                Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
             }
+            onDecision?.invoke(RequestDecision.INVALID_REQUEST)
             return
         }
 

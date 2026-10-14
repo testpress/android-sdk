@@ -57,6 +57,8 @@ import in.testpress.util.ViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
 
+import in.testpress.course.TestpressCourse;
+
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
 import static in.testpress.network.TestpressApiClient.CREATED_SINCE;
@@ -111,6 +113,7 @@ public class BookmarksActivity extends BaseToolBarActivity
     private RetrofitCall<BookmarkFolder> updateFolderAPIRequest;
     private RetrofitCall<Void> deleteFolderAPIRequest;
     private RetrofitCall<Bookmark> undoBookmarkAPIRequest;
+    private boolean enableLocalFileDownload = true;
 
     @SuppressLint("InflateParams")
     @Override
@@ -141,6 +144,7 @@ public class BookmarksActivity extends BaseToolBarActivity
 
         apiClient = new TestpressExamApiClient(this);
         bookmarkDao = TestpressSDKDatabase.getBookmarkDao(this);
+        enableLocalFileDownload = getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
 
         ViewUtils.setTypeface(
                 new TextView[] { nextButton, previousButton, emptyTitleView },
@@ -216,7 +220,7 @@ public class BookmarksActivity extends BaseToolBarActivity
                         showBookmarksList(false);
                     }
                 });
-        pagerAdapter = new in.testpress.course.ui.BookmarkPagerAdapter(this, currentFolder);
+        pagerAdapter = new in.testpress.course.ui.BookmarkPagerAdapter(this, currentFolder, enableLocalFileDownload);
         viewPager.setAdapter(pagerAdapter);
         goToPosition(0);
         viewPager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {

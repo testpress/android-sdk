@@ -28,29 +28,6 @@ class OfflineAttachmentViewModel(application: Application) : AndroidViewModel(ap
 
     fun getOfflineAttachment(id: Long) = repo.getAttachment(id)
 
-    /**
-     * Submits an attachment download request.
-     *
-     * @param onDecision Optional callback invoked with the actual [NewOfflineAttachmentDownloadManager.RequestDecision]
-     *                   once the mutex-protected database check resolves. Dispatched on the main thread ([Dispatchers.Main]).
-     * @return `true` if the request was submitted for processing; `false` if rejected immediately.
-     */
-    @JvmOverloads
-    fun requestDownload(
-        context: Context,
-        attachment: DomainAttachmentContent,
-        onDecision: ((NewOfflineAttachmentDownloadManager.RequestDecision) -> Unit)? = null
-    ): Boolean {
-        return NewOfflineAttachmentDownloadManager.getInstance(getApplication()).enqueueDownload(context, attachment, onDecision)
-    }
-
-    suspend fun requestDownloadAwait(
-        context: Context,
-        attachment: DomainAttachmentContent
-    ): NewOfflineAttachmentDownloadManager.RequestDecision {
-        return NewOfflineAttachmentDownloadManager.getInstance(getApplication()).enqueueDownloadAwait(context, attachment)
-    }
-
     fun requestOrNotify(
         context: Context,
         attachment: DomainAttachmentContent,

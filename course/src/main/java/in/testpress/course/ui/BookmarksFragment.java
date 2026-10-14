@@ -107,11 +107,12 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<Content> refreshContentCall;
     private PermissionsUtils permissionsUtils;
 
-    public static in.testpress.course.ui.BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
+    public static in.testpress.course.ui.BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage, boolean enableLocalFileDownload) {
         in.testpress.course.ui.BookmarksFragment reviewQuestionsFragment = new in.testpress.course.ui.BookmarksFragment();
         Bundle bundle = new Bundle();
         bundle.putLong(PARAM_BOOKMARK_ID, bookmarkId);
         bundle.putParcelable(PARAM_SELECTED_LANGUAGE, selectedLanguage);
+        bundle.putBoolean(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, enableLocalFileDownload);
         reviewQuestionsFragment.setArguments(bundle);
         return reviewQuestionsFragment;
     }
@@ -371,11 +372,7 @@ public class BookmarksFragment extends BaseFragment {
     }
 
     private boolean getEnableLocalFileDownload() {
-        Activity activity = getActivity();
-        if (activity != null && activity.getIntent() != null) {
-            return activity.getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
-        }
-        return true;
+        return getArguments() != null ? getArguments().getBoolean(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) : true;
     }
 
     private void startPdfViewActivity(){

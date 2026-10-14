@@ -15,18 +15,20 @@ class BookmarkPagerAdapter extends FragmentStatePagerAdapter {
     private boolean positionsModified;
     private LazyList<Bookmark> bookmarks;
     private String currentFolder;
+    private boolean enableLocalFileDownload;
 
-    BookmarkPagerAdapter(FragmentActivity activity, String currentFolder) {
+    BookmarkPagerAdapter(FragmentActivity activity, String currentFolder, boolean enableLocalFileDownload) {
         super(activity.getSupportFragmentManager());
         this.currentFolder = currentFolder;
         this.activity = activity;
+        this.enableLocalFileDownload = enableLocalFileDownload;
         bookmarks = Bookmark.getQueryBuilderToDisplay(activity, currentFolder).listLazy();
     }
 
     @Override
     public Fragment getItem(int position) {
         return in.testpress.course.ui.BookmarksFragment.getInstance(bookmarks.get(position).getId(),
-                selectedLanguage);
+                selectedLanguage, enableLocalFileDownload);
     }
 
     public void setCurrentFolder(String currentFolder) {
