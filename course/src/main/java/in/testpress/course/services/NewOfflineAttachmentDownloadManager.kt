@@ -40,8 +40,7 @@ class HttpDownloadException(val responseCode: Int, message: String) : IOExceptio
 internal enum class RequestDecision {
     ENQUEUED,
     ALREADY_IN_PROGRESS,
-    ALREADY_COMPLETED,
-    INVALID_REQUEST
+    ALREADY_COMPLETED
 }
 
 
@@ -340,7 +339,6 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
                         }
                     }
                 }
-                RequestDecision.INVALID_REQUEST -> {}
             }
         }
     }
