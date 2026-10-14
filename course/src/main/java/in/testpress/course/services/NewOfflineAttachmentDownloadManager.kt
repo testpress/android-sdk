@@ -231,38 +231,6 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
         )
     }
 
-    internal fun enqueueDownload(
-        context: Context,
-        domainAttachmentContent: DomainAttachmentContent,
-        onDecision: ((RequestDecision) -> Unit)?
-    ) {
-        if (domainAttachmentContent.attachmentUrl.isNullOrBlank()) {
-            progressScope.launch(Dispatchers.Main) {
-                onDecision?.invoke(RequestDecision.INVALID_REQUEST)
-            }
-            return
-        }
-
-        handleDownloadRequest(
-            context = context,
-            domainAttachmentContent = domainAttachmentContent,
-            showToasts = false,
-            openIfCompleted = false,
-            onDecision = onDecision
-        )
-    }
-
-    internal suspend fun enqueueDownloadAwait(
-        context: Context,
-        domainAttachmentContent: DomainAttachmentContent
-    ): RequestDecision = suspendCancellableCoroutine { continuation ->
-        enqueueDownload(context, domainAttachmentContent) { decision ->
-            if (continuation.isActive) {
-                continuation.resume(decision)
-            }
-        }
-    }
-
     @JvmOverloads
     fun requestOrNotify(
         context: Context,
@@ -281,15 +249,13 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
         context: Context,
         domainAttachmentContent: DomainAttachmentContent,
         showToasts: Boolean,
-        openIfCompleted: Boolean,
-        onDecision: ((RequestDecision) -> Unit)? = null
+        openIfCompleted: Boolean
     ) {
         val attachmentUrl = domainAttachmentContent.attachmentUrl
         if (attachmentUrl.isNullOrBlank()) {
             if (showToasts) {
                 Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
             }
-            onDecision?.invoke(RequestDecision.INVALID_REQUEST)
             return
         }
 
@@ -342,12 +308,6 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
                 }
                 pendingQueue.add(domainAttachmentContent)
                 RequestDecision.ENQUEUED
-            }
-
-            if (onDecision != null) {
-                withContext(Dispatchers.Main) {
-                    onDecision.invoke(decision)
-                }
             }
 
             when (decision) {
