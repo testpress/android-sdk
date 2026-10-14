@@ -4,6 +4,8 @@ import `in`.testpress.course.adapter.BaseCourseContentItemViewHolder
 import `in`.testpress.course.databinding.RunningUpcomingListItemBinding
 import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.ui.ContentActivity
+import `in`.testpress.course.TestpressCourse
+import `in`.testpress.course.util.getActivity
 
 class RunningContentItemViewHolder(val binding: RunningUpcomingListItemBinding) :
     BaseCourseContentItemViewHolder(binding) {
@@ -17,11 +19,17 @@ class RunningContentItemViewHolder(val binding: RunningUpcomingListItemBinding) 
 
     private fun onItemClick(content: DomainContent) {
         itemView.setOnClickListener {
-            binding.root.context.startActivity(
+            val context = binding.root.context
+            val activity = context.getActivity()
+            val enableLocalFileDownload = activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
+            context.startActivity(
                 ContentActivity.createIntent(
                     content.id,
-                    binding.root.context,
-                    ""
+                    context,
+                    "",
+                    false,
+                    false,
+                    enableLocalFileDownload
                 )
             )
         }

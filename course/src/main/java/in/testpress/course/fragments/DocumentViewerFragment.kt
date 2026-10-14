@@ -131,13 +131,7 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun isLocalFileDownloadEnabled(): Boolean {
-        if (arguments?.containsKey(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD) == true) {
-            return arguments?.getBoolean(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
-        }
-        if (activity?.intent?.hasExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD) == true) {
-            return activity?.intent?.getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
-        }
-        return true
+        return arguments?.getBoolean(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true) ?: true
     }
 
     private fun onDownloadPdfClick() {

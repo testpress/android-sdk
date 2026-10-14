@@ -55,6 +55,8 @@ import in.testpress.ui.view.ClosableSpinner;
 import in.testpress.util.FullScreenChromeClient;
 import in.testpress.util.UIUtils;
 import in.testpress.util.ViewUtils;
+import android.app.Activity;
+import in.testpress.course.TestpressCourse;
 import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
@@ -368,12 +370,16 @@ public class BookmarksFragment extends BaseFragment {
         progressBar.setVisibility(View.GONE);
     }
 
-    private void startPdfViewActivity(){
-        boolean enableLocalFileDownload = true;
-        if (getActivity() != null && getActivity().getIntent() != null) {
-            enableLocalFileDownload = getActivity().getIntent()
-                    .getBooleanExtra(in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
+    private boolean getEnableLocalFileDownload() {
+        Activity activity = getActivity();
+        if (activity != null && activity.getIntent() != null) {
+            return activity.getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
         }
+        return true;
+    }
+
+    private void startPdfViewActivity(){
+        boolean enableLocalFileDownload = getEnableLocalFileDownload();
         getActivity().startActivity(ContentActivity.createIntent(
                 content.getId(),
                 getContext(),
@@ -396,13 +402,7 @@ public class BookmarksFragment extends BaseFragment {
             return;
         }
 
-        final boolean enableLocalFileDownload;
-        if (getActivity() != null && getActivity().getIntent() != null) {
-            enableLocalFileDownload = getActivity().getIntent()
-                    .getBooleanExtra(in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
-        } else {
-            enableLocalFileDownload = true;
-        }
+        final boolean enableLocalFileDownload = getEnableLocalFileDownload();
 
         if (enableLocalFileDownload && permissionsUtils != null && !permissionsUtils.isStoragePermissionGranted()) {
             permissionsUtils.requestStoragePermissionWithSnackbar();

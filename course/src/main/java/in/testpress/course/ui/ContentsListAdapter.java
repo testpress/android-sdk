@@ -31,6 +31,7 @@ import in.testpress.models.greendao.Video;
 import in.testpress.store.ui.ProductDetailsActivity;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
+import in.testpress.course.TestpressCourse;
 
 import static in.testpress.store.TestpressStore.STORE_REQUEST_CODE;
 
@@ -132,10 +133,14 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
             view(4).setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
+                    boolean enableLocalFileDownload = mActivity.getIntent().getBooleanExtra(TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
                     mActivity.startActivity(ContentActivity.createIntent(
                             content.getId(),
                             mActivity,
-                            productSlug)
+                            productSlug,
+                            false,
+                            false,
+                            enableLocalFileDownload)
                     );
                 }
             });

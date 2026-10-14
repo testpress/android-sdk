@@ -1,8 +1,6 @@
 package in.testpress.course.ui;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.ContextWrapper;
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.MenuItem;
@@ -37,22 +35,19 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
     public static final String HIDE_BOTTOM_NAVIGATION = "hideBottomNavigation";
     public static final String FORCE_REFRESH_CONTENT = "forceRefreshContent";
 
-    private static Activity getActivityFromContext(Context context) {
-        while (context instanceof ContextWrapper) {
-            if (context instanceof Activity) {
-                return (Activity) context;
-            }
-            context = ((ContextWrapper) context).getBaseContext();
-        }
-        return null;
-    }
-
     public static Intent createIntent(Long contentId, Context context, String productSlug) {
-        return createIntent(contentId, context, productSlug, false);
+        Intent intent = new Intent(context, ContentActivity.class);
+        intent.putExtra(CONTENT_ID, contentId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
+        return intent;
     }
 
     public static Intent createIntent(Long contentId, Context context, String productSlug, Boolean hideBottomNavigation) {
-        return createIntent(contentId, context, productSlug, hideBottomNavigation, false);
+        Intent intent = new Intent(context, ContentActivity.class);
+        intent.putExtra(CONTENT_ID, contentId);
+        intent.putExtra(PRODUCT_SLUG, productSlug);
+        intent.putExtra(HIDE_BOTTOM_NAVIGATION, hideBottomNavigation);
+        return intent;
     }
 
     public static Intent createIntent(Long contentId, Context context, String productSlug, Boolean hideBottomNavigation, Boolean forceRefreshContent) {
@@ -61,11 +56,6 @@ public class ContentActivity extends BaseToolBarActivity implements ContentFragm
         intent.putExtra(PRODUCT_SLUG, productSlug);
         intent.putExtra(HIDE_BOTTOM_NAVIGATION, hideBottomNavigation);
         intent.putExtra(FORCE_REFRESH_CONTENT, forceRefreshContent);
-        Activity activity = getActivityFromContext(context);
-        if (activity != null && activity.getIntent() != null) {
-            intent.putExtra(ENABLE_LOCAL_FILE_DOWNLOAD,
-                    activity.getIntent().getBooleanExtra(ENABLE_LOCAL_FILE_DOWNLOAD, true));
-        }
         return intent;
     }
 
