@@ -58,6 +58,9 @@ import in.testpress.util.ViewUtils;
 import in.testpress.util.WebViewUtils;
 import in.testpress.v2_4.models.ApiResponse;
 import in.testpress.v2_4.models.FolderListResponse;
+import in.testpress.course.api.TestpressCourseApiClient;
+import in.testpress.course.domain.DomainAttachmentContentKt;
+import in.testpress.util.PermissionsUtils;
 
 import static in.testpress.exam.api.TestpressExamApiClient.BOOKMARK_FOLDERS_PATH;
 import static in.testpress.models.greendao.BookmarkFolder.UNCATEGORIZED;
@@ -99,6 +102,8 @@ public class BookmarksFragment extends BaseFragment {
     private RetrofitCall<ApiResponse<FolderListResponse>> bookmarkFoldersLoader;
     private RetrofitCall<Bookmark> updateBookmarkAPIRequest;
     private RetrofitCall<Void> deleteBookmarkAPIRequest;
+    private RetrofitCall<Content> refreshContentCall;
+    private PermissionsUtils permissionsUtils;
 
     public static in.testpress.course.ui.BookmarksFragment getInstance(long bookmarkId, Language selectedLanguage) {
         in.testpress.course.ui.BookmarksFragment reviewQuestionsFragment = new in.testpress.course.ui.BookmarksFragment();
@@ -209,6 +214,7 @@ public class BookmarksFragment extends BaseFragment {
         TextView usersAnsweredRight = view.findViewById(R.id.users_answered_right);
 
         rootLayout = view;
+        permissionsUtils = new PermissionsUtils(getActivity(), rootLayout);
         ViewUtils.setTypeface(
                 new TextView[] {difficultyTitle, difficultyPercentageText },
                 TestpressSdk.getRubikMediumFont(view.getContext())
@@ -380,19 +386,60 @@ public class BookmarksFragment extends BaseFragment {
 
     private void startAttachmentDownloadActivity(){
         final Attachment attachment = content.getRawAttachment();
-        if (attachment == null || attachment.getAttachmentUrl() == null) {
+        if (attachment == null || attachment.getAttachmentUrl() == null || attachment.getAttachmentUrl().trim().isEmpty()) {
+            ViewUtils.toast(getContext(), getString(R.string.download_url_not_available));
             return;
         }
 
-        Context ctx = getContext();
+        final Context ctx = getContext();
         if (ctx == null) {
             return;
         }
 
-        boolean enableLocalFileDownload = true;
+        final boolean enableLocalFileDownload;
         if (getActivity() != null && getActivity().getIntent() != null) {
             enableLocalFileDownload = getActivity().getIntent()
                     .getBooleanExtra(in.testpress.course.TestpressCourse.ENABLE_LOCAL_FILE_DOWNLOAD, true);
+        } else {
+            enableLocalFileDownload = true;
+        }
+
+        if (enableLocalFileDownload && permissionsUtils != null && !permissionsUtils.isStoragePermissionGranted()) {
+            permissionsUtils.requestStoragePermissionWithSnackbar();
+            return;
+        }
+
+        if (DomainAttachmentContentKt.asDomainContent(attachment).isAttachmentUrlExpired()) {
+            if (content.getUrl() != null && !content.getUrl().trim().isEmpty()) {
+                progressBar.setVisibility(View.VISIBLE);
+                refreshContentCall = new TestpressCourseApiClient(ctx).getContent(content.getUrl());
+                refreshContentCall.enqueue(new TestpressCallback<Content>() {
+                    @Override
+                    public void onSuccess(Content reloadedContent) {
+                        progressBar.setVisibility(View.GONE);
+                        if (!isAdded()) {
+                            return;
+                        }
+                        content = reloadedContent;
+                        Attachment newAttachment = content.getRawAttachment();
+                        if (newAttachment != null && newAttachment.getAttachmentUrl() != null && !newAttachment.getAttachmentUrl().trim().isEmpty()) {
+                            in.testpress.course.TestpressCourse.downloadAttachment(ctx, newAttachment, enableLocalFileDownload);
+                        } else {
+                            ViewUtils.toast(ctx, getString(R.string.download_url_not_available));
+                        }
+                    }
+
+                    @Override
+                    public void onException(TestpressException exception) {
+                        progressBar.setVisibility(View.GONE);
+                        if (!isAdded()) {
+                            return;
+                        }
+                        ViewUtils.toast(ctx, "Failed to refresh download link");
+                    }
+                });
+                return;
+            }
         }
 
         in.testpress.course.TestpressCourse.downloadAttachment(ctx, attachment, enableLocalFileDownload);
@@ -771,7 +818,12 @@ public class BookmarksFragment extends BaseFragment {
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[],
                                            @NonNull int[] grantResults) {
 
-        imagePickerUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
+        if (permissionsUtils != null) {
+            permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
+        }
+        if (imagePickerUtils != null && imagePickerUtils.permissionsUtils != null) {
+            imagePickerUtils.permissionsUtils.onRequestPermissionsResult(requestCode, grantResults);
+        }
     }
 
     protected void setEmptyText(final int title, final int description) {
@@ -785,7 +837,7 @@ public class BookmarksFragment extends BaseFragment {
     @Override
     public RetrofitCall[] getRetrofitCalls() {
         return new RetrofitCall[] {
-                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest
+                bookmarkFoldersLoader, updateBookmarkAPIRequest, deleteBookmarkAPIRequest, refreshContentCall
         };
     }
 
@@ -835,7 +887,10 @@ public class BookmarksFragment extends BaseFragment {
     @Override
     public void onResume() {
         super.onResume();
-        if (imagePickerUtils != null) {
+        if (permissionsUtils != null) {
+            permissionsUtils.onResume();
+        }
+        if (imagePickerUtils != null && imagePickerUtils.permissionsUtils != null) {
             imagePickerUtils.permissionsUtils.onResume();
         }
         webView.onResume();
