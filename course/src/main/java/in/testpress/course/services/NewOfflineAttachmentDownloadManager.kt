@@ -277,11 +277,7 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
                                 return@withLock RequestDecision.ALREADY_COMPLETED
                             }
                         }
-                        OfflineAttachmentDownloadStatus.DOWNLOADING,
-                        OfflineAttachmentDownloadStatus.QUEUED -> {
-                            return@withLock RequestDecision.ALREADY_IN_PROGRESS
-                        }
-                        else -> {}
+                        else -> {} // QUEUED/DOWNLOADING with no live job is stale: re-enqueue
                     }
                 }
 
