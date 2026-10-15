@@ -3,7 +3,6 @@ package `in`.testpress.course.fragments
 import `in`.testpress.Constants.DEFAULT_ATTACHMENT_TITLE
 import `in`.testpress.course.R
 import `in`.testpress.course.databinding.LayoutDocumentViewerBinding
-import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.ui.ContentActivity
 import `in`.testpress.course.ui.PdfViewerActivity
 import `in`.testpress.course.util.PDFViewer
@@ -11,7 +10,6 @@ import `in`.testpress.course.util.DisplayPDFListener
 import `in`.testpress.course.util.PDFDownloadManager
 import `in`.testpress.course.util.PdfDownloadListener
 import `in`.testpress.course.util.SHA256Generator.generateSha256
-import `in`.testpress.course.util.AttachmentDownloader
 import `in`.testpress.util.FileDownloader
 import `in`.testpress.util.PermissionsUtils
 import `in`.testpress.util.ViewUtils
@@ -149,20 +147,15 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
     }
 
     private fun startPdfPublicDownload() {
-        val attachment = content.attachment
-        val url = attachment?.attachmentUrl
+        val url = content.attachment?.attachmentUrl
         if (url.isNullOrBlank()) {
             ViewUtils.toast(requireContext(), getString(R.string.download_url_not_available))
             return
         }
 
-        val domainAttachmentContent = DomainAttachmentContent(
-            id = contentId,
-            title = attachment.title,
-            attachmentUrl = url,
-            allowDownload = attachment.allowDownload ?: true
-        )
-        AttachmentDownloader.downloadAttachment(requireContext(), domainAttachmentContent)
+        val title = content.attachment?.title?.takeIf { it.isNotBlank() } ?: "Attachment-$contentId"
+        val fileName = "$title${getFileExtensionFromUrl(url)}".sanitizeFileName()
+        FileDownloader(requireContext()).downloadFile(url, fileName)
     }
 
     private fun navigateToPdfViewerActivity() {
