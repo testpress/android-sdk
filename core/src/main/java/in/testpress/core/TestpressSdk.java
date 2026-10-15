@@ -46,6 +46,8 @@ public final class TestpressSdk {
     private static Typeface sRubikRegular;
     private static Typeface sRubikMedium;
 
+    private static Boolean useInAppAttachmentDownload;
+
     private static SharedPreferences getPreferences(Context context) {
         if (pref == null) {
             validateContext(context);
@@ -340,5 +342,27 @@ public final class TestpressSdk {
                     options.setDsn(androidSentryDns);
                     options.setEnableAutoSessionTracking(true);
                 });
+    }
+
+    /**
+     * Sets whether to use the in-app attachment download flow.
+     * When enabled, uses NewOfflineAttachmentDownloadManager for downloads.
+     * When disabled, uses the legacy FileDownloader flow.
+     * Default is false (legacy flow) to preserve backward compatibility.
+     *
+     * @param useInAppDownload true to use in-app download, false for legacy
+     */
+    public static void setUseInAppAttachmentDownload(boolean useInAppDownload) {
+        useInAppAttachmentDownload = useInAppDownload;
+    }
+
+    /**
+     * Returns whether the in-app attachment download flow is enabled.
+     * Default is false (legacy flow) if not explicitly configured.
+     *
+     * @return true if in-app download is enabled, false otherwise
+     */
+    public static boolean isUseInAppAttachmentDownload() {
+        return useInAppAttachmentDownload != null && useInAppAttachmentDownload;
     }
 }
