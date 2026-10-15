@@ -46,7 +46,7 @@ public final class TestpressSdk {
     private static Typeface sRubikRegular;
     private static Typeface sRubikMedium;
 
-    private static Boolean useInAppAttachmentDownload;
+    private static volatile boolean useInAppAttachmentDownload = false;
 
     private static SharedPreferences getPreferences(Context context) {
         if (pref == null) {
@@ -363,6 +363,6 @@ public final class TestpressSdk {
      * @return true if in-app download is enabled, false otherwise
      */
     public static boolean isUseInAppAttachmentDownload() {
-        return useInAppAttachmentDownload != null && useInAppAttachmentDownload;
+        return useInAppAttachmentDownload;
     }
 }

@@ -156,13 +156,11 @@ class DocumentViewerFragment : BaseContentDetailFragment(), PdfDownloadListener,
             return
         }
 
-        if (attachment?.allowDownload != true) return
-
         val domainAttachmentContent = DomainAttachmentContent(
             id = contentId,
             title = attachment.title,
             attachmentUrl = url,
-            allowDownload = true
+            allowDownload = attachment.allowDownload ?: true
         )
         AttachmentDownloader.downloadAttachment(requireContext(), domainAttachmentContent)
     }
