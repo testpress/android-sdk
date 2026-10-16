@@ -24,6 +24,7 @@ object AttachmentDownloader {
                 return
             }
             NewOfflineAttachmentDownloadManager.getInstance(context).enqueueDownload(context, attachment)
+            ViewUtils.toast(context, "Download started. Check the Downloads tab.")
         } else {
             val title = attachment.title?.takeIf { it.isNotBlank() } ?: "Attachment-${attachment.id}"
             val fileName = "$title${getFileExtensionFromUrl(url)}".sanitizeFileName()
