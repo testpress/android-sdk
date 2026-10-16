@@ -61,6 +61,10 @@
     <string name="get_it_for_free">Get it for free</string>
     <string name="download">Download</string>
     <string name="download_url_not_available">Download URL not available</string>
+    <string name="download_started_check_downloads">Download started. Check Downloads.</string>
+    <string name="already_downloaded_check_downloads">Already downloaded. Check Downloads.</string>
+    <string name="download_in_progress_check_downloads">Download already in progress. Check Downloads.</string>
+    <string name="downloads">Downloads</string>
     <string name="download_description">Download Descrition</string>
     <string name="download_start_error">Failed to start download</string>
     <string name="syncing_video">Please wait... We are syncing video</string>
