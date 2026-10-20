@@ -107,7 +107,7 @@ object AttachmentDownloader {
             throw e
         } catch (e: Exception) {
             Log.w("AttachmentDownloader", "Attachment download enqueue failed", e)
-            return
+            R.string.download_start_error
         }
         withContext(Dispatchers.Main) {
             showDownloadSnackbar(context, context.getString(messageRes))
