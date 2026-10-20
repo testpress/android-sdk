@@ -3,7 +3,6 @@ package `in`.testpress.course.services
 import android.content.Context
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import `in`.testpress.course.domain.DomainAttachmentContent
 import `in`.testpress.course.repository.OfflineAttachmentsRepository
 import `in`.testpress.database.TestpressDatabase
@@ -202,7 +201,6 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
 
     fun enqueueDownload(context: Context, domainAttachmentContent: DomainAttachmentContent): EnqueueResult {
         if (domainAttachmentContent.attachmentUrl.isNullOrBlank()) {
-            Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
             return EnqueueResult.Rejected
         }
 
