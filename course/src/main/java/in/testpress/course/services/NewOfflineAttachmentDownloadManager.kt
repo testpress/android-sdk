@@ -173,6 +173,8 @@ class NewOfflineAttachmentDownloader(
 
 class NewOfflineAttachmentDownloadManager private constructor(private val repository: OfflineAttachmentsRepository) {
 
+    enum class EnqueueResult { Started, AlreadyQueued, Rejected }
+
     private val progressScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
     private val dbMutex = Mutex()
 
@@ -198,16 +200,16 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
         processQueue()
     }
 
-    fun enqueueDownload(context: Context, domainAttachmentContent: DomainAttachmentContent) {
-        if (domainAttachmentContent.attachmentUrl == null) {
+    fun enqueueDownload(context: Context, domainAttachmentContent: DomainAttachmentContent): EnqueueResult {
+        if (domainAttachmentContent.attachmentUrl.isNullOrBlank()) {
             Toast.makeText(context, "Attachment URL cannot be null", Toast.LENGTH_SHORT).show()
-            return
+            return EnqueueResult.Rejected
         }
 
         // De-duplication check: if task is already running or queued, ignore the duplicate request
         if (activeJobs.containsKey(domainAttachmentContent.id) ||
             pendingQueue.any { it.id == domainAttachmentContent.id }) {
-            return
+            return EnqueueResult.AlreadyQueued
         }
 
         val fileName = "${domainAttachmentContent.title}${getFileExtensionFromUrl(domainAttachmentContent.attachmentUrl)}".sanitizeFileName()
@@ -232,6 +234,7 @@ class NewOfflineAttachmentDownloadManager private constructor(private val reposi
             pendingQueue.add(domainAttachmentContent)
             processQueue()
         }
+        return EnqueueResult.Started
     }
 
     private fun processQueue() {
