@@ -1042,6 +1042,18 @@ public class Content implements android.os.Parcelable {
 
         return null;
     }
+
+    public String getFormattedEnd() {
+        if (getEnd() != null) {
+            java.util.Date date = FormatDate.getDate(getEnd(),
+                    "yyyy-MM-dd'T'HH:mm:ss", "UTC");
+            if (date != null) {
+                return DateUtils.getRelativeTimeSpanString(date.getTime()).toString();
+            }
+        }
+
+        return null;
+    }
     // KEEP METHODS END
 
 }

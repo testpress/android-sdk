@@ -95,6 +95,19 @@ data class DomainContent(
         return null
     }
 
+    fun getFormattedEnd(): String? {
+        end?.let {
+            val date = FormatDate.getDate(
+                end,
+                "yyyy-MM-dd'T'HH:mm:ss", "UTC"
+            )
+            date?.let {
+                return DateUtils.getRelativeTimeSpanString(it.time).toString()
+            }
+        }
+        return null
+    }
+
     fun getAttemptsCount(): Int {
         return exam?.attemptsCount ?: attemptsCount ?: 0
     }
@@ -213,6 +226,7 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         videoId = contentEntity.videoId,
         htmlId = contentEntity.htmlId,
         start = contentEntity.start,
+        end = contentEntity.end,
         hasStarted = contentEntity.hasStarted,
         isCourseAvailable = contentEntity.isCourseAvailable,
         coverImage = contentEntity.coverImage,
@@ -264,6 +278,7 @@ fun createDomainContent(content: Content): DomainContent {
         videoId = content.videoId,
         htmlId = content.htmlId,
         start = content.start,
+        end = content.end,
         hasStarted = content.hasStarted,
         attachment = attachment?.asDomainContent(),
         htmlContent = content.rawHtmlContent?.asDomainContent(),
