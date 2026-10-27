@@ -66,10 +66,10 @@ abstract class BaseContentListItemViewHolder(view: View) : RecyclerView.ViewHold
     }
 
     private fun showEndedInfo(content: DomainContent) {
-        if (content.getFormattedStart() != null) {
-            scheduledInfo.text = "This content expired on " + content.getFormattedStart()
+        if (content.getFormattedEnd() != null) {
+            scheduledInfo.text = "This content expired on " + content.getFormattedEnd()
         } else {
-            scheduledInfo.text = "Coming soon"
+            scheduledInfo.text = "This content has expired"
         }
         scheduledInfoContainer.visibility = View.VISIBLE
         contentDetailsContainer.visibility = View.GONE

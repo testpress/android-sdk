@@ -135,6 +135,7 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
     contentEntity.videoId = this.videoId
     contentEntity.liveStreamId = this.liveStreamId
     contentEntity.start = this.start
+    contentEntity.end = this.end
     return contentEntity
 }
 
