@@ -177,12 +177,11 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
                 ActivityInfo.SCREEN_ORIENTATION_SENSOR
         }
         hideSystemUI()
-        fragment.webView.visibility = View.GONE
 
         backCallback = object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (customView != null) {
-                    customViewCallback?.onCustomViewHidden()
+                    onHideCustomView()
                 } else {
                     isEnabled = false
                     fragment.requireActivity().onBackPressedDispatcher.onBackPressed()
@@ -208,8 +207,6 @@ class CustomWebChromeClient(val fragment: WebViewFragment) : WebChromeClient() {
         previousSystemUiVisibility?.let {
             fragment.requireActivity().window.decorView.systemUiVisibility = it
         } ?: showSystemUI()
-
-        fragment.webView.visibility = View.VISIBLE
 
         backCallback?.remove()
         backCallback = null
