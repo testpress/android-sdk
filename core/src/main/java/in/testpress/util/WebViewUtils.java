@@ -19,6 +19,7 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.MimeTypeMap;
+import android.webkit.PermissionRequest;
 import android.webkit.WebViewClient;
 
 import java.io.IOException;
@@ -54,7 +55,7 @@ public class WebViewUtils {
 
     @SuppressLint({"SetJavaScriptEnabled", "AddJavascriptInterface"})
     public static void initWebView(WebView webView) {
-        webView.setWebChromeClient(new WebChromeClient());
+        webView.setWebChromeClient(new ProtectedMediaChromeClient());
         WebSettings webSettings = webView.getSettings();
         webSettings.setJavaScriptEnabled(true);
         webSettings.setPluginState(WebSettings.PluginState.ON);
@@ -67,6 +68,20 @@ public class WebViewUtils {
         webSettings.setAllowFileAccess(true);
         webSettings.setCacheMode(WebSettings.LOAD_CACHE_ELSE_NETWORK);
         webSettings.setRenderPriority(WebSettings.RenderPriority.HIGH);
+    }
+
+    private static class ProtectedMediaChromeClient extends WebChromeClient {
+
+        @Override
+        public void onPermissionRequest(PermissionRequest request) {
+            for (String resource : request.getResources()) {
+                if (PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID.equals(resource)) {
+                    request.grant(new String[]{resource});
+                    return;
+                }
+            }
+            request.deny();
+        }
     }
 
     @SuppressLint({"AddJavascriptInterface", "SetJavaScriptEnabled"})
