@@ -359,6 +359,10 @@ public class CourseAttempt implements android.os.Parcelable {
         return CONTENT_ATTEMPTS_PATH + id + END_EXAM_PATH;
     }
 
+    public String getAttemptUrl() {
+        return CONTENT_ATTEMPTS_PATH + id + "/";
+    }
+
     public Attempt getRawAssessment() {
         if (myDao == null || assessment != null) {
             return assessment;
