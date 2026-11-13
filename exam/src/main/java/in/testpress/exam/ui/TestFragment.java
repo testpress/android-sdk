@@ -22,6 +22,8 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +50,7 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressError;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
+import in.testpress.exam.exception.InvalidNumericalValueException;
 import in.testpress.exam.util.NumericalInputValidator;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
@@ -1002,7 +1005,7 @@ public class TestFragment extends BaseFragment implements
             return;
         }
 
-        if (isNumericalValidationError(exception, position)) {
+        if (isNumericalValidationError(exception)) {
             progressDialog.dismiss();
             if (millisRemaining > 0) {
                 startCountDownTimer(millisRemaining);
@@ -1024,26 +1027,17 @@ public class TestFragment extends BaseFragment implements
         }
     }
 
-    private boolean isNumericalValidationError(TestpressException exception, int position) {
-        if (position >= 0 && position < attemptItemList.size()) {
-            AttemptItem item = attemptItemList.get(position);
-            if (item.getAttemptQuestion() != null && "N".equals(item.getAttemptQuestion().getType())) {
-                String shortText = item.getCurrentShortText();
-                if (shortText != null && !shortText.trim().isEmpty() && !NumericalInputValidator.isValidNumericalInput(shortText)) {
-                    return true;
-                }
-            }
+    private boolean isNumericalValidationError(TestpressException exception) {
+        if (exception == null) {
+            return false;
         }
-        if (exception == null) return false;
-        if (exception.getMessage() != null && exception.getMessage().contains("Only numbers, decimals or fractions are accepted")) {
+        if (exception.getCause() instanceof InvalidNumericalValueException) {
             return true;
         }
-        try {
-            TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
-            if (errorDetails != null && errorDetails.getDetail() != null && errorDetails.getDetail().getMessage() != null) {
-                return errorDetails.getDetail().getMessage().contains("Only numbers, decimals or fractions are accepted");
-            }
-        } catch (Exception ignored) {}
+        if (exception.getResponse() != null && exception.getResponse().code() == 400) {
+            String errorBody = exception.getErrorBodyString();
+            return errorBody != null && errorBody.contains("short_text");
+        }
         return false;
     }
 
@@ -1061,13 +1055,23 @@ public class TestFragment extends BaseFragment implements
             AttemptItem item = attemptItemList.get(i);
             if (item.getAttemptQuestion() != null && "N".equals(item.getAttemptQuestion().getType())) {
                 String text = item.getCurrentShortText();
-                if (text != null && !text.trim().isEmpty() && !NumericalInputValidator.isValidNumericalInput(text)) {
+                if (text != null && text.trim().isEmpty()) {
+                    item.setCurrentShortText(null);
+                    text = null;
+                }
+                if (text != null && !NumericalInputValidator.isValidNumericalInput(text)) {
                     if (millisRemaining > 0) {
                         viewPager.setCurrentItem(i);
                         showNumericalValidationError(i);
                         return false;
                     } else {
-                        item.setCurrentShortText(item.getShortText());
+                        Log.w("TestFragment", "Timer expired with invalid numerical answer on question " + i + ": '" + text + "'. Explicitly handling invalid answer.");
+                        if (NumericalInputValidator.isValidNumericalInput(item.getShortText())) {
+                            item.setCurrentShortText(item.getShortText());
+                        } else {
+                            item.setCurrentShortText(null);
+                            item.setShortText(null);
+                        }
                     }
                 }
             }

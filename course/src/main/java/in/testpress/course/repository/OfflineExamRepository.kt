@@ -350,9 +350,16 @@ class OfflineExamRepository(val context: Context) {
 
             val attemptAnswers = attemptItems.map { attemptItem ->
                 val validatedShortText = if (attemptItem.question?.type == "N") {
-                    if (NumericalInputValidator.isValidNumericalInput(attemptItem.shortText)) {
-                        attemptItem.shortText
+                    val rawAnswer = attemptItem.shortText
+                    if (rawAnswer.isNullOrBlank()) {
+                        null
+                    } else if (NumericalInputValidator.isValidNumericalInput(rawAnswer)) {
+                        rawAnswer
                     } else {
+                        Log.w(
+                            "OfflineExamRepository",
+                            "Invalid numerical answer encountered during sync for attemptId=${completedOfflineAttempt.id}, questionId=${attemptItem.question.id}: '$rawAnswer'. Discarding invalid response before sync."
+                        )
                         null
                     }
                 } else {

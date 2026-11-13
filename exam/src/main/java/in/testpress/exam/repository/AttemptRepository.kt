@@ -8,6 +8,8 @@ import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
+import `in`.testpress.exam.R
+import `in`.testpress.exam.exception.InvalidNumericalValueException
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.network.asNetworkModel
 import `in`.testpress.exam.ui.TestFragment.Action
@@ -192,20 +194,25 @@ class AttemptRepository(val context: Context) {
     }
 
     suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
-        if (isOfflineExam){
-            val shortText = attemptItem.currentShortText
-            if (attemptItem.attemptQuestion?.type == "N" && !shortText.isNullOrBlank()) {
-                if (!NumericalInputValidator.isValidNumericalInput(shortText)) {
-                    val exception = TestpressException.httpError(400, "Invalid value. Only numbers, decimals or fractions are accepted")
-                    _saveResultResource.postValue(
-                        Resource.error(
-                            exception,
-                            Triple(position, null, action)
-                        )
+        val shortText = attemptItem.currentShortText
+        if (attemptItem.attemptQuestion?.type == "N") {
+            if (shortText.isNullOrBlank()) {
+                attemptItem.currentShortText = null
+            } else if (!NumericalInputValidator.isValidNumericalInput(shortText)) {
+                val errorMessage = context.getString(R.string.testpress_invalid_numerical_input)
+                val exception = TestpressException.unexpectedError(InvalidNumericalValueException(errorMessage))
+                exception.setStatusCode(InvalidNumericalValueException.VALIDATION_ERROR_CODE)
+                _saveResultResource.postValue(
+                    Resource.error(
+                        exception,
+                        Triple(position, null, action)
                     )
-                    return
-                }
+                )
+                return
             }
+        }
+
+        if (isOfflineExam){
             if (attempt.hasSectionalLock()){
                 offlineAttemptSectionDao.getRemainingTimeByAttemptSectionId(
                     attempt.sections[attempt.currentSectionPosition].attemptSectionId,
@@ -252,8 +259,13 @@ class AttemptRepository(val context: Context) {
             } else {
                 offlineAttemptItem.selectedAnswers = attemptItem.savedAnswers
                 offlineAttemptItem.savedAnswers = attemptItem.savedAnswers
-                offlineAttemptItem.currentShortText = attemptItem.currentShortText
-                offlineAttemptItem.shortText = attemptItem.currentShortText
+                val normalizedShortText = if (attemptItem.attemptQuestion.type == "N" && attemptItem.currentShortText.isNullOrBlank()) {
+                    null
+                } else {
+                    attemptItem.currentShortText
+                }
+                offlineAttemptItem.currentShortText = normalizedShortText
+                offlineAttemptItem.shortText = normalizedShortText
             }
             offlineAttemptItem.unSyncedFiles = attemptItem.unSyncedFiles
             offlineAttemptItem.review = attemptItem.currentReview

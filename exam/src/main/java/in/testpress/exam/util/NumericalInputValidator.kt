@@ -11,12 +11,16 @@ object NumericalInputValidator {
             return false
         }
         val value = input.trim()
-        val hasValidStructure = NUMERICAL_PATTERN.matcher(value).matches()
-        val noConsecutiveDotsOrSlashes = !value.contains("..") && !value.contains("//")
-        val noDotAfterSlash = !value.contains("/.")
-        val noSlashAfterDot = !value.contains("./")
-
-        return hasValidStructure && noConsecutiveDotsOrSlashes && noDotAfterSlash && noSlashAfterDot
+        if (!NUMERICAL_PATTERN.matcher(value).matches()) {
+            return false
+        }
+        if (value.contains('/')) {
+            val denominator = value.substringAfter('/').toDoubleOrNull()
+            if (denominator == null || denominator == 0.0) {
+                return false
+            }
+        }
+        return true
     }
 }
 
