@@ -10,6 +10,7 @@ import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.domain.DomainAnswer
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
+import `in`.testpress.exam.domain.getSafeAnswerAt
 import `in`.testpress.exam.models.AudiencePollResponse
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.exam.util.GraphAxisLabelFormatter
@@ -93,8 +94,10 @@ class QuizQuestionFragment : Fragment() {
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
-                    userSelectedAnswer = it.data?.sortedBy { it.order }?.get(position)!!
-                    initWebview()
+                    it.data.getSafeAnswerAt(position)?.let {
+                        userSelectedAnswer = it
+                        initWebview()
+                    }
                 }
                 else -> {}
             }

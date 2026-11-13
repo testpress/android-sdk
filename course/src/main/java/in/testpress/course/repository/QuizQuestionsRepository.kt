@@ -47,12 +47,20 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    _resourceUserSelectedAnswers.postValue(Resource.error(exception!!, null))
+                    val questions = getQuestionsFromDB(examId, attemptId)
+                    if (!questions.isNullOrEmpty()) {
+                        createUserSelectedAnswers(questions, attemptId)
+                    } else {
+                        _resourceUserSelectedAnswers.postValue(Resource.error(exception!!, null))
+                    }
                 }
             })
     }
 
     private fun handleQuestionsFetchSuccess(response: ApiResponse<NetworkExamQuestionResult>?, examId: Long, attemptId: Long, url: String) {
+        if (page == 1) {
+            cleanQuestionInDB(examId, attemptId)    
+        }
         if (response?.next != null) {
             page += 1
             fetchQuestions(url, examId, attemptId)
@@ -66,20 +74,28 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     private fun cleanQuestionInDB(examId: Long, attemptId: Long) {
-        if (examId == -1L) {
+        if (attemptId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId))
                 .buildDelete().executeDeleteWithoutDetachingEntities()
-        } else {
+            userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId))
+                .buildDelete().executeDeleteWithoutDetachingEntities()
+        } else if (examId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId))
                 .buildDelete().executeDeleteWithoutDetachingEntities()
         }
     }
 
     private fun getQuestionsFromDB(examId: Long, attemptId: Long): List<ExamQuestion>? {
-        return if (examId == -1L) {
-            examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId)).list()
-        } else {
+        if (attemptId != -1L) {
+            val questions = examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId)).list()
+            if (!questions.isNullOrEmpty()) {
+                return questions
+            }
+        }
+        return if (examId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
+        } else {
+            null
         }
     }
 
@@ -111,15 +127,10 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     fun getQuestions(examId: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
-        if(getQuestionsFromDB(examId, attemptId)?.isNotEmpty() == true) {
-            val userSelectedAnswers = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
-            if (userSelectedAnswers.isEmpty()) {
-                createUserSelectedAnswers(getQuestionsFromDB(examId, attemptId)!!, attemptId)
-            } else {
-                _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
-            }
+        val userSelectedAnswers = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
+        if (userSelectedAnswers.isNotEmpty()) {
+            _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
         } else {
-            cleanQuestionInDB(examId,attemptId)
             fetchQuestions(url, examId, attemptId)
         }
         return resourceUserSelectedAnswers
@@ -137,7 +148,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
 
             val url = "/api/v2.4/attempts/${attemptId}/questions/${examQuestion.id}/"
             val userSelectedAnswer = UserSelectedAnswer(
-                id + index, index, false, null, attemptId,
+                id + index, index, false, examQuestion.examId, attemptId,
                 question.explanationHtml, null, null, null,
                 correctAnswersIds, url, question.id, examQuestion.id
             )
@@ -173,7 +184,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     private fun getUserSelectedAnswer(id: Long): UserSelectedAnswer? {
-        return userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.Id.eq(id)).list().get(0)
+        val answers = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.Id.eq(id)).list()
+        return answers.firstOrNull()
     }
 
     fun setAnswer(id: Long, selectedOptions: ArrayList<Int>) {
@@ -184,9 +196,9 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     fun submitAnswer(id: Long): MutableLiveData<Resource<DomainUserSelectedAnswer>> {
-        val userSelectedAnswer = getUserSelectedAnswer(id)
+        val userSelectedAnswer = getUserSelectedAnswer(id) ?: return answerResource
         val answer = HashMap<String, Any>()
-        answer["selected_answers"] = userSelectedAnswer!!.selectedAnswers ?: listOf<Integer>()
+        answer["selected_answers"] = userSelectedAnswer.selectedAnswers ?: listOf<Integer>()
         userSelectedAnswer.shortText?.let {
             answer["short_text"] = it
         }
@@ -195,16 +207,22 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         examNetwork.saveUserSelectedAnswer(url, answer)
             .enqueue(object : TestpressCallback<NetworkUserSelectedAnswer>() {
                 override fun onSuccess(result: NetworkUserSelectedAnswer?) {
-                    var usa = result?.asGreenDaoModel()
-                    usa?.questionId = userSelectedAnswer.questionId
-                    usa?.attemptId = userSelectedAnswer.attemptId
-                    usa?.explanationHtml = userSelectedAnswer.explanationHtml
-                    usa?.correctAnswers = userSelectedAnswer.correctAnswers
-                    usa?.duration = "00:00:01"
+                    val usa = result?.asGreenDaoModel()?.apply {
+                        order = userSelectedAnswer.order
+                        examId = userSelectedAnswer.examId
+                        examQuestionId = userSelectedAnswer.examQuestionId
+                        questionId = userSelectedAnswer.questionId
+                        attemptId = userSelectedAnswer.attemptId
+                        explanationHtml = result?.explanationHtml?.takeIf { it.isNotBlank() }
+                            ?: userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
+                            ?: userSelectedAnswer.question?.explanationHtml
+                        correctAnswers = userSelectedAnswer.correctAnswers
+                        duration = "00:00:01"
+                    }
                     userSelectedAnswerDao.delete(userSelectedAnswer)
                     userSelectedAnswerDao.insertOrReplaceInTx(usa)
-                    val userSelectedAnswer = getUserSelectedAnswer(usa?.id!!)
-                    answerResource.postValue(Resource.success(userSelectedAnswer?.asDomainModel()))
+                    val updatedAnswer = getUserSelectedAnswer(usa?.id!!)
+                    answerResource.postValue(Resource.success(updatedAnswer?.asDomainModel()))
                 }
 
                 override fun onException(exception: TestpressException?) {
