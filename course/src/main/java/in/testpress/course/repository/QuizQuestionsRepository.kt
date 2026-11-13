@@ -37,16 +37,24 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         get() = _resourceUserSelectedAnswers
     val answerResource: MutableLiveData<Resource<DomainUserSelectedAnswer>> = MutableLiveData()
 
-    private fun fetchQuestions(url: String, examId: Long, attemptId: Long) {
+    private fun fetchQuestions(
+        url: String,
+        examId: Long,
+        attemptId: Long,
+        pageNumber: Int = 1,
+        accumulatedResults: MutableList<NetworkExamQuestionResult> = mutableListOf()
+    ) {
+        page = pageNumber
         val queryParams: HashMap<String, Any> = hashMapOf()
         queryParams["page"] = page
         examNetwork.getQuestions(url, queryParams)
             .enqueue(object: TestpressCallback<ApiResponse<NetworkExamQuestionResult>>(){
                 override fun onSuccess(result: ApiResponse<NetworkExamQuestionResult>?) {
-                    handleQuestionsFetchSuccess(result, examId, attemptId, url)
+                    handleQuestionsFetchSuccess(result, examId, attemptId, url, accumulatedResults)
                 }
 
                 override fun onException(exception: TestpressException?) {
+                    page = 1
                     val questions = getQuestionsFromDB(examId, attemptId)
                     if (!questions.isNullOrEmpty()) {
                         createUserSelectedAnswers(questions, attemptId)
@@ -57,17 +65,21 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             })
     }
 
-    private fun handleQuestionsFetchSuccess(response: ApiResponse<NetworkExamQuestionResult>?, examId: Long, attemptId: Long, url: String) {
-        if (page == 1) {
-            cleanQuestionInDB(examId, attemptId)    
-        }
+    private fun handleQuestionsFetchSuccess(
+        response: ApiResponse<NetworkExamQuestionResult>?,
+        examId: Long,
+        attemptId: Long,
+        url: String,
+        accumulatedResults: MutableList<NetworkExamQuestionResult>
+    ) {
+        response?.results?.let { accumulatedResults.add(it) }
         if (response?.next != null) {
             page += 1
-            fetchQuestions(url, examId, attemptId)
-            saveQuestionsToDB(response?.results, examId, attemptId)
+            fetchQuestions(url, examId, attemptId, page, accumulatedResults)
         } else {
             page = 1
-            saveQuestionsToDB(response?.results, examId, attemptId)
+            cleanQuestionInDB(examId, attemptId)
+            saveQuestionsToDB(accumulatedResults, examId, attemptId)
             val questions = getQuestionsFromDB(examId, attemptId)
             createUserSelectedAnswers(questions!!, attemptId)
         }
@@ -99,31 +111,43 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         }
     }
 
-    private fun saveQuestionsToDB(response: NetworkExamQuestionResult?, examId: Long, attemptId: Long) {
+    private fun saveQuestionsToDB(results: List<NetworkExamQuestionResult>, examId: Long, attemptId: Long) {
         val questionDao = TestpressSDKDatabase.getQuestionDao(context)
         val answerDao = TestpressSDKDatabase.getAnswerDao(context)
         val directionDao = TestpressSDKDatabase.getDirectionDao(context)
 
-        val questions = response?.questions
         val answers = mutableListOf<NetworkAnswer>()
-
-        for(question in questions ?: listOf()) {
-            question.answers?.map {
-                it.questionId = question.id
-                answers.add(it)
-            }
-        }
-        answerDao.insertOrReplaceInTx(answers.asGreenDaoModels())
-        questionDao.insertOrReplaceInTx(questions?.asGreenDaoModels())
+        val questions = mutableListOf<NetworkQuestion>()
+        val examQuestions = mutableListOf<NetworkExamQuestion>()
+        val directions = mutableListOf<NetworkDirection>()
 
         val defaultExamId = if (examId == -1L) null else examId
-        for (examQuestion in response?.examQuestions ?: listOf()) {
-            examQuestion.examId = defaultExamId
-            examQuestion.attemptId = attemptId
+        for (result in results) {
+            result.questions?.let { questions.addAll(it) }
+            for (question in result.questions ?: listOf()) {
+                question.answers?.map {
+                    it.questionId = question.id
+                    answers.add(it)
+                }
+            }
+
+            for (examQuestion in result.examQuestions ?: listOf()) {
+                examQuestion.examId = defaultExamId
+                examQuestion.attemptId = attemptId
+                examQuestions.add(examQuestion)
+            }
+
+            result.directions?.let { directions.addAll(it) }
         }
 
-        examQuestionDao.insertOrReplaceInTx(response?.examQuestions?.asGreenDaoModels())
-        directionDao.insertOrReplaceInTx(response?.directions?.asGreenDaoModels())
+        answerDao.insertOrReplaceInTx(answers.asGreenDaoModels())
+        questionDao.insertOrReplaceInTx(questions.asGreenDaoModels())
+        examQuestionDao.insertOrReplaceInTx(examQuestions.asGreenDaoModels())
+        directionDao.insertOrReplaceInTx(directions.asGreenDaoModels())
+    }
+
+    private fun saveQuestionsToDB(response: NetworkExamQuestionResult?, examId: Long, attemptId: Long) {
+        response?.let { saveQuestionsToDB(listOf(it), examId, attemptId) }
     }
 
     fun getQuestions(examId: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
@@ -196,7 +220,12 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     fun submitAnswer(id: Long): MutableLiveData<Resource<DomainUserSelectedAnswer>> {
-        val userSelectedAnswer = getUserSelectedAnswer(id) ?: return answerResource
+        val userSelectedAnswer = getUserSelectedAnswer(id) ?: run {
+            answerResource.postValue(
+                Resource.error(TestpressException.unexpectedError(IllegalStateException("Answer not found")), null)
+            )
+            return answerResource
+        }
         val answer = HashMap<String, Any>()
         answer["selected_answers"] = userSelectedAnswer.selectedAnswers ?: listOf<Integer>()
         userSelectedAnswer.shortText?.let {
@@ -208,20 +237,27 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             .enqueue(object : TestpressCallback<NetworkUserSelectedAnswer>() {
                 override fun onSuccess(result: NetworkUserSelectedAnswer?) {
                     val usa = result?.asGreenDaoModel()?.apply {
+                        this.id = userSelectedAnswer.id
                         order = userSelectedAnswer.order
                         examId = userSelectedAnswer.examId
                         examQuestionId = userSelectedAnswer.examQuestionId
                         questionId = userSelectedAnswer.questionId
                         attemptId = userSelectedAnswer.attemptId
-                        explanationHtml = result?.explanationHtml?.takeIf { it.isNotBlank() }
+                        explanationHtml = result.explanationHtml?.takeIf { it.isNotBlank() }
+                            ?: result.question?.explanationHtml?.takeIf { it.isNotBlank() }
                             ?: userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
                             ?: userSelectedAnswer.question?.explanationHtml
                         correctAnswers = userSelectedAnswer.correctAnswers
                         duration = "00:00:01"
                     }
-                    userSelectedAnswerDao.delete(userSelectedAnswer)
+                    if (usa == null) {
+                        answerResource.postValue(
+                            Resource.error(TestpressException.unexpectedError(IllegalStateException("Failed to parse answer response")), null)
+                        )
+                        return
+                    }
                     userSelectedAnswerDao.insertOrReplaceInTx(usa)
-                    val updatedAnswer = getUserSelectedAnswer(usa?.id!!)
+                    val updatedAnswer = getUserSelectedAnswer(usa.id)
                     answerResource.postValue(Resource.success(updatedAnswer?.asDomainModel()))
                 }
 

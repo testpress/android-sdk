@@ -273,8 +273,8 @@ class QuizReviewFragment: Fragment() {
 
     private fun getExplanationHtml(userSelectedAnswer: DomainUserSelectedAnswer): String {
         var htmlContent = ""
-        val explanation = userSelectedAnswer.question?.explanation?.takeIf { it.isNotBlank() }
-            ?: userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
+        val explanation = userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
+            ?: userSelectedAnswer.question?.explanation?.takeIf { it.isNotBlank() }
         explanation?.let {
             htmlContent += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
             htmlContent += getEmailWaterMarkHtml()
