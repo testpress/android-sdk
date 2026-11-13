@@ -1028,17 +1028,7 @@ public class TestFragment extends BaseFragment implements
     }
 
     private boolean isNumericalValidationError(TestpressException exception) {
-        if (exception == null) {
-            return false;
-        }
-        if (exception.getCause() instanceof InvalidNumericalValueException) {
-            return true;
-        }
-        if (exception.getResponse() != null && exception.getResponse().code() == 400) {
-            String errorBody = exception.getErrorBodyString();
-            return errorBody != null && errorBody.contains("short_text");
-        }
-        return false;
+        return exception != null && exception.getCause() instanceof InvalidNumericalValueException;
     }
 
     private void showNumericalValidationError(final int position) {
