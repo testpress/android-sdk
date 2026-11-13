@@ -22,6 +22,8 @@ import androidx.slidingpanelayout.widget.SlidingPaneLayout;
 import androidx.appcompat.app.AlertDialog;
 
 import android.text.Html;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -48,6 +50,8 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressError;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
+import in.testpress.exam.exception.InvalidNumericalValueException;
+import in.testpress.exam.util.NumericalInputValidator;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.network.NetworkAttempt;
@@ -1001,6 +1005,15 @@ public class TestFragment extends BaseFragment implements
             return;
         }
 
+        if (isNumericalValidationError(exception)) {
+            progressDialog.dismiss();
+            if (millisRemaining > 0) {
+                startCountDownTimer(millisRemaining);
+            }
+            showNumericalValidationError(position);
+            return;
+        }
+
         TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
 
         if (exception.isForbidden() && isMaxQuestionsAttemptedError(errorDetails)) {
@@ -1012,6 +1025,52 @@ public class TestFragment extends BaseFragment implements
             progressDialog.dismiss();
             showAlertDialog(exception, position, action);
         }
+    }
+
+    private boolean isNumericalValidationError(TestpressException exception) {
+        return exception != null && exception.getCause() instanceof InvalidNumericalValueException;
+    }
+
+    private void showNumericalValidationError(final int position) {
+        viewPager.setCurrentItem(position);
+        new AlertDialog.Builder(getContext(), R.style.TestpressAppCompatAlertDialogStyle)
+                .setTitle(R.string.testpress_invalid_answer)
+                .setMessage(R.string.testpress_invalid_numerical_input)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    private boolean validateNumericalQuestions() {
+        return validateNumericalQuestions(true);
+    }
+
+    private boolean validateNumericalQuestions(boolean blockOnInvalid) {
+        for (int i = 0; i < attemptItemList.size(); i++) {
+            AttemptItem item = attemptItemList.get(i);
+            if (item.getAttemptQuestion() != null && "N".equals(item.getAttemptQuestion().getType())) {
+                String text = item.getCurrentShortText();
+                if (text != null && text.trim().isEmpty()) {
+                    item.setCurrentShortText(null);
+                    text = null;
+                }
+                if (text != null && !NumericalInputValidator.isValidNumericalInput(text)) {
+                    if (blockOnInvalid) {
+                        viewPager.setCurrentItem(i);
+                        showNumericalValidationError(i);
+                        return false;
+                    } else {
+                        Log.w("TestFragment", "Invalid numerical answer on question " + i + ": '" + text + "'. Sanitizing without blocking.");
+                        if (NumericalInputValidator.isValidNumericalInput(item.getShortText())) {
+                            item.setCurrentShortText(item.getShortText());
+                        } else {
+                            item.setCurrentShortText(null);
+                            item.setShortText(null);
+                        }
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private void showAlertDialog(TestpressException exception, int position, Action action) {
@@ -1124,6 +1183,13 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endSection() {
+        endSection(true);
+    }
+
+    void endSection(boolean blockOnInvalid) {
+        if (!validateNumericalQuestions(blockOnInvalid)) {
+            return;
+        }
         stopTimer();
         // Save attemptItem, if option or review is changed
 
@@ -1239,10 +1305,21 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endExam() {
-        endExam(false);
+        endExam(false, true);
     }
 
     void endExam(boolean isExamWindowViolated) {
+        endExam(isExamWindowViolated, !isExamWindowViolated);
+    }
+
+    void endExam(boolean isExamWindowViolated, boolean blockOnInvalid) {
+        if (!isExamWindowViolated && blockOnInvalid) {
+            if (!validateNumericalQuestions(true)) {
+                return;
+            }
+        } else {
+            validateNumericalQuestions(false);
+        }
         stopTimer();
         // Save attemptItem, if option or review is changed
         if (!attemptItemList.isEmpty() && attemptItemList.get(viewPager.getCurrentItem()).hasChanged()) {
@@ -1527,9 +1604,9 @@ public class TestFragment extends BaseFragment implements
 
     void onRemainingTimeOver() {
         if (attempt.hasSectionalLock()) {
-            endSection();
+            endSection(false);
         } else {
-            endExam();
+            endExam(false, false);
         }
     }
 

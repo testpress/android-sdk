@@ -8,9 +8,12 @@ import `in`.testpress.database.mapping.asGreenDoaModels
 import `in`.testpress.database.mapping.createGreenDoaModel
 import `in`.testpress.exam.api.TestpressExamApiClient
 import `in`.testpress.exam.models.AttemptItem
+import `in`.testpress.exam.R
+import `in`.testpress.exam.exception.InvalidNumericalValueException
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.network.asNetworkModel
 import `in`.testpress.exam.ui.TestFragment.Action
+import `in`.testpress.exam.util.NumericalInputValidator
 import `in`.testpress.exam.util.asAttemptItem
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
@@ -191,6 +194,26 @@ class AttemptRepository(val context: Context) {
     }
 
     suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
+        if (attemptItem.attemptQuestion?.type == "N") {
+            val trimmedText = attemptItem.currentShortText?.trim()
+            if (trimmedText.isNullOrBlank()) {
+                attemptItem.currentShortText = null
+            } else if (!NumericalInputValidator.isValidNumericalInput(trimmedText)) {
+                val errorMessage = context.getString(R.string.testpress_invalid_numerical_input)
+                val exception = TestpressException.unexpectedError(InvalidNumericalValueException(errorMessage))
+                exception.setStatusCode(InvalidNumericalValueException.VALIDATION_ERROR_CODE)
+                _saveResultResource.postValue(
+                    Resource.error(
+                        exception,
+                        Triple(position, null, action)
+                    )
+                )
+                return
+            } else {
+                attemptItem.currentShortText = trimmedText
+            }
+        }
+
         if (isOfflineExam){
             if (attempt.hasSectionalLock()){
                 offlineAttemptSectionDao.getRemainingTimeByAttemptSectionId(
@@ -238,8 +261,13 @@ class AttemptRepository(val context: Context) {
             } else {
                 offlineAttemptItem.selectedAnswers = attemptItem.savedAnswers
                 offlineAttemptItem.savedAnswers = attemptItem.savedAnswers
-                offlineAttemptItem.currentShortText = attemptItem.currentShortText
-                offlineAttemptItem.shortText = attemptItem.currentShortText
+                val normalizedShortText = if (attemptItem.attemptQuestion.type == "N") {
+                    if (attemptItem.currentShortText.isNullOrBlank()) null else attemptItem.currentShortText.trim()
+                } else {
+                    attemptItem.currentShortText
+                }
+                offlineAttemptItem.currentShortText = normalizedShortText
+                offlineAttemptItem.shortText = normalizedShortText
             }
             offlineAttemptItem.unSyncedFiles = attemptItem.unSyncedFiles
             offlineAttemptItem.review = attemptItem.currentReview
