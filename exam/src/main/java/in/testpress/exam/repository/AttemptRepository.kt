@@ -194,11 +194,11 @@ class AttemptRepository(val context: Context) {
     }
 
     suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
-        val shortText = attemptItem.currentShortText
         if (attemptItem.attemptQuestion?.type == "N") {
-            if (shortText.isNullOrBlank()) {
+            val trimmedText = attemptItem.currentShortText?.trim()
+            if (trimmedText.isNullOrBlank()) {
                 attemptItem.currentShortText = null
-            } else if (!NumericalInputValidator.isValidNumericalInput(shortText)) {
+            } else if (!NumericalInputValidator.isValidNumericalInput(trimmedText)) {
                 val errorMessage = context.getString(R.string.testpress_invalid_numerical_input)
                 val exception = TestpressException.unexpectedError(InvalidNumericalValueException(errorMessage))
                 exception.setStatusCode(InvalidNumericalValueException.VALIDATION_ERROR_CODE)
@@ -209,6 +209,8 @@ class AttemptRepository(val context: Context) {
                     )
                 )
                 return
+            } else {
+                attemptItem.currentShortText = trimmedText
             }
         }
 
@@ -259,8 +261,8 @@ class AttemptRepository(val context: Context) {
             } else {
                 offlineAttemptItem.selectedAnswers = attemptItem.savedAnswers
                 offlineAttemptItem.savedAnswers = attemptItem.savedAnswers
-                val normalizedShortText = if (attemptItem.attemptQuestion.type == "N" && attemptItem.currentShortText.isNullOrBlank()) {
-                    null
+                val normalizedShortText = if (attemptItem.attemptQuestion.type == "N") {
+                    if (attemptItem.currentShortText.isNullOrBlank()) null else attemptItem.currentShortText.trim()
                 } else {
                     attemptItem.currentShortText
                 }

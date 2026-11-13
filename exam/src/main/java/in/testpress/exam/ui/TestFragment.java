@@ -1041,6 +1041,10 @@ public class TestFragment extends BaseFragment implements
     }
 
     private boolean validateNumericalQuestions() {
+        return validateNumericalQuestions(true);
+    }
+
+    private boolean validateNumericalQuestions(boolean blockOnInvalid) {
         for (int i = 0; i < attemptItemList.size(); i++) {
             AttemptItem item = attemptItemList.get(i);
             if (item.getAttemptQuestion() != null && "N".equals(item.getAttemptQuestion().getType())) {
@@ -1050,12 +1054,12 @@ public class TestFragment extends BaseFragment implements
                     text = null;
                 }
                 if (text != null && !NumericalInputValidator.isValidNumericalInput(text)) {
-                    if (millisRemaining > 0) {
+                    if (blockOnInvalid) {
                         viewPager.setCurrentItem(i);
                         showNumericalValidationError(i);
                         return false;
                     } else {
-                        Log.w("TestFragment", "Timer expired with invalid numerical answer on question " + i + ": '" + text + "'. Explicitly handling invalid answer.");
+                        Log.w("TestFragment", "Invalid numerical answer on question " + i + ": '" + text + "'. Sanitizing without blocking.");
                         if (NumericalInputValidator.isValidNumericalInput(item.getShortText())) {
                             item.setCurrentShortText(item.getShortText());
                         } else {
@@ -1179,7 +1183,11 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endSection() {
-        if (!validateNumericalQuestions()) {
+        endSection(true);
+    }
+
+    void endSection(boolean blockOnInvalid) {
+        if (!validateNumericalQuestions(blockOnInvalid)) {
             return;
         }
         stopTimer();
@@ -1297,12 +1305,20 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endExam() {
-        endExam(false);
+        endExam(false, true);
     }
 
     void endExam(boolean isExamWindowViolated) {
-        if (!validateNumericalQuestions()) {
-            return;
+        endExam(isExamWindowViolated, !isExamWindowViolated);
+    }
+
+    void endExam(boolean isExamWindowViolated, boolean blockOnInvalid) {
+        if (!isExamWindowViolated && blockOnInvalid) {
+            if (!validateNumericalQuestions(true)) {
+                return;
+            }
+        } else {
+            validateNumericalQuestions(false);
         }
         stopTimer();
         // Save attemptItem, if option or review is changed
@@ -1588,9 +1604,9 @@ public class TestFragment extends BaseFragment implements
 
     void onRemainingTimeOver() {
         if (attempt.hasSectionalLock()) {
-            endSection();
+            endSection(false);
         } else {
-            endExam();
+            endExam(false, false);
         }
     }
 

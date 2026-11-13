@@ -350,7 +350,7 @@ class OfflineExamRepository(val context: Context) {
 
             val attemptAnswers = attemptItems.map { attemptItem ->
                 val validatedShortText = if (attemptItem.question?.type == "N") {
-                    val rawAnswer = attemptItem.shortText
+                    val rawAnswer = attemptItem.shortText?.trim()
                     if (rawAnswer.isNullOrBlank()) {
                         null
                     } else if (NumericalInputValidator.isValidNumericalInput(rawAnswer)) {
