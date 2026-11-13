@@ -17,6 +17,7 @@ import `in`.testpress.exam.network.NetworkExamContent
 import `in`.testpress.exam.network.NetworkLanguage
 import `in`.testpress.exam.network.asRoomModels
 import `in`.testpress.exam.network.getLastModifiedAsDate
+import `in`.testpress.exam.util.NumericalInputValidator
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
 import `in`.testpress.models.greendao.Content
@@ -348,6 +349,15 @@ class OfflineExamRepository(val context: Context) {
                 offlineAttemptItemDao.getOfflineAttemptItemByAttemptId(completedOfflineAttempt.id)
 
             val attemptAnswers = attemptItems.map { attemptItem ->
+                val validatedShortText = if (attemptItem.question?.type == "N") {
+                    if (NumericalInputValidator.isValidNumericalInput(attemptItem.shortText)) {
+                        attemptItem.shortText
+                    } else {
+                        null
+                    }
+                } else {
+                    attemptItem.shortText
+                }
                 OfflineAnswer(
                     examQuestionId = examQuestionDao.getExamQuestionIdByExamIdAndQuestionId(
                         completedOfflineAttempt.examId,
@@ -356,7 +366,7 @@ class OfflineExamRepository(val context: Context) {
                     duration = null,
                     selectedAnswers = attemptItem.savedAnswers,
                     essayText = attemptItem.essayText,
-                    shortText = attemptItem.shortText,
+                    shortText = validatedShortText,
                     files = null,
                     gapFillResponses = null
                 )

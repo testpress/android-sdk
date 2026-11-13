@@ -48,6 +48,7 @@ import in.testpress.core.TestpressCallback;
 import in.testpress.core.TestpressError;
 import in.testpress.core.TestpressException;
 import in.testpress.core.TestpressSdk;
+import in.testpress.exam.util.NumericalInputValidator;
 import in.testpress.exam.R;
 import in.testpress.exam.models.AttemptItem;
 import in.testpress.exam.network.NetworkAttempt;
@@ -1001,6 +1002,15 @@ public class TestFragment extends BaseFragment implements
             return;
         }
 
+        if (isNumericalValidationError(exception, position)) {
+            progressDialog.dismiss();
+            if (millisRemaining > 0) {
+                startCountDownTimer(millisRemaining);
+            }
+            showNumericalValidationError(position);
+            return;
+        }
+
         TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
 
         if (exception.isForbidden() && isMaxQuestionsAttemptedError(errorDetails)) {
@@ -1012,6 +1022,57 @@ public class TestFragment extends BaseFragment implements
             progressDialog.dismiss();
             showAlertDialog(exception, position, action);
         }
+    }
+
+    private boolean isNumericalValidationError(TestpressException exception, int position) {
+        if (position >= 0 && position < attemptItemList.size()) {
+            AttemptItem item = attemptItemList.get(position);
+            if (item.getAttemptQuestion() != null && "N".equals(item.getAttemptQuestion().getType())) {
+                String shortText = item.getCurrentShortText();
+                if (shortText != null && !shortText.trim().isEmpty() && !NumericalInputValidator.isValidNumericalInput(shortText)) {
+                    return true;
+                }
+            }
+        }
+        if (exception == null) return false;
+        if (exception.getMessage() != null && exception.getMessage().contains("Only numbers, decimals or fractions are accepted")) {
+            return true;
+        }
+        try {
+            TestpressError errorDetails = exception.getErrorBodyAs(exception.getResponse(), TestpressError.class);
+            if (errorDetails != null && errorDetails.getDetail() != null && errorDetails.getDetail().getMessage() != null) {
+                return errorDetails.getDetail().getMessage().contains("Only numbers, decimals or fractions are accepted");
+            }
+        } catch (Exception ignored) {}
+        return false;
+    }
+
+    private void showNumericalValidationError(final int position) {
+        viewPager.setCurrentItem(position);
+        new AlertDialog.Builder(getContext(), R.style.TestpressAppCompatAlertDialogStyle)
+                .setTitle(R.string.testpress_invalid_answer)
+                .setMessage(R.string.testpress_invalid_numerical_input)
+                .setPositiveButton(android.R.string.ok, null)
+                .show();
+    }
+
+    private boolean validateNumericalQuestions() {
+        for (int i = 0; i < attemptItemList.size(); i++) {
+            AttemptItem item = attemptItemList.get(i);
+            if (item.getAttemptQuestion() != null && "N".equals(item.getAttemptQuestion().getType())) {
+                String text = item.getCurrentShortText();
+                if (text != null && !text.trim().isEmpty() && !NumericalInputValidator.isValidNumericalInput(text)) {
+                    if (millisRemaining > 0) {
+                        viewPager.setCurrentItem(i);
+                        showNumericalValidationError(i);
+                        return false;
+                    } else {
+                        item.setCurrentShortText(item.getShortText());
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     private void showAlertDialog(TestpressException exception, int position, Action action) {
@@ -1124,6 +1185,9 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endSection() {
+        if (!validateNumericalQuestions()) {
+            return;
+        }
         stopTimer();
         // Save attemptItem, if option or review is changed
 
@@ -1243,6 +1307,9 @@ public class TestFragment extends BaseFragment implements
     }
 
     void endExam(boolean isExamWindowViolated) {
+        if (!validateNumericalQuestions()) {
+            return;
+        }
         stopTimer();
         // Save attemptItem, if option or review is changed
         if (!attemptItemList.isEmpty() && attemptItemList.get(viewPager.getCurrentItem()).hasChanged()) {

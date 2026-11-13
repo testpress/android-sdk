@@ -275,4 +275,6 @@
     <string name="testpress_pdf_preview">PDF Preview</string>
     <string name="testpress_floating_window_detected">Floating window detected. Please close it.</string>
     <string name="testpress_mindset_insights">Mindset Insights</string>
+    <string name="testpress_invalid_answer">Invalid Answer</string>
+    <string name="testpress_invalid_numerical_input">Invalid value. Only numbers, decimals or fractions are accepted</string>
 </resources>

@@ -11,6 +11,7 @@ import `in`.testpress.exam.models.AttemptItem
 import `in`.testpress.exam.network.NetworkAttemptSection
 import `in`.testpress.exam.network.asNetworkModel
 import `in`.testpress.exam.ui.TestFragment.Action
+import `in`.testpress.exam.util.NumericalInputValidator
 import `in`.testpress.exam.util.asAttemptItem
 import `in`.testpress.models.TestpressApiResponse
 import `in`.testpress.models.greendao.Attempt
@@ -192,6 +193,19 @@ class AttemptRepository(val context: Context) {
 
     suspend fun saveAnswer(position: Int, attemptItem: AttemptItem, action: Action, remainingTime: String) {
         if (isOfflineExam){
+            val shortText = attemptItem.currentShortText
+            if (attemptItem.attemptQuestion?.type == "N" && !shortText.isNullOrBlank()) {
+                if (!NumericalInputValidator.isValidNumericalInput(shortText)) {
+                    val exception = TestpressException.httpError(400, "Invalid value. Only numbers, decimals or fractions are accepted")
+                    _saveResultResource.postValue(
+                        Resource.error(
+                            exception,
+                            Triple(position, null, action)
+                        )
+                    )
+                    return
+                }
+            }
             if (attempt.hasSectionalLock()){
                 offlineAttemptSectionDao.getRemainingTimeByAttemptSectionId(
                     attempt.sections[attempt.currentSectionPosition].attemptSectionId,
