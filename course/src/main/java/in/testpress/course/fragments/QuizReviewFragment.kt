@@ -7,6 +7,7 @@ import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
+import `in`.testpress.exam.domain.getSafeAnswerAt
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.exam.util.Watermark
 import `in`.testpress.models.InstituteSettings
@@ -102,8 +103,10 @@ class QuizReviewFragment: Fragment() {
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
-                    userSelectedAnswer = it.data?.sortedBy { it.order }?.get(position)!!
-                    initWebview()
+                    it.data.getSafeAnswerAt(position)?.let {
+                        userSelectedAnswer = it
+                        initWebview()
+                    }
                 }
                 else -> {}
             }
@@ -270,10 +273,12 @@ class QuizReviewFragment: Fragment() {
 
     private fun getExplanationHtml(userSelectedAnswer: DomainUserSelectedAnswer): String {
         var htmlContent = ""
-        userSelectedAnswer.explanationHtml?.let {
-            htmlContent +=  WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
+        val explanation = userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
+            ?: userSelectedAnswer.question?.explanation?.takeIf { it.isNotBlank() }
+        explanation?.let {
+            htmlContent += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
             htmlContent += getEmailWaterMarkHtml()
-            htmlContent += "<div class='review-explanation'>${it}</div>"
+            htmlContent += "<div class='review-explanation'>$it</div>"
         }
 
         return htmlContent

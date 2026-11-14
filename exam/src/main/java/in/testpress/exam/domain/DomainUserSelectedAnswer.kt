@@ -38,3 +38,12 @@ fun List<UserSelectedAnswer>.asDomainModels(): List<DomainUserSelectedAnswer> {
         it.asDomainModel()
     }
 }
+
+fun List<DomainUserSelectedAnswer>?.getSafeAnswerAt(position: Int): DomainUserSelectedAnswer? {
+    val answers = this?.sortedBy { answer -> answer.order }
+    return if (!answers.isNullOrEmpty() && position in answers.indices) {
+        answers[position]
+    } else {
+        null
+    }
+}
