@@ -54,4 +54,14 @@ class DomainUserSelectedAnswerTest {
         assertEquals(answerWithNullOrder, list.getSafeAnswerAt(0))
         assertEquals(answerWithOrder1, list.getSafeAnswerAt(1))
     }
+
+    @Test
+    fun getSafeAnswerAt_returnsCorrectElementForSingleItemList() {
+        val answer = DomainUserSelectedAnswer(id = 1L, order = 0)
+        val list = listOf(answer)
+
+        assertEquals(answer, list.getSafeAnswerAt(0))
+        assertNull(list.getSafeAnswerAt(1))
+        assertNull(list.getSafeAnswerAt(-1))
+    }
 }

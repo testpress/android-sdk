@@ -9,7 +9,10 @@ import `in`.testpress.exam.domain.asDomainModel
 import `in`.testpress.exam.domain.asDomainModels
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkAnswer
+import `in`.testpress.exam.network.NetworkDirection
+import `in`.testpress.exam.network.NetworkExamQuestion
 import `in`.testpress.exam.network.NetworkExamQuestionResult
+import `in`.testpress.exam.network.NetworkQuestion
 import `in`.testpress.exam.network.NetworkUserSelectedAnswer
 import `in`.testpress.exam.network.asGreenDaoModel
 import `in`.testpress.exam.network.asGreenDaoModels
@@ -81,7 +84,9 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             cleanQuestionInDB(examId, attemptId)
             saveQuestionsToDB(accumulatedResults, examId, attemptId)
             val questions = getQuestionsFromDB(examId, attemptId)
-            createUserSelectedAnswers(questions!!, attemptId)
+            if (!questions.isNullOrEmpty()) {
+                createUserSelectedAnswers(questions, attemptId)
+            }
         }
     }
 
@@ -155,6 +160,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         if (userSelectedAnswers.isNotEmpty()) {
             _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
         } else {
+            page = 1
             fetchQuestions(url, examId, attemptId)
         }
         return resourceUserSelectedAnswers
@@ -246,7 +252,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                         explanationHtml = result.explanationHtml?.takeIf { it.isNotBlank() }
                             ?: result.question?.explanationHtml?.takeIf { it.isNotBlank() }
                             ?: userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
-                            ?: userSelectedAnswer.question?.explanationHtml
+                            ?: userSelectedAnswer.question?.explanationHtml?.takeIf { it.isNotBlank() }
                         correctAnswers = userSelectedAnswer.correctAnswers
                         duration = "00:00:01"
                     }
