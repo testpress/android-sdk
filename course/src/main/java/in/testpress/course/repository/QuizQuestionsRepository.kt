@@ -62,7 +62,12 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                     if (!questions.isNullOrEmpty()) {
                         createUserSelectedAnswers(questions, attemptId)
                     } else {
-                        _resourceUserSelectedAnswers.postValue(Resource.error(exception!!, null))
+                        _resourceUserSelectedAnswers.postValue(
+                            Resource.error(
+                                exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error")),
+                                null
+                            )
+                        )
                     }
                 }
             })
@@ -86,6 +91,10 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             val questions = getQuestionsFromDB(examId, attemptId)
             if (!questions.isNullOrEmpty()) {
                 createUserSelectedAnswers(questions, attemptId)
+            } else {
+                _resourceUserSelectedAnswers.postValue(
+                    Resource.error(TestpressException.unexpectedError(IllegalStateException("No questions found")), null)
+                )
             }
         }
     }
@@ -109,6 +118,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                 return questions
             }
         }
+        // Fall back to all questions for the examId if questions for attemptId are not found.
+        // This is intentional offline fallback behavior, allowing cached questions from a previous attempt of the exam to be used.
         return if (examId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
         } else {
@@ -149,10 +160,6 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         questionDao.insertOrReplaceInTx(questions.asGreenDaoModels())
         examQuestionDao.insertOrReplaceInTx(examQuestions.asGreenDaoModels())
         directionDao.insertOrReplaceInTx(directions.asGreenDaoModels())
-    }
-
-    private fun saveQuestionsToDB(response: NetworkExamQuestionResult?, examId: Long, attemptId: Long) {
-        response?.let { saveQuestionsToDB(listOf(it), examId, attemptId) }
     }
 
     fun getQuestions(examId: Long, attemptId: Long, url: String): LiveData<Resource<List<DomainUserSelectedAnswer>>> {
@@ -270,7 +277,12 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                 override fun onException(exception: TestpressException?) {
                     userSelectedAnswer.duration = "00:00:01"
                     userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
-                    answerResource.postValue(Resource.error(exception!!, null))
+                    answerResource.postValue(
+                        Resource.error(
+                            exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error")),
+                            null
+                        )
+                    )
                 }
             })
         return answerResource
