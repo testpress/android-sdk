@@ -264,6 +264,13 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
     }
 
+    fun setShortText(id: Long, shortText: String) {
+        val userSelectedAnswer = getUserSelectedAnswer(id)
+        userSelectedAnswer?.shortText = if (shortText.isBlank()) null else shortText.trim()
+        userSelectedAnswer?.selectedAnswers = IntegerList()
+        userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
+    }
+
     fun submitAnswer(id: Long): MutableLiveData<Resource<DomainUserSelectedAnswer>> {
         val userSelectedAnswer = getUserSelectedAnswer(id) ?: run {
             answerResource.postValue(

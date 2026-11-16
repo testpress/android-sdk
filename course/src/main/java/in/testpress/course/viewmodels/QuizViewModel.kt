@@ -31,6 +31,10 @@ class QuizViewModel(val repository: QuizQuestionsRepository): ViewModel() {
         repository.setAnswer(id, selectedOptions)
     }
 
+    fun setShortText(id: Long, shortText: String) {
+        repository.setShortText(id, shortText)
+    }
+
     fun submitAnswer(id: Long): MutableLiveData<Resource<DomainUserSelectedAnswer>> {
         return repository.submitAnswer(id)
     }
