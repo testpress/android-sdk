@@ -82,41 +82,48 @@ public final class TestpressSdk {
     }
 
     public static void clearActiveSession(@NonNull Context context) {
-        clearActiveSession(context, null);
+        validateContext(context);
+        Context appContext = context.getApplicationContext();
+        TestpressSession session = getTestpressSession(appContext);
+        if (session != null) {
+            new TestpressApiClient(appContext, session).logout().enqueue(new TestpressCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {}
+
+                @Override
+                public void onException(TestpressException exception) {}
+            });
+        }
+        clearLocalData(appContext);
     }
 
-    public static void clearActiveSession(@NonNull final Context context,
+    public static void clearActiveSession(@NonNull Context context,
                                           @Nullable final TestpressCallback<Void> callback) {
         validateContext(context);
-        TestpressSession session = TestpressSdk.getTestpressSession(context);
-        if (session == null) {
-            notifySessionCleared(context, callback, null, null);
-            return;
-        }
+        final Context appContext = context.getApplicationContext();
+        TestpressSession session = getTestpressSession(appContext);
+        if (session != null) {
+            new TestpressApiClient(appContext, session).logout().enqueue(new TestpressCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    clearLocalData(appContext);
+                    if (callback != null) {
+                        callback.onSuccess(result);
+                    }
+                }
 
-        new TestpressApiClient(context, session).logout().enqueue(new TestpressCallback<Void>() {
-            @Override
-            public void onSuccess(Void result) {
-                notifySessionCleared(context, callback, result, null);
-            }
-
-            @Override
-            public void onException(TestpressException exception) {
-                notifySessionCleared(context, callback, null, exception);
-            }
-        });
-    }
-
-    private static void notifySessionCleared(@NonNull Context context,
-                                             @Nullable TestpressCallback<Void> callback,
-                                             @Nullable Void result,
-                                             @Nullable TestpressException exception) {
-        clearLocalData(context);
-        if (callback != null) {
-            if (exception != null) {
-                callback.onException(exception);
-            } else {
-                callback.onSuccess(result);
+                @Override
+                public void onException(TestpressException exception) {
+                    clearLocalData(appContext);
+                    if (callback != null) {
+                        callback.onException(exception);
+                    }
+                }
+            });
+        } else {
+            clearLocalData(appContext);
+            if (callback != null) {
+                callback.onSuccess(null);
             }
         }
     }
