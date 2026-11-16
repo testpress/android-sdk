@@ -165,8 +165,8 @@ class QuizQuestionFragment : Fragment() {
         } else {
             val numberType = question.type == "N"
             questionsView.setNumberType(numberType)
-            val textValue = userSelectedAnswer.shortText ?: ""
-            htmlContent += "<input class='edit_box' type='text' onpaste='return false'" +
+            val textValue = android.text.TextUtils.htmlEncode(userSelectedAnswer.shortText ?: "")
+            htmlContent += "<input class='edit_box' type='text' onpaste='return false' " +
                 "value='$textValue' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>"
         }
         htmlContent += "</div>"
@@ -401,7 +401,7 @@ class QuizQuestionFragment : Fragment() {
         @JavascriptInterface
         fun onTextValueChange(value: String) {
             userSelectedAnswer.id?.let {
-                viewModel.setShortText(it, value.trim())
+                viewModel.setShortText(it, value)
             }
         }
 

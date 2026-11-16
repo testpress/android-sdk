@@ -32,12 +32,14 @@ import java.util.HashMap
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
+import java.util.concurrent.Executors
 import kotlin.random.Random
 
 class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     private val examNetwork = ExamNetwork(context)
     val examQuestionDao = TestpressSDKDatabase.getExamQuestionDao(context)
     private val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
+    private val dbExecutor = Executors.newSingleThreadExecutor()
 
     private val inFlightAttemptIds = Collections.synchronizedSet(mutableSetOf<Long>())
 
@@ -259,73 +261,88 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     fun setAnswer(id: Long, selectedOptions: ArrayList<Int>) {
-        val userSelectedAnswer = getUserSelectedAnswer(id) ?: return
-        userSelectedAnswer.selectedAnswers = IntegerList().apply { addAll(selectedOptions) }
-        userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
+        dbExecutor.execute {
+            val userSelectedAnswer = getUserSelectedAnswer(id) ?: return@execute
+            userSelectedAnswer.selectedAnswers = IntegerList().apply { addAll(selectedOptions) }
+            userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
+        }
     }
 
     fun setShortText(id: Long, shortText: String) {
-        val userSelectedAnswer = getUserSelectedAnswer(id)
-        userSelectedAnswer?.shortText = if (shortText.isBlank()) null else shortText.trim()
-        userSelectedAnswer?.selectedAnswers = IntegerList()
-        userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
+        dbExecutor.execute {
+            val answer = getUserSelectedAnswer(id) ?: return@execute
+            val trimmed = shortText.trim().ifEmpty { null }
+            if (answer.shortText != trimmed) {
+                answer.shortText = trimmed
+                answer.selectedAnswers = IntegerList()
+                userSelectedAnswerDao.insertOrReplaceInTx(answer)
+            }
+        }
     }
 
     fun submitAnswer(id: Long): MutableLiveData<Resource<DomainUserSelectedAnswer>> {
-        val userSelectedAnswer = getUserSelectedAnswer(id) ?: run {
-            answerResource.postValue(
-                Resource.error(TestpressException.unexpectedError(IllegalStateException("Answer not found")), null)
-            )
-            return answerResource
-        }
-        val answer = HashMap<String, Any>()
-        answer["selected_answers"] = userSelectedAnswer.selectedAnswers ?: listOf<Integer>()
-        userSelectedAnswer.shortText?.let {
-            answer["short_text"] = it
-        }
-
-        val url = "/api/v2.4/attempts/${userSelectedAnswer.attemptId}/questions/${userSelectedAnswer.examQuestionId}/"
-        examNetwork.saveUserSelectedAnswer(url, answer)
-            .enqueue(object : TestpressCallback<NetworkUserSelectedAnswer>() {
-                override fun onSuccess(result: NetworkUserSelectedAnswer?) {
-                    val usa = result?.asGreenDaoModel()?.apply {
-                        this.id = userSelectedAnswer.id
-                        order = userSelectedAnswer.order
-                        examId = userSelectedAnswer.examId
-                        examQuestionId = userSelectedAnswer.examQuestionId
-                        questionId = userSelectedAnswer.questionId
-                        attemptId = userSelectedAnswer.attemptId
-                        val freshExplanation = DomainUserSelectedAnswer(
-                            explanationHtml = result.explanationHtml,
-                            question = result.question?.let { DomainQuestion(explanation = it.explanationHtml) }
-                        ).getResolvedExplanation()
-                        val cachedExplanation = userSelectedAnswer.asDomainModel().getResolvedExplanation()
-                        explanationHtml = freshExplanation ?: cachedExplanation
-                        correctAnswers = userSelectedAnswer.correctAnswers
-                        duration = "00:00:01"
-                    }
-                    if (usa == null) {
-                        answerResource.postValue(
-                            Resource.error(TestpressException.unexpectedError(IllegalStateException("Failed to parse answer response")), null)
-                        )
-                        return
-                    }
-                    userSelectedAnswerDao.insertOrReplaceInTx(usa)
-                    val updatedAnswer = getUserSelectedAnswer(usa.id)
-                    answerResource.postValue(Resource.success(updatedAnswer?.asDomainModel()))
-                }
-
-                override fun onException(exception: TestpressException?) {
-                    userSelectedAnswer.duration = "00:00:01"
-                    userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
-                    answerResource.postValue(
-                        Resource.error(
-                            exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error")),
-                            null
-                        )
+        dbExecutor.execute {
+            val userSelectedAnswer = getUserSelectedAnswer(id) ?: run {
+                answerResource.postValue(
+                    Resource.error(
+                        TestpressException.unexpectedError(IllegalStateException("Answer not found")),
+                        null
                     )
-                }
-            })
+                )
+                return@execute
+            }
+            val answer = HashMap<String, Any>()
+            answer["selected_answers"] = userSelectedAnswer.selectedAnswers ?: listOf<Integer>()
+            userSelectedAnswer.shortText?.let {
+                answer["short_text"] = it
+            }
+
+            val url = "/api/v2.4/attempts/${userSelectedAnswer.attemptId}/questions/${userSelectedAnswer.examQuestionId}/"
+            examNetwork.saveUserSelectedAnswer(url, answer)
+                .enqueue(object : TestpressCallback<NetworkUserSelectedAnswer>() {
+                    override fun onSuccess(result: NetworkUserSelectedAnswer?) {
+                        val usa = result?.asGreenDaoModel()?.apply {
+                            this.id = userSelectedAnswer.id
+                            order = userSelectedAnswer.order
+                            examId = userSelectedAnswer.examId
+                            examQuestionId = userSelectedAnswer.examQuestionId
+                            questionId = userSelectedAnswer.questionId
+                            attemptId = userSelectedAnswer.attemptId
+                            val freshExplanation = DomainUserSelectedAnswer(
+                                explanationHtml = result.explanationHtml,
+                                question = result.question?.let { DomainQuestion(explanation = it.explanationHtml) }
+                            ).getResolvedExplanation()
+                            val cachedExplanation = userSelectedAnswer.asDomainModel().getResolvedExplanation()
+                            explanationHtml = freshExplanation ?: cachedExplanation
+                            correctAnswers = userSelectedAnswer.correctAnswers
+                            duration = "00:00:01"
+                        }
+                        if (usa == null) {
+                            answerResource.postValue(
+                                Resource.error(
+                                    TestpressException.unexpectedError(IllegalStateException("Received empty answer response")),
+                                    null
+                                )
+                            )
+                            return
+                        }
+                        dbExecutor.execute {
+                            userSelectedAnswerDao.insertOrReplaceInTx(usa)
+                            val updatedAnswer = getUserSelectedAnswer(usa.id)
+                            answerResource.postValue(Resource.success(updatedAnswer?.asDomainModel()))
+                        }
+                    }
+
+                    override fun onException(exception: TestpressException?) {
+                        dbExecutor.execute {
+                            userSelectedAnswer.duration = "00:00:01"
+                            userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
+                            val error = exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error"))
+                            answerResource.postValue(Resource.error(error, null))
+                        }
+                    }
+                })
+        }
         return answerResource
     }
 }
