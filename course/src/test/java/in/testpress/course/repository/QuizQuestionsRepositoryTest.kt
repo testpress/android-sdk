@@ -122,6 +122,22 @@ class QuizQuestionsRepositoryTest : GreendaoCleanupMixin() {
     }
 
     @Test
+    fun offlineFallbackIsUsedWhenFetchSucceedsWithEmptyResultsAndCacheExists() {
+        Mockito.`when`(userSelectedAnswerQueryBuilder.list()).thenReturn(emptyList())
+        val emptyResponse = ApiResponse<NetworkExamQuestionResult>()
+        val apiCall = RetrofitCallMock(Resource.success(emptyResponse))
+        Mockito.`when`(examNetwork.getQuestions(anyString(), anyMap())).thenReturn(apiCall)
+
+        val cachedQuestion = ExamQuestion(1L)
+        Mockito.`when`(examQuestionQueryBuilder.list()).thenReturn(listOf(cachedQuestion))
+
+        repository.getQuestions(1L, 100L, "http://testpress.in/api/questions/")
+
+        verify(examQuestionQueryBuilder, Mockito.never()).buildDelete()
+        verify(examQuestionDao, Mockito.atLeastOnce()).queryBuilder()
+    }
+
+    @Test
     fun errorResourceEmittedWhenFetchSucceedsWithNoQuestions() {
         Mockito.`when`(userSelectedAnswerQueryBuilder.list()).thenReturn(emptyList())
         val emptyResponse = ApiResponse<NetworkExamQuestionResult>()

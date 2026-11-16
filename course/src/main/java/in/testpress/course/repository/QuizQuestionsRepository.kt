@@ -88,9 +88,11 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             fetchQuestions(url, examId, attemptId, pageNumber + 1, accumulatedResults)
         } else {
             fetchingAttemptId = null
-            TestpressSDKDatabase.getDaoSession(context).runInTx {
-                cleanQuestionInDB(examId, attemptId)
-                saveQuestionsToDB(accumulatedResults, examId, attemptId)
+            if (accumulatedResults.isNotEmpty()) {
+                TestpressSDKDatabase.getDaoSession(context).runInTx {
+                    cleanQuestionInDB(examId, attemptId)
+                    saveQuestionsToDB(accumulatedResults, examId, attemptId)
+                }
             }
             val questions = getQuestionsFromDB(examId, attemptId)
             if (!questions.isNullOrEmpty()) {
