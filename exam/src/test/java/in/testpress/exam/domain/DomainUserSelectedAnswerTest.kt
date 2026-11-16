@@ -45,14 +45,16 @@ class DomainUserSelectedAnswerTest {
     }
 
     @Test
-    fun getSafeAnswerAt_handlesNullOrderGracefully() {
+    fun getSafeAnswerAt_sortsNullOrderLastWithoutShiftingValidItems() {
         val answerWithNullOrder = DomainUserSelectedAnswer(id = 1L, order = null)
-        val answerWithOrder1 = DomainUserSelectedAnswer(id = 2L, order = 1)
+        val answer0 = DomainUserSelectedAnswer(id = 2L, order = 0)
+        val answer1 = DomainUserSelectedAnswer(id = 3L, order = 1)
 
-        val list = listOf(answerWithOrder1, answerWithNullOrder)
+        val list = listOf(answerWithNullOrder, answer1, answer0)
 
-        assertEquals(answerWithNullOrder, list.getSafeAnswerAt(0))
-        assertEquals(answerWithOrder1, list.getSafeAnswerAt(1))
+        assertEquals(answer0, list.getSafeAnswerAt(0))
+        assertEquals(answer1, list.getSafeAnswerAt(1))
+        assertEquals(answerWithNullOrder, list.getSafeAnswerAt(2))
     }
 
     @Test
@@ -63,5 +65,38 @@ class DomainUserSelectedAnswerTest {
         assertEquals(answer, list.getSafeAnswerAt(0))
         assertNull(list.getSafeAnswerAt(1))
         assertNull(list.getSafeAnswerAt(-1))
+    }
+
+    @Test
+    fun getResolvedExplanation_prefersAuthoritativeExplanationHtml() {
+        val answer = DomainUserSelectedAnswer(
+            explanationHtml = "Answer explanation",
+            question = DomainQuestion(explanation = "Question explanation")
+        )
+        assertEquals("Answer explanation", answer.getResolvedExplanation())
+    }
+
+    @Test
+    fun getResolvedExplanation_fallsBackToQuestionExplanationWhenBlankOrNull() {
+        val answerWithNull = DomainUserSelectedAnswer(
+            explanationHtml = null,
+            question = DomainQuestion(explanation = "Question explanation")
+        )
+        assertEquals("Question explanation", answerWithNull.getResolvedExplanation())
+
+        val answerWithBlank = DomainUserSelectedAnswer(
+            explanationHtml = "   ",
+            question = DomainQuestion(explanation = "Question explanation")
+        )
+        assertEquals("Question explanation", answerWithBlank.getResolvedExplanation())
+    }
+
+    @Test
+    fun getResolvedExplanation_returnsNullWhenBothAreNullOrBlank() {
+        val answer = DomainUserSelectedAnswer(
+            explanationHtml = " ",
+            question = DomainQuestion(explanation = "  ")
+        )
+        assertNull(answer.getResolvedExplanation())
     }
 }

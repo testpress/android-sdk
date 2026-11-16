@@ -4,9 +4,11 @@ import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
 import `in`.testpress.network.Resource
+import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
 import `in`.testpress.exam.domain.asDomainModel
 import `in`.testpress.exam.domain.asDomainModels
+import `in`.testpress.exam.domain.getResolvedExplanation
 import `in`.testpress.exam.network.ExamNetwork
 import `in`.testpress.exam.network.NetworkAnswer
 import `in`.testpress.exam.network.NetworkDirection
@@ -33,7 +35,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     val examQuestionDao = TestpressSDKDatabase.getExamQuestionDao(context)
     private val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
 
-    var page = 1
+    @Volatile
+    private var fetchingAttemptId: Long? = null
 
     var _resourceUserSelectedAnswers: MutableLiveData<Resource<List<DomainUserSelectedAnswer>>> = MutableLiveData()
     val resourceUserSelectedAnswers: LiveData<Resource<List<DomainUserSelectedAnswer>>>
@@ -47,17 +50,16 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         pageNumber: Int = 1,
         accumulatedResults: MutableList<NetworkExamQuestionResult> = mutableListOf()
     ) {
-        page = pageNumber
         val queryParams: HashMap<String, Any> = hashMapOf()
-        queryParams["page"] = page
+        queryParams["page"] = pageNumber
         examNetwork.getQuestions(url, queryParams)
             .enqueue(object: TestpressCallback<ApiResponse<NetworkExamQuestionResult>>(){
                 override fun onSuccess(result: ApiResponse<NetworkExamQuestionResult>?) {
-                    handleQuestionsFetchSuccess(result, examId, attemptId, url, accumulatedResults)
+                    handleQuestionsFetchSuccess(result, examId, attemptId, url, pageNumber, accumulatedResults)
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    page = 1
+                    fetchingAttemptId = null
                     val questions = getQuestionsFromDB(examId, attemptId)
                     if (!questions.isNullOrEmpty()) {
                         createUserSelectedAnswers(questions, attemptId)
@@ -78,16 +80,18 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         examId: Long,
         attemptId: Long,
         url: String,
+        pageNumber: Int,
         accumulatedResults: MutableList<NetworkExamQuestionResult>
     ) {
         response?.results?.let { accumulatedResults.add(it) }
         if (response?.next != null) {
-            page += 1
-            fetchQuestions(url, examId, attemptId, page, accumulatedResults)
+            fetchQuestions(url, examId, attemptId, pageNumber + 1, accumulatedResults)
         } else {
-            page = 1
-            cleanQuestionInDB(examId, attemptId)
-            saveQuestionsToDB(accumulatedResults, examId, attemptId)
+            fetchingAttemptId = null
+            TestpressSDKDatabase.getDaoSession(context).runInTx {
+                cleanQuestionInDB(examId, attemptId)
+                saveQuestionsToDB(accumulatedResults, examId, attemptId)
+            }
             val questions = getQuestionsFromDB(examId, attemptId)
             if (!questions.isNullOrEmpty()) {
                 createUserSelectedAnswers(questions, attemptId)
@@ -102,8 +106,6 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     private fun cleanQuestionInDB(examId: Long, attemptId: Long) {
         if (attemptId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.AttemptId.eq(attemptId))
-                .buildDelete().executeDeleteWithoutDetachingEntities()
-            userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId))
                 .buildDelete().executeDeleteWithoutDetachingEntities()
         } else if (examId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId))
@@ -166,8 +168,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         val userSelectedAnswers = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
         if (userSelectedAnswers.isNotEmpty()) {
             _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
-        } else {
-            page = 1
+        } else if (fetchingAttemptId != attemptId) {
+            fetchingAttemptId = attemptId
             fetchQuestions(url, examId, attemptId)
         }
         return resourceUserSelectedAnswers
@@ -256,10 +258,12 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                         examQuestionId = userSelectedAnswer.examQuestionId
                         questionId = userSelectedAnswer.questionId
                         attemptId = userSelectedAnswer.attemptId
-                        explanationHtml = result.explanationHtml?.takeIf { it.isNotBlank() }
-                            ?: result.question?.explanationHtml?.takeIf { it.isNotBlank() }
-                            ?: userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
-                            ?: userSelectedAnswer.question?.explanationHtml?.takeIf { it.isNotBlank() }
+                        val freshExplanation = DomainUserSelectedAnswer(
+                            explanationHtml = result.explanationHtml,
+                            question = result.question?.let { DomainQuestion(explanation = it.explanationHtml) }
+                        ).getResolvedExplanation()
+                        val cachedExplanation = userSelectedAnswer.asDomainModel().getResolvedExplanation()
+                        explanationHtml = freshExplanation ?: cachedExplanation
                         correctAnswers = userSelectedAnswer.correctAnswers
                         duration = "00:00:01"
                     }

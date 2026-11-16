@@ -94,9 +94,12 @@ class QuizQuestionFragment : Fragment() {
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
-                    it.data.getSafeAnswerAt(position)?.let {
-                        userSelectedAnswer = it
+                    val answer = it.data.getSafeAnswerAt(position)
+                    if (answer != null) {
+                        userSelectedAnswer = answer
                         initWebview()
+                    } else {
+                        android.util.Log.w("QuizQuestionFragment", "No answer found at position $position for attemptId $attemptId")
                     }
                 }
                 else -> {}

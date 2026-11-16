@@ -7,6 +7,7 @@ import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
+import `in`.testpress.exam.domain.getResolvedExplanation
 import `in`.testpress.exam.domain.getSafeAnswerAt
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.exam.util.Watermark
@@ -103,9 +104,12 @@ class QuizReviewFragment: Fragment() {
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
-                    it.data.getSafeAnswerAt(position)?.let {
-                        userSelectedAnswer = it
+                    val answer = it.data.getSafeAnswerAt(position)
+                    if (answer != null) {
+                        userSelectedAnswer = answer
                         initWebview()
+                    } else {
+                        android.util.Log.w("QuizReviewFragment", "No answer found at position $position for attemptId $attemptId")
                     }
                 }
                 else -> {}
@@ -273,8 +277,7 @@ class QuizReviewFragment: Fragment() {
 
     private fun getExplanationHtml(userSelectedAnswer: DomainUserSelectedAnswer): String {
         var htmlContent = ""
-        val explanation = userSelectedAnswer.explanationHtml?.takeIf { it.isNotBlank() }
-            ?: userSelectedAnswer.question?.explanation?.takeIf { it.isNotBlank() }
+        val explanation = userSelectedAnswer.getResolvedExplanation()
         explanation?.let {
             htmlContent += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
             htmlContent += getEmailWaterMarkHtml()
