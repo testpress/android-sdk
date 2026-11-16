@@ -39,7 +39,14 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     private val examNetwork = ExamNetwork(context)
     val examQuestionDao = TestpressSDKDatabase.getExamQuestionDao(context)
     private val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
-    private val dbExecutor = Executors.newSingleThreadExecutor()
+
+    companion object {
+        private val dbExecutor = Executors.newSingleThreadExecutor { runnable ->
+            Thread(runnable, "QuizQuestionsDbThread").apply {
+                isDaemon = true
+            }
+        }
+    }
 
     private val inFlightAttemptIds = Collections.synchronizedSet(mutableSetOf<Long>())
 
