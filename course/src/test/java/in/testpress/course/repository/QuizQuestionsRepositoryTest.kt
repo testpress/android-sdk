@@ -186,4 +186,40 @@ class QuizQuestionsRepositoryTest : GreendaoCleanupMixin() {
         assertEquals("Authoritative explanation", answerWithExplanation.getResolvedExplanation())
         assertEquals("Question explanation", answerWithFallbackOnly.getResolvedExplanation())
     }
+
+    @Test
+    fun onExceptionFallbackFailsGracefullyWhenCachedQuestionHasNullQuestion() {
+        Mockito.`when`(userSelectedAnswerQueryBuilder.list()).thenReturn(emptyList())
+        val exception = TestpressException.networkError(IOException("No internet"))
+        val apiCall = RetrofitCallMock(Resource.error(exception, ApiResponse<NetworkExamQuestionResult>()))
+        Mockito.`when`(examNetwork.getQuestions(anyString(), anyMap())).thenReturn(apiCall)
+
+        val cachedQuestionWithNullQuestion = ExamQuestion(1L)
+        Mockito.`when`(examQuestionQueryBuilder.list()).thenReturn(listOf(cachedQuestionWithNullQuestion))
+
+        val result = repository.getQuestions(1L, 100L, "http://testpress.in/api/questions/").getOrAwaitValue()
+
+        assertEquals(Status.ERROR, result.status)
+    }
+
+    @Test
+    fun getUserSelectedAnswerIDRetriesUntilNonCollidingIdFound() {
+        val method = repository.javaClass.getDeclaredMethod("getUserSelectedAnswerID", Int::class.javaPrimitiveType)
+        method.isAccessible = true
+
+        Mockito.`when`(userSelectedAnswerQueryBuilder.count()).thenReturn(1L, 0L)
+
+        val id = method.invoke(repository, 5) as Long
+        assert(id >= 99999L)
+        verify(userSelectedAnswerQueryBuilder, times(2)).count()
+    }
+
+    @Test
+    fun setAnswerReturnsEarlyWhenAnswerNotFound() {
+        Mockito.`when`(userSelectedAnswerQueryBuilder.list()).thenReturn(emptyList())
+
+        repository.setAnswer(999L, arrayListOf(1, 2))
+
+        verify(userSelectedAnswerDao, Mockito.never()).insertOrReplaceInTx(any(UserSelectedAnswer::class.java))
+    }
 }

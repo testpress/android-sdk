@@ -27,7 +27,11 @@ import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
+import java.util.Collections
 import java.util.HashMap
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import kotlin.random.Random
 
 class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
@@ -35,8 +39,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     val examQuestionDao = TestpressSDKDatabase.getExamQuestionDao(context)
     private val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
 
-    @Volatile
-    private var fetchingAttemptId: Long? = null
+    private val inFlightAttemptIds = Collections.synchronizedSet(mutableSetOf<Long>())
 
     var _resourceUserSelectedAnswers: MutableLiveData<Resource<List<DomainUserSelectedAnswer>>> = MutableLiveData()
     val resourceUserSelectedAnswers: LiveData<Resource<List<DomainUserSelectedAnswer>>>
@@ -59,16 +62,12 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                 }
 
                 override fun onException(exception: TestpressException?) {
-                    fetchingAttemptId = null
-                    val questions = getQuestionsFromDB(examId, attemptId)
-                    if (!questions.isNullOrEmpty()) {
-                        createUserSelectedAnswers(questions, attemptId)
-                    } else {
-                        _resourceUserSelectedAnswers.postValue(
-                            Resource.error(
-                                exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error")),
-                                null
-                            )
+                    inFlightAttemptIds.remove(attemptId)
+                    CoroutineScope(Dispatchers.IO).launch {
+                        loadQuestionsFromDBAndPost(
+                            examId,
+                            attemptId,
+                            exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error"))
                         )
                     }
                 }
@@ -87,27 +86,43 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         if (response?.next != null) {
             fetchQuestions(url, examId, attemptId, pageNumber + 1, accumulatedResults)
         } else {
-            fetchingAttemptId = null
-            try {
-                if (accumulatedResults.isNotEmpty()) {
-                    TestpressSDKDatabase.getDaoSession(context).runInTx {
-                        cleanQuestionInDB(examId, attemptId)
-                        saveQuestionsToDB(accumulatedResults, examId, attemptId)
+            inFlightAttemptIds.remove(attemptId)
+            CoroutineScope(Dispatchers.IO).launch {
+                try {
+                    if (accumulatedResults.isNotEmpty()) {
+                        TestpressSDKDatabase.getDaoSession(context).runInTx {
+                            cleanQuestionInDB(examId, attemptId)
+                            saveQuestionsToDB(accumulatedResults, examId, attemptId)
+                        }
                     }
-                }
-                val questions = getQuestionsFromDB(examId, attemptId)
-                if (!questions.isNullOrEmpty()) {
-                    createUserSelectedAnswers(questions, attemptId)
-                } else {
+                    loadQuestionsFromDBAndPost(
+                        examId,
+                        attemptId,
+                        TestpressException.unexpectedError(IllegalStateException("No questions found"))
+                    )
+                } catch (e: Exception) {
                     _resourceUserSelectedAnswers.postValue(
-                        Resource.error(TestpressException.unexpectedError(IllegalStateException("No questions found")), null)
+                        Resource.error(TestpressException.unexpectedError(e), null)
                     )
                 }
-            } catch (e: Exception) {
+            }
+        }
+    }
+
+    private fun loadQuestionsFromDBAndPost(examId: Long, attemptId: Long, fallbackException: TestpressException) {
+        try {
+            val questions = getQuestionsFromDB(examId, attemptId)
+            if (!questions.isNullOrEmpty()) {
+                createUserSelectedAnswers(questions, attemptId)
+            } else {
                 _resourceUserSelectedAnswers.postValue(
-                    Resource.error(TestpressException.unexpectedError(e), null)
+                    Resource.error(fallbackException, null)
                 )
             }
+        } catch (e: Exception) {
+            _resourceUserSelectedAnswers.postValue(
+                Resource.error(TestpressException.unexpectedError(e), null)
+            )
         }
     }
 
@@ -130,6 +145,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         }
         // Fall back to all questions for the examId if questions for attemptId are not found.
         // This is intentional offline fallback behavior, allowing cached questions from a previous attempt of the exam to be used.
+        // Note: Exam-question IDs are exam-scoped, remaining stable across attempts.
         return if (examId != -1L) {
             examQuestionDao.queryBuilder().where(ExamQuestionDao.Properties.ExamId.eq(examId)).list()
         } else {
@@ -176,9 +192,16 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         val userSelectedAnswers = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
         if (userSelectedAnswers.isNotEmpty()) {
             _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
-        } else if (fetchingAttemptId != attemptId) {
-            fetchingAttemptId = attemptId
-            fetchQuestions(url, examId, attemptId)
+        } else if (!inFlightAttemptIds.contains(attemptId)) {
+            inFlightAttemptIds.add(attemptId)
+            try {
+                fetchQuestions(url, examId, attemptId)
+            } catch (e: Exception) {
+                inFlightAttemptIds.remove(attemptId)
+                _resourceUserSelectedAnswers.postValue(
+                    Resource.error(TestpressException.unexpectedError(e), null)
+                )
+            }
         }
         return resourceUserSelectedAnswers
     }
@@ -209,14 +232,13 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         _resourceUserSelectedAnswers.postValue(Resource.success(userSelectedAnswers.asDomainModels()))
     }
 
-    private fun getUserSelectedAnswerID(endIndex: Int): Long {
-        val id = Random.nextLong(99999, 9999999)
-        val count = userSelectedAnswerDao.queryBuilder().where(UserSelectedAnswerDao.Properties.Id.between(id, id + endIndex)).count()
-        if (count > 0) {
-            getUserSelectedAnswerID(endIndex)
+    private fun getUserSelectedAnswerID(count: Int): Long {
+        while (true) {
+            val id = Random.nextLong(99999, 9999999)
+            val used = userSelectedAnswerDao.queryBuilder()
+                .where(UserSelectedAnswerDao.Properties.Id.between(id, id + count - 1)).count()
+            if (used == 0L) return id
         }
-
-        return id
     }
 
     fun getUserSelectedAnswersFromDB(attemptId: Long): List<UserSelectedAnswer>? {
@@ -237,9 +259,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     }
 
     fun setAnswer(id: Long, selectedOptions: ArrayList<Int>) {
-        val userSelectedAnswer = getUserSelectedAnswer(id)
-        userSelectedAnswer?.selectedAnswers = IntegerList()
-        userSelectedAnswer?.selectedAnswers?.addAll(selectedOptions)
+        val userSelectedAnswer = getUserSelectedAnswer(id) ?: return
+        userSelectedAnswer.selectedAnswers = IntegerList().apply { addAll(selectedOptions) }
         userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
     }
 

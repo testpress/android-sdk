@@ -31,6 +31,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import io.sentry.Sentry
 import com.github.testpress.mikephil.charting.charts.HorizontalBarChart
 import com.github.testpress.mikephil.charting.components.XAxis
 import com.github.testpress.mikephil.charting.data.BarData
@@ -99,12 +100,21 @@ class QuizQuestionFragment : Fragment() {
                         userSelectedAnswer = answer
                         initWebview()
                     } else {
-                        android.util.Log.w("QuizQuestionFragment", "No answer found at position $position for attemptId $attemptId")
+                        val message = "No answer found at position $position for attemptId $attemptId"
+                        android.util.Log.w("QuizQuestionFragment", message)
+                        Sentry.captureException(IllegalStateException(message))
+                        showErrorView()
                     }
                 }
                 else -> {}
             }
         })
+    }
+
+    private fun showErrorView() {
+        val errorHtml = "<div style='padding: 20px; text-align: center; color: #666; font-size: 16px;'>" +
+            getString(R.string.nothing_here) + "</div>"
+        questionsView.loadDataWithBaseURL("file:///android_asset/", errorHtml, "text/html", "utf-8", null)
     }
 
     fun submitAnswer() {
