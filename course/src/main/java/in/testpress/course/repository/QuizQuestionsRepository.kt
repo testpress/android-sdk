@@ -339,7 +339,23 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         result: NetworkUserSelectedAnswer?,
         userSelectedAnswer: UserSelectedAnswer
     ) {
-        val usa = result?.asGreenDaoModel()
+        val usa = result?.asGreenDaoModel()?.apply {
+            this.id = userSelectedAnswer.id
+            order = userSelectedAnswer.order
+            examId = userSelectedAnswer.examId
+            examQuestionId = userSelectedAnswer.examQuestionId
+            questionId = userSelectedAnswer.questionId
+            attemptId = userSelectedAnswer.attemptId
+            shortText = result.shortText ?: userSelectedAnswer.shortText
+            val freshExplanation = DomainUserSelectedAnswer(
+                explanationHtml = result.explanationHtml,
+                question = result.question?.let { DomainQuestion(explanation = it.explanationHtml) }
+            ).getResolvedExplanation()
+            val cachedExplanation = userSelectedAnswer.asDomainModel().getResolvedExplanation()
+            explanationHtml = freshExplanation ?: cachedExplanation
+            correctAnswers = userSelectedAnswer.correctAnswers
+            duration = "00:00:01"
+        }
         if (usa == null) {
             answerResource.postValue(
                 Resource.error(
@@ -349,17 +365,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             )
             return
         }
-        usa.questionId = userSelectedAnswer.questionId
-        usa.attemptId = userSelectedAnswer.attemptId
-        usa.explanationHtml = userSelectedAnswer.explanationHtml
-        usa.correctAnswers = userSelectedAnswer.correctAnswers
-        usa.duration = "00:00:01"
         dbExecutor.execute {
             try {
-                // userSelectedAnswer has a temporary local ID generated in createUserSelectedAnswers.
-                // The server assigns and returns a new backend response ID (usa.id).
-                // Replace the temporary local row with the server-persisted row.
-                userSelectedAnswerDao.delete(userSelectedAnswer)
                 userSelectedAnswerDao.insertOrReplaceInTx(usa)
                 val updatedAnswer = getUserSelectedAnswer(usa.id)
                 answerResource.postValue(Resource.success(updatedAnswer?.asDomainModel()))
