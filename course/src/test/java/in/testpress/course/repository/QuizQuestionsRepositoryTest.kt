@@ -76,6 +76,11 @@ class QuizQuestionsRepositoryTest : GreendaoCleanupMixin() {
         Mockito.`when`(userSelectedAnswerQueryBuilder.where(any(WhereCondition::class.java))).thenReturn(userSelectedAnswerQueryBuilder)
         Mockito.`when`(examQuestionDao.queryBuilder()).thenReturn(examQuestionQueryBuilder)
         Mockito.`when`(examQuestionQueryBuilder.where(any(WhereCondition::class.java))).thenReturn(examQuestionQueryBuilder)
+        Mockito.doAnswer { invocation ->
+            val runnable = invocation.getArgument<Runnable>(0)
+            runnable.run()
+            null
+        }.`when`(daoSession).runInTx(any(Runnable::class.java))
 
         repository = QuizQuestionsRepository(context)
         setField(repository, "examNetwork", examNetwork)

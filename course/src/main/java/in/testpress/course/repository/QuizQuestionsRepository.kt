@@ -187,20 +187,21 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
         val id = getUserSelectedAnswerID(questions.size)
 
-        questions.forEachIndexed{index, examQuestion ->
+        val userSelectedAnswersList = questions.mapIndexed { index, examQuestion ->
             val question = examQuestion.question
             val correctAnswers = question.answers.filter { it.isCorrect ?: false }
             val correctAnswersIds = IntegerList()
-            correctAnswersIds.addAll(correctAnswers.map {it.id.toInt()})
+            correctAnswersIds.addAll(correctAnswers.map { it.id.toInt() })
 
             val url = "/api/v2.4/attempts/${attemptId}/questions/${examQuestion.id}/"
-            val userSelectedAnswer = UserSelectedAnswer(
+            UserSelectedAnswer(
                 id + index, index, false, examQuestion.examId, attemptId,
                 question.explanationHtml, null, null, null,
                 correctAnswersIds, url, question.id, examQuestion.id
             )
-            userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
-
+        }
+        TestpressSDKDatabase.getDaoSession(context).runInTx {
+            userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswersList)
         }
         val userSelectedAnswers = userSelectedAnswerDao.queryBuilder()
             .where(UserSelectedAnswerDao.Properties.AttemptId.eq(attemptId)).list()
