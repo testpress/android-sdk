@@ -2,16 +2,47 @@ package in.testpress.core;
 
 import android.content.Context;
 
+import androidx.test.core.app.ApplicationProvider;
+
+import org.junit.After;
+import org.junit.Before;
 import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.robolectric.RobolectricTestRunner;
+import org.robolectric.shadows.ShadowLooper;
+
+import java.io.IOException;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import in.testpress.models.InstituteSettings;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
 
 import static org.mockito.Mockito.*;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
+@RunWith(RobolectricTestRunner.class)
 public class TestpressSdkTest {
+
+    private static final String USER_TOKEN = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6NDYsInVzZXJfaWQiOjQ2LCJlbWFpbCI6IiIsImV4cCI6MTUxOTAzNjUzM30.FUuyJfYNSAw_VcypZsN8_ZHvZra6gHU3njcXmr-TGVU";
+    private MockWebServer mockWebServer;
+
+    @Before
+    public void setUp() throws IOException {
+        mockWebServer = new MockWebServer();
+        mockWebServer.start();
+    }
+
+    @After
+    public void tearDown() throws IOException {
+        if (mockWebServer != null) {
+            mockWebServer.shutdown();
+        }
+    }
 
     @Test
     public void testGetTestpressSession_withNullContext() throws Exception {
@@ -53,6 +84,131 @@ public class TestpressSdkTest {
         } catch (IllegalArgumentException e) {
             assertEquals("Context must not be null.", e.getMessage());
         }
+    }
+
+    @Test
+    public void testClearActiveSession_withCallback_nullContext() throws Exception {
+        try {
+            TestpressSdk.clearActiveSession(null, new TestpressCallback<Void>() {
+                @Override public void onSuccess(Void result) {}
+                @Override public void onException(TestpressException exception) {}
+            });
+            fail();
+        } catch (IllegalArgumentException e) {
+            assertEquals("Context must not be null.", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testClearActiveSession_withNoSession_invokesCallbackImmediately() {
+        Context context = ApplicationProvider.getApplicationContext();
+        TestpressSdk.clearActiveSession(context);
+        assertFalse(TestpressSdk.hasActiveSession(context));
+
+        final AtomicBoolean successCalled = new AtomicBoolean(false);
+        TestpressSdk.clearActiveSession(context, new TestpressCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                successCalled.set(true);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                fail("onException should not be called when session is null");
+            }
+        });
+
+        assertTrue(successCalled.get());
+        assertFalse(TestpressSdk.hasActiveSession(context));
+    }
+
+    @Test
+    public void testClearActiveSession_withNullCallback() throws Exception {
+        Context context = ApplicationProvider.getApplicationContext();
+        InstituteSettings instituteSettings = new InstituteSettings(mockWebServer.url("/").toString());
+        TestpressSdk.setTestpressSession(context, new TestpressSession(instituteSettings, USER_TOKEN));
+        assertTrue(TestpressSdk.hasActiveSession(context));
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+
+        TestpressSdk.clearActiveSession(context, null);
+        mockWebServer.takeRequest();
+        ShadowLooper.idleMainLooper();
+
+        assertFalse(TestpressSdk.hasActiveSession(context));
+    }
+
+    @Test
+    public void testClearActiveSession_withCallback_success() throws Exception {
+        Context context = ApplicationProvider.getApplicationContext();
+        InstituteSettings instituteSettings = new InstituteSettings(mockWebServer.url("/").toString());
+        TestpressSdk.setTestpressSession(context, new TestpressSession(instituteSettings, USER_TOKEN));
+        assertTrue(TestpressSdk.hasActiveSession(context));
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+
+        final AtomicBoolean successCalled = new AtomicBoolean(false);
+        TestpressSdk.clearActiveSession(context, new TestpressCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                successCalled.set(true);
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                fail("onException should not be called on success");
+            }
+        });
+
+        mockWebServer.takeRequest();
+        ShadowLooper.idleMainLooper();
+
+        assertTrue(successCalled.get());
+        assertFalse(TestpressSdk.hasActiveSession(context));
+    }
+
+    @Test
+    public void testClearActiveSession_withCallback_failureStillClearsLocalData() throws Exception {
+        Context context = ApplicationProvider.getApplicationContext();
+        InstituteSettings instituteSettings = new InstituteSettings(mockWebServer.url("/").toString());
+        TestpressSdk.setTestpressSession(context, new TestpressSession(instituteSettings, USER_TOKEN));
+        assertTrue(TestpressSdk.hasActiveSession(context));
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(500));
+
+        final AtomicBoolean exceptionCalled = new AtomicBoolean(false);
+        TestpressSdk.clearActiveSession(context, new TestpressCallback<Void>() {
+            @Override
+            public void onSuccess(Void result) {
+                fail("onSuccess should not be called on HTTP 500");
+            }
+
+            @Override
+            public void onException(TestpressException exception) {
+                exceptionCalled.set(true);
+            }
+        });
+
+        mockWebServer.takeRequest();
+        ShadowLooper.idleMainLooper();
+
+        assertTrue(exceptionCalled.get());
+        assertFalse(TestpressSdk.hasActiveSession(context));
+    }
+
+    @Test
+    public void testClearActiveSession_legacySynchronousClearing() throws Exception {
+        Context context = ApplicationProvider.getApplicationContext();
+        InstituteSettings instituteSettings = new InstituteSettings(mockWebServer.url("/").toString());
+        TestpressSdk.setTestpressSession(context, new TestpressSession(instituteSettings, USER_TOKEN));
+        assertTrue(TestpressSdk.hasActiveSession(context));
+
+        mockWebServer.enqueue(new MockResponse().setResponseCode(200));
+
+        // Legacy clearActiveSession should clear local session synchronously before returning
+        TestpressSdk.clearActiveSession(context);
+
+        assertFalse(TestpressSdk.hasActiveSession(context));
     }
 
     @Test

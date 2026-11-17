@@ -82,8 +82,11 @@ public final class TestpressSdk {
     }
 
     public static void clearActiveSession(@NonNull Context context) {
-        if (TestpressSdk.getTestpressSession(context) != null) {
-            new TestpressApiClient(context, TestpressSdk.getTestpressSession(context)).logout().enqueue(new TestpressCallback<Void>() {
+        validateContext(context);
+        Context appContext = context.getApplicationContext();
+        TestpressSession session = getTestpressSession(appContext);
+        if (session != null) {
+            new TestpressApiClient(appContext, session).logout().enqueue(new TestpressCallback<Void>() {
                 @Override
                 public void onSuccess(Void result) {}
 
@@ -91,7 +94,41 @@ public final class TestpressSdk {
                 public void onException(TestpressException exception) {}
             });
         }
+        clearLocalData(appContext);
+    }
 
+    public static void clearActiveSession(@NonNull Context context,
+                                          @Nullable final TestpressCallback<Void> callback) {
+        validateContext(context);
+        final Context appContext = context.getApplicationContext();
+        TestpressSession session = getTestpressSession(appContext);
+        if (session != null) {
+            new TestpressApiClient(appContext, session).logout().enqueue(new TestpressCallback<Void>() {
+                @Override
+                public void onSuccess(Void result) {
+                    clearLocalData(appContext);
+                    if (callback != null) {
+                        callback.onSuccess(result);
+                    }
+                }
+
+                @Override
+                public void onException(TestpressException exception) {
+                    clearLocalData(appContext);
+                    if (callback != null) {
+                        callback.onException(exception);
+                    }
+                }
+            });
+        } else {
+            clearLocalData(appContext);
+            if (callback != null) {
+                callback.onSuccess(null);
+            }
+        }
+    }
+
+    private static void clearLocalData(@NonNull Context context) {
         SharedPreferences.Editor editor = getPreferenceEditor(context);
         editor.clear().commit();
         // Clear webView session
