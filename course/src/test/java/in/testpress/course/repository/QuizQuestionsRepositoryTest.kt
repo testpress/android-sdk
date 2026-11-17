@@ -153,6 +153,21 @@ class QuizQuestionsRepositoryTest : GreendaoCleanupMixin() {
     }
 
     @Test
+    fun errorResourceEmittedWhenExceptionOccursInSuccessPath() {
+        Mockito.`when`(userSelectedAnswerQueryBuilder.list()).thenReturn(emptyList())
+        val emptyResponse = ApiResponse<NetworkExamQuestionResult>()
+        val apiCall = RetrofitCallMock(Resource.success(emptyResponse))
+        Mockito.`when`(examNetwork.getQuestions(anyString(), anyMap())).thenReturn(apiCall)
+
+        Mockito.`when`(examQuestionQueryBuilder.list()).thenThrow(RuntimeException("Database failure"))
+
+        val result = repository.getQuestions(1L, 100L, "http://testpress.in/api/questions/").getOrAwaitValue()
+
+        assertEquals(Status.ERROR, result.status)
+        assertEquals("Database failure", result.exception?.cause?.message)
+    }
+
+    @Test
     fun consistentExplanationResolutionAcrossSubmitAndReview() {
         val answerWithExplanation = DomainUserSelectedAnswer(
             explanationHtml = "Authoritative explanation",

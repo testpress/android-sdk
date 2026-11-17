@@ -88,18 +88,24 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             fetchQuestions(url, examId, attemptId, pageNumber + 1, accumulatedResults)
         } else {
             fetchingAttemptId = null
-            if (accumulatedResults.isNotEmpty()) {
-                TestpressSDKDatabase.getDaoSession(context).runInTx {
-                    cleanQuestionInDB(examId, attemptId)
-                    saveQuestionsToDB(accumulatedResults, examId, attemptId)
+            try {
+                if (accumulatedResults.isNotEmpty()) {
+                    TestpressSDKDatabase.getDaoSession(context).runInTx {
+                        cleanQuestionInDB(examId, attemptId)
+                        saveQuestionsToDB(accumulatedResults, examId, attemptId)
+                    }
                 }
-            }
-            val questions = getQuestionsFromDB(examId, attemptId)
-            if (!questions.isNullOrEmpty()) {
-                createUserSelectedAnswers(questions, attemptId)
-            } else {
+                val questions = getQuestionsFromDB(examId, attemptId)
+                if (!questions.isNullOrEmpty()) {
+                    createUserSelectedAnswers(questions, attemptId)
+                } else {
+                    _resourceUserSelectedAnswers.postValue(
+                        Resource.error(TestpressException.unexpectedError(IllegalStateException("No questions found")), null)
+                    )
+                }
+            } catch (e: Exception) {
                 _resourceUserSelectedAnswers.postValue(
-                    Resource.error(TestpressException.unexpectedError(IllegalStateException("No questions found")), null)
+                    Resource.error(TestpressException.unexpectedError(e), null)
                 )
             }
         }
