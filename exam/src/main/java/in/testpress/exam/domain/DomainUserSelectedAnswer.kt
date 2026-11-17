@@ -38,3 +38,17 @@ fun List<UserSelectedAnswer>.asDomainModels(): List<DomainUserSelectedAnswer> {
         it.asDomainModel()
     }
 }
+
+fun List<DomainUserSelectedAnswer>?.getSafeAnswerAt(position: Int): DomainUserSelectedAnswer? {
+    val answers = this?.sortedBy { answer -> answer.order ?: Int.MAX_VALUE }
+    return if (!answers.isNullOrEmpty() && position in answers.indices) {
+        answers[position]
+    } else {
+        null
+    }
+}
+
+fun DomainUserSelectedAnswer.getResolvedExplanation(): String? {
+    return explanationHtml?.takeIf { it.isNotBlank() }
+        ?: question?.explanation?.takeIf { it.isNotBlank() }
+}

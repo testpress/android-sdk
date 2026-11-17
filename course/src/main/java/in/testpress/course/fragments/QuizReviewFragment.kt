@@ -7,6 +7,8 @@ import `in`.testpress.course.repository.QuizQuestionsRepository
 import `in`.testpress.course.viewmodels.QuizViewModel
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
+import `in`.testpress.exam.domain.getResolvedExplanation
+import `in`.testpress.exam.domain.getSafeAnswerAt
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.exam.util.Watermark
 import `in`.testpress.models.InstituteSettings
@@ -25,6 +27,7 @@ import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
+import io.sentry.Sentry
 import org.jsoup.Jsoup
 import org.jsoup.safety.Whitelist
 import kotlin.math.roundToInt
@@ -102,12 +105,26 @@ class QuizReviewFragment: Fragment() {
         viewModel.getUserSelectedAnswers(attemptId).observe(viewLifecycleOwner, Observer {
             when(it.status) {
                 Status.SUCCESS -> {
-                    userSelectedAnswer = it.data?.sortedBy { it.order }?.get(position)!!
-                    initWebview()
+                    val answer = it.data.getSafeAnswerAt(position)
+                    if (answer != null) {
+                        userSelectedAnswer = answer
+                        initWebview()
+                    } else {
+                        val message = "No answer found at position $position for attemptId $attemptId"
+                        android.util.Log.w("QuizReviewFragment", message)
+                        Sentry.captureException(IllegalStateException(message))
+                        showErrorView()
+                    }
                 }
                 else -> {}
             }
         })
+    }
+
+    private fun showErrorView() {
+        val errorHtml = "<div style='padding: 20px; text-align: center; color: #666; font-size: 16px;'>" +
+            getString(R.string.nothing_here) + "</div>"
+        questionsView.loadDataWithBaseURL("file:///android_asset/", errorHtml, "text/html", "utf-8", null)
     }
 
     private fun initWebview() {
@@ -270,10 +287,11 @@ class QuizReviewFragment: Fragment() {
 
     private fun getExplanationHtml(userSelectedAnswer: DomainUserSelectedAnswer): String {
         var htmlContent = ""
-        userSelectedAnswer.explanationHtml?.let {
-            htmlContent +=  WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
+        val explanation = userSelectedAnswer.getResolvedExplanation()
+        explanation?.let {
+            htmlContent += WebViewUtils.getHeadingTags(getString(R.string.testpress_explanation))
             htmlContent += getEmailWaterMarkHtml()
-            htmlContent += "<div class='review-explanation'>${it}</div>"
+            htmlContent += "<div class='review-explanation'>$it</div>"
         }
 
         return htmlContent
