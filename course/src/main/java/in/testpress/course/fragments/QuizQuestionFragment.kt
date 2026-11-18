@@ -165,8 +165,9 @@ class QuizQuestionFragment : Fragment() {
         } else {
             val numberType = question.type == "N"
             questionsView.setNumberType(numberType)
-            htmlContent += "<input class='edit_box' type='text' onpaste='return false'" +
-                "value='' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>"
+            val textValue = android.text.TextUtils.htmlEncode(userSelectedAnswer.shortText ?: "")
+            htmlContent += "<input class='edit_box' type='text' onpaste='return false' " +
+                "value='$textValue' oninput='onValueChange(this)' placeholder='YOUR ANSWER'>"
         }
         htmlContent += "</div>"
 
@@ -395,6 +396,13 @@ class QuizQuestionFragment : Fragment() {
                 selectedOptions.remove(id.toInt())
             }
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
+        }
+
+        @JavascriptInterface
+        fun onTextValueChange(value: String) {
+            userSelectedAnswer.id?.let {
+                viewModel.setShortText(it, value)
+            }
         }
 
         @JavascriptInterface
