@@ -348,8 +348,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             examQuestionId = userSelectedAnswer.examQuestionId
             questionId = userSelectedAnswer.questionId
             attemptId = userSelectedAnswer.attemptId
-            // usa is built from the pre-request snapshot, so insertOrReplaceInTx(usa) discards anything saved while the request was in flight.
-            // If the input can still be edited during submit, either disable it once submit starts, or re-read the row by id and apply only the server-derived fields.
+            // Local row is replaced by the server response; edits are expected to be blocked once submit starts.
             shortText = result.shortText ?: userSelectedAnswer.shortText
             val freshExplanation = DomainUserSelectedAnswer(
                 explanationHtml = result.explanationHtml,
