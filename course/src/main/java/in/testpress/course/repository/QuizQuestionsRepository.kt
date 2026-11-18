@@ -43,11 +43,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
 
     companion object {
         private const val TAG = "QuizQuestionsRepo"
-        private val dbExecutor = Executors.newSingleThreadExecutor { runnable ->
-            Thread(runnable, "QuizQuestionsDbThread").apply {
-                isDaemon = true
-            }
-        }
+        private val dbExecutor = Executors.newSingleThreadExecutor()
     }
 
     private val inFlightAttemptIds = Collections.synchronizedSet(mutableSetOf<Long>())
@@ -348,7 +344,6 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             examQuestionId = userSelectedAnswer.examQuestionId
             questionId = userSelectedAnswer.questionId
             attemptId = userSelectedAnswer.attemptId
-            // Local row is replaced by the server response; edits are expected to be blocked once submit starts.
             shortText = result.shortText ?: userSelectedAnswer.shortText
             val freshExplanation = DomainUserSelectedAnswer(
                 explanationHtml = result.explanationHtml,
@@ -370,6 +365,14 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
         }
         dbExecutor.execute {
             try {
+                getUserSelectedAnswer(usa.id)?.let { current ->
+                    if (result?.shortText == null) {
+                        usa.shortText = current.shortText
+                    }
+                    if (!current.selectedAnswers.isNullOrEmpty() && result?.selectedAnswers.isNullOrEmpty()) {
+                        usa.selectedAnswers = current.selectedAnswers
+                    }
+                }
                 userSelectedAnswerDao.insertOrReplaceInTx(usa)
                 val updatedAnswer = getUserSelectedAnswer(usa.id)
                 answerResource.postValue(Resource.success(updatedAnswer?.asDomainModel()))
