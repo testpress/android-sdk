@@ -25,6 +25,7 @@ import `in`.testpress.models.greendao.UserSelectedAnswerDao
 import `in`.testpress.util.IntegerList
 import `in`.testpress.v2_4.models.ApiResponse
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import java.util.Collections
@@ -41,6 +42,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     private val userSelectedAnswerDao = TestpressSDKDatabase.getUserSelectedAnswerDao(context)
 
     companion object {
+        private const val TAG = "QuizQuestionsRepo"
         private val dbExecutor = Executors.newSingleThreadExecutor { runnable ->
             Thread(runnable, "QuizQuestionsDbThread").apply {
                 isDaemon = true
@@ -274,7 +276,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                 answer.selectedAnswers = IntegerList().apply { addAll(selectedOptions) }
                 userSelectedAnswerDao.insertOrReplaceInTx(answer)
             } catch (e: Exception) {
-                // Ignore DB error during background answer selection
+                Log.w(TAG, "Failed to save selected options", e)
             }
         }
     }
@@ -290,7 +292,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                     userSelectedAnswerDao.insertOrReplaceInTx(answer)
                 }
             } catch (e: Exception) {
-                // Ignore DB error during background text entry
+                // Log this (Log.w(TAG, "Failed to save short text", e)). A swallowed write failure surfaces later as an empty submission.
+                Log.w(TAG, "Failed to save short text", e)
             }
         }
     }
@@ -382,10 +385,14 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     ) {
         dbExecutor.execute {
             try {
-                userSelectedAnswer.duration = "00:00:01"
-                userSelectedAnswerDao.insertOrReplaceInTx(userSelectedAnswer)
+                // userSelectedAnswer is a stale snapshot taken before the network call.
+                // Re-read by id here and update only duration, otherwise a failed submit overwrites newer shortText/selectedAnswers.
+                getUserSelectedAnswer(userSelectedAnswer.id)?.let {
+                    it.duration = "00:00:01"
+                    userSelectedAnswerDao.insertOrReplaceInTx(it)
+                }
             } catch (e: Exception) {
-                // Ignore DB write error during exception handling
+                Log.w(TAG, "Failed to persist duration", e)
             } finally {
                 val error = exception ?: TestpressException.unexpectedError(IllegalStateException("Unknown error"))
                 answerResource.postValue(Resource.error(error, null))
