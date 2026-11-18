@@ -398,7 +398,6 @@ class QuizQuestionFragment : Fragment() {
             viewModel.setAnswer(userSelectedAnswer.id!!, selectedOptions)
         }
 
-        // If the input stays editable during submit, a late setShortText is lost when handleAnswerSuccess replaces the row. Confirm the input is disabled once submit starts.
         @JavascriptInterface
         fun onTextValueChange(value: String) {
             userSelectedAnswer.id?.let {

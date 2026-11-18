@@ -292,7 +292,6 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                     userSelectedAnswerDao.insertOrReplaceInTx(answer)
                 }
             } catch (e: Exception) {
-                // Log this (Log.w(TAG, "Failed to save short text", e)). A swallowed write failure surfaces later as an empty submission.
                 Log.w(TAG, "Failed to save short text", e)
             }
         }
@@ -349,6 +348,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
             examQuestionId = userSelectedAnswer.examQuestionId
             questionId = userSelectedAnswer.questionId
             attemptId = userSelectedAnswer.attemptId
+            // usa is built from the pre-request snapshot, so insertOrReplaceInTx(usa) discards anything saved while the request was in flight.
+            // If the input can still be edited during submit, either disable it once submit starts, or re-read the row by id and apply only the server-derived fields.
             shortText = result.shortText ?: userSelectedAnswer.shortText
             val freshExplanation = DomainUserSelectedAnswer(
                 explanationHtml = result.explanationHtml,
