@@ -43,6 +43,11 @@ class WebViewFragment : Fragment(), EmptyViewListener {
     var session: TestpressSession? = null
     var lockToLandscape: Boolean = false
 
+    fun isFullScreen(): Boolean {
+        if (!::webView.isInitialized) return false
+        return (webView.webChromeClient as? CustomWebChromeClient)?.isFullScreen() == true
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         parseArguments()
