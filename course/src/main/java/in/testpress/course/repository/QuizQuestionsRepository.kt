@@ -337,8 +337,8 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     private fun buildAnswerRequest(userSelectedAnswer: UserSelectedAnswer): HashMap<String, Any> {
         val answer = HashMap<String, Any>()
         answer["selected_answers"] = userSelectedAnswer.selectedAnswers ?: listOf<Integer>()
-        userSelectedAnswer.shortText?.trim()?.ifEmpty { null }?.let {
-            answer["short_text"] = it
+        userSelectedAnswer.shortText?.let {
+            answer["short_text"] = it.trim()
         }
         return answer
     }
