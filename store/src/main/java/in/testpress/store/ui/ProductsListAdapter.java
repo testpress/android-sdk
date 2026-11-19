@@ -11,6 +11,7 @@ import java.util.List;
 
 import in.testpress.store.R;
 import in.testpress.store.models.Product;
+import in.testpress.store.util.UtilKt;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -53,7 +54,7 @@ public class ProductsListAdapter extends SingleTypeAdapter<Product> {
 
             setGone(2, false);
         }
-        setText(3, "₹ " + item.getPrice());
+        setText(3, UtilKt.formatPriceWithStrikethrough(item.getPrice(), item.getStrikeThroughPrice(), "₹ "));
         String categories = Arrays.toString(item.getCategories().toArray());
         setText(4, categories.substring(1, categories.length() - 1));
         if (item.getImages().size() > 0) {

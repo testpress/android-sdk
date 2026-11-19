@@ -1,5 +1,6 @@
 package `in`.testpress.store.data.model
 
+import com.google.gson.annotations.SerializedName
 import `in`.testpress.database.entities.PriceEntity
 import `in`.testpress.database.entities.ProductEntity
 
@@ -27,6 +28,7 @@ data class NetworkProduct(
     val livestreamCount: Int? = null,
     val price: String? = null,
     val prices: List<NetworkPrice>,
+    @SerializedName("strike_through_price")
     val strikeThroughPrice: String? = null,
     val institute: String? = null,
     val requiresShipping: Boolean? = null,

@@ -15,7 +15,9 @@ data class NetworkProductLite(
     val contentsCount: Int = 0,
     val chaptersCount: Int = 0,
     val order: Int?,
-    val price: String?
+    val price: String?,
+    @SerializedName("strike_through_price")
+    val strikeThroughPrice: String? = null
 )
 
 fun NetworkProductLite.asDomain(): ProductLiteEntity {
@@ -29,7 +31,8 @@ fun NetworkProductLite.asDomain(): ProductLiteEntity {
         this.contentsCount,
         this.chaptersCount,
         this.order ?: -1,
-        this.price ?: ""
+        this.price ?: "",
+        this.strikeThroughPrice
     )
 }
 

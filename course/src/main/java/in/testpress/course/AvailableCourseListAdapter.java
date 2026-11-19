@@ -20,6 +20,7 @@ import in.testpress.models.greendao.Product;
 import in.testpress.models.greendao.ProductDao;
 import in.testpress.store.TestpressStore;
 import in.testpress.store.ui.ProductDetailsActivity;
+import in.testpress.store.util.UtilKt;
 import in.testpress.util.ImageUtils;
 import in.testpress.util.SingleTypeAdapter;
 
@@ -74,7 +75,7 @@ public class AvailableCourseListAdapter extends SingleTypeAdapter<Product> {
 
         setGone(6,item.getCourseIds().size() == 0);
 
-        String price = String.format("₹%s", item.getCurrentPrice());
+        CharSequence price = UtilKt.formatPriceWithStrikethrough(item.getCurrentPrice(), item.getStrikeThroughPrice(), "₹");
         setText(3, price);
 
         ImageView imageView = view(4);
