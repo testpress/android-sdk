@@ -77,6 +77,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         public final static Property ExamId = new Property(47, Long.class, "examId", false, "EXAM_ID");
         public final static Property HasArtifacts = new Property(48, Boolean.class, "hasArtifacts", false, "HAS_ARTIFACTS");
         public final static Property ArtifactsUrl = new Property(49, String.class, "artifactsUrl", false, "ARTIFACTS_URL");
+        public final static Property Position = new Property(50, Integer.class, "position", false, "POSITION");
     }
 
     private DaoSession daoSession;
@@ -146,7 +147,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
                 "\"ATTACHMENT_ID\" INTEGER," + // 46: attachmentId
                 "\"EXAM_ID\" INTEGER," + // 47: examId
                 "\"HAS_ARTIFACTS\" INTEGER," + // 48: hasArtifacts
-                "\"ARTIFACTS_URL\" TEXT);"); // 49: artifactsUrl
+                "\"ARTIFACTS_URL\" TEXT," + // 49: artifactsUrl
+                "\"POSITION\" INTEGER);"); // 50: position
     }
 
     /** Drops the underlying database table. */
@@ -400,6 +402,11 @@ public class ContentDao extends AbstractDao<Content, Long> {
         if (artifactsUrl != null) {
             stmt.bindString(50, artifactsUrl);
         }
+
+        Integer position = entity.getPosition();
+        if (position != null) {
+            stmt.bindLong(51, position);
+        }
     }
 
     @Override
@@ -647,6 +654,11 @@ public class ContentDao extends AbstractDao<Content, Long> {
         if (artifactsUrl != null) {
             stmt.bindString(50, artifactsUrl);
         }
+
+        Integer position = entity.getPosition();
+        if (position != null) {
+            stmt.bindLong(51, position);
+        }
     }
 
     @Override
@@ -712,7 +724,8 @@ public class ContentDao extends AbstractDao<Content, Long> {
             cursor.isNull(offset + 46) ? null : cursor.getLong(offset + 46), // attachmentId
             cursor.isNull(offset + 47) ? null : cursor.getLong(offset + 47), // examId
             cursor.isNull(offset + 48) ? null : cursor.getShort(offset + 48) != 0, // hasArtifacts
-            cursor.isNull(offset + 49) ? null : cursor.getString(offset + 49) // artifactsUrl
+            cursor.isNull(offset + 49) ? null : cursor.getString(offset + 49), // artifactsUrl
+            cursor.isNull(offset + 50) ? null : cursor.getInt(offset + 50) // position
         );
         return entity;
     }
@@ -769,6 +782,7 @@ public class ContentDao extends AbstractDao<Content, Long> {
         entity.setExamId(cursor.isNull(offset + 47) ? null : cursor.getLong(offset + 47));
         entity.setHasArtifacts(cursor.isNull(offset + 48) ? null : cursor.getShort(offset + 48) != 0);
         entity.setArtifactsUrl(cursor.isNull(offset + 49) ? null : cursor.getString(offset + 49));
+        entity.setPosition(cursor.isNull(offset + 50) ? null : cursor.getInt(offset + 50));
      }
     
     @Override

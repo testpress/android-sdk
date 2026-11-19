@@ -92,7 +92,7 @@ open class ContentRepository(
                 ContentDao.Properties.ChapterId.eq(chapterId),
                 ContentDao.Properties.Active.eq(true)
             )
-            .orderAsc(ContentDao.Properties.Order)
+            .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC")
             .list()
         liveData.postValue(contents[position].asDomainContent())
         return liveData
@@ -104,7 +104,10 @@ open class ContentRepository(
             .where(
                 ContentDao.Properties.ChapterId.eq(chapterId),
                 ContentDao.Properties.Active.eq(true)
-            ).orderAsc(ContentDao.Properties.Order).list().asDomainContents()
+            )
+            .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC")
+            .list()
+            .asDomainContents()
         contentsLiveData.value = contents
         return contentsLiveData
     }

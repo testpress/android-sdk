@@ -94,9 +94,11 @@ class ContentBottomNavigationFragment : Fragment() {
         val contentsFromChapterObserver = Observer<List<DomainContent>> { contents ->
             val unLockedContents = contents.filter { content ->
                 content.isLocked == false && content.isScheduled == false
-            }.sortedBy {
-                it.order
-            }
+            }.sortedWith(compareBy<DomainContent> {
+                it.position ?: it.order ?: 0
+            }.thenBy {
+                it.id
+            })
             val position = unLockedContents.indexOf(content)
             initNextButton(position, unLockedContents)
             initPrevButton(position, unLockedContents)

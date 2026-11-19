@@ -71,7 +71,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 .where(
                         ContentDao.Properties.ChapterId.eq(chapterId)
                 )
-                .orderAsc(ContentDao.Properties.Order).listLazy().get(position);
+                .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC").listLazy().get(position);
     }
 
     @Override
