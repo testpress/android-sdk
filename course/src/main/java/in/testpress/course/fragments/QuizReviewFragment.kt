@@ -268,9 +268,10 @@ class QuizReviewFragment: Fragment() {
         }
 
         if (question.isShortAnswerType || question.isNumericalType) {
+            val userShortAnswer = android.text.TextUtils.htmlEncode(userSelectedAnswer.shortText ?: "")
             htmlContent += "<div style='display:box; display:-webkit-box; margin-bottom:10px;'>" +
                 WebViewUtils.getHeadingTags(getString(R.string.testpress_your_answer)) +
-                userSelectedAnswer.shortText +
+                userShortAnswer +
                 "</div>"
         }
 

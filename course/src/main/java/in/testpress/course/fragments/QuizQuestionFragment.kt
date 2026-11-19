@@ -14,6 +14,7 @@ import `in`.testpress.exam.domain.getSafeAnswerAt
 import `in`.testpress.exam.models.AudiencePollResponse
 import `in`.testpress.exam.ui.view.WebView
 import `in`.testpress.exam.util.GraphAxisLabelFormatter
+import `in`.testpress.exam.util.NumericalInputValidator
 import `in`.testpress.models.InstituteSettings
 import `in`.testpress.util.UIUtils
 import `in`.testpress.util.WebViewUtils
@@ -46,6 +47,8 @@ class QuizQuestionFragment : Fragment() {
     private lateinit var webViewUtils: WebViewUtils
     lateinit var viewModel: QuizViewModel
     private lateinit var userSelectedAnswer: DomainUserSelectedAnswer
+    private var enteredShortText: String? = null
+    private var isNumericalQuestion: Boolean = false
     var quizOperationsCallback: QuizOperationsCallback? = null
     private lateinit var instituteSettings: InstituteSettings
 
@@ -98,6 +101,7 @@ class QuizQuestionFragment : Fragment() {
                     val answer = it.data.getSafeAnswerAt(position)
                     if (answer != null) {
                         userSelectedAnswer = answer
+                        enteredShortText = answer.shortText
                         initWebview()
                     } else {
                         val message = "No answer found at position $position for attemptId $attemptId"
@@ -118,7 +122,28 @@ class QuizQuestionFragment : Fragment() {
     }
 
     fun submitAnswer() {
-        viewModel.submitAnswer(userSelectedAnswer.id!!)
+        if (isNumericalQuestion) {
+            val text = enteredShortText?.trim()
+            if (!text.isNullOrBlank() && !NumericalInputValidator.isValidNumericalInput(text)) {
+                showInvalidValueDialog()
+                return
+            }
+        }
+        userSelectedAnswer.id?.let { id ->
+            viewModel.submitAnswer(id)
+        }
+    }
+
+    private fun showInvalidValueDialog() {
+        activity?.runOnUiThread {
+            context?.let {
+                AlertDialog.Builder(it, R.style.TestpressAppCompatAlertDialogStyle)
+                    .setTitle(R.string.testpress_invalid_answer)
+                    .setMessage(R.string.testpress_invalid_numerical_input)
+                    .setPositiveButton(R.string.testpress_ok, null)
+                    .show()
+            }
+        }
     }
 
     private fun initWebview() {
@@ -164,6 +189,7 @@ class QuizQuestionFragment : Fragment() {
             htmlContent += "</table>"
         } else {
             val numberType = question.type == "N"
+            isNumericalQuestion = numberType
             questionsView.setNumberType(numberType)
             val textValue = android.text.TextUtils.htmlEncode(userSelectedAnswer.shortText ?: "")
             htmlContent += "<input class='edit_box' type='text' onpaste='return false' " +
@@ -400,6 +426,12 @@ class QuizQuestionFragment : Fragment() {
 
         @JavascriptInterface
         fun onTextValueChange(value: String) {
+            enteredShortText = value
+            val trimmed = value.trim()
+            // For numerical questions reject invalid input at input-time — never write it to DB.
+            if (isNumericalQuestion && trimmed.isNotBlank() && !NumericalInputValidator.isValidNumericalInput(trimmed)) {
+                return
+            }
             userSelectedAnswer.id?.let {
                 viewModel.setShortText(it, value)
             }
