@@ -426,14 +426,12 @@ class QuizQuestionFragment : Fragment() {
 
         @JavascriptInterface
         fun onTextValueChange(value: String) {
+            enteredShortText = value
             val trimmed = value.trim()
             // For numerical questions reject invalid input at input-time — never write it to DB.
             if (isNumericalQuestion && trimmed.isNotBlank() && !NumericalInputValidator.isValidNumericalInput(trimmed)) {
-                // Update in-memory tracker so submitAnswer can re-check, but do NOT persist to DB.
-                enteredShortText = value
                 return
             }
-            enteredShortText = value
             userSelectedAnswer.id?.let {
                 viewModel.setShortText(it, value)
             }
