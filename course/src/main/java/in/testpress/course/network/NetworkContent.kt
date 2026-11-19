@@ -139,7 +139,7 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
     return contentEntity
 }
 
-fun NetworkContent.asGreenDaoModel(): Content {
+fun NetworkContent.asGreenDaoModel(position: Int? = null): Content {
     return Content(
         this.order,
         this.htmlContentTitle,
@@ -190,7 +190,8 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.attachmentId,
         this.examId,
         this.hasArtifacts,
-        this.artifactsUrl
+        this.artifactsUrl,
+        position
     )
 }
 

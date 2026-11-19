@@ -7,6 +7,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.network.Resource
+import `in`.testpress.database.ContentSort
 import `in`.testpress.models.greendao.Chapter
 import `in`.testpress.models.greendao.ChapterDao
 import `in`.testpress.models.greendao.Content
@@ -23,18 +24,17 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     val courseNetwork = CourseNetwork(context)
     var page = 1
     val chapter: Chapter
+    private var currentPosition = 0
+    private var isLoading = false
 
     var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
     val resourceContents: LiveData<Resource<List<DomainContent>>>
         get() = _resourceContents
 
     init {
-        val contents = contentDao.queryBuilder()
-            .where(ContentDao.Properties.ChapterId.eq(chapterId))
-            .list()
+        val contents = getAll()
         if (contents.isNotEmpty()) {
-             val sortedContents = sortContentsByOrder(contents)
-            _resourceContents.postValue(Resource.success(sortedContents.asDomainContents()))
+            _resourceContents.postValue(Resource.success(contents.asDomainContents()))
         } else {
             _resourceContents.value = Resource.loading(null)
         }
@@ -42,17 +42,23 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     }
 
     fun loadItems(page: Int = 1) {
+        if (isLoading) return
+        isLoading = true
         val url = chapter.chapterContentsUrl
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseNetwork.getContents(url, queryParams)
             .enqueue(object : TestpressCallback<ApiResponse<ContentsListResponse>>(){
                 override fun onSuccess(result: ApiResponse<ContentsListResponse>) {
+                    isLoading = false
                     handleFetchSuccess(result)
                 }
 
                 override fun onException(exception: TestpressException?) {
+                    isLoading = false
+                    this@ContentsRepository.page = 1
+                    currentPosition = 0
                     val contents = getAll()
-                    if (contents?.isNotEmpty() == true) {
+                    if (contents.isNotEmpty()) {
                         _resourceContents.postValue(Resource.error(exception!!, contents.asDomainContents()))
                     } else {
                         _resourceContents.postValue(Resource.error(exception!!, null))
@@ -62,23 +68,29 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     }
 
     private fun handleFetchSuccess(response: ApiResponse<ContentsListResponse>) {
-        if (page == 1) {
+        if (this.page == 1) {
             // Delete all contents of chapter once first page is fetched
             deleteExistingContents()
+            currentPosition = 0
         }
 
+        assignPositions(response.results.contents)
         storeContent(response.results)
-        val contents = contentDao.queryBuilder()
-                .where(ContentDao.Properties.ChapterId.eq(chapterId))
-                .list()
-        val sortedContents = sortContentsByOrder(contents)
-        _resourceContents.postValue(Resource.success(sortedContents.asDomainContents()))
+        val contents = getAll()
+        _resourceContents.postValue(Resource.success(contents.asDomainContents()))
 
         if (response.next != null) {
-            page += 1
-            loadItems(page)
+            this.page += 1
+            loadItems(this.page)
         } else {
-            page = 1
+            this.page = 1
+            currentPosition = 0
+        }
+    }
+
+    private fun assignPositions(contents: List<Content>) {
+        for (content in contents) {
+            content.position = currentPosition++
         }
     }
 
@@ -89,10 +101,10 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
             .executeDeleteWithoutDetachingEntities()
     }
 
-    private fun getAll(): MutableList<Content>? {
+    fun getAll(): List<Content> {
         return contentDao.queryBuilder()
             .where(ContentDao.Properties.ChapterId.eq(chapterId))
-            .orderAsc(ContentDao.Properties.Order)
+            .orderRaw(ContentSort.GREENDAO_ORDER_BY)
             .list()
     }
 
@@ -122,11 +134,5 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         contentDao.insertOrReplaceInTx(response.contents)
 
         return response.contents.asDomainContents()
-    }
-
-    private fun sortContentsByOrder(contents: List<Content>): List<Content> {
-        return contents.sortedWith(compareBy {
-            it.order
-        })
     }
 }

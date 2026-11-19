@@ -94,13 +94,13 @@ class ContentBottomNavigationFragment : Fragment() {
         val contentsFromChapterObserver = Observer<List<DomainContent>> { contents ->
             val unLockedContents = contents.filter { content ->
                 content.isLocked == false && content.isScheduled == false
-            }.sortedBy {
-                it.order
-            }
-            val position = unLockedContents.indexOf(content)
+            }.sortedWith(
+                compareBy<DomainContent>({ it.position == null }, { it.position }, { it.order }, { it.id })
+            )
+            val position = unLockedContents.indexOfFirst { it.id == content.id }
             initNextButton(position, unLockedContents)
             initPrevButton(position, unLockedContents)
-            pageNumber.text = String.format("%d/%d", contents.indexOf(content) + 1, contents.size)
+            pageNumber.text = String.format("%d/%d", contents.indexOfFirst { it.id == content.id } + 1, contents.size)
         }
 
         viewModel.getContent(contentId).observe(viewLifecycleOwner, Observer { resource ->

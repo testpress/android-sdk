@@ -78,6 +78,7 @@ data class DomainContent(
     val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
     val hasArtifacts: Boolean? = null,
     val artifactsUrl: String? = null,
+    val position: Int? = null,
 ) {
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
@@ -243,7 +244,8 @@ fun createDomainContent(contentEntity: ContentEntity): DomainContent {
         enableTranscript = contentEntity.enableTranscript,
         videoSubtitle = contentEntity.toDomainVideoSubtitle(),
         hasArtifacts = contentEntity.hasArtifacts,
-        artifactsUrl = contentEntity.artifactsUrl
+        artifactsUrl = contentEntity.artifactsUrl,
+        position = contentEntity.position
     )
 }
 
@@ -304,7 +306,8 @@ fun createDomainContent(content: Content): DomainContent {
         enableTranscript = content.enableTranscript,
         videoSubtitle = content.toDomainVideoSubtitle(),
         hasArtifacts = content.hasArtifacts,
-        artifactsUrl = content.artifactsUrl
+        artifactsUrl = content.artifactsUrl,
+        position = content.position
     )
 }
 

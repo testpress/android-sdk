@@ -15,5 +15,6 @@ class HtmlContentRepository(context: Context) : ContentRepository(context) {
             greenDaoContent.htmlId = htmlContent.id
             htmlContentDao.insertOrReplace(htmlContent)
         }
+        insertOrUpdateWithPositionPreserved(greenDaoContent)
     }
 }
