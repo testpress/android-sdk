@@ -1,8 +1,11 @@
 package `in`.testpress.course.repository
 
+import `in`.testpress.course.R
 import `in`.testpress.core.TestpressCallback
 import `in`.testpress.core.TestpressException
 import `in`.testpress.core.TestpressSDKDatabase
+import `in`.testpress.exam.exception.InvalidNumericalValueException
+import `in`.testpress.exam.util.NumericalInputValidator
 import `in`.testpress.network.Resource
 import `in`.testpress.exam.domain.DomainQuestion
 import `in`.testpress.exam.domain.DomainUserSelectedAnswer
@@ -300,6 +303,17 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
                     postAnswerNotFoundError()
                     return@execute
                 }
+                val questionType = userSelectedAnswer.question?.type ?: userSelectedAnswer.asDomainModel().question?.type
+                if (questionType == "N") {
+                    val rawAnswer = userSelectedAnswer.shortText?.trim()
+                    if (!rawAnswer.isNullOrBlank() && !NumericalInputValidator.isValidNumericalInput(rawAnswer)) {
+                        val errorMessage = context.getString(R.string.testpress_invalid_numerical_input)
+                        val exception = TestpressException.unexpectedError(InvalidNumericalValueException(errorMessage))
+                        exception.setStatusCode(InvalidNumericalValueException.VALIDATION_ERROR_CODE)
+                        answerResource.postValue(Resource.error(exception, null))
+                        return@execute
+                    }
+                }
                 val answer = buildAnswerRequest(userSelectedAnswer)
                 val url = buildAnswerUrl(userSelectedAnswer.attemptId, userSelectedAnswer.examQuestionId)
 
@@ -323,7 +337,7 @@ class QuizQuestionsRepository(context: Context): QuizExamRepository(context) {
     private fun buildAnswerRequest(userSelectedAnswer: UserSelectedAnswer): HashMap<String, Any> {
         val answer = HashMap<String, Any>()
         answer["selected_answers"] = userSelectedAnswer.selectedAnswers ?: listOf<Integer>()
-        userSelectedAnswer.shortText?.let {
+        userSelectedAnswer.shortText?.trim()?.ifEmpty { null }?.let {
             answer["short_text"] = it
         }
         return answer
