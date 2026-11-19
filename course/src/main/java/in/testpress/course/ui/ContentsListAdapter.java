@@ -20,6 +20,7 @@ import java.util.List;
 import in.testpress.core.TestpressSDKDatabase;
 import in.testpress.core.TestpressSdk;
 import in.testpress.course.R;
+import in.testpress.database.ContentSort;
 import in.testpress.models.greendao.Chapter;
 import in.testpress.models.greendao.ChapterDao;
 import in.testpress.models.greendao.Content;
@@ -71,7 +72,7 @@ class ContentsListAdapter extends SingleTypeAdapter<Content> {
                 .where(
                         ContentDao.Properties.ChapterId.eq(chapterId)
                 )
-                .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC").listLazy().get(position);
+                .orderRaw(ContentSort.GREENDAO_ORDER_BY).listLazy().get(position);
     }
 
     @Override

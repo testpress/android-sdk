@@ -15,6 +15,6 @@ class VideoContentRepository(context: Context) : ContentRepository(context) {
             greenDaoContent.videoId = video.id
             videoDao.insertOrReplace(it.asGreenDaoModel())
         }
-        contentDao.insertOrReplace(greenDaoContent)
+        insertOrUpdateWithPositionPreserved(greenDaoContent)
     }
 }

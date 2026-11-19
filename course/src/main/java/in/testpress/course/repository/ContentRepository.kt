@@ -17,6 +17,7 @@ import `in`.testpress.course.network.NetworkVideoQuestionResponse
 import `in`.testpress.network.Resource
 import `in`.testpress.course.network.asDatabaseModel
 import `in`.testpress.course.network.asGreenDaoModel
+import `in`.testpress.database.ContentSort
 import `in`.testpress.database.TestpressDatabase
 import `in`.testpress.database.entities.VideoQuestion
 import `in`.testpress.database.entities.VideoAnswer
@@ -92,7 +93,7 @@ open class ContentRepository(
                 ContentDao.Properties.ChapterId.eq(chapterId),
                 ContentDao.Properties.Active.eq(true)
             )
-            .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC")
+            .orderRaw(ContentSort.GREENDAO_ORDER_BY)
             .list()
         liveData.postValue(contents[position].asDomainContent())
         return liveData
@@ -105,7 +106,7 @@ open class ContentRepository(
                 ContentDao.Properties.ChapterId.eq(chapterId),
                 ContentDao.Properties.Active.eq(true)
             )
-            .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC")
+            .orderRaw(ContentSort.GREENDAO_ORDER_BY)
             .list()
             .asDomainContents()
         contentsLiveData.value = contents
@@ -357,7 +358,19 @@ open class ContentRepository(
             greenDaoContent.liveStreamId = liveStream.id
             liveStreamDao.insertOrReplace(it.asGreenDaoModel())
         }
-        contentDao.insertOrReplace(greenDaoContent)
+        insertOrUpdateWithPositionPreserved(greenDaoContent)
+    }
+
+    fun insertOrUpdateWithPositionPreserved(content: Content) {
+        if (content.position == null && content.id != null) {
+            val existing = contentDao.queryBuilder()
+                .where(ContentDao.Properties.Id.eq(content.id))
+                .list()
+            if (existing.isNotEmpty() && existing[0].position != null) {
+                content.position = existing[0].position
+            }
+        }
+        contentDao.insertOrReplace(content)
     }
 }
 

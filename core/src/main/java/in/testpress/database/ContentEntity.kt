@@ -42,6 +42,5 @@ data class ContentEntity(
     var videoSubtitleLanguage: String? = null,
     var videoSubtitleJobStatus: String? = null,
     var hasArtifacts: Boolean? = null,
-    var artifactsUrl: String? = null,
-    var position: Int? = null
+    var artifactsUrl: String? = null
 ): BaseContentEntity()

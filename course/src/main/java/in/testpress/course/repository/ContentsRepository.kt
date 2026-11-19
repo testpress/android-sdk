@@ -7,6 +7,7 @@ import `in`.testpress.course.domain.DomainContent
 import `in`.testpress.course.domain.asDomainContents
 import `in`.testpress.course.network.CourseNetwork
 import `in`.testpress.network.Resource
+import `in`.testpress.database.ContentSort
 import `in`.testpress.models.greendao.Chapter
 import `in`.testpress.models.greendao.ChapterDao
 import `in`.testpress.models.greendao.Content
@@ -24,6 +25,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     var page = 1
     val chapter: Chapter
     private var currentPosition = 0
+    private var isLoading = false
 
     var _resourceContents: MutableLiveData<Resource<List<DomainContent>>> = MutableLiveData()
     val resourceContents: LiveData<Resource<List<DomainContent>>>
@@ -40,15 +42,19 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     }
 
     fun loadItems(page: Int = 1) {
+        if (isLoading) return
+        isLoading = true
         val url = chapter.chapterContentsUrl
         val queryParams = hashMapOf<String, Any>("page" to page)
         courseNetwork.getContents(url, queryParams)
             .enqueue(object : TestpressCallback<ApiResponse<ContentsListResponse>>(){
                 override fun onSuccess(result: ApiResponse<ContentsListResponse>) {
+                    isLoading = false
                     handleFetchSuccess(result)
                 }
 
                 override fun onException(exception: TestpressException?) {
+                    isLoading = false
                     this@ContentsRepository.page = 1
                     currentPosition = 0
                     val contents = getAll()
@@ -98,7 +104,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
     fun getAll(): List<Content> {
         return contentDao.queryBuilder()
             .where(ContentDao.Properties.ChapterId.eq(chapterId))
-            .orderRaw("CASE WHEN T.'POSITION' IS NOT NULL THEN T.'POSITION' ELSE T.'ORDER' END ASC")
+            .orderRaw(ContentSort.GREENDAO_ORDER_BY)
             .list()
     }
 

@@ -13,6 +13,6 @@ interface ContentDao: BaseDao<ContentEntity> {
     @Query("SELECT * from contententity where id = :id LIMIT 1")
     fun findById(id: Long): LiveData<ContentEntity>
 
-    @Query("SELECT * from contententity where chapterId = :chapterId and active = 1 ORDER BY CASE WHEN position IS NOT NULL THEN position ELSE `order` END ASC")
+    @Query("SELECT * from contententity where chapterId = :chapterId and active = 1")
     fun getChapterContents(chapterId: Long): LiveData<List<ContentEntity>>
 }
