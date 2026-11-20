@@ -47,6 +47,8 @@ public class Product {
     private String category;
 
     // KEEP FIELDS - put your custom fields here
+    @SerializedName("strike_through_price")
+    private String strikeThroughPrice;
     // KEEP FIELDS END
 
     @Generated
@@ -197,6 +199,14 @@ public class Product {
     }
 
     // KEEP METHODS - put your custom methods here
+
+    public String getStrikeThroughPrice() {
+        return strikeThroughPrice;
+    }
+
+    public void setStrikeThroughPrice(String strikeThroughPrice) {
+        this.strikeThroughPrice = strikeThroughPrice;
+    }
 
     public static QueryBuilder<Product> getQueryBuilder(Context context) {
         ProductDao bookmarkDao = TestpressSDKDatabase.getProductDao(context);
