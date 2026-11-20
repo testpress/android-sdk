@@ -12,6 +12,7 @@ import `in`.testpress.database.entities.ProductCategoryEntity
 import `in`.testpress.database.entities.ProductLiteEntity
 import `in`.testpress.store.databinding.ListViewFooterLoadingBinding
 import `in`.testpress.store.databinding.TestpressProductListItemBinding
+import `in`.testpress.store.util.formatPriceWithStrikethrough
 import `in`.testpress.util.ImageUtils
 
 class ProductListAdapter(
@@ -81,7 +82,7 @@ class ProductListAdapter(
 
         fun bind(product: ProductLiteEntity, onItemClick: (ProductLiteEntity) -> Unit) {
             binding.title.text = product.title
-            binding.price.text = "₹ ${product.price}"
+            binding.price.text = formatPriceWithStrikethrough(product.price, product.strikeThroughPrice, "₹ ")
 
             binding.totalChapters.apply {
                 isVisible = product.chaptersCount > 0

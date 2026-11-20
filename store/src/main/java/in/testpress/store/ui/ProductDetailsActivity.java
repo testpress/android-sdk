@@ -299,7 +299,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         }
 
         // Price
-        priceText.setText(product.getPrice());
+        priceText.setText(UtilKt.formatPriceWithStrikethrough(product.getPrice(), product.getStrikeThroughPrice(), ""));
         if (appliedDiscountNameText != null) {
             appliedDiscountNameText.setVisibility(View.GONE);
         }
@@ -598,22 +598,10 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void renderDiscountedPrice(String finalPrice, String originalPrice) {
         TextView priceText = findViewById(R.id.price);
-        if (originalPrice.isEmpty()) {
-            priceText.setText(finalPrice);
-            return;
-        }
-
-        SpannableString originalPriceStrikethrough = new SpannableString(originalPrice);
-        originalPriceStrikethrough.setSpan(
-                new StrikethroughSpan(),
-                0,
-                originalPrice.length(),
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        );
-
-        SpannableStringBuilder finalText = new SpannableStringBuilder();
-        finalText.append(finalPrice).append("  ").append(originalPriceStrikethrough);
-        priceText.setText(finalText);
+        String strikethroughPrice = (product != null && UtilKt.shouldDisplayStrikeThroughPrice(finalPrice, product.getStrikeThroughPrice()))
+                ? product.getStrikeThroughPrice()
+                : originalPrice;
+        priceText.setText(UtilKt.formatPriceWithStrikethrough(finalPrice, strikethroughPrice, ""));
     }
 
     private void renderAppliedOfferName(String offerName) {
@@ -761,7 +749,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void handleCouponApplicationFailure(TestpressException exception) {
         TextView priceText = findViewById(R.id.price);
-        priceText.setText(product.getPrice());
+        priceText.setText(UtilKt.formatPriceWithStrikethrough(product.getPrice(), product.getStrikeThroughPrice(), ""));
         order = null;
 
         if (exception.isNetworkError()) {
