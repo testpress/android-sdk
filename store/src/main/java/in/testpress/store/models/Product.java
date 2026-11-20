@@ -3,6 +3,8 @@ package in.testpress.store.models;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,8 @@ public class Product implements Parcelable {
     private Integer examsCount;
     private Integer notesCount;
     private String price;
+    @SerializedName("strike_through_price")
+    private String strikeThroughPrice;
     private List<Images> images = new ArrayList<>();
     private String buyNowText;
     private String description;
@@ -47,6 +51,7 @@ public class Product implements Parcelable {
         startDate  = parcel.readString();
         endDate    = parcel.readString();
         price      = parcel.readString();
+        strikeThroughPrice = parcel.readString();
         parcel.readStringList(categories);
         parcel.readStringList(types);
         parcel.readTypedList(images, Images.CREATOR);
@@ -78,6 +83,7 @@ public class Product implements Parcelable {
         parcel.writeString(startDate);
         parcel.writeString(endDate);
         parcel.writeString(price);
+        parcel.writeString(strikeThroughPrice);
         parcel.writeStringList(categories);
         parcel.writeStringList(types);
         parcel.writeTypedList(images);
@@ -318,6 +324,14 @@ public class Product implements Parcelable {
      */
     public void setPrice(String price) {
         this.price = price;
+    }
+
+    public String getStrikeThroughPrice() {
+        return strikeThroughPrice;
+    }
+
+    public void setStrikeThroughPrice(String strikeThroughPrice) {
+        this.strikeThroughPrice = strikeThroughPrice;
     }
 
     public List<Images> getImages() { return images; }

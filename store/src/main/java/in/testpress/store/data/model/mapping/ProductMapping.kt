@@ -21,6 +21,7 @@ fun ProductWithPrices.asProduct(): Product {
     product.examsCount = this.product.examsCount
     product.notesCount = this.product.htmlCount
     product.price = this.product.price
+    product.strikeThroughPrice = this.product.strikeThroughPrice
     product.images = this.product.images?.map { it.asDomainImage() }
     product.buyNowText = this.product.buyNowText
     product.purchaseState = this.product.purchaseState

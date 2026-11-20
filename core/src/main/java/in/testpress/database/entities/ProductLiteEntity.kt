@@ -15,5 +15,6 @@ data class ProductLiteEntity(
     val contentsCount: Int = 0,
     val chaptersCount: Int = 0,
     val order: Int,
-    val price: String
+    val price: String,
+    val strikeThroughPrice: String? = null
 )
