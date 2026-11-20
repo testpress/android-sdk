@@ -17,8 +17,8 @@ fun shouldDisplayStrikeThroughPrice(price: String?, strikeThroughPrice: String?)
         return false
     }
     return try {
-        val cleanPrice = price.replace("₹", "").replace(",", "").trim().toDouble()
-        val cleanStrikePrice = strikeThroughPrice.replace("₹", "").replace(",", "").trim().toDouble()
+        val cleanPrice = price.replace(Regex("[^0-9.]"), "").toDouble()
+        val cleanStrikePrice = strikeThroughPrice.replace(Regex("[^0-9.]"), "").toDouble()
         cleanStrikePrice > 0 && cleanStrikePrice > cleanPrice
     } catch (e: NumberFormatException) {
         false
