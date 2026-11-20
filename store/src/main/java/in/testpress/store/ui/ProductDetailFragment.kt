@@ -176,10 +176,9 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun renderDiscountedPrice(finalPrice: String, originalPrice: String) {
-        val strikethroughPrice = domainProduct?.product?.strikeThroughPrice?.takeIf {
-            shouldDisplayStrikeThroughPrice(finalPrice, it)
-        } ?: originalPrice
-        binding.detailLayout.price.text = formatPriceWithStrikethrough(finalPrice, strikethroughPrice, "")
+        val strike = originalPrice.takeIf { shouldDisplayStrikeThroughPrice(finalPrice, it) }
+            ?: domainProduct?.product?.strikeThroughPrice
+        binding.detailLayout.price.text = formatPriceWithStrikethrough(finalPrice, strike, "")
     }
 
     private fun renderAppliedOfferName(offerName: String) {

@@ -598,9 +598,9 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
 
     private void renderDiscountedPrice(String finalPrice, String originalPrice) {
         TextView priceText = findViewById(R.id.price);
-        String strikethroughPrice = (product != null && UtilKt.shouldDisplayStrikeThroughPrice(finalPrice, product.getStrikeThroughPrice()))
-                ? product.getStrikeThroughPrice()
-                : originalPrice;
+        String strikethroughPrice = UtilKt.shouldDisplayStrikeThroughPrice(finalPrice, originalPrice)
+                ? originalPrice
+                : (product != null ? product.getStrikeThroughPrice() : null);
         priceText.setText(UtilKt.formatPriceWithStrikethrough(finalPrice, strikethroughPrice, ""));
     }
 
