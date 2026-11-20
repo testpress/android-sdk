@@ -5,9 +5,8 @@ import android.content.Intent
 import android.graphics.Color
 import android.net.Uri
 import android.os.Bundle
-import android.text.*
+import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.text.style.StrikethroughSpan
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -36,6 +35,8 @@ import `in`.testpress.store.databinding.TestpressProductDetailsFragmentBinding
 import `in`.testpress.store.models.Order
 import `in`.testpress.store.models.PurchaseState
 import `in`.testpress.store.ui.viewmodel.ProductViewModel
+import `in`.testpress.store.util.formatPriceWithStrikethrough
+import `in`.testpress.store.util.shouldDisplayStrikeThroughPrice
 import `in`.testpress.store.util.generateRandom10CharString
 import `in`.testpress.util.DateUtils
 import `in`.testpress.util.StringUtils
@@ -169,32 +170,14 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     }
 
     private fun showOriginalPrice(originalPrice: String) {
-        binding.detailLayout.price.text = originalPrice
+        val strikeThroughPrice = domainProduct?.product?.strikeThroughPrice
+        binding.detailLayout.price.text = formatPriceWithStrikethrough(originalPrice, strikeThroughPrice, "")
     }
 
     private fun renderDiscountedPrice(finalPrice: String, originalPrice: String) {
-        if (originalPrice.isEmpty()) {
-            binding.detailLayout.price.text = finalPrice
-            return
-        }
-
-        val originalPriceStrikethrough = buildStrikethrough(originalPrice)
-        val finalText = SpannableStringBuilder()
-            .append(finalPrice)
-            .append("  ")
-            .append(originalPriceStrikethrough)
-        binding.detailLayout.price.text = finalText
-    }
-
-    private fun buildStrikethrough(text: String): SpannableString {
-        return SpannableString(text).apply {
-            setSpan(
-                StrikethroughSpan(),
-                0,
-                text.length,
-                Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-            )
-        }
+        val strike = originalPrice.takeIf { shouldDisplayStrikeThroughPrice(finalPrice, it) }
+            ?: domainProduct?.product?.strikeThroughPrice
+        binding.detailLayout.price.text = formatPriceWithStrikethrough(finalPrice, strike, "")
     }
 
     private fun renderAppliedOfferName(offerName: String) {
@@ -242,7 +225,7 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
 
                 detailLayout.apply {
                     title.text = product.title
-                    price.text = product.price
+                    price.text = formatPriceWithStrikethrough(product.price, product.strikeThroughPrice, "")
                     totalExamsContainer.isVisible = false
                     totalNotesContainer.isVisible = false
                     examsListContainer.isVisible = false
@@ -453,20 +436,12 @@ class ProductDetailFragment : Fragment(), EmptyViewListener {
     private fun updatePriceDisplay() {
         val newPrice = order?.orderItems?.firstOrNull()?.price ?: return
         val oldPrice: String = domainProduct?.product?.price ?: ""
-        val oldPriceStrikethrough = SpannableString(oldPrice)
-        oldPriceStrikethrough.setSpan(
-            StrikethroughSpan(),
-            0,
-            oldPrice.length,
-            Spannable.SPAN_EXCLUSIVE_EXCLUSIVE
-        )
-        val finalText = SpannableStringBuilder()
-        finalText.append(newPrice).append("  ").append(oldPriceStrikethrough)
-        binding.detailLayout.price.text = finalText
+        binding.detailLayout.price.text = formatPriceWithStrikethrough(newPrice, oldPrice, "")
     }
 
     private fun handleCouponApplicationFailure(exception: TestpressException?) {
-        binding.detailLayout.price.text = domainProduct?.product?.price
+        val product = domainProduct?.product
+        binding.detailLayout.price.text = formatPriceWithStrikethrough(product?.price, product?.strikeThroughPrice, "")
         if (exception?.isNetworkError == true) {
             showToast("Please check your internet connection")
         } else {
