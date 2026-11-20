@@ -8,14 +8,10 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.text.Editable;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.TextWatcher;
 import android.text.TextUtils;
 import android.text.method.LinkMovementMethod;
-import android.text.style.StrikethroughSpan;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
@@ -737,14 +733,7 @@ public class ProductDetailsActivity extends BaseToolBarActivity {
         }
         String newPrice = createdOrder.getOrderItems().get(0).getPrice();
         String oldPrice = product.getPrice();
-
-        SpannableString oldPriceStrikethrough = new SpannableString(oldPrice);
-        oldPriceStrikethrough.setSpan(new StrikethroughSpan(), 0, oldPrice.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
-
-        SpannableStringBuilder finalText = new SpannableStringBuilder();
-        finalText.append(newPrice).append("  ").append(oldPriceStrikethrough);
-
-        priceText.setText(finalText);
+        priceText.setText(UtilKt.formatPriceWithStrikethrough(newPrice, oldPrice, ""));
     }
 
     private void handleCouponApplicationFailure(TestpressException exception) {
