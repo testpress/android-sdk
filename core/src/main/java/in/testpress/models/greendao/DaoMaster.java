@@ -201,9 +201,13 @@ public class DaoMaster extends AbstractDaoMaster {
 
         @Override
         public void onUpgrade(Database db, int oldVersion, int newVersion) {
-            Log.i("greenDAO", "Upgrading schema from version " + oldVersion + " to " + newVersion + " by dropping all tables");
-            dropAllTables(db, true);
-            onCreate(db);
+            if (oldVersion == 87 && newVersion == 88) {
+                db.execSQL("ALTER TABLE CONTENT ADD COLUMN POSITION INTEGER");
+            } else {
+                Log.i("greenDAO", "Upgrading schema from version " + oldVersion + " to " + newVersion + " by dropping all tables");
+                dropAllTables(db, true);
+                onCreate(db);
+            }
         }
     }
 
