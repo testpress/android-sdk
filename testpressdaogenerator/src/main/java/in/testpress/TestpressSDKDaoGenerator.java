@@ -403,7 +403,6 @@ public class TestpressSDKDaoGenerator {
         content.addStringProperty("videoSubtitleUrl");
         content.addStringProperty("videoSubtitleLanguage");
         content.addStringProperty("videoSubtitleJobStatus");
-        content.addIntProperty("position");
         content.implementsInterface("android.os.Parcelable");
         return content;
     }
