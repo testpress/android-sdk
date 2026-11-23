@@ -54,11 +54,13 @@ public class TestpressSDKDatabase {
 
         @Override
         public void onUpgrade(Database db, int oldVersion, int newVersion) {
-            if (oldVersion == 87 && newVersion == 88) {
-                db.execSQL("ALTER TABLE CONTENT ADD COLUMN POSITION INTEGER");
-            } else {
+            if (oldVersion < 87) {
                 DaoMaster.dropAllTables(db, true);
                 onCreate(db);
+                return;
+            }
+            if (oldVersion < 88) {
+                db.execSQL("ALTER TABLE CONTENT ADD COLUMN POSITION INTEGER");
             }
         }
     }
