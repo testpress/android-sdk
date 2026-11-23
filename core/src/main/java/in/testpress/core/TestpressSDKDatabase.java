@@ -47,9 +47,25 @@ public class TestpressSDKDatabase {
     private static DaoSession daoSession;
     private static Database database;
 
+    public static class OpenHelper extends DaoMaster.OpenHelper {
+        public OpenHelper(Context context, String name) {
+            super(context, name);
+        }
+
+        @Override
+        public void onUpgrade(Database db, int oldVersion, int newVersion) {
+            if (oldVersion == 87 && newVersion == 88) {
+                db.execSQL("ALTER TABLE CONTENT ADD COLUMN POSITION INTEGER");
+            } else {
+                DaoMaster.dropAllTables(db, true);
+                onCreate(db);
+            }
+        }
+    }
+
     public static Database getDatabase(@NonNull Context context) {
         if (database == null) {
-            DaoMaster.DevOpenHelper helper = new DaoMaster.DevOpenHelper(
+            OpenHelper helper = new OpenHelper(
                     context.getApplicationContext(), TestpressSdk.TESTPRESS_SDK_DATABASE);
 
             database = helper.getWritableDb();
