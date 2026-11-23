@@ -78,7 +78,12 @@ data class DomainContent(
     val type: Int = CourseContentType.RUNNING_CONTENT.ordinal,
     val hasArtifacts: Boolean? = null,
     val artifactsUrl: String? = null,
+    val position: Int? = null,
 ) {
+    companion object {
+        val comparator: Comparator<DomainContent> =
+            compareBy({ it.position == null }, { it.position }, { it.order }, { it.id })
+    }
     val contentTypeEnum: ContentType
         get() = contentType?.asEnumOrDefault(ContentType.Unknown)!!
 
@@ -304,7 +309,8 @@ fun createDomainContent(content: Content): DomainContent {
         enableTranscript = content.enableTranscript,
         videoSubtitle = content.toDomainVideoSubtitle(),
         hasArtifacts = content.hasArtifacts,
-        artifactsUrl = content.artifactsUrl
+        artifactsUrl = content.artifactsUrl,
+        position = content.position
     )
 }
 

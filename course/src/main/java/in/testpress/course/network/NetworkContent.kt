@@ -84,7 +84,7 @@ data class NetworkVideoSubtitle(
     val jobStatus: String? = null,
 )
 
-fun NetworkContent.asDatabaseModel(): ContentEntity {
+fun NetworkContent.asDatabaseModel(position: Int? = null): ContentEntity {
     val contentEntity = ContentEntity(
         id = this.id,
         description = this.description,
@@ -122,7 +122,8 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
         videoSubtitleLanguage = this.videoSubtitle?.language,
         videoSubtitleJobStatus = this.videoSubtitle?.jobStatus,
         hasArtifacts = this.hasArtifacts,
-        artifactsUrl = this.artifactsUrl
+        artifactsUrl = this.artifactsUrl,
+        position = position
     )
     contentEntity.title = this.title
     contentEntity.order = this.order
@@ -139,7 +140,7 @@ fun NetworkContent.asDatabaseModel(): ContentEntity {
     return contentEntity
 }
 
-fun NetworkContent.asGreenDaoModel(): Content {
+fun NetworkContent.asGreenDaoModel(position: Int? = null): Content {
     return Content(
         this.order,
         this.htmlContentTitle,
@@ -190,7 +191,8 @@ fun NetworkContent.asGreenDaoModel(): Content {
         this.attachmentId,
         this.examId,
         this.hasArtifacts,
-        this.artifactsUrl
+        this.artifactsUrl,
+        position
     )
 }
 

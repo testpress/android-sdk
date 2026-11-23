@@ -162,6 +162,6 @@ class ExamContentRepository(
             greenDaoContent.examId = exam.id
             examContentDao.insertOrReplace(exam)
         }
-        contentDao.insertOrReplace(greenDaoContent)
+        insertOrUpdateWithPositionPreserved(greenDaoContent)
     }
 }
