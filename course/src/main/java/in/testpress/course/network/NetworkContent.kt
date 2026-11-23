@@ -84,7 +84,7 @@ data class NetworkVideoSubtitle(
     val jobStatus: String? = null,
 )
 
-fun NetworkContent.asDatabaseModel(position: Int? = null): ContentEntity {
+fun NetworkContent.asDatabaseModel(): ContentEntity {
     val contentEntity = ContentEntity(
         id = this.id,
         description = this.description,
@@ -122,8 +122,7 @@ fun NetworkContent.asDatabaseModel(position: Int? = null): ContentEntity {
         videoSubtitleLanguage = this.videoSubtitle?.language,
         videoSubtitleJobStatus = this.videoSubtitle?.jobStatus,
         hasArtifacts = this.hasArtifacts,
-        artifactsUrl = this.artifactsUrl,
-        position = position
+        artifactsUrl = this.artifactsUrl
     )
     contentEntity.title = this.title
     contentEntity.order = this.order

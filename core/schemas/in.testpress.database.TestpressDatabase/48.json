@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 48,
-    "identityHash": "f2e5bcb2d9451a964908f31e30ec7d2a",
+    "identityHash": "d20d0fc100885897e511606667e7dc7a",
     "entities": [
       {
         "tableName": "ContentEntity",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `description` TEXT, `image` TEXT, `url` TEXT NOT NULL, `chapterSlug` TEXT NOT NULL, `chapterUrl` TEXT, `modified` TEXT, `examUrl` TEXT, `videoUrl` TEXT, `attachmentUrl` TEXT, `htmlUrl` TEXT, `isLocked` INTEGER NOT NULL, `isScheduled` INTEGER NOT NULL, `attemptsCount` INTEGER NOT NULL, `bookmarkId` INTEGER, `videoWatchedPercentage` INTEGER, `active` INTEGER NOT NULL, `htmlId` INTEGER, `hasStarted` INTEGER NOT NULL, `isCourseAvailable` INTEGER, `coverImageSmall` TEXT, `coverImageMedium` TEXT, `coverImage` TEXT, `nextContentId` INTEGER, `hasEnded` INTEGER, `examStartUrl` TEXT, `isAIEnabled` INTEGER, `learnlensAssetId` TEXT, `canEnableLearnLensAI` INTEGER, `aiNotesUrl` TEXT, `learnlensAssetStatus` TEXT, `enableTranscript` INTEGER, `videoSubtitleUrl` TEXT, `videoSubtitleLanguage` TEXT, `videoSubtitleJobStatus` TEXT, `hasArtifacts` INTEGER, `artifactsUrl` TEXT, `position` INTEGER, `order` INTEGER, `chapterId` INTEGER, `freePreview` INTEGER, `title` TEXT, `courseId` INTEGER, `examId` INTEGER, `contentId` INTEGER, `videoId` INTEGER, `attachmentId` INTEGER, `liveStreamId` INTEGER, `contentType` TEXT, `icon` TEXT, `start` TEXT, `end` TEXT, `treePath` TEXT, PRIMARY KEY(`id`))",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `description` TEXT, `image` TEXT, `url` TEXT NOT NULL, `chapterSlug` TEXT NOT NULL, `chapterUrl` TEXT, `modified` TEXT, `examUrl` TEXT, `videoUrl` TEXT, `attachmentUrl` TEXT, `htmlUrl` TEXT, `isLocked` INTEGER NOT NULL, `isScheduled` INTEGER NOT NULL, `attemptsCount` INTEGER NOT NULL, `bookmarkId` INTEGER, `videoWatchedPercentage` INTEGER, `active` INTEGER NOT NULL, `htmlId` INTEGER, `hasStarted` INTEGER NOT NULL, `isCourseAvailable` INTEGER, `coverImageSmall` TEXT, `coverImageMedium` TEXT, `coverImage` TEXT, `nextContentId` INTEGER, `hasEnded` INTEGER, `examStartUrl` TEXT, `isAIEnabled` INTEGER, `learnlensAssetId` TEXT, `canEnableLearnLensAI` INTEGER, `aiNotesUrl` TEXT, `learnlensAssetStatus` TEXT, `enableTranscript` INTEGER, `videoSubtitleUrl` TEXT, `videoSubtitleLanguage` TEXT, `videoSubtitleJobStatus` TEXT, `hasArtifacts` INTEGER, `artifactsUrl` TEXT, `order` INTEGER, `chapterId` INTEGER, `freePreview` INTEGER, `title` TEXT, `courseId` INTEGER, `examId` INTEGER, `contentId` INTEGER, `videoId` INTEGER, `attachmentId` INTEGER, `liveStreamId` INTEGER, `contentType` TEXT, `icon` TEXT, `start` TEXT, `end` TEXT, `treePath` TEXT, PRIMARY KEY(`id`))",
         "fields": [
           {
             "fieldPath": "id",
@@ -200,11 +200,6 @@
             "fieldPath": "artifactsUrl",
             "columnName": "artifactsUrl",
             "affinity": "TEXT"
-          },
-          {
-            "fieldPath": "position",
-            "columnName": "position",
-            "affinity": "INTEGER"
           },
           {
             "fieldPath": "order",
@@ -2026,7 +2021,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'f2e5bcb2d9451a964908f31e30ec7d2a')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'd20d0fc100885897e511606667e7dc7a')"
     ]
   }
 }

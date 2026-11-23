@@ -63,8 +63,7 @@ open class ContentRepository(
                     hasArtifacts = item.hasArtifacts ?: existingContent?.hasArtifacts,
                     artifactsUrl = item.artifactsUrl ?: existingContent?.artifactsUrl
                 )
-                val existingPosition = roomContentDao.getPosition(contentId)
-                roomContentDao.insert(mergedItem.asDatabaseModel(position = existingPosition))
+                roomContentDao.insert(mergedItem.asDatabaseModel())
                 storeContentAndItsRelationsToDB(mergedItem)
             }
 
