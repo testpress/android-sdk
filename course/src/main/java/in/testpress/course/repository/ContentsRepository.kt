@@ -71,8 +71,7 @@ class ContentsRepository(val context: Context, val chapterId: Long = -1) {
         _resourceContents.postValue(Resource.success(contents.asDomainContents()))
 
         if (response.next != null) {
-            page += 1
-            loadItems(page)
+            loadItems(requestedPage + 1)
         } else {
             page = 1
         }
