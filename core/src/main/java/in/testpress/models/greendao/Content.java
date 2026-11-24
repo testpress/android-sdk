@@ -89,6 +89,7 @@ public class Content implements android.os.Parcelable {
     private Boolean hasArtifacts;
     @SerializedName("artifacts_url")
     private String artifactsUrl;
+    private Integer position;
 
     /** Used to resolve relations */
     @Generated
@@ -158,7 +159,7 @@ public class Content implements android.os.Parcelable {
     }
 
     @Generated
-    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Boolean enableTranscript, String videoSubtitleUrl, String videoSubtitleLanguage, String videoSubtitleJobStatus, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId, Boolean hasArtifacts, String artifactsUrl) {
+    public Content(Integer order, String htmlContentTitle, String htmlContentUrl, String url, String attemptsUrl, String chapterSlug, String chapterUrl, Long id, String title, String contentType, String image, String description, Boolean isLocked, int attemptsCount, String start, String end, Boolean hasStarted, Boolean active, Long bookmarkId, int videoWatchedPercentage, String modified, Long modifiedDate, Boolean freePreview, Boolean isScheduled, String coverImage, String coverImageMedium, String coverImageSmall, Boolean isCourseAvailable, Long nextContentId, Boolean hasEnded, String examStartUrl, Boolean isAIEnabled, String learnlensAssetId, Boolean canEnableLearnLensAI, String aiNotesUrl, String learnlensAssetStatus, Boolean enableTranscript, String videoSubtitleUrl, String videoSubtitleLanguage, String videoSubtitleJobStatus, Long courseId, Long chapterId, Long videoConferenceId, Long liveStreamId, Long htmlId, Long videoId, Long attachmentId, Long examId, Boolean hasArtifacts, String artifactsUrl, Integer position) {
         this.order = order;
         this.htmlContentTitle = htmlContentTitle;
         this.htmlContentUrl = htmlContentUrl;
@@ -209,6 +210,7 @@ public class Content implements android.os.Parcelable {
         this.examId = examId;
         this.hasArtifacts = hasArtifacts;
         this.artifactsUrl = artifactsUrl;
+        this.position = position;
     }
 
     /** called by internal mechanisms, do not call yourself. */
@@ -618,6 +620,14 @@ public class Content implements android.os.Parcelable {
         this.artifactsUrl = artifactsUrl;
     }
 
+    public Integer getPosition() {
+        return position;
+    }
+
+    public void setPosition(Integer position) {
+        this.position = position;
+    }
+
     /** To-one relationship, resolved on first access. */
     @Generated
     public Chapter getChapter() {
@@ -884,6 +894,11 @@ public class Content implements android.os.Parcelable {
         attachment = in.readParcelable(Attachment.class.getClassLoader());
         exam = in.readParcelable(Exam.class.getClassLoader());
         contentType = in.readString();
+        if (in.readByte() == 0) {
+            position = null;
+        } else {
+            position = in.readInt();
+        }
     }
 
     @Override
@@ -943,6 +958,12 @@ public class Content implements android.os.Parcelable {
         dest.writeParcelable(getRawAttachment(), flags);
         dest.writeParcelable(getRawExam(), flags);
         dest.writeString(getContentType());
+        if (position == null) {
+            dest.writeByte((byte) 0);
+        } else {
+            dest.writeByte((byte) 1);
+            dest.writeInt(position);
+        }
     }
 
     @Override
