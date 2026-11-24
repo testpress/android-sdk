@@ -15,6 +15,6 @@ class AttachmentContentRepository(context: Context) : ContentRepository(context)
             greenDaoContent.attachmentId = attachment.id
             attachmentDao.insertOrReplace(it.asGreenDaoModel())
         }
-        contentDao.insertOrReplace(greenDaoContent)
+        insertOrUpdateWithPositionPreserved(greenDaoContent)
     }
 }
